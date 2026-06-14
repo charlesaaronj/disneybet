@@ -699,53 +699,55 @@ function lockWagers() {
 function computeRevealAndScoring() {
   const round = gameState.currentRound;
   const authorId = round.selectedAnswer.playerId;
-  const tableStakes = gameState.settings.tableStakes;
+
   const allWagers = round.wagers;
 
-  let participants;
-  if (tableStakes) {
-    const max = Math.max(...allWagers.map(w => w.amount));
-    participants = allWagers.filter(
-      w => w.amount === max && w.amount > 0
-    );
-  } else {
-    participants = allWagers.filter(w => w.amount > 0);
-  }
-
-  const pot =
-    participants.reduce((s, w) => s + w.amount, 0) +
-    round.houseBonusAmount;
-  const correct = participants.filter(
-    w => w.guessedAuthorId === authorId
-  );
-  round.correctGuessers = correct.map(w => w.playerId);
-
+  // Track per-player deltas
   const payouts = [];
-  if (correct.length === 0) {
-    gameState.players.forEach(p => {
-      const we = participants.find(w => w.playerId === p.id);
-      let delta = 0;
-      if (we) delta -= we.amount;
-      if (p.id === authorId) delta += pot;
-      payouts.push({ playerId: p.id, delta });
-    });
-  } else {
-    const share = Math.floor(pot / correct.length);
-    const remainder = pot - share * correct.length;
-    const firstId = correct[0].playerId;
-    gameState.players.forEach(p => {
-      const we = participants.find(w => w.playerId === p.id);
-      let delta = 0;
-      if (we) delta -= we.amount;
-      if (correct.some(w => w.playerId === p.id)) {
-        delta += share + (p.id === firstId ? remainder : 0);
+  let wrongGuessCount = 0;
+
+  // 1) Apply wager risk to each player
+  gameState.players.forEach(p => {
+    const we = allWagers.find(w => w.playerId === p.id);
+    let delta = 0;
+
+    if (we) {
+      const amount = Math.max(0, parseInt(we.amount, 10) || 0);
+      const guessedAuthorId = parseInt(we.guessedAuthorId, 10);
+
+      if (amount > 0) {
+        if (guessedAuthorId === authorId) {
+          // Correct guess: win what you wagered
+          delta += amount;
+        } else {
+          // Wrong guess: lose what you wagered
+          delta -= amount;
+          wrongGuessCount += 1;
+        }
       }
-      payouts.push({ playerId: p.id, delta });
-    });
+    }
+
+    payouts.push({ playerId: p.id, delta });
+  });
+
+  // 2) Author bonus: +1 per wrong wagering player
+  if (wrongGuessCount > 0) {
+    const authorPayout = payouts.find(pt => pt.playerId === authorId);
+    if (authorPayout) authorPayout.delta += wrongGuessCount;
   }
 
-  round.pot = pot;
+  // 3) Save round results & apply to gameState
   round.payouts = payouts;
+  round.correctGuessers = allWagers
+    .filter(w => {
+      const amount = Math.max(0, parseInt(w.amount, 10) || 0);
+      return amount > 0 && parseInt(w.guessedAuthorId, 10) === authorId;
+    })
+    .map(w => w.playerId);
+
+  // We no longer use a pot, but keep a field for UI consistency
+  round.pot = 0;
+
   applyRoundResults(authorId);
 }
 
