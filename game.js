@@ -1236,6 +1236,14 @@ function wireEvents() {
     if (c.querySelectorAll("input").length >= 8) return;
     addPlayerInput(c);
   });
+  
+    // Park select → update theme + label immediately
+  $("wsd-park-select").addEventListener("change", () => {
+    const name = $("wsd-park-select").value;
+    $("wsd-park-label").textContent = name || "Not set";
+    applyParkTheme(name);
+  });
+
 
   // Setup question
   $("wsd-attraction-select").addEventListener(
