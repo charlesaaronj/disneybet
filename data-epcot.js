@@ -1,4 +1,4 @@
-l// EPCOT sample data for "Who Said Diz"
+//EPCOT sample data for "Who Said Diz"
 
 const PARK_EPCOT = {
   name: "EPCOT",
