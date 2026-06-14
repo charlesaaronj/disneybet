@@ -500,13 +500,19 @@ function goToGuessWager() {
     });
 
     const wagerInp = document.createElement("input");
-    wagerInp.type = "number";
-    wagerInp.min = 0;
-    wagerInp.max = p.score;
-    wagerInp.value = Math.min(1, p.score); // default 1
-    wagerInp.className = "form-control wsd-form-control";
-    wagerInp.style.maxWidth = "90px";
-    wagerInp.dataset.playerId = p.id;
+wagerInp.type = "number";
+wagerInp.min = 0;
+wagerInp.max = p.score;
+wagerInp.value = Math.min(1, p.score); // default 1
+
+// iPhone numeric keypad hints
+wagerInp.inputMode = "numeric";     // iOS 12+ numeric keypad [web:142][web:145]
+wagerInp.pattern = "[0-9]*";        // iOS keypad hint + restricts to digits [web:141][web:147]
+
+wagerInp.className = "form-control wsd-form-control";
+wagerInp.style.maxWidth = "90px";
+wagerInp.dataset.playerId = p.id;
+
 
     inner.appendChild(guessSel);
     inner.appendChild(wagerInp);
