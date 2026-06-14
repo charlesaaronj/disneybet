@@ -110,6 +110,44 @@ const SCREEN_META = {
   }
 };
 
+// ---- Park themes -----------------------------------------
+const PARK_THEMES = {
+  "Magic Kingdom": {
+    hero: "linear-gradient(180deg,#4b0082,#ff69b4)",    // purple → pink
+    nav:  "rgba(75,0,130,0.95)"
+  },
+  "EPCOT": {
+    hero: "linear-gradient(180deg,#003366,#66ccff)",    // deep blue → teal
+    nav:  "rgba(0,51,102,0.95)"
+  },
+  "Hollywood Studios": {
+    hero: "linear-gradient(180deg,#3b3b3b,#ffcc00)",   // dark → gold
+    nav:  "rgba(59,59,59,0.95)"
+  },
+  "Animal Kingdom": {
+    hero: "linear-gradient(180deg,#014422,#8bc34a)",   // jungle
+    nav:  "rgba(1,68,34,0.95)"
+  }
+};
+
+function applyParkTheme(parkName) {
+  const theme = PARK_THEMES[parkName];
+  const hero  = document.querySelector(".wsd-hero");
+  const nav   = document.querySelector(".wsd-bottom-nav");
+
+  if (!hero || !nav) return;
+
+  if (theme) {
+    hero.style.backgroundImage = theme.hero;
+    nav.style.backgroundColor  = theme.nav;
+  } else {
+    // Fallback to default colors
+    hero.style.backgroundImage = "";
+    nav.style.backgroundColor  = "rgba(255,255,255,0.9)";
+  }
+}
+
+
 const ALL_SCREENS = Object.keys(SCREEN_META);
 
 function showScreen(name) {
@@ -250,6 +288,7 @@ function startGameFromSetup() {
   };
 
   $("wsd-park-label").textContent = parkName;
+  applyParkTheme(parkName);   // <-- add this
   if ($("wsd-player-summary")) {
     $("wsd-player-summary").textContent = players.length + " players";
   }
@@ -1345,10 +1384,13 @@ document.addEventListener("DOMContentLoaded", () => {
   debugLog("loadState ran; gameState present? " + !!gameState);
 
   if (gameState) {
-    $("wsd-park-label").textContent =
-      gameState.settings?.park || "Not set";
-    renderAttractionOptions();
-    const scr = gameState.screen || "setup-game";
+  const parkName = gameState.settings?.park || "Not set";
+  $("wsd-park-label").textContent = parkName;
+  applyParkTheme(parkName);          // <-- add this
+  renderAttractionOptions();
+  const scr = gameState.screen || "setup-game";
+  // ...
+
     if (scr === "scores") renderScoresScreen();
     if (scr === "game-end") renderFinalResults();
     if (scr === "history") renderHistoryScreen();
