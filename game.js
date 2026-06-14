@@ -19,11 +19,19 @@ function debugLog(msg) {
 
 // ---- Park registry ----------------------------------------
 const PARKS = {};
+
 if (typeof PARK_MAGIC_KINGDOM !== "undefined") {
   PARKS[PARK_MAGIC_KINGDOM.name] = PARK_MAGIC_KINGDOM;
 }
-// Later: if (typeof PARK_EPCOT !== "undefined")
-// PARKS[PARK_EPCOT.name] = PARK_EPCOT;
+
+if (typeof PARK_EPCOT !== "undefined") {
+  PARKS[PARK_EPCOT.name] = PARK_EPCOT;
+}
+
+// Add more parks the same way:
+// if (typeof PARK_HOLLYWOOD_STUDIOS !== "undefined") {
+//   PARKS[PARK_HOLLYWOOD_STUDIOS.name] = PARK_HOLLYWOOD_STUDIOS;
+// }
 
 // ---- State ------------------------------------------------
 let gameState = null;
