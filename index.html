@@ -392,6 +392,34 @@
       </div>
     </section>
 
+<!-- ===== Answer pick loading overlay ===== -->
+<div id="wsd-pick-overlay"
+     style="display:none; position:fixed; inset:0; z-index:50;
+            background:rgba(0,110,153,0.93);
+            display:none; flex-direction:column;
+            align-items:center; justify-content:center; gap:1rem;">
+
+  <!-- Spinning emoji -->
+  <div id="wsd-pick-spinner"
+       style="font-size:4rem; animation:wsdSpin 0.7s linear infinite;">
+    🎲
+  </div>
+
+  <!-- Animated text -->
+  <div id="wsd-pick-label"
+       style="color:#fff; font-size:1.1rem; font-weight:700;
+              letter-spacing:0.04em; animation:wsdPulse 0.8s ease infinite;">
+    Picking an answer...
+  </div>
+
+  <!-- Dot loader -->
+  <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
+    <div class="wsd-dot-bounce" style="animation-delay:0s;"></div>
+    <div class="wsd-dot-bounce" style="animation-delay:0.15s;"></div>
+    <div class="wsd-dot-bounce" style="animation-delay:0.3s;"></div>
+  </div>
+</div>
+
   </main>
 
   <!-- Bottom nav -->
