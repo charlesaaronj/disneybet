@@ -122,7 +122,7 @@ const PARK_THEMES = {
   "Magic Kingdom": {
     hero:   "linear-gradient(180deg,#4b0082,#ff69b4)",
     nav:    "rgba(75,0,130,0.95)",
-    avatar: "linear-gradient(135deg,#ff69b4,#800080)"  // pink → gold
+    avatar: "linear-gradient(135deg,#ff69b4,#800080)"  // pink → purple
   },
   "EPCOT": {
     hero:   "linear-gradient(180deg,#003366,#66ccff)",
@@ -140,7 +140,6 @@ const PARK_THEMES = {
     avatar: "linear-gradient(135deg,#8bc34a,#ffe082)"  // green → light gold
   }
 };
-
 
 function applyParkTheme(parkName) {
   const theme = PARK_THEMES[parkName];
@@ -249,9 +248,6 @@ function startGameFromSetup() {
     return;
   }
 
-  const tableStakes =
-    document.querySelector('input[name="wsd-table-stakes"]:checked').value ===
-    "yes";
   let bonusPointValue = parseInt($("wsd-bonus-value").value, 10);
   if (isNaN(bonusPointValue) || bonusPointValue < 0) bonusPointValue = 1;
 
@@ -287,7 +283,6 @@ function startGameFromSetup() {
     roundNumber: 0,
     settings: {
       park: parkName,
-      tableStakes,
       bonusPointValue,
       startingPoints: START_POINTS,
       minPoints: MIN_POINTS
@@ -302,7 +297,7 @@ function startGameFromSetup() {
   };
 
   $("wsd-park-label").textContent = parkName;
-  applyParkTheme(parkName);   // <-- add this
+  applyParkTheme(parkName);
   if ($("wsd-player-summary")) {
     $("wsd-player-summary").textContent = players.length + " players";
   }
@@ -342,7 +337,9 @@ function startNewRoundCore() {
     payouts: [],
     scoreBefore: {},
     scoreAfter: {},
-    collectionsThisRound: []
+    collectionsThisRound: [],
+    wrongGuessCount: 0,
+    authorBonus: 0
   };
   saveState();
   if ($("wsd-house-bonus")) $("wsd-house-bonus").value = "0";
@@ -637,7 +634,6 @@ function clearWagersUI() {
 function lockWagers() {
   const err = $("wsd-gw-error");
   err.textContent = "";
-  const tableStakes = gameState.settings.tableStakes;
 
   let houseBonus = parseInt($("wsd-house-bonus").value, 10);
   if (isNaN(houseBonus) || houseBonus < 0) houseBonus = 0;
@@ -661,30 +657,12 @@ function lockWagers() {
       });
     });
 
-  let participants;
-  if (tableStakes) {
-    const max = Math.max(...wagers.map(w => w.amount));
-    if (max <= 0) {
-      err.textContent =
-        "At least two players must wager more than 0.";
-      return;
-    }
-    participants = wagers.filter(w => w.amount === max);
-    if (participants.length < 2) {
-      err.textContent =
-        "At least two players must match the top bet to play this round.";
-      return;
-    }
-    wagers.forEach(w => {
-      if (w.amount !== max) w.amount = 0;
-    });
-  } else {
-    participants = wagers.filter(w => w.amount > 0);
-    if (participants.length < 2) {
-      err.textContent =
-        "At least two players must wager more than 0.";
-      return;
-    }
+  // At least two players must wager > 0 to play the round
+  const participants = wagers.filter(w => w.amount > 0);
+  if (participants.length < 2) {
+    err.textContent =
+      "At least two players must wager more than 0.";
+    return;
   }
 
   gameState.currentRound.houseBonusAmount = houseBonus;
@@ -852,39 +830,38 @@ function runRevealAnimation() {
     void authWrap.offsetWidth;
     authWrap.classList.add("wsd-anim-pop");
 
-   // Show confetti if someone got it right
-if (round.correctGuessers.length > 0) {
-  spawnConfetti($("wsd-confetti-wrap"));
-}
-
-// Show author bonus info whenever there were wrong wagers
-if (round.wrongGuessCount && round.wrongGuessCount > 0) {
-  const line = $("wsd-no-correct-author-line");
-  if (line) {
-    const name = author ? author.name : "the author";
-    const bonus = round.authorBonus || 0;
-    const wrong = round.wrongGuessCount;
-    line.textContent =
-      name +
-      " earned +" +
-      bonus +
-      " point" +
-      (bonus === 1 ? "" : "s") +
-      " from " +
-      wrong +
-      " wrong guess" +
-      (wrong === 1 ? "" : "es") +
-      " this round.";
-  }
-  try {
-    const modalEl = $("modal-no-correct");
-    if (modalEl && typeof bootstrap !== "undefined") {
-      const m = new bootstrap.Modal(modalEl);
-      setTimeout(() => m.show(), 400);
+    // Confetti if someone got it right
+    if (round.correctGuessers.length > 0) {
+      spawnConfetti($("wsd-confetti-wrap"));
     }
-  } catch (e) {}
-}
 
+    // Show author bonus info whenever there were wrong wagers
+    if (round.wrongGuessCount && round.wrongGuessCount > 0) {
+      const line = $("wsd-no-correct-author-line");
+      if (line) {
+        const name = author ? author.name : "the author";
+        const bonus = round.authorBonus || 0;
+        const wrong = round.wrongGuessCount;
+        line.textContent =
+          name +
+          " earned +" +
+          bonus +
+          " point" +
+          (bonus === 1 ? "" : "s") +
+          " from " +
+          wrong +
+          " wrong guess" +
+          (wrong === 1 ? "" : "es") +
+          " this round.";
+      }
+      try {
+        const modalEl = $("modal-no-correct");
+        if (modalEl && typeof bootstrap !== "undefined") {
+          const m = new bootstrap.Modal(modalEl);
+          setTimeout(() => m.show(), 400);
+        }
+      } catch (e) {}
+    }
 
     round.payouts.forEach((payout, i) => {
       setTimeout(() => {
@@ -1267,14 +1244,13 @@ function wireEvents() {
     if (c.querySelectorAll("input").length >= 8) return;
     addPlayerInput(c);
   });
-  
-    // Park select → update theme + label immediately
+
+  // Park select → update theme + label immediately
   $("wsd-park-select").addEventListener("change", () => {
     const name = $("wsd-park-select").value;
     $("wsd-park-label").textContent = name || "Not set";
     applyParkTheme(name);
   });
-
 
   // Setup question
   $("wsd-attraction-select").addEventListener(
@@ -1308,14 +1284,14 @@ function wireEvents() {
   );
 
   // Select answer
-$("wsd-select-again").addEventListener("click", () => {
-  // Replay the loading flourish, then pick a new answer
-  showPickOverlay(() => {
-    pickRandomAnswer();
-    renderSelectAnswerScreen();
-    saveState();
+  $("wsd-select-again").addEventListener("click", () => {
+    // Replay the loading flourish, then pick a new answer
+    showPickOverlay(() => {
+      pickRandomAnswer();
+      renderSelectAnswerScreen();
+      saveState();
+    });
   });
-});
 
   $("wsd-to-wagers").addEventListener("click", goToGuessWager);
   $("wsd-abandon-from-select").addEventListener(
@@ -1390,11 +1366,11 @@ $("wsd-select-again").addEventListener("click", () => {
       "guess-wager",
       "reveal"
     ];
-    showScreen(
-      roundScreens.includes(gameState.screen)
-        ? gameState.screen
-        : "setup-question"
-    );
+    if (roundScreens.includes(gameState.screen)) {
+      showScreen(gameState.screen);
+    } else {
+      showScreen("setup-question");
+    }
   });
   $("wsd-nav-scores").addEventListener("click", () => {
     if (!gameState) {
@@ -1414,36 +1390,23 @@ $("wsd-select-again").addEventListener("click", () => {
   });
 }
 
-// ---- Bootstrap --------------------------------------------
+// ---- DOM ready --------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-  debugLog("DOMContentLoaded fired");
+  loadState();
+
   initSetupScreen();
   wireEvents();
-  loadState();
-  debugLog("loadState ran; gameState present? " + !!gameState);
 
   if (gameState) {
-  const parkName = gameState.settings?.park || "Not set";
-  $("wsd-park-label").textContent = parkName;
-  applyParkTheme(parkName);          // <-- add this
-  renderAttractionOptions();
-  const scr = gameState.screen || "setup-game";
-  // ...
-
+    const parkName = gameState.settings?.park || "Not set";
+    $("wsd-park-label").textContent = parkName;
+    applyParkTheme(parkName);
+    renderAttractionOptions();
+    const scr = gameState.screen || "setup-game";
     if (scr === "scores") renderScoresScreen();
-    if (scr === "game-end") renderFinalResults();
     if (scr === "history") renderHistoryScreen();
-    if (scr === "reveal") runRevealAnimation();
     showScreen(scr);
-    debugLog("Resumed existing game on screen: " + scr);
   } else {
     showScreen("setup-game");
-    debugLog("No saved game; showing setup-game");
-    try {
-      const modal = new bootstrap.Modal($("modal-welcome"));
-      modal.show();
-    } catch (e) {
-      debugLog("Bootstrap modal error: " + e.message);
-    }
   }
 });
