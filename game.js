@@ -22,7 +22,8 @@ const PARKS = {};
 if (typeof PARK_MAGIC_KINGDOM !== "undefined") {
   PARKS[PARK_MAGIC_KINGDOM.name] = PARK_MAGIC_KINGDOM;
 }
-// Later: if (typeof PARK_EPCOT !== "undefined") PARKS[PARK_EPCOT.name] = PARK_EPCOT;
+// Later: if (typeof PARK_EPCOT !== "undefined")
+// PARKS[PARK_EPCOT.name] = PARK_EPCOT;
 
 // ---- State ------------------------------------------------
 let gameState = null;
@@ -148,15 +149,23 @@ function showScreen(name) {
 
 // ---- Setup screen init ------------------------------------
 function initSetupScreen() {
+  debugLog("initSetupScreen starting");
   const sel = $("wsd-park-select");
+  const container = $("wsd-player-inputs");
+  debugLog("wsd-park-select exists? " + !!sel);
+  debugLog("wsd-player-inputs exists? " + !!container);
+  if (!sel || !container) return;
+
   Object.keys(PARKS).forEach(name => {
     const opt = document.createElement("option");
     opt.value = name;
     opt.textContent = name;
     sel.appendChild(opt);
   });
-  const container = $("wsd-player-inputs");
+  debugLog("Added park options: " + JSON.stringify(Object.keys(PARKS)));
+
   for (let i = 0; i < 3; i++) addPlayerInput(container);
+  debugLog("Seeded 3 player inputs");
 }
 
 function addPlayerInput(container) {
@@ -434,10 +443,13 @@ function saveAnswerForCurrentPlayer(skip) {
         "No answers were entered. Abandon or go back.";
       return;
     }
-    pickRandomAnswer();
-    renderSelectAnswerScreen();
     saveState();
-    showScreen("select-answer");
+    // Loading flourish before selecting answer
+    showPickOverlay(() => {
+      pickRandomAnswer();
+      renderSelectAnswerScreen();
+      showScreen("select-answer");
+    });
   } else {
     renderAnswerProgress();
     saveState();
@@ -458,6 +470,42 @@ function renderSelectAnswerScreen() {
   el.textContent =
     "“" + gameState.currentRound.selectedAnswer.text + "”";
   el.classList.add("wsd-anim-pop");
+}
+
+// ---- Answer pick overlay flourish -------------------------
+function showPickOverlay(onDone) {
+  const overlay = $("wsd-pick-overlay");
+  if (!overlay) {
+    onDone();
+    return;
+  }
+
+  const labels = [
+    "Picking an answer...",
+    "Shuffling the pile...",
+    "Choosing wisely...",
+    "Let fate decide...",
+    "Drawing a card..."
+  ];
+  const labelEl = $("wsd-pick-label");
+  if (labelEl) {
+    labelEl.textContent =
+      labels[Math.floor(Math.random() * labels.length)];
+  }
+
+  overlay.style.display = "flex";
+  overlay.style.opacity = "1";
+
+  setTimeout(() => {
+    overlay.style.transition = "opacity 0.35s ease";
+    overlay.style.opacity = "0";
+    setTimeout(() => {
+      overlay.style.display = "none";
+      overlay.style.opacity = "1";
+      overlay.style.transition = "";
+      onDone();
+    }, 350);
+  }, 1400);
 }
 
 // ---- Guess & wager ----------------------------------------
@@ -500,19 +548,17 @@ function goToGuessWager() {
     });
 
     const wagerInp = document.createElement("input");
-wagerInp.type = "number";
-wagerInp.min = 0;
-wagerInp.max = p.score;
-wagerInp.value = Math.min(1, p.score); // default 1
+    wagerInp.type = "number";
+    wagerInp.min = 0;
+    wagerInp.max = p.score;
+    wagerInp.value = Math.min(1, p.score); // default 1
+    // iPhone numeric keypad hints
+    wagerInp.inputMode = "numeric";
+    wagerInp.pattern = "[0-9]*";
 
-// iPhone numeric keypad hints
-wagerInp.inputMode = "numeric";     // iOS 12+ numeric keypad [web:142][web:145]
-wagerInp.pattern = "[0-9]*";        // iOS keypad hint + restricts to digits [web:141][web:147]
-
-wagerInp.className = "form-control wsd-form-control";
-wagerInp.style.maxWidth = "90px";
-wagerInp.dataset.playerId = p.id;
-
+    wagerInp.className = "form-control wsd-form-control";
+    wagerInp.style.maxWidth = "90px";
+    wagerInp.dataset.playerId = p.id;
 
     inner.appendChild(guessSel);
     inner.appendChild(wagerInp);
@@ -745,35 +791,31 @@ function runRevealAnimation() {
   setTimeout(() => {
     countEl.textContent = "";
     authEl.textContent = author ? author.name : "Unknown";
-authWrap.style.display = "block";
-authWrap.classList.remove("wsd-anim-pop");
-void authWrap.offsetWidth;
-authWrap.classList.add("wsd-anim-pop");
+    authWrap.style.display = "block";
+    authWrap.classList.remove("wsd-anim-pop");
+    void authWrap.offsetWidth;
+    authWrap.classList.add("wsd-anim-pop");
 
-// Confetti only if someone got it right
-if (round.correctGuessers.length > 0) {
-  spawnConfetti($("wsd-confetti-wrap"));
-} else {
-  // No correct guessers: show modal explaining author gets the pot
-  const line = $("wsd-no-correct-author-line");
-  if (line) {
-    const name = author ? author.name : "the author";
-    const pot  = round.pot;
-    line.textContent =
-      name + " collects the full pot of " + pot + " points this round.";
-  }
-  try {
-    const modalEl = $("modal-no-correct");
-    if (modalEl && typeof bootstrap !== "undefined") {
-      const m = new bootstrap.Modal(modalEl);
-      // small delay so it appears after the pop animation
-      setTimeout(() => m.show(), 400);
+    // Confetti only if someone got it right
+    if (round.correctGuessers.length > 0) {
+      spawnConfetti($("wsd-confetti-wrap"));
+    } else {
+      // No correct guessers: show modal explaining author gets the pot
+      const line = $("wsd-no-correct-author-line");
+      if (line) {
+        const name = author ? author.name : "the author";
+        const pot  = round.pot;
+        line.textContent =
+          name + " collects the full pot of " + pot + " points this round.";
+      }
+      try {
+        const modalEl = $("modal-no-correct");
+        if (modalEl && typeof bootstrap !== "undefined") {
+          const m = new bootstrap.Modal(modalEl);
+          setTimeout(() => m.show(), 400);
+        }
+      } catch (e) {}
     }
-  } catch (e) {
-    // ignore if Bootstrap not available
-  }
-}
-
 
     round.payouts.forEach((payout, i) => {
       setTimeout(() => {
@@ -1137,6 +1179,7 @@ function abandonRound() {
 
 // ---- Event wiring -----------------------------------------
 function wireEvents() {
+  debugLog("wireEvents starting");
   // Setup
   $("wsd-start-game").addEventListener("click", startGameFromSetup);
   $("wsd-reset-setup").addEventListener("click", () => {
@@ -1291,9 +1334,11 @@ function wireEvents() {
 
 // ---- Bootstrap --------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
+  debugLog("DOMContentLoaded fired");
   initSetupScreen();
   wireEvents();
   loadState();
+  debugLog("loadState ran; gameState present? " + !!gameState);
 
   if (gameState) {
     $("wsd-park-label").textContent =
@@ -1305,9 +1350,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (scr === "history") renderHistoryScreen();
     if (scr === "reveal") runRevealAnimation();
     showScreen(scr);
+    debugLog("Resumed existing game on screen: " + scr);
   } else {
     showScreen("setup-game");
-    const modal = new bootstrap.Modal($("modal-welcome"));
-    modal.show();
+    debugLog("No saved game; showing setup-game");
+    try {
+      const modal = new bootstrap.Modal($("modal-welcome"));
+      modal.show();
+    } catch (e) {
+      debugLog("Bootstrap modal error: " + e.message);
+    }
   }
 });
