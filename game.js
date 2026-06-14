@@ -745,14 +745,35 @@ function runRevealAnimation() {
   setTimeout(() => {
     countEl.textContent = "";
     authEl.textContent = author ? author.name : "Unknown";
-    authWrap.style.display = "block";
-    authWrap.classList.remove("wsd-anim-pop");
-    void authWrap.offsetWidth;
-    authWrap.classList.add("wsd-anim-pop");
+authWrap.style.display = "block";
+authWrap.classList.remove("wsd-anim-pop");
+void authWrap.offsetWidth;
+authWrap.classList.add("wsd-anim-pop");
 
-    if (round.correctGuessers.length > 0) {
-      spawnConfetti($("wsd-confetti-wrap"));
+// Confetti only if someone got it right
+if (round.correctGuessers.length > 0) {
+  spawnConfetti($("wsd-confetti-wrap"));
+} else {
+  // No correct guessers: show modal explaining author gets the pot
+  const line = $("wsd-no-correct-author-line");
+  if (line) {
+    const name = author ? author.name : "the author";
+    const pot  = round.pot;
+    line.textContent =
+      name + " collects the full pot of " + pot + " points this round.";
+  }
+  try {
+    const modalEl = $("modal-no-correct");
+    if (modalEl && typeof bootstrap !== "undefined") {
+      const m = new bootstrap.Modal(modalEl);
+      // small delay so it appears after the pop animation
+      setTimeout(() => m.show(), 400);
     }
+  } catch (e) {
+    // ignore if Bootstrap not available
+  }
+}
+
 
     round.payouts.forEach((payout, i) => {
       setTimeout(() => {
