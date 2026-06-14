@@ -470,6 +470,40 @@
   </div>
 </div>
 
+<!-- ===== MODAL: No correct guess ===== -->
+<div class="modal fade" id="modal-no-correct" tabindex="-1"
+     aria-labelledby="modal-no-correct-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px; overflow:hidden;">
+      <div class="modal-header"
+           style="background:linear-gradient(135deg,#ff3b30,#ff9500);
+                  color:#fff;border:none;">
+        <h5 class="modal-title fw-bold" id="modal-no-correct-label">
+          Nobody guessed it!
+        </h5>
+        <button type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="font-size:0.9rem;">
+        <p>
+          No one guessed the correct author this round, so the author
+          collects the entire pot of points.
+        </p>
+        <p id="wsd-no-correct-author-line" class="wsd-text-small"></p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="wsd-btn-primary"
+                style="max-width:200px;"
+                data-bs-dismiss="modal">
+          Got it
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- ===== MODAL: Bonus topics explainer ===== -->
 <div class="modal fade" id="modal-bonuses" tabindex="-1"
      aria-labelledby="modal-bonuses-label" aria-hidden="true">
