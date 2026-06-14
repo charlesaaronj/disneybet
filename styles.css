@@ -447,3 +447,23 @@ body {
   border-top: 1px solid #ebebf0;
   margin: 0.75rem 0;
 }
+
+/* ---------- Answer pick overlay ---------- */
+@keyframes wsdSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes wsdDotBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%           { transform: scale(1.2); opacity: 1; }
+}
+
+.wsd-dot-bounce {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  animation: wsdDotBounce 1s ease infinite;
+}
+
