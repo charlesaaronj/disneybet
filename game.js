@@ -1230,11 +1230,15 @@ function wireEvents() {
   );
 
   // Select answer
-  $("wsd-select-again").addEventListener("click", () => {
+$("wsd-select-again").addEventListener("click", () => {
+  // Replay the loading flourish, then pick a new answer
+  showPickOverlay(() => {
     pickRandomAnswer();
     renderSelectAnswerScreen();
     saveState();
   });
+});
+
   $("wsd-to-wagers").addEventListener("click", goToGuessWager);
   $("wsd-abandon-from-select").addEventListener(
     "click",
