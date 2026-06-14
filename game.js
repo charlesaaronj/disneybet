@@ -922,12 +922,6 @@ function renderManualAdjustmentsUI() {
         <button type="button"
           class="btn btn-sm btn-outline-secondary me-1"
           data-adj="1" data-player="${p.id}">+1</button>
-        <button type="button"
-          class="btn btn-sm btn-outline-secondary me-1"
-          data-adj="3" data-player="${p.id}">+3</button>
-        <button type="button"
-          class="btn btn-sm btn-outline-secondary"
-          data-adj="-3" data-player="${p.id}">−3</button>
       </div>`;
     container.appendChild(row);
   });
