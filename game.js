@@ -114,7 +114,7 @@ const PARK_THEMES = {
   "Magic Kingdom": {
     hero:   "linear-gradient(180deg,#4b0082,#ff69b4)",
     nav:    "rgba(75,0,130,0.95)",
-    avatar: "linear-gradient(135deg,#ff69b4,#ffd700)"  // pink → gold
+    avatar: "linear-gradient(135deg,#ff69b4,#800080)"  // pink → gold
   },
   "EPCOT": {
     hero:   "linear-gradient(180deg,#003366,#66ccff)",
