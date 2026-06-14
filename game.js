@@ -520,11 +520,7 @@ function showPickOverlay(onDone) {
   }
 
   const labels = [
-    "Picking an answer...",
-    "Shuffling the pile...",
-    "Choosing wisely...",
-    "Let fate decide...",
-    "Drawing a card..."
+    "Selecting an answer..."
   ];
   const labelEl = $("wsd-pick-label");
   if (labelEl) {
