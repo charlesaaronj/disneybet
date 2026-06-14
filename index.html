@@ -1,408 +1,553 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Who Said Diz</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+  <meta charset="utf-8"/>
+  <title>Who Said Diz</title>
+  <!-- Prevent zoom -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
 
-    <!-- Bootstrap 5 CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div class="wsd-app-shell">
+  <main class="wsd-main">
 
-    <!-- Custom styles -->
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="wsd-app-shell">
-      <main class="wsd-main">
+    <!-- Hero header -->
+    <header class="wsd-hero">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+          <div class="wsd-hero-title">Who Said Diz</div>
+          <div class="wsd-hero-subtitle">The Disney waiting-in-line game</div>
+        </div>
+        <div class="text-end">
+          <div style="font-size:0.7rem;opacity:0.9;">Park</div>
+          <div id="wsd-park-label" style="font-size:0.8rem;font-weight:600;">Not set</div>
+        </div>
+      </div>
+    </header>
 
-        <!-- Hero header (shared) -->
-        <header class="wsd-hero">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div>
-              <div class="wsd-hero-title">Who Said Diz</div>
-              <div class="wsd-hero-subtitle">Guess who said it on your next ride</div>
-            </div>
-            <div class="text-end">
-              <div style="font-size:0.7rem; opacity:0.9;">Today in the park</div>
-              <div id="wsd-park-label" style="font-size:0.8rem; font-weight:600;">
-                No park selected
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <!-- Floating welcome card -->
-        <div class="wsd-hero-card-wrapper">
-          <div class="wsd-hero-card">
-            <div class="wsd-avatar">
-              <span>🎈</span>
-            </div>
-            <div>
-              <div class="wsd-hero-text-main">
-                Hello, <span id="wsd-player-summary">friends</span>!
-              </div>
-              <div class="wsd-hero-text-sub">
-                Discover who really said that answer in line.
-              </div>
-            </div>
+    <!-- Floating instruction card (updates per screen) -->
+    <div class="wsd-hero-card-wrapper">
+      <div class="wsd-hero-card">
+        <div class="wsd-avatar" id="wsd-step-icon">🎮</div>
+        <div>
+          <div class="wsd-hero-text-main" id="wsd-step-title">Setup game</div>
+          <div class="wsd-hero-text-instruction" id="wsd-step-instruction">
+            Pick your park, add players, and choose your settings.
           </div>
         </div>
-
-        <!-- Screens -->
-
-        <!-- SETUP_GAME -->
-        <section id="screen-setup-game" class="wsd-screen wsd-screen-active">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Setup game</div>
-            <div class="wsd-section-subtitle">
-              Pick your park, add players, and choose table stakes.
-            </div>
-
-            <!-- Park select -->
-            <div class="mb-3">
-              <label class="wsd-form-label" for="wsd-park-select">Park</label>
-              <select class="form-select wsd-form-select" id="wsd-park-select">
-                <option value="">Select a park</option>
-                <!-- options filled by JS -->
-              </select>
-            </div>
-
-            <!-- Players -->
-            <div class="mb-3">
-              <label class="wsd-form-label">Players</label>
-              <div id="wsd-player-inputs">
-                <!-- player name inputs added by JS -->
-              </div>
-              <button id="wsd-add-player" type="button" class="wsd-btn-tertiary wsd-mt-2">
-                + Add player
-              </button>
-            </div>
-
-            <!-- Table stakes -->
-            <div class="mb-3">
-              <label class="wsd-form-label d-block">Use table stakes?</label>
-              <div class="d-flex gap-2">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="wsd-table-stakes" id="wsd-ts-no" value="no" checked />
-                  <label class="form-check-label" for="wsd-ts-no">No</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="wsd-table-stakes" id="wsd-ts-yes" value="yes" />
-                  <label class="form-check-label" for="wsd-ts-yes">Yes</label>
-                </div>
-              </div>
-              <div class="wsd-text-small wsd-mt-1">
-                With table stakes, you must match the top bet to stay in the round.
-              </div>
-            </div>
-
-            <!-- Bonus value -->
-            <div class="mb-3">
-              <label class="wsd-form-label" for="wsd-bonus-value">
-                Bonus points per bonus
-              </label>
-              <input
-                type="number"
-                min="0"
-                class="form-control wsd-form-control"
-                id="wsd-bonus-value"
-                value="1"
-              />
-              <div class="wsd-text-small wsd-mt-1">
-                This value applies to each attraction bonus at the end of the game.
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="wsd-actions-stack">
-              <button id="wsd-start-game" class="wsd-btn-primary" type="button">
-                Start game
-              </button>
-              <button id="wsd-reset-setup" class="wsd-btn-secondary" type="button">
-                Reset
-              </button>
-            </div>
-
-            <div id="wsd-setup-error" class="wsd-text-small text-danger wsd-mt-3"></div>
-          </div>
-        </section>
-
-        <!-- SETUP_QUESTION -->
-        <section id="screen-setup-question" class="wsd-screen">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Choose attraction</div>
-            <div class="wsd-section-subtitle">
-              Pick where you’re standing and get a fresh question.
-            </div>
-
-            <!-- Attraction select -->
-            <div class="mb-3">
-              <label class="wsd-form-label" for="wsd-attraction-select">Attraction</label>
-              <select id="wsd-attraction-select" class="form-select wsd-form-select">
-                <option value="">Select an attraction</option>
-                <!-- filled by JS based on park -->
-              </select>
-              <div class="wsd-text-small wsd-mt-1" id="wsd-attraction-meta">
-                <!-- land / park info -->
-              </div>
-            </div>
-
-            <!-- Question -->
-            <div class="mb-3">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="wsd-form-label mb-0">Question</label>
-                <span id="wsd-question-type-badge" class="wsd-badge-pill">
-                  &nbsp;
-                </span>
-              </div>
-              <textarea
-                id="wsd-question-text"
-                class="form-control wsd-form-control"
-                rows="3"
-                readonly
-              ></textarea>
-            </div>
-
-            <!-- Actions -->
-            <div class="wsd-actions-stack">
-              <button id="wsd-generate-question" class="wsd-btn-secondary" type="button">
-                Generate new question
-              </button>
-              <button id="wsd-enter-custom-question" class="wsd-btn-secondary" type="button">
-                Enter own question
-              </button>
-              <button id="wsd-to-answers" class="wsd-btn-primary" type="button">
-                Proceed to answers
-              </button>
-              <button id="wsd-abandon-from-setupq" class="wsd-btn-tertiary" type="button">
-                Abandon round
-              </button>
-            </div>
-
-            <div id="wsd-setupq-error" class="wsd-text-small text-danger wsd-mt-3"></div>
-          </div>
-        </section>
-
-        <!-- ENTER_ANSWERS -->
-        <section id="screen-enter-answers" class="wsd-screen">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Enter answers</div>
-            <div id="wsd-enter-question" class="wsd-text-small mb-2"></div>
-            <div class="wsd-text-small mb-2" id="wsd-answer-progress"></div>
-
-            <div class="mb-3">
-              <label class="wsd-form-label" id="wsd-current-player-label">
-                Player
-              </label>
-              <textarea
-                id="wsd-answer-input"
-                class="form-control wsd-form-control"
-                rows="3"
-              ></textarea>
-            </div>
-
-            <div class="wsd-actions-stack">
-              <button id="wsd-save-answer" class="wsd-btn-primary" type="button">
-                Save &amp; pass
-              </button>
-              <button id="wsd-skip-player" class="wsd-btn-secondary" type="button">
-                Skip player
-              </button>
-              <button id="wsd-abandon-from-answers" class="wsd-btn-tertiary" type="button">
-                Abandon round
-              </button>
-            </div>
-
-            <div id="wsd-answers-error" class="wsd-text-small text-danger wsd-mt-3"></div>
-          </div>
-        </section>
-
-        <!-- SELECT_ANSWER -->
-        <section id="screen-select-answer" class="wsd-screen">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Selected answer</div>
-            <div class="wsd-text-small mb-2" id="wsd-select-question"></div>
-
-            <div class="mb-3">
-              <div class="wsd-form-label">Answer</div>
-              <div id="wsd-selected-answer" class="wsd-text-small"></div>
-            </div>
-
-            <div class="wsd-actions-stack">
-              <button id="wsd-select-again" class="wsd-btn-secondary" type="button">
-                Select again
-              </button>
-              <button id="wsd-to-wagers" class="wsd-btn-primary" type="button">
-                Proceed to guesses
-              </button>
-              <button id="wsd-abandon-from-select" class="wsd-btn-tertiary" type="button">
-                Abandon round
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- GUESS_WAGER -->
-        <section id="screen-guess-wager" class="wsd-screen">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Guess &amp; wager</div>
-            <div class="wsd-text-small mb-2" id="wsd-gw-question"></div>
-            <div class="wsd-text-small mb-2" id="wsd-gw-answer"></div>
-
-            <div class="mb-3">
-              <label class="wsd-form-label" for="wsd-house-bonus">House bonus this round</label>
-              <input
-                type="number"
-                min="0"
-                id="wsd-house-bonus"
-                class="form-control wsd-form-control"
-                value="0"
-              />
-            </div>
-
-            <div id="wsd-gw-players"></div>
-
-            <div class="wsd-actions-stack">
-              <button id="wsd-lock-wagers" class="wsd-btn-primary" type="button">
-                Lock wagers
-              </button>
-              <button id="wsd-clear-wagers" class="wsd-btn-secondary" type="button">
-                Clear guesses &amp; wagers
-              </button>
-              <button id="wsd-abandon-from-gw" class="wsd-btn-tertiary" type="button">
-                Abandon round
-              </button>
-            </div>
-
-            <div id="wsd-gw-error" class="wsd-text-small text-danger wsd-mt-3"></div>
-          </div>
-        </section>
-
-        <!-- REVEAL -->
-        <section id="screen-reveal" class="wsd-screen">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Reveal</div>
-            <div class="wsd-text-small mb-2" id="wsd-reveal-question"></div>
-            <div class="wsd-text-small mb-3" id="wsd-reveal-answer"></div>
-
-            <div id="wsd-reveal-countdown" class="mb-3 fw-bold"></div>
-            <div id="wsd-reveal-author" class="mb-3 fw-bold"></div>
-
-            <div id="wsd-reveal-results"></div>
-
-            <div class="wsd-actions-stack">
-              <button id="wsd-to-scores" class="wsd-btn-primary" type="button">
-                Next round
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- SCORES -->
-        <section id="screen-scores" class="wsd-screen">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Scores</div>
-            <div class="wsd-section-subtitle">
-              Current standings and bonus progress.
-            </div>
-
-            <div id="wsd-scores-list" class="mb-3"></div>
-
-            <div class="mb-3">
-              <div class="wsd-form-label">Bonus progress</div>
-              <div id="wsd-bonus-progress" class="wsd-text-small"></div>
-            </div>
-
-            <div class="mb-3">
-              <div class="wsd-form-label">Manual adjustments</div>
-              <div id="wsd-manual-adjustments" class="wsd-text-small"></div>
-            </div>
-
-            <div class="wsd-actions-stack">
-              <button id="wsd-start-round" class="wsd-btn-primary" type="button">
-                Start new round
-              </button>
-              <button id="wsd-view-history" class="wsd-btn-secondary" type="button">
-                View round history
-              </button>
-              <button id="wsd-end-game" class="wsd-btn-secondary" type="button">
-                End game
-              </button>
-              <button id="wsd-restart-game" class="wsd-btn-tertiary" type="button">
-                Restart game
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- GAME_END -->
-        <section id="screen-game-end" class="wsd-screen">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Game results</div>
-            <div class="wsd-section-subtitle">
-              Bonuses applied and winner crowned.
-            </div>
-
-            <div id="wsd-final-results" class="mb-3"></div>
-
-            <div class="wsd-actions-stack">
-              <button id="wsd-view-history-end" class="wsd-btn-secondary" type="button">
-                View round history
-              </button>
-              <button id="wsd-play-again" class="wsd-btn-primary" type="button">
-                Play again
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- HISTORY overlay -->
-        <section id="screen-history" class="wsd-screen">
-          <div class="wsd-card">
-            <div class="wsd-section-title">Round history</div>
-            <div id="wsd-history-list" class="wsd-text-small"></div>
-
-            <div class="wsd-actions-stack">
-              <button id="wsd-close-history" class="wsd-btn-primary" type="button">
-                Close history
-              </button>
-            </div>
-          </div>
-        </section>
-
-      </main>
-
-      <!-- Bottom nav -->
-      <nav class="wsd-bottom-nav">
-        <div class="wsd-bottom-nav-inner">
-          <button class="wsd-nav-item wsd-nav-item-active" id="wsd-nav-home" type="button">
-            <span class="wsd-nav-icon">🏠</span>
-            <span>Setup</span>
-          </button>
-          <button class="wsd-nav-item" id="wsd-nav-round" type="button">
-            <span class="wsd-nav-icon">🎢</span>
-            <span>Round</span>
-          </button>
-          <button class="wsd-nav-item" id="wsd-nav-scores" type="button">
-            <span class="wsd-nav-icon">🏆</span>
-            <span>Scores</span>
-          </button>
-          <button class="wsd-nav-item" id="wsd-nav-history" type="button">
-            <span class="wsd-nav-icon">⏱</span>
-            <span>History</span>
-          </button>
-        </div>
-      </nav>
+      </div>
     </div>
 
-    <!-- Dependencies -->
-    <script src="data-mk.js"></script>
-    <!-- later: data-epcot.js, data-hs.js, data-ak.js -->
+    <!-- ===== SCREEN: SETUP_GAME ===== -->
+    <section id="screen-setup-game" class="wsd-screen wsd-screen-active">
+      <div class="wsd-card">
 
-    <!-- Game logic -->
-    <script src="game.js"></script>
-  </body>
+        <!-- Header + tutorial trigger -->
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <div class="wsd-section-title mb-0">Setup game</div>
+          <button type="button" class="wsd-btn-tertiary" style="width:auto;"
+                  data-bs-toggle="modal" data-bs-target="#modal-welcome">
+            How to play
+          </button>
+        </div>
+        <hr class="wsd-divider"/>
+
+        <!-- Park -->
+        <div class="mb-3">
+          <label class="wsd-form-label" for="wsd-park-select">Park</label>
+          <select class="form-select wsd-form-select" id="wsd-park-select">
+            <option value="">Select a park</option>
+          </select>
+        </div>
+
+        <!-- Players -->
+        <div class="mb-3">
+          <label class="wsd-form-label">Players (min 3, max 8)</label>
+          <div id="wsd-player-inputs"></div>
+          <button id="wsd-add-player" type="button"
+                  class="wsd-btn-tertiary wsd-mt-2">+ Add player</button>
+        </div>
+
+        <!-- Table stakes -->
+        <div class="mb-3">
+          <label class="wsd-form-label d-block">Use table stakes?</label>
+          <div class="d-flex gap-3 wsd-mt-1">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="wsd-table-stakes"
+                     id="wsd-ts-no" value="no" checked/>
+              <label class="form-check-label" for="wsd-ts-no">No</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="wsd-table-stakes"
+                     id="wsd-ts-yes" value="yes"/>
+              <label class="form-check-label" for="wsd-ts-yes">Yes</label>
+            </div>
+          </div>
+          <div class="wsd-text-small wsd-mt-1">
+            Yes = everyone must match the top bet to stay in the round.
+          </div>
+        </div>
+
+        <!-- Bonus points with info trigger -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <label class="wsd-form-label mb-0" for="wsd-bonus-value">
+              Bonus points per bonus
+            </label>
+            <button type="button" class="wsd-btn-tertiary" style="width:auto;"
+                    data-bs-toggle="modal" data-bs-target="#modal-bonuses">
+              What are bonuses?
+            </button>
+          </div>
+          <input type="number" min="0"
+                 class="form-control wsd-form-control wsd-mt-1"
+                 id="wsd-bonus-value" value="1"/>
+          <div class="wsd-text-small wsd-mt-1">
+            Awarded per attraction bonus category at end of game.
+          </div>
+        </div>
+
+        <div class="wsd-actions-stack">
+          <button id="wsd-start-game" class="wsd-btn-primary" type="button">
+            Start game
+          </button>
+          <button id="wsd-reset-setup" class="wsd-btn-secondary" type="button">
+            Reset
+          </button>
+        </div>
+        <div id="wsd-setup-error"
+             class="wsd-text-small text-danger wsd-mt-3"></div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN: SETUP_QUESTION ===== -->
+    <section id="screen-setup-question" class="wsd-screen">
+      <div class="wsd-card">
+        <div class="wsd-section-title">Choose attraction</div>
+
+        <div class="mb-3">
+          <label class="wsd-form-label" for="wsd-attraction-select">Attraction</label>
+          <select id="wsd-attraction-select"
+                  class="form-select wsd-form-select">
+            <option value="">Select an attraction</option>
+          </select>
+          <div class="wsd-text-small wsd-mt-1" id="wsd-attraction-meta"></div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="wsd-form-label mb-0">Question</label>
+            <span id="wsd-question-type-badge"
+                  class="wsd-badge-pill">&nbsp;</span>
+          </div>
+          <textarea id="wsd-question-text"
+                    class="form-control wsd-form-control"
+                    rows="3" readonly></textarea>
+        </div>
+
+        <div class="wsd-actions-stack">
+          <button id="wsd-to-answers"
+                  class="wsd-btn-primary" type="button">
+            Proceed to answers
+          </button>
+          <button id="wsd-generate-question"
+                  class="wsd-btn-secondary" type="button">
+            Generate new question
+          </button>
+          <button id="wsd-enter-custom-question"
+                  class="wsd-btn-secondary" type="button">
+            Enter own question
+          </button>
+          <button id="wsd-abandon-from-setupq"
+                  class="wsd-btn-tertiary" type="button">
+            Abandon round
+          </button>
+        </div>
+        <div id="wsd-setupq-error"
+             class="wsd-text-small text-danger wsd-mt-3"></div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN: ENTER_ANSWERS ===== -->
+    <section id="screen-enter-answers" class="wsd-screen">
+      <div class="wsd-card">
+        <div class="wsd-section-title">Enter answers</div>
+        <div class="wsd-text-small mb-1" id="wsd-enter-question"></div>
+        <div class="wsd-text-small mb-2" id="wsd-answer-progress"></div>
+
+        <div class="mb-3">
+          <label class="wsd-form-label" id="wsd-current-player-label">
+            Player
+          </label>
+          <textarea id="wsd-answer-input"
+                    class="form-control wsd-form-control"
+                    rows="3"
+                    placeholder="Type your answer here..."></textarea>
+        </div>
+
+        <div class="wsd-actions-stack">
+          <button id="wsd-save-answer"
+                  class="wsd-btn-primary" type="button">
+            Save &amp; pass
+          </button>
+          <button id="wsd-skip-player"
+                  class="wsd-btn-secondary" type="button">
+            Skip player
+          </button>
+          <button id="wsd-abandon-from-answers"
+                  class="wsd-btn-tertiary" type="button">
+            Abandon round
+          </button>
+        </div>
+        <div id="wsd-answers-error"
+             class="wsd-text-small text-danger wsd-mt-3"></div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN: SELECT_ANSWER ===== -->
+    <section id="screen-select-answer" class="wsd-screen">
+      <div class="wsd-card">
+        <div class="wsd-section-title">Selected answer</div>
+        <div class="wsd-text-small mb-3" id="wsd-select-question"></div>
+
+        <div id="wsd-selected-answer"
+             class="wsd-answer-spotlight mb-3"></div>
+
+        <div class="wsd-actions-stack">
+          <button id="wsd-to-wagers"
+                  class="wsd-btn-primary" type="button">
+            Proceed to guesses
+          </button>
+          <button id="wsd-select-again"
+                  class="wsd-btn-secondary" type="button">
+            Select again
+          </button>
+          <button id="wsd-abandon-from-select"
+                  class="wsd-btn-tertiary" type="button">
+            Abandon round
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN: GUESS_WAGER ===== -->
+    <section id="screen-guess-wager" class="wsd-screen">
+      <div class="wsd-card">
+        <div class="wsd-section-title">Guess &amp; wager</div>
+        <div class="wsd-text-small mb-1" id="wsd-gw-question"></div>
+        <div class="wsd-answer-spotlight mb-3" id="wsd-gw-answer"></div>
+
+        <div class="mb-3">
+          <label class="wsd-form-label" for="wsd-house-bonus">
+            House bonus this round
+          </label>
+          <input type="number" min="0" id="wsd-house-bonus"
+                 class="form-control wsd-form-control" value="0"/>
+          <div class="wsd-text-small wsd-mt-1">
+            Extra points added to the pot for this round.
+          </div>
+        </div>
+
+        <div id="wsd-gw-players"></div>
+
+        <div class="wsd-actions-stack">
+          <button id="wsd-lock-wagers"
+                  class="wsd-btn-primary" type="button">
+            Lock wagers
+          </button>
+          <button id="wsd-clear-wagers"
+                  class="wsd-btn-secondary" type="button">
+            Clear guesses &amp; wagers
+          </button>
+          <button id="wsd-abandon-from-gw"
+                  class="wsd-btn-tertiary" type="button">
+            Abandon round
+          </button>
+        </div>
+        <div id="wsd-gw-error"
+             class="wsd-text-small text-danger wsd-mt-3"></div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN: REVEAL ===== -->
+    <section id="screen-reveal" class="wsd-screen">
+      <div class="wsd-card">
+        <div class="wsd-section-title">Reveal</div>
+        <div class="wsd-text-small mb-1" id="wsd-reveal-question"></div>
+        <div class="wsd-answer-spotlight mb-3"
+             id="wsd-reveal-answer-text"></div>
+
+        <!-- Countdown -->
+        <div id="wsd-reveal-countdown"
+             class="wsd-countdown-num text-center mb-1"></div>
+
+        <!-- Author reveal -->
+        <div id="wsd-reveal-author-wrap"
+             class="text-center mb-2" style="display:none;">
+          <div class="wsd-text-small mb-1">
+            The answer was written by...
+          </div>
+          <div id="wsd-reveal-author" class="wsd-author-reveal"></div>
+        </div>
+
+        <!-- Confetti container -->
+        <div id="wsd-confetti-wrap" class="wsd-confetti-wrap"></div>
+
+        <!-- Results table -->
+        <div id="wsd-reveal-results"></div>
+
+        <div class="wsd-actions-stack" id="wsd-reveal-next-wrap"
+             style="display:none;">
+          <button id="wsd-to-scores" class="wsd-btn-primary" type="button">
+            Next round
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN: SCORES ===== -->
+    <section id="screen-scores" class="wsd-screen">
+      <div class="wsd-card">
+        <div class="wsd-section-title">Scores</div>
+        <div id="wsd-scores-list" class="mb-3"></div>
+
+        <hr class="wsd-divider"/>
+        <div class="wsd-form-label mb-2">Bonus progress</div>
+        <div id="wsd-bonus-progress"></div>
+
+        <hr class="wsd-divider"/>
+        <div class="wsd-form-label mb-1">Manual adjustments</div>
+        <div id="wsd-manual-adjustments"></div>
+
+        <div class="wsd-actions-stack wsd-mt-3">
+          <button id="wsd-start-round"
+                  class="wsd-btn-primary" type="button">
+            Start new round
+          </button>
+          <button id="wsd-view-history"
+                  class="wsd-btn-secondary" type="button">
+            View round history
+          </button>
+          <button id="wsd-end-game"
+                  class="wsd-btn-secondary" type="button">
+            End game
+          </button>
+          <button id="wsd-restart-game"
+                  class="wsd-btn-tertiary" type="button">
+            Restart game
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN: GAME_END ===== -->
+    <section id="screen-game-end" class="wsd-screen">
+      <div class="wsd-card">
+        <div id="wsd-winner-banner" class="wsd-winner-banner"></div>
+        <div id="wsd-confetti-wrap-end" class="wsd-confetti-wrap"></div>
+
+        <div class="wsd-section-title">Final results</div>
+        <div id="wsd-final-results" class="mb-3"></div>
+
+        <div class="wsd-actions-stack">
+          <button id="wsd-view-history-end"
+                  class="wsd-btn-secondary" type="button">
+            View round history
+          </button>
+          <button id="wsd-play-again"
+                  class="wsd-btn-primary" type="button">
+            Play again
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN: HISTORY ===== -->
+    <section id="screen-history" class="wsd-screen">
+      <div class="wsd-card">
+        <div class="wsd-section-title">Round history</div>
+        <div id="wsd-history-list" class="wsd-text-small"></div>
+        <div class="wsd-actions-stack wsd-mt-3">
+          <button id="wsd-close-history"
+                  class="wsd-btn-primary" type="button">
+            Close history
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom nav -->
+  <nav class="wsd-bottom-nav">
+    <div class="wsd-bottom-nav-inner">
+      <button class="wsd-nav-item wsd-nav-item-active"
+              id="wsd-nav-home" type="button">
+        <span class="wsd-nav-icon">🏠</span><span>Setup</span>
+      </button>
+      <button class="wsd-nav-item"
+              id="wsd-nav-round" type="button">
+        <span class="wsd-nav-icon">🎢</span><span>Round</span>
+      </button>
+      <button class="wsd-nav-item"
+              id="wsd-nav-scores" type="button">
+        <span class="wsd-nav-icon">🏆</span><span>Scores</span>
+      </button>
+      <button class="wsd-nav-item"
+              id="wsd-nav-history" type="button">
+        <span class="wsd-nav-icon">📋</span><span>History</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- ===== MODAL: Welcome / How to play ===== -->
+<div class="modal fade" id="modal-welcome" tabindex="-1"
+     aria-labelledby="modal-welcome-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content"
+         style="border-radius:20px; overflow:hidden;">
+      <div class="modal-header"
+           style="background:linear-gradient(135deg,#006e99,#4fc3f7);
+                  color:#fff;border:none;">
+        <h5 class="modal-title fw-bold" id="modal-welcome-label">
+          🎢 How to play Who Said Diz
+        </h5>
+        <button type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="font-size:0.9rem;">
+        <p><strong>Who Said Diz</strong> is a points game you play
+          while waiting in line at Disney. The player with the most
+          points at the end of the day wins a park snack paid for
+          everyone else.</p>
+        <hr/>
+        <p><strong>Each round:</strong></p>
+        <ol>
+          <li>Choose the attraction you're waiting for.</li>
+          <li>Everyone secretly answers a question about it.</li>
+          <li>One answer is randomly selected.</li>
+          <li>Everyone guesses who wrote it and wagers points.</li>
+          <li>Correct guessers share the pot. If nobody guesses right,
+              the author wins the whole pot.</li>
+          <li>Guess correctly on an attraction round to
+              <em>collect</em> it for end-of-day bonuses.</li>
+        </ol>
+        <hr/>
+        <p><strong>Points:</strong> Everyone starts with 10.
+           Nobody goes below 3.</p>
+        <p><strong>Table stakes (optional):</strong> You must
+           match the top bet to stay in the round.</p>
+        <p><strong>Bonuses</strong> are awarded at the end for
+           attraction collection milestones.</p>
+        <p><strong>Tiebreaker:</strong> Most correct guesses (wins)
+           wins the tie.</p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="wsd-btn-primary"
+                style="max-width:200px;" data-bs-dismiss="modal">
+          Got it!
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Bonus topics explainer ===== -->
+<div class="modal fade" id="modal-bonuses" tabindex="-1"
+     aria-labelledby="modal-bonuses-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content"
+         style="border-radius:20px; overflow:hidden;">
+      <div class="modal-header"
+           style="background:linear-gradient(135deg,#ff9500,#ffcc00);
+                  color:#fff;border:none;">
+        <h5 class="modal-title fw-bold" id="modal-bonuses-label">
+          🏅 End-of-day bonuses
+        </h5>
+        <button type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="font-size:0.9rem;">
+        <p>You collect an attraction by
+          <strong>guessing the correct author</strong> in a round
+          tied to that attraction. Bonuses are awarded at the end
+          of the game.</p>
+        <p>All bonuses use the same <strong>bonus point value</strong>
+          you set at setup.</p>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">🗺️</div>
+          <div>
+            <div class="wsd-bonus-topic-title">
+              Bonus A – Lands covered
+            </div>
+            <div class="wsd-bonus-topic-desc">
+              Have at least one collected attraction in every land
+              that appeared in the game.
+            </div>
+          </div>
+        </div>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">⭐</div>
+          <div>
+            <div class="wsd-bonus-topic-title">
+              Bonus B – Deep in a land
+            </div>
+            <div class="wsd-bonus-topic-desc">
+              For each land where you have 2 or more different
+              attractions collected, earn one bonus
+              (one per qualifying land).
+            </div>
+          </div>
+        </div>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">🏆</div>
+          <div>
+            <div class="wsd-bonus-topic-title">
+              Bonus C – Top collector
+            </div>
+            <div class="wsd-bonus-topic-desc">
+              Have the most total attractions collected overall.
+              Ties all earn it.
+            </div>
+          </div>
+        </div>
+
+        <hr/>
+        <p class="wsd-text-small">
+          Example: if bonus value = 2 and you earn bonus A + bonus C,
+          you get +4 bonus points added to your final score.
+        </p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="wsd-btn-primary"
+                style="max-width:200px;" data-bs-dismiss="modal">
+          Got it!
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Park data -->
+<script src="data-mk.js"></script>
+<!-- <script src="data-epcot.js"></script> -->
+
+<!-- Game logic -->
+<script src="game.js"></script>
+</body>
 </html>
