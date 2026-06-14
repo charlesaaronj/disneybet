@@ -1,4 +1,19 @@
-l// ===========================================================
+function debugLog(msg) {
+  // Also try real console if it exists
+  try { console.log(msg); } catch (e) {}
+
+  // Mirror to on-page debug div
+  var box = document.getElementById("wsd-debug");
+  if (!box) return;
+  var line = document.createElement("div");
+  var now  = new Date();
+  var ts   = now.toLocaleTimeString();
+  line.textContent = "[" + ts + "] " + msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+// ===========================================================
 //  Who Said Diz — game.js
 // ===========================================================
 
