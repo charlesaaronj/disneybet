@@ -702,7 +702,6 @@ function computeRevealAndScoring() {
 
   const allWagers = round.wagers;
 
-  // Track per-player deltas
   const payouts = [];
   let wrongGuessCount = 0;
 
@@ -731,10 +730,16 @@ function computeRevealAndScoring() {
   });
 
   // 2) Author bonus: +1 per wrong wagering player
+  let authorBonus = 0;
   if (wrongGuessCount > 0) {
+    authorBonus = wrongGuessCount;
     const authorPayout = payouts.find(pt => pt.playerId === authorId);
-    if (authorPayout) authorPayout.delta += wrongGuessCount;
+    if (authorPayout) authorPayout.delta += authorBonus;
   }
+
+  // Save these for UI
+  round.wrongGuessCount = wrongGuessCount;
+  round.authorBonus = authorBonus;
 
   // 3) Save round results & apply to gameState
   round.payouts = payouts;
@@ -745,7 +750,7 @@ function computeRevealAndScoring() {
     })
     .map(w => w.playerId);
 
-  // We no longer use a pot, but keep a field for UI consistency
+  // We no longer use a pot
   round.pot = 0;
 
   applyRoundResults(authorId);
@@ -847,26 +852,39 @@ function runRevealAnimation() {
     void authWrap.offsetWidth;
     authWrap.classList.add("wsd-anim-pop");
 
-    // Confetti only if someone got it right
-    if (round.correctGuessers.length > 0) {
-      spawnConfetti($("wsd-confetti-wrap"));
-    } else {
-      // No correct guessers: show modal explaining author gets the pot
-      const line = $("wsd-no-correct-author-line");
-      if (line) {
-        const name = author ? author.name : "the author";
-        const pot  = round.pot;
-        line.textContent =
-          name + " collects the full pot of " + pot + " points this round.";
-      }
-      try {
-        const modalEl = $("modal-no-correct");
-        if (modalEl && typeof bootstrap !== "undefined") {
-          const m = new bootstrap.Modal(modalEl);
-          setTimeout(() => m.show(), 400);
-        }
-      } catch (e) {}
+   // Show confetti if someone got it right
+if (round.correctGuessers.length > 0) {
+  spawnConfetti($("wsd-confetti-wrap"));
+}
+
+// Show author bonus info whenever there were wrong wagers
+if (round.wrongGuessCount && round.wrongGuessCount > 0) {
+  const line = $("wsd-no-correct-author-line");
+  if (line) {
+    const name = author ? author.name : "the author";
+    const bonus = round.authorBonus || 0;
+    const wrong = round.wrongGuessCount;
+    line.textContent =
+      name +
+      " earned +" +
+      bonus +
+      " point" +
+      (bonus === 1 ? "" : "s") +
+      " from " +
+      wrong +
+      " wrong guess" +
+      (wrong === 1 ? "" : "es") +
+      " this round.";
+  }
+  try {
+    const modalEl = $("modal-no-correct");
+    if (modalEl && typeof bootstrap !== "undefined") {
+      const m = new bootstrap.Modal(modalEl);
+      setTimeout(() => m.show(), 400);
     }
+  } catch (e) {}
+}
+
 
     round.payouts.forEach((payout, i) => {
       setTimeout(() => {
