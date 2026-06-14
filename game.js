@@ -110,43 +110,49 @@ const SCREEN_META = {
   }
 };
 
-// ---- Park themes -----------------------------------------
 const PARK_THEMES = {
   "Magic Kingdom": {
-    hero: "linear-gradient(180deg,#4b0082,#ff69b4)",    // purple → pink
-    nav:  "rgba(75,0,130,0.95)"
+    hero:   "linear-gradient(180deg,#4b0082,#ff69b4)",
+    nav:    "rgba(75,0,130,0.95)",
+    avatar: "linear-gradient(135deg,#ff69b4,#ffd700)"  // pink → gold
   },
   "EPCOT": {
-    hero: "linear-gradient(180deg,#003366,#66ccff)",    // deep blue → teal
-    nav:  "rgba(0,51,102,0.95)"
+    hero:   "linear-gradient(180deg,#003366,#66ccff)",
+    nav:    "rgba(0,51,102,0.95)",
+    avatar: "linear-gradient(135deg,#66ccff,#ffffff)"  // blue → white
   },
   "Hollywood Studios": {
-    hero: "linear-gradient(180deg,#3b3b3b,#ffcc00)",   // dark → gold
-    nav:  "rgba(59,59,59,0.95)"
+    hero:   "linear-gradient(180deg,#3b3b3b,#ffcc00)",
+    nav:    "rgba(59,59,59,0.95)",
+    avatar: "linear-gradient(135deg,#ffcc00,#ff4081)"  // gold → magenta
   },
   "Animal Kingdom": {
-    hero: "linear-gradient(180deg,#014422,#8bc34a)",   // jungle
-    nav:  "rgba(1,68,34,0.95)"
+    hero:   "linear-gradient(180deg,#014422,#8bc34a)",
+    nav:    "rgba(1,68,34,0.95)",
+    avatar: "linear-gradient(135deg,#8bc34a,#ffe082)"  // green → light gold
   }
 };
+
 
 function applyParkTheme(parkName) {
   const theme = PARK_THEMES[parkName];
   const hero  = document.querySelector(".wsd-hero");
   const nav   = document.querySelector(".wsd-bottom-nav");
+  const avatar = document.querySelector(".wsd-avatar");
 
-  if (!hero || !nav) return;
+  if (!hero || !nav || !avatar) return;
 
   if (theme) {
     hero.style.backgroundImage = theme.hero;
     nav.style.backgroundColor  = theme.nav;
+    avatar.style.backgroundImage = theme.avatar;
   } else {
-    // Fallback to default colors
+    // Fallback to default colors from CSS
     hero.style.backgroundImage = "";
     nav.style.backgroundColor  = "rgba(255,255,255,0.9)";
+    avatar.style.backgroundImage = "";  // uses .wsd-avatar default
   }
 }
-
 
 const ALL_SCREENS = Object.keys(SCREEN_META);
 
