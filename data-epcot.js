@@ -1,5 +1,5 @@
 const EPCOT_DATA = {
-  park: "EPCOT",
+  name: "EPCOT",
   lands: [
     {
       name: "World Discovery",
