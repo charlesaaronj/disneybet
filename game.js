@@ -989,21 +989,22 @@ function renderBonusProgress() {
             ${p.name} — projected +${total} pts
           </div>
           <div class="wsd-bonus-topic-desc">
-            🗺️ Lands covered:
-            ${
-              A > 0
-                ? "✅"
-                : landsUsed.length === 0
-                ? "(no rounds yet)"
-                : "❌ (" +
-                  [...landsOwned].length +
-                  " of " +
-                  landsUsed.length +
-                  " lands)"
-            }
-            · ⭐ Deep lands: +${B}
-            · 🏆 Top collector: ${C > 0 ? "✅" : "❌"}
-          </div>
+  🗺️ Lands covered:
+  ${
+    A > 0
+      ? "✅"
+      : landsUsed.length === 0
+      ? "(no rounds yet)"
+      : "❌ (" +
+        [...landsOwned].length +
+        " of " +
+        landsUsed.length +
+        " lands)"
+  }<br/>
+  ⭐ Deep lands: +${B}<br/>
+  🏆 Top collector: ${C > 0 ? "✅" : "❌"}
+</div>
+
         </div>
       </div>`;
   });
