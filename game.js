@@ -28,11 +28,6 @@ if (typeof PARK_EPCOT !== "undefined") {
   PARKS[PARK_EPCOT.name] = PARK_EPCOT;
 }
 
-// Add more parks the same way:
-// if (typeof PARK_HOLLYWOOD_STUDIOS !== "undefined") {
-//   PARKS[PARK_HOLLYWOOD_STUDIOS.name] = PARK_HOLLYWOOD_STUDIOS;
-// }
-
 // ---- State ------------------------------------------------
 let gameState = null;
 const MIN_POINTS   = 3;
@@ -122,22 +117,22 @@ const PARK_THEMES = {
   "Magic Kingdom": {
     hero:   "linear-gradient(180deg,#4b0082,#ff69b4)",
     nav:    "rgba(75,0,130,0.95)",
-    avatar: "linear-gradient(135deg,#ff69b4,#800080)"  // pink → purple
+    avatar: "linear-gradient(135deg,#ff69b4,#800080)"
   },
   "EPCOT": {
     hero:   "linear-gradient(180deg,#003366,#66ccff)",
     nav:    "rgba(0,51,102,0.95)",
-    avatar: "linear-gradient(135deg,#66ccff,#ffffff)"  // blue → white
+    avatar: "linear-gradient(135deg,#66ccff,#ffffff)"
   },
   "Hollywood Studios": {
     hero:   "linear-gradient(180deg,#3b3b3b,#ffcc00)",
     nav:    "rgba(59,59,59,0.95)",
-    avatar: "linear-gradient(135deg,#ffcc00,#ff4081)"  // gold → magenta
+    avatar: "linear-gradient(135deg,#ffcc00,#ff4081)"
   },
   "Animal Kingdom": {
     hero:   "linear-gradient(180deg,#014422,#8bc34a)",
     nav:    "rgba(1,68,34,0.95)",
-    avatar: "linear-gradient(135deg,#8bc34a,#ffe082)"  // green → light gold
+    avatar: "linear-gradient(135deg,#8bc34a,#ffe082)"
   }
 };
 
@@ -154,10 +149,9 @@ function applyParkTheme(parkName) {
     nav.style.backgroundColor  = theme.nav;
     avatar.style.backgroundImage = theme.avatar;
   } else {
-    // Fallback to default colors from CSS
     hero.style.backgroundImage = "";
     nav.style.backgroundColor  = "rgba(255,255,255,0.9)";
-    avatar.style.backgroundImage = "";  // uses .wsd-avatar default
+    avatar.style.backgroundImage = "";
   }
 }
 
@@ -174,13 +168,11 @@ function showScreen(name) {
     saveState();
   }
 
-  // Update instruction card
   const meta = SCREEN_META[name] || SCREEN_META["setup-game"];
   $("wsd-step-icon").textContent        = meta.icon;
   $("wsd-step-title").textContent       = meta.title;
   $("wsd-step-instruction").textContent = meta.instruction;
 
-  // Bottom nav highlight
   const navMap = {
     "setup-game": "wsd-nav-home",
     "setup-question": "wsd-nav-round",
@@ -261,7 +253,6 @@ function startGameFromSetup() {
     bonusTotal: 0
   }));
 
-  // Shuffle question pools once
   const usedQuestions = {
     attractions: {},
     generic: shuffle(parkData.genericQuestions),
@@ -339,7 +330,9 @@ function startNewRoundCore() {
     scoreAfter: {},
     collectionsThisRound: [],
     wrongGuessCount: 0,
-    authorBonus: 0
+    authorBonus: 0,
+    houseBonusResolved: 0,
+    houseBonusRecipients: []
   };
   saveState();
   if ($("wsd-house-bonus")) $("wsd-house-bonus").value = "0";
@@ -494,7 +487,6 @@ function saveAnswerForCurrentPlayer(skip) {
       return;
     }
     saveState();
-    // Loading flourish before selecting answer
     showPickOverlay(() => {
       pickRandomAnswer();
       renderSelectAnswerScreen();
@@ -597,8 +589,7 @@ function goToGuessWager() {
     wagerInp.type = "number";
     wagerInp.min = 0;
     wagerInp.max = p.score;
-    wagerInp.value = Math.min(1, p.score); // default 1
-    // iPhone numeric keypad hints
+    wagerInp.value = Math.min(1, p.score);
     wagerInp.inputMode = "numeric";
     wagerInp.pattern = "[0-9]*";
 
@@ -657,7 +648,6 @@ function lockWagers() {
       });
     });
 
-  // At least two players must wager > 0 to play the round
   const participants = wagers.filter(w => w.amount > 0);
   if (participants.length < 2) {
     err.textContent =
@@ -677,7 +667,6 @@ function lockWagers() {
 function computeRevealAndScoring() {
   const round = gameState.currentRound;
   const authorId = round.selectedAnswer.playerId;
-
   const allWagers = round.wagers;
 
   const payouts = [];
@@ -694,10 +683,8 @@ function computeRevealAndScoring() {
 
       if (amount > 0) {
         if (guessedAuthorId === authorId) {
-          // Correct guess: win what you wagered
           delta += amount;
         } else {
-          // Wrong guess: lose what you wagered
           delta -= amount;
           wrongGuessCount += 1;
         }
@@ -715,12 +702,10 @@ function computeRevealAndScoring() {
     if (authorPayout) authorPayout.delta += authorBonus;
   }
 
-  // Save these for UI
   round.wrongGuessCount = wrongGuessCount;
   round.authorBonus = authorBonus;
 
-  // 3) Save round results & apply to gameState
-  round.payouts = payouts;
+  // 3) Correct guessers
   round.correctGuessers = allWagers
     .filter(w => {
       const amount = Math.max(0, parseInt(w.amount, 10) || 0);
@@ -728,7 +713,31 @@ function computeRevealAndScoring() {
     })
     .map(w => w.playerId);
 
-  // We no longer use a pot
+  // 4) House bonus distribution
+  const houseBonus = Math.max(0, parseInt(round.houseBonusAmount, 10) || 0);
+  round.houseBonusResolved = houseBonus;
+  round.houseBonusRecipients = [];
+
+  if (houseBonus > 0) {
+    const recipients = round.correctGuessers.length > 0
+      ? round.correctGuessers
+      : [authorId];
+
+    const share = Math.floor(houseBonus / recipients.length);
+    const remainder = houseBonus - share * recipients.length;
+
+    recipients.forEach((pid, i) => {
+      const pt = payouts.find(p => p.playerId === pid);
+      if (pt) {
+        const extra = share + (i === 0 ? remainder : 0);
+        pt.delta += extra;
+        round.houseBonusRecipients.push({ playerId: pid, extra });
+      }
+    });
+  }
+
+  // 5) Finalize
+  round.payouts = payouts;
   round.pot = 0;
 
   applyRoundResults(authorId);
@@ -771,7 +780,6 @@ function applyRoundResults(authorId) {
     });
   }
 
-  // history entry
   gameState.history.push({
     roundNumber: gameState.roundNumber,
     park: gameState.settings.park,
@@ -787,7 +795,9 @@ function applyRoundResults(authorId) {
     collectionsThisRound: round.collectionsThisRound,
     manualAdjustments: [],
     scoreBefore,
-    scoreAfter
+    scoreAfter,
+    houseBonusResolved: round.houseBonusResolved,
+    houseBonusRecipients: round.houseBonusRecipients
   });
 }
 
@@ -830,30 +840,70 @@ function runRevealAnimation() {
     void authWrap.offsetWidth;
     authWrap.classList.add("wsd-anim-pop");
 
-    // Confetti if someone got it right
     if (round.correctGuessers.length > 0) {
       spawnConfetti($("wsd-confetti-wrap"));
     }
 
-    // Show author bonus info whenever there were wrong wagers
-    if (round.wrongGuessCount && round.wrongGuessCount > 0) {
-      const line = $("wsd-no-correct-author-line");
-      if (line) {
-        const name = author ? author.name : "the author";
-        const bonus = round.authorBonus || 0;
-        const wrong = round.wrongGuessCount;
-        line.textContent =
-          name +
-          " earned +" +
-          bonus +
-          " point" +
-          (bonus === 1 ? "" : "s") +
-          " from " +
-          wrong +
-          " wrong guess" +
-          (wrong === 1 ? "" : "es") +
-          " this round.";
+    // Author + house bonus modal
+    if ((round.wrongGuessCount && round.wrongGuessCount > 0) ||
+        (round.houseBonusResolved && round.houseBonusResolved > 0)) {
+
+      const name = author ? author.name : "the author";
+
+      const authorLine = $("wsd-no-correct-author-line");
+      if (authorLine) {
+        if (round.wrongGuessCount > 0) {
+          const bonus = round.authorBonus || 0;
+          const wrong = round.wrongGuessCount;
+          authorLine.textContent =
+            name +
+            " earned +" +
+            bonus +
+            " point" +
+            (bonus === 1 ? "" : "s") +
+            " from " +
+            wrong +
+            " wrong guess" +
+            (wrong === 1 ? "" : "es") +
+            " this round.";
+        } else {
+          authorLine.textContent = "";
+        }
       }
+
+      const houseLine = $("wsd-house-bonus-line");
+      if (houseLine) {
+        if (round.houseBonusResolved > 0) {
+          const total = round.houseBonusResolved;
+          if (round.houseBonusRecipients && round.houseBonusRecipients.length) {
+            const names = round.houseBonusRecipients
+              .map(hr => {
+                const p = gameState.players.find(pl => pl.id === hr.playerId);
+                return p ? `${p.name} (+${hr.extra})` :
+                           `Player ${hr.playerId} (+${hr.extra})`;
+              })
+              .join(", ");
+            houseLine.textContent =
+              "House bonus +" +
+              total +
+              " point" +
+              (total === 1 ? "" : "s") +
+              " was split between: " +
+              names +
+              ".";
+          } else {
+            houseLine.textContent =
+              "House bonus +" +
+              total +
+              " point" +
+              (total === 1 ? "" : "s") +
+              " did not get distributed this round.";
+          }
+        } else {
+          houseLine.textContent = "";
+        }
+      }
+
       try {
         const modalEl = $("modal-no-correct");
         if (modalEl && typeof bootstrap !== "undefined") {
@@ -1108,6 +1158,18 @@ function renderHistoryScreen() {
       }, ${pt.delta >= 0 ? "+" : ""}${pt.delta} pts
       </div>`;
     });
+    if (h.houseBonusResolved && h.houseBonusResolved > 0) {
+      const names = (h.houseBonusRecipients || [])
+        .map(hr => {
+          const pl = gameState.players.find(x => x.id === hr.playerId);
+          return pl ? `${pl.name} (+${hr.extra})`
+                    : `Player ${hr.playerId} (+${hr.extra})`;
+        })
+        .join(", ");
+      html += `<div class="wsd-text-small">
+        &nbsp;&nbsp;House bonus +${h.houseBonusResolved} split: ${names || "—"}
+      </div>`;
+    }
     if (h.manualAdjustments && h.manualAdjustments.length) {
       h.manualAdjustments.forEach(adj => {
         const pl = gameState.players.find(x => x.id === adj.playerId);
@@ -1245,7 +1307,6 @@ function wireEvents() {
     addPlayerInput(c);
   });
 
-  // Park select → update theme + label immediately
   $("wsd-park-select").addEventListener("change", () => {
     const name = $("wsd-park-select").value;
     $("wsd-park-label").textContent = name || "Not set";
@@ -1285,7 +1346,6 @@ function wireEvents() {
 
   // Select answer
   $("wsd-select-again").addEventListener("click", () => {
-    // Replay the loading flourish, then pick a new answer
     showPickOverlay(() => {
       pickRandomAnswer();
       renderSelectAnswerScreen();
