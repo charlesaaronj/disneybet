@@ -2,14 +2,12 @@
 //  Who Said Diz — game.js
 // ===========================================================
 
-// --- Helpers -------------------------------------------------
-
-const $  = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const medal = i => ["🥇 ","🥈 ","🥉 "][i] || "";
 
 function debugLog(msg) {
-  try { console.log(msg); } catch (e) {}
+  try { console.log(msg); } catch(e){}
   const box = $("wsd-debug");
   if (!box) return;
   const line = document.createElement("div");
@@ -17,1204 +15,888 @@ function debugLog(msg) {
   box.appendChild(line);
   box.scrollTop = box.scrollHeight;
 }
-
-function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+function shuffle(a) {
+  a = a.slice();
+  for (let i=a.length-1;i>0;i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
   }
   return a;
 }
+function resetGame() { localStorage.removeItem("whoSaidDiz"); location.reload(); }
+function requireState(fn){return()=>{if(!gameState){showScreen("setup-game");return;}fn();};}
 
-function resetGame() {
-  localStorage.removeItem("whoSaidDiz");
-  location.reload();
-}
-
-function requireState(fn) {
-  return () => {
-    if (!gameState) { showScreen("setup-game"); return; }
-    fn();
-  };
-}
-
-// --- Constants -----------------------------------------------
-
-const MIN_POINTS   = 3;
-const START_POINTS = 10;
-
+const MIN_POINTS=3, START_POINTS=10;
 const FINAL_BONUS_POINTS = {
-  topLandCollector: 3,
-  topAttractionCollector: 3,
-  bestGuesser: 2,
-  mostRiskyPlayer: 2
+  topLandCollector:3, topAttractionCollector:3, bestGuesser:2, mostRiskyPlayer:2
 };
-
 const SCREEN_META = {
-  "setup-game":     { icon: "🎮", title: "Setup game",       instruction: "Pick your park, add players, and choose your settings." },
-  "setup-question": { icon: "🎢", title: "Choose attraction", instruction: "Pick your attraction. A question will be selected for you." },
-  "enter-answers":  { icon: "✏️", title: "Enter answers",     instruction: "Pass the phone around. Each player secretly types their answer." },
-  "select-answer":  { icon: "🎲", title: "Selected answer",   instruction: "A random answer has been chosen. No peeking at who wrote it!" },
-  "guess-wager":    { icon: "💰", title: "Guess & wager",     instruction: "Everyone guesses the author and places their bet." },
-  "reveal":         { icon: "🔍", title: "Reveal",            instruction: "Find out who really said that!" },
-  "scores":         { icon: "📊", title: "Scores",            instruction: "Check standings and bonus progress. Start the next round when ready." },
-  "game-end":       { icon: "🏆", title: "Game over",         instruction: "Bonuses applied! The player with most points wins the snack." },
-  "history":        { icon: "📋", title: "Round history",     instruction: "A full log of every round played." }
+  "setup-game":     {icon:"🎮",title:"Setup game",instruction:"Pick your park, add players, and choose your settings."},
+  "setup-question": {icon:"🎢",title:"Choose attraction",instruction:"Pick your attraction. A question will be selected for you."},
+  "enter-answers":  {icon:"✏️",title:"Enter answers",instruction:"Pass the phone around. Each player secretly types their answer."},
+  "select-answer":  {icon:"🎲",title:"Selected answer",instruction:"A random answer has been chosen. No peeking at who wrote it!"},
+  "guess-wager":    {icon:"💰",title:"Guess & wager",instruction:"Everyone guesses the author and places their bet."},
+  "reveal":         {icon:"🔍",title:"Reveal",instruction:"Find out who really said that!"},
+  "scores":         {icon:"📊",title:"Scores",instruction:"Check standings and bonus progress. Start the next round when ready."},
+  "game-end":       {icon:"🏆",title:"Game over",instruction:"Bonuses applied! The player with most points wins the snack."},
+  "history":        {icon:"📋",title:"Round history",instruction:"A full log of every round played."}
 };
-
 const PARK_THEMES = {
-  "Magic Kingdom":    { hero: "linear-gradient(180deg,#4b0082,#ff69b4)", nav: "rgba(75,0,130,0.95)",  avatar: "linear-gradient(135deg,#ff69b4,#800080)" },
-  "EPCOT":            { hero: "linear-gradient(180deg,#003366,#66ccff)", nav: "rgba(0,51,102,0.95)",  avatar: "linear-gradient(135deg,#66ccff,#ffffff)" },
-  "Hollywood Studios":{ hero: "linear-gradient(180deg,#3b3b3b,#ffcc00)", nav: "rgba(59,59,59,0.95)",  avatar: "linear-gradient(135deg,#ffcc00,#ff4081)" },
-  "Animal Kingdom":   { hero: "linear-gradient(180deg,#014422,#8bc34a)", nav: "rgba(1,68,34,0.95)",   avatar: "linear-gradient(135deg,#8bc34a,#ffe082)" }
+  "Magic Kingdom":    {hero:"linear-gradient(180deg,#4b0082,#ff69b4)",nav:"rgba(75,0,130,0.95)",avatar:"linear-gradient(135deg,#ff69b4,#800080)"},
+  "EPCOT":            {hero:"linear-gradient(180deg,#003366,#66ccff)",nav:"rgba(0,51,102,0.95)",avatar:"linear-gradient(135deg,#66ccff,#ffffff)"},
+  "Hollywood Studios":{hero:"linear-gradient(180deg,#3b3b3b,#ffcc00)",nav:"rgba(59,59,59,0.95)",avatar:"linear-gradient(135deg,#ffcc00,#ff4081)"},
+  "Animal Kingdom":   {hero:"linear-gradient(180deg,#014422,#8bc34a)",nav:"rgba(1,68,34,0.95)",avatar:"linear-gradient(135deg,#8bc34a,#ffe082)"}
 };
-
 const NAV_MAP = {
-  "setup-game":     "wsd-nav-home",
-  "setup-question": "wsd-nav-round",
-  "enter-answers":  "wsd-nav-round",
-  "select-answer":  "wsd-nav-round",
-  "guess-wager":    "wsd-nav-round",
-  "reveal":         "wsd-nav-round",
-  "scores":         "wsd-nav-scores",
-  "game-end":       "wsd-nav-scores",
-  "history":        "wsd-nav-history"
+  "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
+  "select-answer":"wsd-nav-round","guess-wager":"wsd-nav-round","reveal":"wsd-nav-round",
+  "scores":"wsd-nav-scores","game-end":"wsd-nav-scores","history":"wsd-nav-history"
 };
-
 const ROUND_SCREENS = ["setup-question","enter-answers","select-answer","guess-wager","reveal"];
 
-// --- Parks ---------------------------------------------------
-
 const PARKS = {};
-if (typeof PARK_MAGIC_KINGDOM !== "undefined") PARKS[PARK_MAGIC_KINGDOM.name] = PARK_MAGIC_KINGDOM;
-if (typeof PARK_EPCOT         !== "undefined") PARKS[PARK_EPCOT.name]         = PARK_EPCOT;
+if (typeof PARK_MAGIC_KINGDOM!=="undefined") PARKS[PARK_MAGIC_KINGDOM.name]=PARK_MAGIC_KINGDOM;
+if (typeof PARK_EPCOT!=="undefined") PARKS[PARK_EPCOT.name]=PARK_EPCOT;
 
-// --- State ---------------------------------------------------
+let gameState=null;
 
-let gameState = null;
-
-function saveState() {
-  if (!gameState) return;
-  try { localStorage.setItem("whoSaidDiz", JSON.stringify(gameState)); } catch (e) {}
+function saveState(){if(!gameState)return;try{localStorage.setItem("whoSaidDiz",JSON.stringify(gameState));}catch(e){}}
+function loadState(){try{const raw=localStorage.getItem("whoSaidDiz");if(raw)gameState=JSON.parse(raw);}catch(e){gameState=null;}}
+function ensurePlayerStats(p){
+  p.stats??={correctGuesses:0,totalRisked:0,uniqueLands:[]};
+  if(!Array.isArray(p.stats.uniqueLands))p.stats.uniqueLands=[];
 }
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem("whoSaidDiz");
-    if (raw) gameState = JSON.parse(raw);
-  } catch (e) { gameState = null; }
-}
-
-function ensurePlayerStats(p) {
-  p.stats ??= { correctGuesses: 0, totalRisked: 0, uniqueLands: [] };
-  if (!Array.isArray(p.stats.uniqueLands)) p.stats.uniqueLands = [];
-}
-
-function ensureStateShape() {
-  if (!gameState) return;
-
-  gameState.settings ??= {};
-  gameState.settings.startingPoints ||= START_POINTS;
-  gameState.settings.minPoints      ||= MIN_POINTS;
-  gameState.players  ||= [];
-  gameState.history  ||= [];
-
-  gameState.players.forEach(p => {
-    if (!Array.isArray(p.collected)) p.collected = [];
-    if (typeof p.wins       !== "number") p.wins = 0;
-    if (typeof p.bonusTotal !== "number") p.bonusTotal = 0;
+function ensureStateShape(){
+  if(!gameState)return;
+  gameState.settings??={};
+  gameState.settings.startingPoints||=START_POINTS;
+  gameState.settings.minPoints||=MIN_POINTS;
+  gameState.players||=[];
+  gameState.history||=[];
+  gameState.players.forEach(p=>{
+    if(!Array.isArray(p.collected))p.collected=[];
+    if(typeof p.wins!=="number")p.wins=0;
+    if(typeof p.bonusTotal!=="number")p.bonusTotal=0;
     ensurePlayerStats(p);
   });
-
-  if (!gameState.currentRound) return;
-  const r = gameState.currentRound;
-  ["correctGuessers","payouts","houseBonusRecipients","collectionsThisRound"]
-    .forEach(k => { r[k] ||= []; });
-  if (typeof r.houseBonusApplied !== "boolean") r.houseBonusApplied = false;
-  r.houseBonusReason ||= "";
+  if(!gameState.currentRound)return;
+  const r=gameState.currentRound;
+  ["correctGuessers","payouts","houseBonusRecipients","collectionsThisRound"].forEach(k=>{r[k]||=[];});
+  if(typeof r.houseBonusApplied!=="boolean")r.houseBonusApplied=false;
+  r.houseBonusReason||="";
 }
-
-// --- Player helpers ------------------------------------------
-
-const getAttractionByName = name => gameState.attractions.find(a => a.name === name);
-
-function getPlayerUniqueLandCount(player) {
-  const set = new Set();
-  player.collected.forEach(name => {
-    const a = getAttractionByName(name);
-    if (a?.land) set.add(a.land);
-  });
-  return set.size;
+const getAttractionByName=name=>gameState.attractions.find(a=>a.name===name);
+function getPlayerUniqueLandCount(player){
+  const s=new Set();
+  player.collected.forEach(name=>{const a=getAttractionByName(name);if(a?.land)s.add(a.land);});
+  return s.size;
 }
-
-// --- Theme & screen ------------------------------------------
-
-function applyParkTheme(parkName) {
-  const t = PARK_THEMES[parkName];
+function applyParkTheme(parkName){
+  const t=PARK_THEMES[parkName];
   [
-    [".wsd-hero",                              "backgroundImage", t?.hero   || ""],
-    [".wsd-bottom-nav",                        "backgroundColor", t?.nav    || "rgba(255,255,255,0.9)"],
-    [".wsd-avatar",                            "backgroundImage", t?.avatar || ""],
-    ["#modal-no-correct .modal-header",        "backgroundImage", t?.hero   || ""],
-    ["#modal-no-correct .modal-header",        "color",           t ? "#fff" : ""]
-  ].forEach(([sel, prop, val]) => {
-    const el = document.querySelector(sel);
-    if (el) el.style[prop] = val;
+    [".wsd-hero","backgroundImage",t?.hero||""],
+    [".wsd-bottom-nav","backgroundColor",t?.nav||"rgba(255,255,255,0.9)"],
+    [".wsd-avatar","backgroundImage",t?.avatar||""],
+    ["#modal-no-correct .modal-header","backgroundImage",t?.hero||""],
+    ["#modal-no-correct .modal-header","color",t?"#fff":""]
+  ].forEach(([sel,prop,val])=>{const el=document.querySelector(sel);if(el)el.style[prop]=val;});
+}
+const ALL_SCREENS=Object.keys(SCREEN_META);
+function showScreen(name){
+  ALL_SCREENS.forEach(key=>{
+    const el=$(`screen-${key}`);
+    if(el)el.classList.toggle("wsd-screen-active",key===name);
   });
+  if(gameState){gameState.screen=name;saveState();}
+  const m=SCREEN_META[name]||SCREEN_META["setup-game"];
+  [["wsd-step-icon",m.icon],["wsd-step-title",m.title],["wsd-step-instruction",m.instruction]]
+    .forEach(([id,val])=>{const el=$(id);if(el)el.textContent=val;});
+  $$(".wsd-nav-item").forEach(b=>b.classList.remove("wsd-nav-item-active"));
+  const navId=NAV_MAP[name];
+  if(navId&&$(navId))$(navId).classList.add("wsd-nav-item-active");
 }
 
-const ALL_SCREENS = Object.keys(SCREEN_META);
-
-function showScreen(name) {
-  ALL_SCREENS.forEach(key => {
-    const el = $(`screen-${key}`);
-    if (el) el.classList.toggle("wsd-screen-active", key === name);
-  });
-
-  if (gameState) { gameState.screen = name; saveState(); }
-
-  const meta = SCREEN_META[name] || SCREEN_META["setup-game"];
-  [["wsd-step-icon", meta.icon], ["wsd-step-title", meta.title], ["wsd-step-instruction", meta.instruction]]
-    .forEach(([id, val]) => { const el = $(id); if (el) el.textContent = val; });
-
-  $$(".wsd-nav-item").forEach(b => b.classList.remove("wsd-nav-item-active"));
-  const navId = NAV_MAP[name];
-  if (navId && $(navId)) $(navId).classList.add("wsd-nav-item-active");
-}
-
-// --- Setup ---------------------------------------------------
-
-function initSetupScreen() {
+function initSetupScreen(){
   debugLog("initSetupScreen starting");
-  const sel       = $("wsd-park-select");
-  const container = $("wsd-player-inputs");
+  const sel=$("wsd-park-select"),container=$("wsd-player-inputs");
   debugLog(`wsd-park-select exists? ${!!sel}`);
   debugLog(`wsd-player-inputs exists? ${!!container}`);
-  if (!sel || !container) return;
-
-  sel.innerHTML = '<option value="">Select a park</option>';
-  Object.keys(PARKS).forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    sel.appendChild(opt);
+  if(!sel||!container)return;
+  sel.innerHTML='<option value="">Select a park</option>';
+  Object.keys(PARKS).forEach(name=>{
+    const opt=document.createElement("option");
+    opt.value=name;opt.textContent=name;sel.appendChild(opt);
   });
-
-  if (!container.querySelectorAll("input").length) {
-    for (let i = 0; i < 3; i++) addPlayerInput(container);
+  if(!container.querySelectorAll("input").length){
+    for(let i=0;i<3;i++)addPlayerInput(container);
   }
   debugLog("Setup screen ready");
 }
-
-function addPlayerInput(container) {
-  const inp = document.createElement("input");
-  inp.type = "text";
-  inp.className = "form-control wsd-form-control wsd-player-input";
-  inp.placeholder = "Player name";
+function addPlayerInput(container){
+  const inp=document.createElement("input");
+  inp.type="text";
+  inp.className="form-control wsd-form-control wsd-player-input";
+  inp.placeholder="Player name";
   container.appendChild(inp);
 }
-
-function startGameFromSetup() {
-  const errEl    = $("wsd-setup-error");
-  const parkSel  = $("wsd-park-select");
-  const parkName = parkSel ? parkSel.value : "";
-  if (errEl) errEl.textContent = "";
-
-  if (!parkName || !PARKS[parkName]) {
-    if (errEl) errEl.textContent = "Please select a park.";
-    return;
+function startGameFromSetup(){
+  const errEl=$("wsd-setup-error"),parkSel=$("wsd-park-select");
+  const parkName=parkSel?parkSel.value:"";
+  if(errEl)errEl.textContent="";
+  if(!parkName||!PARKS[parkName]){
+    if(errEl)errEl.textContent="Please select a park.";return;
   }
-
-  const names = $$("#wsd-player-inputs input").map(i => i.value.trim()).filter(Boolean);
-  if (names.length < 3) {
-    if (errEl) errEl.textContent = "Please enter at least three player names.";
-    return;
+  const names=$$("#wsd-player-inputs input").map(i=>i.value.trim()).filter(Boolean);
+  if(names.length<3){
+    if(errEl)errEl.textContent="Please enter at least three player names.";return;
   }
-
-  const parkData = PARKS[parkName];
-  const players  = names.map((name, id) => ({
-    id, name, score: START_POINTS, wins: 0, collected: [], bonusTotal: 0,
-    stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] }
+  const parkData=PARKS[parkName];
+  const players=names.map((name,id)=>({
+    id,name,score:START_POINTS,wins:0,collected:[],bonusTotal:0,
+    stats:{correctGuesses:0,totalRisked:0,uniqueLands:[]}
   }));
-
-  const usedQuestions = { attractions: {}, generic: shuffle(parkData.genericQuestions), genericIndex: 0 };
-  parkData.attractions.forEach(a => {
-    usedQuestions.attractions[a.name] = { questions: shuffle(a.questions), index: 0 };
+  const usedQuestions={attractions:{},generic:shuffle(parkData.genericQuestions),genericIndex:0};
+  parkData.attractions.forEach(a=>{
+    usedQuestions.attractions[a.name]={questions:shuffle(a.questions),index:0};
   });
-
-  gameState = {
-    screen: "setup-question",
-    roundNumber: 0,
-    settings: { park: parkName, startingPoints: START_POINTS, minPoints: MIN_POINTS },
+  gameState={
+    screen:"setup-question",roundNumber:0,
+    settings:{park:parkName,startingPoints:START_POINTS,minPoints:MIN_POINTS},
     players,
-    lands: [...new Set(parkData.attractions.map(a => a.land).filter(Boolean))],
-    attractions: parkData.attractions,
-    genericQuestions: parkData.genericQuestions,
-    usedQuestions,
-    currentRound: null,
-    history: [],
-    finalBonusesApplied: false
+    lands:[...new Set(parkData.attractions.map(a=>a.land).filter(Boolean))],
+    attractions:parkData.attractions,genericQuestions:parkData.genericQuestions,
+    usedQuestions,currentRound:null,history:[],finalBonusesApplied:false
   };
-
-  const parkLabel = $("wsd-park-label");
-  if (parkLabel) parkLabel.textContent = parkName;
+  const parkLabel=$("wsd-park-label"); if(parkLabel)parkLabel.textContent=parkName;
   applyParkTheme(parkName);
-
-  const summary = $("wsd-player-summary");
-  if (summary) summary.textContent = `${players.length} players`;
-
+  const summary=$("wsd-player-summary"); if(summary)summary.textContent=`${players.length} players`;
   renderAttractionOptions();
   saveState();
   showScreen("setup-question");
   startNewRoundCore();
 }
-
-function renderAttractionOptions() {
-  const sel = $("wsd-attraction-select");
-  if (!sel || !gameState) return;
-  sel.innerHTML = '<option value="">Select an attraction</option>';
-  gameState.attractions.forEach((a, idx) => {
-    const opt = document.createElement("option");
-    opt.value = String(idx);
-    opt.textContent = a.name;
-    sel.appendChild(opt);
+function renderAttractionOptions(){
+  const sel=$("wsd-attraction-select");
+  if(!sel||!gameState)return;
+  sel.innerHTML='<option value="">Select an attraction</option>';
+  gameState.attractions.forEach((a,i)=>{
+    const opt=document.createElement("option");
+    opt.value=String(i);opt.textContent=a.name;sel.appendChild(opt);
   });
 }
-
-function startNewRoundCore() {
-  if (!gameState) return;
-  gameState.roundNumber += 1;
-  gameState.currentRound = {
-    attraction: null, question: "", questionType: "", answers: [],
-    selectedAnswer: null, answerIndex: 0, houseBonusAmount: 0,
-    wagers: [], pot: 0, correctGuessers: [], payouts: {},
-    scoreBefore: {}, scoreAfter: {}, collectionsThisRound: [],
-    wrongGuessCount: 0, authorBonus: 0, houseBonusResolved: 0,
-    houseBonusRecipients: [], houseBonusApplied: false, houseBonusReason: ""
+function startNewRoundCore(){
+  if(!gameState)return;
+  gameState.roundNumber+=1;
+  gameState.currentRound={
+    attraction:null,question:"",questionType:"",answers:[],
+    selectedAnswer:null,answerIndex:0,houseBonusAmount:0,
+    wagers:[],pot:0,correctGuessers:[],payouts:[],
+    scoreBefore:{},scoreAfter:{},collectionsThisRound:[],
+    wrongGuessCount:0,authorBonus:0,houseBonusResolved:0,
+    houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:""
   };
   saveState();
-
   [
-    ["wsd-house-bonus",        el => { el.value = "0"; }],
-    ["wsd-question-text",      el => { el.readOnly = true; el.value = ""; }],
-    ["wsd-question-type-badge",el => { el.textContent = ""; }],
-    ["wsd-attraction-select",  el => { el.value = ""; }],
-    ["wsd-attraction-meta",    el => { el.textContent = ""; }],
-    ["wsd-setupq-error",       el => { el.textContent = ""; }]
-  ].forEach(([id, fn]) => { const el = $(id); if (el) fn(el); });
+    ["wsd-house-bonus",el=>{el.value="0";}],
+    ["wsd-question-text",el=>{el.readOnly=true;el.value="";}],
+    ["wsd-question-type-badge",el=>{el.textContent="";}],
+    ["wsd-attraction-select",el=>{el.value="";}],
+    ["wsd-attraction-meta",el=>{el.textContent="";}],
+    ["wsd-setupq-error",el=>{el.textContent="";}]
+  ].forEach(([id,fn])=>{const el=$(id);if(el)fn(el);});
 }
 
-// --- Question flow -------------------------------------------
-
-function onAttractionChange() {
-  if (!gameState) return;
-  const attrSel = $("wsd-attraction-select");
-  const idx     = attrSel ? parseInt(attrSel.value, 10) : NaN;
-  const meta    = $("wsd-attraction-meta");
-  const qTxt    = $("wsd-question-text");
-  const badge   = $("wsd-question-type-badge");
-
-  if (meta)  meta.textContent  = "";
-  if (qTxt)  qTxt.value        = "";
-  if (badge) badge.textContent = "";
-
-  if (isNaN(idx) || !gameState.attractions[idx]) {
-    gameState.currentRound.attraction = null;
-    gameState.currentRound.question   = "";
-    return;
+function onAttractionChange(){
+  if(!gameState)return;
+  const attrSel=$("wsd-attraction-select");
+  const idx=attrSel?parseInt(attrSel.value,10):NaN;
+  const meta=$("wsd-attraction-meta"),qTxt=$("wsd-question-text"),badge=$("wsd-question-type-badge");
+  if(meta)meta.textContent="";if(qTxt)qTxt.value="";if(badge)badge.textContent="";
+  if(isNaN(idx)||!gameState.attractions[idx]){
+    gameState.currentRound.attraction=null;gameState.currentRound.question="";return;
   }
-
-  const attraction = gameState.attractions[idx];
-  gameState.currentRound.attraction = attraction;
-  if (meta) meta.textContent = `${attraction.park} • ${attraction.land}`;
-
-  const { q, type } = drawQuestion(attraction);
-  gameState.currentRound.question     = q;
-  gameState.currentRound.questionType = type;
-  if (qTxt)  qTxt.value        = q;
-  if (badge) badge.textContent = labelForType(type);
+  const attraction=gameState.attractions[idx];
+  gameState.currentRound.attraction=attraction;
+  if(meta)meta.textContent=`${attraction.park} • ${attraction.land}`;
+  const {q,type}=drawQuestion(attraction);
+  gameState.currentRound.question=q;gameState.currentRound.questionType=type;
+  if(qTxt)qTxt.value=q; if(badge)badge.textContent=labelForType(type);
   saveState();
 }
-
-function drawQuestion(attraction) {
-  const uq    = gameState.usedQuestions;
-  const entry = uq.attractions[attraction.name];
-  if (entry && entry.index < entry.questions.length) return { q: entry.questions[entry.index++], type: "attraction" };
-  if (uq.genericIndex < uq.generic.length)          return { q: uq.generic[uq.genericIndex++],  type: "generic" };
-  const pool = gameState.genericQuestions;
+function drawQuestion(attraction){
+  const uq=gameState.usedQuestions,entry=uq.attractions[attraction.name];
+  if(entry&&entry.index<entry.questions.length) return{q:entry.questions[entry.index++],type:"attraction"};
+  if(uq.genericIndex<uq.generic.length)         return{q:uq.generic[uq.genericIndex++],type:"generic"};
+  const pool=gameState.genericQuestions;
   return pool.length
-    ? { q: pool[Math.floor(Math.random() * pool.length)], type: "generic" }
-    : { q: "No questions available.", type: "generic" };
+    ? {q:pool[Math.floor(Math.random()*pool.length)],type:"generic"}
+    : {q:"No questions available.",type:"generic"};
 }
-
-const labelForType = type =>
-  type === "attraction" ? "Attraction question" :
-  type === "generic"    ? "Generic question"    : "Custom question";
-
-function onGenerateNewQuestion() {
-  const err = $("wsd-setupq-error");
-  if (!gameState || !gameState.currentRound.attraction) {
-    if (err) err.textContent = "Select an attraction first.";
-    return;
+const labelForType=t=>t==="attraction"?"Attraction question":t==="generic"?"Generic question":"Custom question";
+function onGenerateNewQuestion(){
+  const err=$("wsd-setupq-error");
+  if(!gameState||!gameState.currentRound.attraction){
+    if(err)err.textContent="Select an attraction first.";return;
   }
-  if (err) err.textContent = "";
-  const { q, type } = drawQuestion(gameState.currentRound.attraction);
-  gameState.currentRound.question     = q;
-  gameState.currentRound.questionType = type;
-  const qTxt  = $("wsd-question-text");
-  const badge = $("wsd-question-type-badge");
-  if (qTxt)  qTxt.value        = q;
-  if (badge) badge.textContent = labelForType(type);
+  if(err)err.textContent="";
+  const {q,type}=drawQuestion(gameState.currentRound.attraction);
+  gameState.currentRound.question=q;gameState.currentRound.questionType=type;
+  const qTxt=$("wsd-question-text"),badge=$("wsd-question-type-badge");
+  if(qTxt)qTxt.value=q;if(badge)badge.textContent=labelForType(type);
   saveState();
 }
-
-function onEnterCustomQuestion() {
-  const qTxt = $("wsd-question-text");
-  if (!qTxt) return;
-  qTxt.readOnly = false;
-  qTxt.value    = "";
-  const badge = $("wsd-question-type-badge");
-  if (badge) badge.textContent = "Custom question";
-  gameState.currentRound.questionType = "custom";
-  qTxt.focus();
-  saveState();
+function onEnterCustomQuestion(){
+  const qTxt=$("wsd-question-text");if(!qTxt)return;
+  qTxt.readOnly=false;qTxt.value="";
+  const badge=$("wsd-question-type-badge");if(badge)badge.textContent="Custom question";
+  gameState.currentRound.questionType="custom";qTxt.focus();saveState();
 }
-
-function proceedToAnswers() {
-  const err = $("wsd-setupq-error");
-  if (err) err.textContent = "";
-  if (!gameState || !gameState.currentRound.attraction) {
-    if (err) err.textContent = "Please select an attraction.";
-    return;
+function proceedToAnswers(){
+  const err=$("wsd-setupq-error");if(err)err.textContent="";
+  if(!gameState||!gameState.currentRound.attraction){
+    if(err)err.textContent="Please select an attraction.";return;
   }
-  const qTxt = $("wsd-question-text");
-  const q    = qTxt ? qTxt.value.trim() : "";
-  if (!q) {
-    if (err) err.textContent = "Please enter a question.";
-    return;
-  }
-  gameState.currentRound.question     = q;
-  gameState.currentRound.answers      = [];
-  gameState.currentRound.answerIndex  = 0;
+  const qTxt=$("wsd-question-text"),q=qTxt?qTxt.value.trim():"";
+  if(!q){if(err)err.textContent="Please enter a question.";return;}
+  gameState.currentRound.question=q;
+  gameState.currentRound.answers=[];
+  gameState.currentRound.answerIndex=0;
   saveState();
-  const enterQ = $("wsd-enter-question");
-  const ansInp = $("wsd-answer-input");
-  if (enterQ) enterQ.textContent = q;
-  if (ansInp) ansInp.value = "";
+  const enterQ=$("wsd-enter-question"),ansInp=$("wsd-answer-input");
+  if(enterQ)enterQ.textContent=q;
+  if(ansInp)ansInp.value="";
   renderAnswerProgress();
   showScreen("enter-answers");
 }
-
-function renderAnswerProgress() {
-  const r      = gameState.currentRound;
-  const idx    = r.answerIndex || 0;
-  const progEl = $("wsd-answer-progress");
-  const label  = $("wsd-current-player-label");
-  const player = gameState.players[idx];
-  if (progEl) progEl.textContent = `Player ${idx + 1} of ${gameState.players.length}`;
-  if (label)  label.textContent  = player ? `${player.name}'s answer` : "Done";
+function renderAnswerProgress(){
+  const r=gameState.currentRound,idx=r.answerIndex||0;
+  const prog=$("wsd-answer-progress"),label=$("wsd-current-player-label");
+  const player=gameState.players[idx];
+  if(prog)prog.textContent=`Player ${idx+1} of ${gameState.players.length}`;
+  if(label)label.textContent=player?`${player.name}'s answer`:"Done";
 }
-
-function saveAnswerForCurrentPlayer(skip) {
-  const r      = gameState.currentRound;
-  const idx    = r.answerIndex || 0;
-  const player = gameState.players[idx];
-  const ansInp = $("wsd-answer-input");
-  const err    = $("wsd-answers-error");
-  const text   = ansInp ? ansInp.value.trim() : "";
-
-  if (err) err.textContent = "";
-  if (!skip && !text) {
-    if (err) err.textContent = "Please enter an answer or skip.";
-    return;
-  }
-
-  if (!skip) r.answers.push({ playerId: player.id, text });
-  if (ansInp) ansInp.value = "";
-  r.answerIndex = idx + 1;
-
-  if (r.answerIndex >= gameState.players.length) {
-    if (!r.answers.length) {
-      if (err) err.textContent = "No answers were entered. Abandon or go back.";
-      return;
-    }
+function saveAnswerForCurrentPlayer(skip){
+  const r=gameState.currentRound,idx=r.answerIndex||0,player=gameState.players[idx];
+  const ansInp=$("wsd-answer-input"),err=$("wsd-answers-error");
+  const text=ansInp?ansInp.value.trim():"";
+  if(err)err.textContent="";
+  if(!skip&&!text){if(err)err.textContent="Please enter an answer or skip.";return;}
+  if(!skip)r.answers.push({playerId:player.id,text});
+  if(ansInp)ansInp.value="";
+  r.answerIndex=idx+1;
+  if(r.answerIndex>=gameState.players.length){
+    if(!r.answers.length){if(err)err.textContent="No answers were entered. Abandon or go back.";return;}
     saveState();
-    showPickOverlay(() => {
-      pickRandomAnswer();
-      renderSelectAnswerScreen();
-      showScreen("select-answer");
-    });
-  } else {
-    renderAnswerProgress();
-    saveState();
+    showPickOverlay(()=>{pickRandomAnswer();renderSelectAnswerScreen();showScreen("select-answer");});
+  }else{
+    renderAnswerProgress();saveState();
   }
 }
-
-function pickRandomAnswer() {
-  const pool = gameState.currentRound.answers;
-  gameState.currentRound.selectedAnswer = pool[Math.floor(Math.random() * pool.length)];
+function pickRandomAnswer(){
+  const pool=gameState.currentRound.answers;
+  gameState.currentRound.selectedAnswer=pool[Math.floor(Math.random()*pool.length)];
 }
-
-function renderSelectAnswerScreen() {
-  const r     = gameState.currentRound;
-  const qEl   = $("wsd-select-question");
-  const ansEl = $("wsd-selected-answer");
-  if (qEl)   qEl.textContent = r.question;
-  if (!ansEl) return;
-  ansEl.classList.remove("wsd-anim-pop");
-  void ansEl.offsetWidth;
-  ansEl.textContent = `"${r.selectedAnswer.text}"`;
+function renderSelectAnswerScreen(){
+  const r=gameState.currentRound,qEl=$("wsd-select-question"),ansEl=$("wsd-selected-answer");
+  if(qEl)qEl.textContent=r.question;
+  if(!ansEl)return;
+  ansEl.classList.remove("wsd-anim-pop");void ansEl.offsetWidth;
+  ansEl.textContent=`"${r.selectedAnswer.text}"`;
   ansEl.classList.add("wsd-anim-pop");
 }
-
-function showPickOverlay(onDone) {
-  const overlay = $("wsd-pick-overlay");
-  if (!overlay) { onDone(); return; }
-  const labelEl = $("wsd-pick-label");
-  if (labelEl) labelEl.textContent = "Selecting an answer...";
-  overlay.style.display = "flex";
-  overlay.style.opacity = "1";
-  setTimeout(() => {
-    overlay.style.transition = "opacity 0.35s ease";
-    overlay.style.opacity    = "0";
-    setTimeout(() => {
-      overlay.style.display    = "none";
-      overlay.style.opacity    = "1";
-      overlay.style.transition = "";
+function showPickOverlay(onDone){
+  const overlay=$("wsd-pick-overlay");
+  if(!overlay){onDone();return;}
+  const labelEl=$("wsd-pick-label");
+  if(labelEl)labelEl.textContent="Selecting an answer...";
+  overlay.style.display="flex";
+  overlay.style.opacity="1";
+  setTimeout(()=>{
+    overlay.style.transition="opacity 0.35s ease";
+    overlay.style.opacity="0";
+    setTimeout(()=>{
+      overlay.style.display="none";
+      overlay.style.opacity="1";
+      overlay.style.transition="";
       onDone();
-    }, 350);
-  }, 1400);
+    },350);
+  },1400);
 }
 
-// --- Wagers --------------------------------------------------
-
-function goToGuessWager() {
-  const errEl = $("wsd-gw-error");
-  if (errEl) errEl.textContent = "";
-  const hb = $("wsd-house-bonus");
-  if (hb) hb.value = "0";
-
-  const r = gameState.currentRound;
-  const qEl   = $("wsd-gw-question");
-  const ansEl = $("wsd-gw-answer");
-  if (qEl)  qEl.textContent  = r.question;
-  if (ansEl) ansEl.textContent = `"${r.selectedAnswer.text}"`;
-
-  const container = $("wsd-gw-players");
-  if (!container) return;
-  container.innerHTML = "";
-
-  gameState.players.forEach(p => {
-    const row = document.createElement("div");
-    row.className = "mb-3 pb-2 border-bottom";
-
-    const playerLabel = document.createElement("div");
-    playerLabel.className = "wsd-score-row mb-1";
-    playerLabel.innerHTML = `
+function goToGuessWager(){
+  const errEl=$("wsd-gw-error");if(errEl)errEl.textContent="";
+  const hb=$("wsd-house-bonus");if(hb)hb.value="0";
+  const r=gameState.currentRound,qEl=$("wsd-gw-question"),ansEl=$("wsd-gw-answer");
+  if(qEl)qEl.textContent=r.question;
+  if(ansEl)ansEl.textContent=`"${r.selectedAnswer.text}"`;
+  const container=$("wsd-gw-players");
+  if(!container)return;
+  container.innerHTML="";
+  gameState.players.forEach(p=>{
+    const row=document.createElement("div");
+    row.className="mb-3 pb-2 border-bottom";
+    const playerLabel=document.createElement("div");
+    playerLabel.className="wsd-score-row mb-1";
+    playerLabel.innerHTML=`
       <div>
         <div class="wsd-score-name">${p.name}</div>
         <div class="wsd-score-meta">Current score: ${p.score}</div>
       </div>`;
     row.appendChild(playerLabel);
-
-    const inner = document.createElement("div");
-    inner.className = "d-flex gap-2";
-
-    const guessSel = document.createElement("select");
-    guessSel.className = "form-select wsd-form-select";
-    guessSel.dataset.playerId = p.id;
-    gameState.players.forEach(p2 => {
-      const opt = document.createElement("option");
-      opt.value = p2.id;
-      opt.textContent = p2.name + (p2.id === p.id ? " (you)" : "");
+    const inner=document.createElement("div");
+    inner.className="d-flex gap-2";
+    const guessSel=document.createElement("select");
+    guessSel.className="form-select wsd-form-select";
+    guessSel.dataset.playerId=p.id;
+    gameState.players.forEach(p2=>{
+      const opt=document.createElement("option");
+      opt.value=p2.id;
+      opt.textContent=p2.name+(p2.id===p.id?" (you)":"");
       guessSel.appendChild(opt);
     });
-
-    const wagerInp = document.createElement("input");
-    wagerInp.type = "number"; wagerInp.min = 0; wagerInp.max = p.score;
-    wagerInp.value = Math.min(1, p.score); wagerInp.inputMode = "numeric";
-    wagerInp.pattern = "[0-9]*"; wagerInp.className = "form-control wsd-form-control";
-    wagerInp.style.maxWidth = "90px"; wagerInp.dataset.playerId = p.id;
-
-    inner.appendChild(guessSel);
-    inner.appendChild(wagerInp);
+    const wagerInput=document.createElement("input");
+    wagerInput.type="number";wagerInput.min=0;wagerInput.max=p.score;
+    wagerInput.value=Math.min(1,p.score);
+    wagerInput.inputMode="numeric";wagerInput.pattern="[0-9]*";
+    wagerInput.className="form-control wsd-form-control";
+    wagerInput.style.maxWidth="90px";wagerInput.dataset.playerId=p.id;
+    inner.appendChild(guessSel);inner.appendChild(wagerInput);
     row.appendChild(inner);
     container.appendChild(row);
   });
-
   showScreen("guess-wager");
 }
-
-function clearWagersUI() {
-  $$("#wsd-gw-players select").forEach(s => { s.selectedIndex = 0; });
-  $$("#wsd-gw-players input[type=number]").forEach(inp => {
-    const p = gameState.players.find(pl => pl.id === parseInt(inp.dataset.playerId, 10));
-    inp.value = Math.min(1, p ? p.score : 1);
+function clearWagersUI(){
+  $$("#wsd-gw-players select").forEach(s=>{s.selectedIndex=0;});
+  $$("#wsd-gw-players input[type=number]").forEach(inp=>{
+    const p=gameState.players.find(pl=>pl.id===parseInt(inp.dataset.playerId,10));
+    inp.value=Math.min(1,p?p.score:1);
   });
-  const hb = $("wsd-house-bonus");
-  if (hb) hb.value = "0";
+  const hb=$("wsd-house-bonus");if(hb)hb.value="0";
 }
-
-function lockWagers() {
-  const err = $("wsd-gw-error");
-  if (err) err.textContent = "";
-
-  const hbInput = $("wsd-house-bonus");
-  let houseBonus = hbInput ? parseInt(hbInput.value, 10) : 0;
-  if (isNaN(houseBonus) || houseBonus < 0) houseBonus = 0;
-
-  const wagers = [];
-  $$("#wsd-gw-players select").forEach(sel => {
-    const pid    = parseInt(sel.dataset.playerId, 10);
-    const wInp   = document.querySelector(`#wsd-gw-players input[data-player-id="${pid}"]`);
-    let amount   = wInp ? parseInt(wInp.value, 10) : 0;
-    if (isNaN(amount) || amount < 0) amount = 0;
-    const player = gameState.players.find(pl => pl.id === pid);
-    if (player && amount > player.score) amount = player.score;
-    wagers.push({ playerId: pid, guessedAuthorId: parseInt(sel.value, 10), amount });
+function lockWagers(){
+  const err=$("wsd-gw-error");if(err)err.textContent="";
+  const hbInput=$("wsd-house-bonus");
+  let houseBonus=hbInput?parseInt(hbInput.value,10):0;
+  if(isNaN(houseBonus)||houseBonus<0)houseBonus=0;
+  const wagers=[];
+  $$("#wsd-gw-players select").forEach(sel=>{
+    const pid=parseInt(sel.dataset.playerId,10);
+    const wInp=document.querySelector(`#wsd-gw-players input[data-player-id="${pid}"]`);
+    let amount=wInp?parseInt(wInp.value,10):0;
+    if(isNaN(amount)||amount<0)amount=0;
+    const player=gameState.players.find(pl=>pl.id===pid);
+    if(player&&amount>player.score)amount=player.score;
+    wagers.push({playerId:pid,guessedAuthorId:parseInt(sel.value,10),amount});
   });
-
-  if (wagers.filter(w => w.amount > 0).length < 2) {
-    if (err) err.textContent = "At least two players must wager more than 0.";
-    return;
+  if(wagers.filter(w=>w.amount>0).length<2){
+    if(err)err.textContent="At least two players must wager more than 0.";return;
   }
-
-  gameState.currentRound.houseBonusAmount = houseBonus;
-  gameState.currentRound.wagers           = wagers;
+  gameState.currentRound.houseBonusAmount=houseBonus;
+  gameState.currentRound.wagers=wagers;
   computeRevealAndScoring();
   showScreen("reveal");
   runRevealAnimation();
   saveState();
 }
 
-// --- Scoring -------------------------------------------------
-
-function computeRevealAndScoring() {
-  const r         = gameState.currentRound;
-  const authorId  = r.selectedAnswer.playerId;
-  const payouts   = [];
-  let wrongGuessCount = 0;
-
-  gameState.players.forEach(p => {
-    const we    = r.wagers.find(w => w.playerId === p.id);
-    let delta   = 0;
-    if (we) {
-      const amount = Math.max(0, parseInt(we.amount, 10) || 0);
+function computeRevealAndScoring(){
+  const r=gameState.currentRound,authorId=r.selectedAnswer.playerId;
+  const payouts=[];let wrong=0;
+  gameState.players.forEach(p=>{
+    const we=r.wagers.find(w=>w.playerId===p.id);
+    let delta=0;
+    if(we){
+      const amount=Math.max(0,parseInt(we.amount,10)||0);
       ensurePlayerStats(p);
-      p.stats.totalRisked += amount;
-      if (amount > 0) {
-        if (parseInt(we.guessedAuthorId, 10) === authorId) delta += amount;
-        else { delta -= amount; wrongGuessCount++; }
+      p.stats.totalRisked+=amount;
+      if(amount>0){
+        if(parseInt(we.guessedAuthorId,10)===authorId)delta+=amount;
+        else{delta-=amount;wrong++;}
       }
     }
-    payouts.push({ playerId: p.id, delta });
+    payouts.push({playerId:p.id,delta});
   });
-
-  r.wrongGuessCount = wrongGuessCount;
-  r.authorBonus     = wrongGuessCount;
-  if (wrongGuessCount > 0) {
-    const ap = payouts.find(pt => pt.playerId === authorId);
-    if (ap) ap.delta += wrongGuessCount;
+  r.wrongGuessCount=wrong;
+  r.authorBonus=wrong;
+  if(wrong>0){
+    const ap=payouts.find(pt=>pt.playerId===authorId);
+    if(ap)ap.delta+=wrong;
   }
-
-  r.correctGuessers = r.wagers
-    .filter(w => Math.max(0, parseInt(w.amount, 10) || 0) > 0 && parseInt(w.guessedAuthorId, 10) === authorId)
-    .map(w => w.playerId);
-
-  const hb = Math.max(0, parseInt(r.houseBonusAmount, 10) || 0);
-  r.houseBonusResolved = 0; r.houseBonusRecipients = [];
-  r.houseBonusApplied  = false; r.houseBonusReason = "";
-
-  if (hb > 0) {
-    const cc = r.correctGuessers.length;
-    if (cc === 0) {
-      r.houseBonusReason = "No house bonus: nobody guessed correctly.";
-    } else if (hb % cc !== 0) {
-      r.houseBonusReason = "No house bonus: it could not be split evenly among correct guessers.";
-    } else {
-      const share = hb / cc;
-      r.correctGuessers.forEach(pid => {
-        const pt = payouts.find(p => p.playerId === pid);
-        if (pt) { pt.delta += share; r.houseBonusRecipients.push({ playerId: pid, extra: share }); }
+  r.correctGuessers=r.wagers
+    .filter(w=>Math.max(0,parseInt(w.amount,10)||0)>0&&parseInt(w.guessedAuthorId,10)===authorId)
+    .map(w=>w.playerId);
+  const hb=Math.max(0,parseInt(r.houseBonusAmount,10)||0);
+  r.houseBonusResolved=0;r.houseBonusRecipients=[];r.houseBonusApplied=false;r.houseBonusReason="";
+  if(hb>0){
+    const cc=r.correctGuessers.length;
+    if(cc===0){
+      r.houseBonusReason="No house bonus: nobody guessed correctly.";
+    }else if(hb%cc!==0){
+      r.houseBonusReason="No house bonus: it could not be split evenly among correct guessers.";
+    }else{
+      const share=hb/cc;
+      r.correctGuessers.forEach(pid=>{
+        const pt=payouts.find(p=>p.playerId===pid);
+        if(pt){pt.delta+=share;r.houseBonusRecipients.push({playerId:pid,extra:share});}
       });
-      r.houseBonusResolved = hb;
-      r.houseBonusApplied  = true;
-      r.houseBonusReason   = "House bonus applied evenly.";
+      r.houseBonusResolved=hb;r.houseBonusApplied=true;r.houseBonusReason="House bonus applied evenly.";
     }
   }
-
-  r.payouts = payouts;
-  r.pot     = 0;
+  r.payouts=payouts;r.pot=0;
   applyRoundResults(authorId);
 }
-
-function applyRoundResults(authorId) {
-  const r           = gameState.currentRound;
-  const scoreBefore = {};
-  const scoreAfter  = {};
-
-  gameState.players.forEach(p => {
-    const payout     = r.payouts.find(x => x.playerId === p.id);
-    scoreBefore[p.id] = p.score;
-    p.score += payout ? payout.delta : 0;
-    if (p.score < gameState.settings.minPoints) p.score = gameState.settings.minPoints;
-    scoreAfter[p.id] = p.score;
+function applyRoundResults(authorId){
+  const r=gameState.currentRound,scoreBefore={},scoreAfter={};
+  gameState.players.forEach(p=>{
+    const payout=r.payouts.find(x=>x.playerId===p.id);
+    scoreBefore[p.id]=p.score;
+    p.score+=payout?payout.delta:0;
+    if(p.score<gameState.settings.minPoints)p.score=gameState.settings.minPoints;
+    scoreAfter[p.id]=p.score;
   });
-
-  r.scoreBefore = scoreBefore;
-  r.scoreAfter  = scoreAfter;
-
-  r.correctGuessers.forEach(pid => {
-    const p = gameState.players.find(pl => pl.id === pid);
-    if (!p) return;
-    p.wins++;
-    ensurePlayerStats(p);
-    p.stats.correctGuesses = (p.stats.correctGuesses || 0) + 1;
+  r.scoreBefore=scoreBefore;r.scoreAfter=scoreAfter;
+  r.correctGuessers.forEach(pid=>{
+    const p=gameState.players.find(pl=>pl.id===pid);
+    if(!p)return;
+    p.wins++;ensurePlayerStats(p);
+    p.stats.correctGuesses=(p.stats.correctGuesses||0)+1;
   });
-
-  r.collectionsThisRound = [];
-  if (r.attraction) {
-    r.correctGuessers.forEach(pid => {
-      const p = gameState.players.find(pl => pl.id === pid);
-      if (!p) return;
-      if (!p.collected.includes(r.attraction.name)) {
+  r.collectionsThisRound=[];
+  if(r.attraction){
+    r.correctGuessers.forEach(pid=>{
+      const p=gameState.players.find(pl=>pl.id===pid);
+      if(!p)return;
+      if(!p.collected.includes(r.attraction.name)){
         p.collected.push(r.attraction.name);
         r.collectionsThisRound.push(pid);
       }
       ensurePlayerStats(p);
-      if (r.attraction.land && !p.stats.uniqueLands.includes(r.attraction.land)) {
+      if(r.attraction.land&&!p.stats.uniqueLands.includes(r.attraction.land)){
         p.stats.uniqueLands.push(r.attraction.land);
       }
     });
   }
-
   gameState.history.push({
-    roundNumber: gameState.roundNumber,
-    park: gameState.settings.park,
-    land: r.attraction?.land || "",
-    attraction: r.attraction?.name || "",
-    question: r.question,
-    questionType: r.questionType,
-    selectedAnswerText: r.selectedAnswer.text,
+    roundNumber:gameState.roundNumber,
+    park:gameState.settings.park,
+    land:r.attraction?.land||"",
+    attraction:r.attraction?.name||"",
+    question:r.question,
+    questionType:r.questionType,
+    selectedAnswerText:r.selectedAnswer.text,
     authorId,
-    wagers: r.wagers,
-    correctGuessers: r.correctGuessers,
-    payouts: r.payouts,
-    collectionsThisRound: r.collectionsThisRound,
-    manualAdjustments: [],
-    scoreBefore, scoreAfter,
-    houseBonusResolved: r.houseBonusResolved,
-    houseBonusRecipients: r.houseBonusRecipients,
-    houseBonusApplied: r.houseBonusApplied,
-    houseBonusReason: r.houseBonusReason,
-    authorBonus: r.authorBonus,
-    wrongGuessCount: r.wrongGuessCount,
-    houseBonusAmount: r.houseBonusAmount
+    wagers:r.wagers,
+    correctGuessers:r.correctGuessers,
+    payouts:r.payouts,
+    collectionsThisRound:r.collectionsThisRound,
+    manualAdjustments:[],
+    scoreBefore,scoreAfter,
+    houseBonusResolved:r.houseBonusResolved,
+    houseBonusRecipients:r.houseBonusRecipients,
+    houseBonusApplied:r.houseBonusApplied,
+    houseBonusReason:r.houseBonusReason,
+    authorBonus:r.authorBonus,
+    wrongGuessCount:r.wrongGuessCount,
+    houseBonusAmount:r.houseBonusAmount
   });
 }
 
-// --- Reveal animation ----------------------------------------
-
-function runRevealAnimation() {
-  const r    = gameState.currentRound;
-  const author = gameState.players.find(p => p.id === r.selectedAnswer.playerId);
-  const countEl     = $("wsd-reveal-countdown");
-  const authWrap    = $("wsd-reveal-author-wrap");
-  const authEl      = $("wsd-reveal-author");
-  const resultsEl   = $("wsd-reveal-results");
-  const nextWrap    = $("wsd-reveal-next-wrap");
-  const confettiEl  = $("wsd-confetti-wrap");
-  const qEl         = $("wsd-reveal-question");
-  const ansEl       = $("wsd-reveal-answer-text");
-
-  if (qEl)  qEl.textContent  = r.question;
-  if (ansEl) ansEl.textContent = `"${r.selectedAnswer.text}"`;
-  if (authWrap)   authWrap.style.display  = "none";
-  if (resultsEl)  resultsEl.innerHTML     = "";
-  if (nextWrap)   nextWrap.style.display  = "none";
-  if (confettiEl) confettiEl.innerHTML    = "";
-
-  ["3","2","1"].forEach((n, i) => {
-    setTimeout(() => {
-      if (!countEl) return;
-      countEl.textContent = n;
-      countEl.classList.remove("wsd-anim-pop");
-      void countEl.offsetWidth;
+function runRevealAnimation(){
+  const r=gameState.currentRound;
+  const author=gameState.players.find(p=>p.id===r.selectedAnswer.playerId);
+  const countEl=$("wsd-reveal-countdown"),authWrap=$("wsd-reveal-author-wrap"),
+        authEl=$("wsd-reveal-author"),resultsEl=$("wsd-reveal-results"),
+        nextWrap=$("wsd-reveal-next-wrap"),confettiEl=$("wsd-confetti-wrap"),
+        qEl=$("wsd-reveal-question"),ansEl=$("wsd-reveal-answer-text");
+  if(qEl)qEl.textContent=r.question;
+  if(ansEl)ansEl.textContent=`"${r.selectedAnswer.text}"`;
+  if(authWrap)authWrap.style.display="none";
+  if(resultsEl)resultsEl.innerHTML="";
+  if(nextWrap)nextWrap.style.display="none";
+  if(confettiEl)confettiEl.innerHTML="";
+  ["3","2","1"].forEach((n,i)=>{
+    setTimeout(()=>{
+      if(!countEl)return;
+      countEl.textContent=n;
+      countEl.classList.remove("wsd-anim-pop");void countEl.offsetWidth;
       countEl.classList.add("wsd-anim-pop");
-    }, i * 700);
+    },i*700);
   });
-
-  setTimeout(() => {
-    if (countEl) countEl.textContent = "";
-    if (authEl)  authEl.textContent  = author ? author.name : "Unknown";
-    if (authWrap) {
-      authWrap.style.display = "block";
-      authWrap.classList.remove("wsd-anim-pop");
-      void authWrap.offsetWidth;
+  setTimeout(()=>{
+    if(countEl)countEl.textContent="";
+    if(authEl)authEl.textContent=author?author.name:"Unknown";
+    if(authWrap){
+      authWrap.style.display="block";
+      authWrap.classList.remove("wsd-anim-pop");void authWrap.offsetWidth;
       authWrap.classList.add("wsd-anim-pop");
     }
+    if(r.correctGuessers.length>0&&confettiEl)spawnConfetti(confettiEl);
 
-    if (r.correctGuessers.length > 0 && confettiEl) spawnConfetti(confettiEl);
-
-    if (r.wrongGuessCount > 0 || r.houseBonusAmount > 0) {
-      const authorLine = $("wsd-no-correct-author-line");
-      if (authorLine) {
-        if (r.wrongGuessCount > 0) {
-          const b = r.authorBonus || 0;
-          const w = r.wrongGuessCount;
-          authorLine.textContent =
-            `✍️ ${author ? author.name : "the author"} earned +${b} point${b === 1 ? "" : "s"} ` +
-            `from ${w} wrong guess${w === 1 ? "" : "es"}.`;
-        } else {
-          authorLine.textContent = "";
-        }
+    if(r.wrongGuessCount>0||r.houseBonusAmount>0){
+      const authorLine=$("wsd-no-correct-author-line");
+      if(authorLine){
+        if(r.wrongGuessCount>0){
+          const b=r.authorBonus||0,w=r.wrongGuessCount;
+          authorLine.textContent=
+            `✍️ ${author?author.name:"the author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
+        }else authorLine.textContent="";
       }
-
-      const houseLine = $("wsd-house-bonus-line");
-      if (houseLine) {
-        if (r.houseBonusApplied) {
-          const names = r.houseBonusRecipients.map(hr => {
-            const p = gameState.players.find(pl => pl.id === hr.playerId);
-            return p ? `${p.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
+      const houseLine=$("wsd-house-bonus-line");
+      if(houseLine){
+        if(r.houseBonusApplied){
+          const names=r.houseBonusRecipients.map(hr=>{
+            const p=gameState.players.find(pl=>pl.id===hr.playerId);
+            return p?`${p.name} (+${hr.extra})`:`Player ${hr.playerId} (+${hr.extra})`;
           }).join(", ");
-          houseLine.textContent =
-            `🏠 House bonus +${r.houseBonusResolved} was split evenly between: ${names}.`;
-        } else if (r.houseBonusAmount > 0) {
-          houseLine.textContent = `🏠 ${r.houseBonusReason || "House bonus was not applied."}`;
-        } else {
-          houseLine.textContent = "";
-        }
+          houseLine.textContent=`🏠 House bonus +${r.houseBonusResolved} was split evenly between: ${names}.`;
+        }else if(r.houseBonusAmount>0){
+          houseLine.textContent=`🏠 ${r.houseBonusReason||"House bonus was not applied."}`;
+        }else houseLine.textContent="";
       }
-
-      try {
-        const modalEl = $("modal-no-correct");
-        if (modalEl && typeof bootstrap !== "undefined") {
-          const titleEl = modalEl.querySelector(".modal-title");
-          if (titleEl) titleEl.textContent = "Bonus Summary";
-          setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
+      try{
+        const modalEl=$("modal-no-correct");
+        if(modalEl&&typeof bootstrap!=="undefined"){
+          const titleEl=modalEl.querySelector(".modal-title");
+          if(titleEl){
+            const winnerNames=r.correctGuessers.length
+              ? r.correctGuessers
+                  .map(pid=>gameState.players.find(p=>p.id===pid)?.name)
+                  .filter(Boolean).join(" & ")
+              : null;
+            titleEl.textContent = winnerNames
+              ? `Summary — ${winnerNames} got it!`
+              : `Summary — nobody guessed ${author?author.name:"the author"}!`;
+          }
+          setTimeout(()=>new bootstrap.Modal(modalEl).show(),400);
         }
-      } catch (e) {}
+      }catch(e){}
     }
 
-    r.payouts.forEach((payout, i) => {
-      setTimeout(() => {
-        const p     = gameState.players.find(pl => pl.id === payout.playerId);
-        const wager = r.wagers.find(w => w.playerId === payout.playerId);
-        const guess = wager && gameState.players.find(pl => pl.id === wager.guessedAuthorId);
-        const ok    = r.correctGuessers.includes(payout.playerId);
-        const dStr  = `${payout.delta >= 0 ? "+" : ""}${payout.delta}`;
-        const row   = document.createElement("div");
-        row.className = "wsd-result-row";
-        row.style.animationDelay = `${i * 0.07}s`;
-        row.innerHTML = `
+    r.payouts.forEach((payout,i)=>{
+      setTimeout(()=>{
+        const p=gameState.players.find(pl=>pl.id===payout.playerId);
+        const wager=r.wagers.find(w=>w.playerId===payout.playerId);
+        const guess=wager&&gameState.players.find(pl=>pl.id===wager.guessedAuthorId);
+        const ok=r.correctGuessers.includes(payout.playerId);
+        const dStr=`${payout.delta>=0?"+":""}${payout.delta}`;
+        const row=document.createElement("div");
+        row.className="wsd-result-row";
+        row.style.animationDelay=`${i*0.07}s`;
+        row.innerHTML=`
           <div>
-            <div class="wsd-score-name">${p.name} ${ok ? "✅" : "❌"}</div>
-            <div class="wsd-score-meta">Guess: ${guess ? guess.name : "—"} • Wager: ${wager ? wager.amount : 0}</div>
+            <div class="wsd-score-name">${p.name} ${ok?"✅":"❌"}</div>
+            <div class="wsd-score-meta">Guess: ${guess?guess.name:"—"} • Wager: ${wager?wager.amount:0}</div>
           </div>
-          <div class="wsd-score-value ${payout.delta >= 0 ? "text-success" : "text-danger"}">${dStr}</div>`;
-        if (resultsEl) resultsEl.appendChild(row);
-      }, i * 120);
+          <div class="wsd-score-value ${payout.delta>=0?"text-success":"text-danger"}">${dStr}</div>`;
+        if(resultsEl)resultsEl.appendChild(row);
+      },i*120);
     });
-
-    setTimeout(() => {
-      if (nextWrap) nextWrap.style.display = "block";
-    }, r.payouts.length * 120 + 300);
-  }, 2100);
+    setTimeout(()=>{if(nextWrap)nextWrap.style.display="block";},r.payouts.length*120+300);
+  },2100);
 }
-
-function spawnConfetti(container) {
-  if (!container) return;
-  const colors = ["#ff3b30","#ffcc00","#34c759","#007aff","#ff9500","#af52de"];
-  container.style.height = "0";
-  for (let i = 0; i < 18; i++) {
-    const dot = document.createElement("div");
-    dot.className = "wsd-confetti-dot";
-    dot.style.left            = `${Math.random() * 100}%`;
-    dot.style.top             = `${Math.random() * -30}px`;
-    dot.style.background      = colors[Math.floor(Math.random() * colors.length)];
-    dot.style.animationDelay    = `${Math.random() * 0.6}s`;
-    dot.style.animationDuration = `${0.9 + Math.random() * 0.6}s`;
+function spawnConfetti(container){
+  if(!container)return;
+  const colors=["#ff3b30","#ffcc00","#34c759","#007aff","#ff9500","#af52de"];
+  container.style.height="0";
+  for(let i=0;i<18;i++){
+    const dot=document.createElement("div");
+    dot.className="wsd-confetti-dot";
+    dot.style.left=`${Math.random()*100}%`;
+    dot.style.top=`${Math.random()*-30}px`;
+    dot.style.background=colors[Math.floor(Math.random()*colors.length)];
+    dot.style.animationDelay=`${Math.random()*0.6}s`;
+    dot.style.animationDuration=`${0.9+Math.random()*0.6}s`;
     container.appendChild(dot);
   }
 }
 
-// --- Scores --------------------------------------------------
-
-function maybeRenderCollectionsScreen() {
-  if (typeof window.renderCollectionsScreen === "function") {
-    window.renderCollectionsScreen();
-  }
+function maybeRenderCollectionsScreen(){
+  if(typeof window.renderCollectionsScreen==="function")window.renderCollectionsScreen();
 }
-
-function renderScoresScreen() {
-  const listEl = $("wsd-scores-list");
-  if (!listEl) return;
-  listEl.innerHTML = "";
-
-  [...gameState.players]
-    .sort((a, b) => b.score - a.score || b.wins - a.wins)
-    .forEach((p, i) => {
-      const row = document.createElement("div");
-      row.className = "wsd-score-row wsd-anim-fade-up";
-      row.style.animationDelay = `${i * 0.05}s`;
-      row.innerHTML = `
+function renderScoresScreen(){
+  const list=$("wsd-scores-list");if(!list)return;
+  list.innerHTML="";
+  [...gameState.players].sort((a,b)=>b.score-a.score||b.wins-a.wins)
+    .forEach((p,i)=>{
+      const row=document.createElement("div");
+      row.className="wsd-score-row wsd-anim-fade-up";
+      row.style.animationDelay=`${i*0.05}s`;
+      row.innerHTML=`
         <div>
           <div class="wsd-score-name">${medal(i)}${p.name}</div>
           <div class="wsd-score-meta">Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)}</div>
         </div>
         <div class="wsd-score-value">${p.score}</div>`;
-      listEl.appendChild(row);
+      list.appendChild(row);
     });
-
   renderBonusProgress();
   renderManualAdjustmentsUI();
   maybeRenderCollectionsScreen();
 }
-
-function renderBonusProgress() {
-  const el = $("wsd-bonus-progress");
-  if (!el) return;
-
-  const players = gameState.players;
-  players.forEach(ensurePlayerStats);
-
-  const maxLand  = Math.max(0, ...players.map(getPlayerUniqueLandCount));
-  const maxAttr  = Math.max(0, ...players.map(p => p.collected.length));
-  const maxCorr  = Math.max(0, ...players.map(p => p.stats.correctGuesses || 0));
-  const maxRisk  = Math.max(0, ...players.map(p => p.stats.totalRisked    || 0));
-
-  let html = "";
-  players.forEach(p => {
-    const lc  = getPlayerUniqueLandCount(p);
-    const ac  = p.collected.length;
-    const cc  = p.stats.correctGuesses || 0;
-    const rc  = p.stats.totalRisked    || 0;
-    const lb  = lc > 0 && lc === maxLand ? FINAL_BONUS_POINTS.topLandCollector       : 0;
-    const ab  = ac > 0 && ac === maxAttr ? FINAL_BONUS_POINTS.topAttractionCollector : 0;
-    const gb  = cc > 0 && cc === maxCorr ? FINAL_BONUS_POINTS.bestGuesser            : 0;
-    const rb  = rc > 0 && rc === maxRisk ? FINAL_BONUS_POINTS.mostRiskyPlayer        : 0;
-    const tot = lb + ab + gb + rb;
-
-    html += `
+function renderBonusProgress(){
+  const el=$("wsd-bonus-progress");if(!el)return;
+  const players=gameState.players;players.forEach(ensurePlayerStats);
+  const maxLand=Math.max(0,...players.map(getPlayerUniqueLandCount));
+  const maxAttr=Math.max(0,...players.map(p=>p.collected.length));
+  const maxCorr=Math.max(0,...players.map(p=>p.stats.correctGuesses||0));
+  const maxRisk=Math.max(0,...players.map(p=>p.stats.totalRisked||0));
+  let html="";
+  players.forEach(p=>{
+    const lc=getPlayerUniqueLandCount(p);
+    const ac=p.collected.length;
+    const cc=p.stats.correctGuesses||0;
+    const rc=p.stats.totalRisked||0;
+    const lb=lc>0&&lc===maxLand?FINAL_BONUS_POINTS.topLandCollector:0;
+    const ab=ac>0&&ac===maxAttr?FINAL_BONUS_POINTS.topAttractionCollector:0;
+    const gb=cc>0&&cc===maxCorr?FINAL_BONUS_POINTS.bestGuesser:0;
+    const rb=rc>0&&rc===maxRisk?FINAL_BONUS_POINTS.mostRiskyPlayer:0;
+    const tot=lb+ab+gb+rb;
+    html+=`
       <div class="wsd-bonus-topic">
         <div class="wsd-bonus-topic-icon">🎯</div>
         <div>
           <div class="wsd-bonus-topic-title">${p.name} — projected +${tot} pts</div>
           <div class="wsd-bonus-topic-desc">
-            🗺️ Top land collector: ${lb > 0 ? "✅ +3" : `${lc} lands`}<br/>
-            🎢 Top attraction collector: ${ab > 0 ? "✅ +3" : `${ac} attractions`}<br/>
-            🧠 Best guesser: ${gb > 0 ? "✅ +2" : `${cc} correct`}<br/>
-            🎲 Most risky player: ${rb > 0 ? "✅ +2" : `${rc} risked`}
+            🗺️ Top land collector: ${lb>0?"✅ +3":`${lc} lands`}<br/>
+            🎢 Top attraction collector: ${ab>0?"✅ +3":`${ac} attractions`}<br/>
+            🧠 Best guesser: ${gb>0?"✅ +2":`${cc} correct`}<br/>
+            🎲 Most risky player: ${rb>0?"✅ +2":`${rc} risked`}
           </div>
         </div>
       </div>`;
   });
-
+  // bonus explanation link moved into this panel
+  html+=`
+    <div class="wsd-text-small mt-2 text-center">
+      <a href="#" data-bs-toggle="modal" data-bs-target="#modal-bonuses">
+        How are bonuses calculated?
+      </a>
+    </div>`;
   el.innerHTML = html || "<div class='wsd-text-small'>No rounds played yet.</div>";
 }
-
-function renderManualAdjustmentsUI() {
-  const container = $("wsd-manual-adjustments");
-  if (!container) return;
-  container.innerHTML = "";
-
-  gameState.players.forEach(p => {
-    const row = document.createElement("div");
-    row.className = "wsd-score-row";
-    row.innerHTML = `
+function renderManualAdjustmentsUI(){
+  const c=$("wsd-manual-adjustments");if(!c)return;
+  c.innerHTML="";
+  gameState.players.forEach(p=>{
+    const row=document.createElement("div");
+    row.className="wsd-score-row";
+    row.innerHTML=`
       <div class="wsd-score-name">${p.name}</div>
       <div>
         <button type="button" class="btn btn-sm btn-outline-secondary me-1" data-adj="-1" data-player="${p.id}">−1</button>
         <button type="button" class="btn btn-sm btn-outline-secondary me-1" data-adj="1"  data-player="${p.id}">+1</button>
       </div>`;
-    container.appendChild(row);
+    c.appendChild(row);
   });
-
-  container.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () =>
-      adjustPlayerScore(parseInt(btn.dataset.player, 10), parseInt(btn.dataset.adj, 10))
-    );
+  c.querySelectorAll("button").forEach(btn=>{
+    btn.addEventListener("click",()=>adjustPlayerScore(parseInt(btn.dataset.player,10),parseInt(btn.dataset.adj,10)));
   });
 }
-
-function adjustPlayerScore(pid, delta) {
-  const p = gameState.players.find(pl => pl.id === pid);
-  if (!p) return;
-  p.score += delta;
-  if (p.score < gameState.settings.minPoints) p.score = gameState.settings.minPoints;
-  if (gameState.history.length > 0) {
-    const last = gameState.history[gameState.history.length - 1];
-    (last.manualAdjustments ||= []).push({ playerId: pid, delta, note: "Manual" });
+function adjustPlayerScore(pid,delta){
+  const p=gameState.players.find(pl=>pl.id===pid);if(!p)return;
+  p.score+=delta;
+  if(p.score<gameState.settings.minPoints)p.score=gameState.settings.minPoints;
+  if(gameState.history.length>0){
+    const last=gameState.history[gameState.history.length-1];
+    (last.manualAdjustments||=[]).push({playerId:pid,delta,note:"Manual"});
   }
-  saveState();
-  renderScoresScreen();
+  saveState();renderScoresScreen();
 }
-
-function invertCurrentScores() {
-  if (!gameState || gameState.players.length < 2) return;
-  const ranked      = [...gameState.players].sort((a, b) => b.score - a.score || b.wins - a.wins || a.id - b.id);
-  const scoreValues = ranked.map(p => p.score).sort((a, b) => a - b);
-  const before      = {};
-  ranked.forEach((p, i) => { before[p.id] = p.score; p.score = scoreValues[i]; });
-  if (gameState.history.length > 0) {
-    const last = gameState.history[gameState.history.length - 1];
-    (last.manualAdjustments ||= []).push({ type: "invertScores", before, note: "Invert scores" });
+function invertCurrentScores(){
+  if(!gameState||gameState.players.length<2)return;
+  const ranked=[...gameState.players].sort((a,b)=>b.score-a.score||b.wins-a.wins||a.id-b.id);
+  const scoreValues=ranked.map(p=>p.score).sort((a,b)=>a-b);
+  const before={};
+  ranked.forEach((p,i)=>{before[p.id]=p.score;p.score=scoreValues[i];});
+  if(gameState.history.length>0){
+    const last=gameState.history[gameState.history.length-1];
+    (last.manualAdjustments||=[]).push({type:"invertScores",before,note:"Invert scores"});
   }
-  saveState();
-  renderScoresScreen();
+  saveState();renderScoresScreen();
 }
-
-// --- History -------------------------------------------------
-
-function renderHistoryScreen() {
-  const container = $("wsd-history-list");
-  if (!container) return;
-  container.innerHTML = "";
-  if (!gameState.history.length) {
-    container.textContent = "No rounds played yet.";
-    return;
-  }
-
-  [...gameState.history].reverse().forEach(h => {
-    const author = gameState.players.find(p => p.id === h.authorId);
-    const wrap   = document.createElement("div");
-    wrap.className = "mb-3 pb-2 border-bottom";
-
-    let html = `<div><strong>Round ${h.roundNumber}</strong>`;
-    if (h.park)       html += ` — ${h.park}`;
-    if (h.land)       html += ` · ${h.land}`;
-    if (h.attraction) html += ` · <em>${h.attraction}</em>`;
-    html += `</div>`;
-    html += `<div class="wsd-text-small">Q: ${h.question}</div>`;
-    html += `<div class="wsd-text-small">Answer: &ldquo;${h.selectedAnswerText}&rdquo;</div>`;
-    html += `<div class="wsd-text-small">Author: <strong>${author ? author.name : "Unknown"}</strong></div>`;
-
-    h.payouts.forEach(pt => {
-      const pl    = gameState.players.find(x => x.id === pt.playerId);
-      const wager = h.wagers.find(w => w.playerId === pt.playerId);
-      const guess = wager && gameState.players.find(x => x.id === wager.guessedAuthorId);
-      const ok    = h.correctGuessers.includes(pt.playerId);
-      html += `<div class="wsd-text-small">&nbsp;&nbsp;${pl ? pl.name : "?"}: guess ${guess ? guess.name : "—"}, wager ${wager ? wager.amount : 0}, ${ok ? "✅" : "❌"}, ${pt.delta >= 0 ? "+" : ""}${pt.delta} pts</div>`;
+function renderHistoryScreen(){
+  const c=$("wsd-history-list");if(!c)return;
+  c.innerHTML="";
+  if(!gameState.history.length){c.textContent="No rounds played yet.";return;}
+  [...gameState.history].reverse().forEach(h=>{
+    const author=gameState.players.find(p=>p.id===h.authorId);
+    const wrap=document.createElement("div");
+    wrap.className="mb-3 pb-2 border-bottom";
+    let html=`<div><strong>Round ${h.roundNumber}</strong>`;
+    if(h.park)html+=` — ${h.park}`;
+    if(h.land)html+=` · ${h.land}`;
+    if(h.attraction)html+=` · <em>${h.attraction}</em>`;
+    html+=`</div>`;
+    html+=`<div class="wsd-text-small">Q: ${h.question}</div>`;
+    html+=`<div class="wsd-text-small">Answer: &ldquo;${h.selectedAnswerText}&rdquo;</div>`;
+    html+=`<div class="wsd-text-small">Author: <strong>${author?author.name:"Unknown"}</strong></div>`;
+    h.payouts.forEach(pt=>{
+      const pl=gameState.players.find(x=>x.id===pt.playerId);
+      const wager=h.wagers.find(w=>w.playerId===pt.playerId);
+      const guess=wager&&gameState.players.find(x=>x.id===wager.guessedAuthorId);
+      const ok=h.correctGuessers.includes(pt.playerId);
+      html+=`<div class="wsd-text-small">&nbsp;&nbsp;${pl?pl.name:"?"}: guess ${guess?guess.name:"—"}, wager ${wager?wager.amount:0}, ${ok?"✅":"❌"}, ${pt.delta>=0?"+":""}${pt.delta} pts</div>`;
     });
-
-    if (h.authorBonus > 0) {
-      html += `<div class="wsd-text-small">&nbsp;&nbsp;Author bonus: +${h.authorBonus}</div>`;
+    if(h.authorBonus>0){
+      html+=`<div class="wsd-text-small">&nbsp;&nbsp;Author bonus: +${h.authorBonus}</div>`;
     }
-
-    if (h.houseBonusAmount > 0 || h.houseBonusResolved > 0 || h.houseBonusReason) {
-      const names = (h.houseBonusRecipients || []).map(hr => {
-        const pl = gameState.players.find(x => x.id === hr.playerId);
-        return pl ? `${pl.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
+    if(h.houseBonusAmount>0||h.houseBonusResolved>0||h.houseBonusReason){
+      const names=(h.houseBonusRecipients||[]).map(hr=>{
+        const pl=gameState.players.find(x=>x.id===hr.playerId);
+        return pl?`${pl.name} (+${hr.extra})`:`Player ${hr.playerId} (+${hr.extra})`;
       }).join(", ");
-      html += `<div class="wsd-text-small">&nbsp;&nbsp;House bonus: ${h.houseBonusApplied ? `+${h.houseBonusResolved} split evenly: ${names}` : (h.houseBonusReason || "Not applied")}</div>`;
+      html+=`<div class="wsd-text-small">&nbsp;&nbsp;House bonus: ${h.houseBonusApplied?`+${h.houseBonusResolved} split evenly: ${names}`:(h.houseBonusReason||"Not applied")}</div>`;
     }
-
-    (h.manualAdjustments || []).forEach(adj => {
-      if (adj.type === "invertScores") {
-        html += `<div class="wsd-text-small">&nbsp;&nbsp;Manual: scores inverted</div>`;
-      } else {
-        const pl = gameState.players.find(x => x.id === adj.playerId);
-        html += `<div class="wsd-text-small">&nbsp;&nbsp;Manual: ${pl ? pl.name : "?"} ${adj.delta >= 0 ? "+" : ""}${adj.delta}</div>`;
+    (h.manualAdjustments||[]).forEach(adj=>{
+      if(adj.type==="invertScores"){
+        html+=`<div class="wsd-text-small">&nbsp;&nbsp;Manual: scores inverted</div>`;
+      }else{
+        const pl=gameState.players.find(x=>x.id===adj.playerId);
+        html+=`<div class="wsd-text-small">&nbsp;&nbsp;Manual: ${pl?pl.name:"?"} ${adj.delta>=0?"+":""}${adj.delta}</div>`;
       }
     });
-
-    wrap.innerHTML = html;
-    container.appendChild(wrap);
+    wrap.innerHTML=html;
+    c.appendChild(wrap);
   });
 }
 
-// --- Final bonuses -------------------------------------------
-
-function computeFinalBonusesAndShow() {
-  if (gameState.finalBonusesApplied) { renderFinalResults(); return; }
-
-  const players = gameState.players;
-  players.forEach(ensurePlayerStats);
-  const maxLand = Math.max(0, ...players.map(getPlayerUniqueLandCount));
-  const maxAttr = Math.max(0, ...players.map(p => p.collected.length));
-  const maxCorr = Math.max(0, ...players.map(p => p.stats.correctGuesses || 0));
-  const maxRisk = Math.max(0, ...players.map(p => p.stats.totalRisked    || 0));
-
-  players.forEach(p => {
-    p.bonusTotal = 0;
-    p.finalBonusBreakdown = {
-      topLandCollector: 0, topAttractionCollector: 0, bestGuesser: 0, mostRiskyPlayer: 0
-    };
-
-    const lc = getPlayerUniqueLandCount(p);
-    const ac = p.collected.length;
-    const cc = p.stats.correctGuesses || 0;
-    const rc = p.stats.totalRisked    || 0;
-
-    if (lc > 0 && lc === maxLand) { p.bonusTotal += FINAL_BONUS_POINTS.topLandCollector;       p.finalBonusBreakdown.topLandCollector       = FINAL_BONUS_POINTS.topLandCollector; }
-    if (ac > 0 && ac === maxAttr) { p.bonusTotal += FINAL_BONUS_POINTS.topAttractionCollector; p.finalBonusBreakdown.topAttractionCollector = FINAL_BONUS_POINTS.topAttractionCollector; }
-    if (cc > 0 && cc === maxCorr) { p.bonusTotal += FINAL_BONUS_POINTS.bestGuesser;            p.finalBonusBreakdown.bestGuesser            = FINAL_BONUS_POINTS.bestGuesser; }
-    if (rc > 0 && rc === maxRisk) { p.bonusTotal += FINAL_BONUS_POINTS.mostRiskyPlayer;        p.finalBonusBreakdown.mostRiskyPlayer        = FINAL_BONUS_POINTS.mostRiskyPlayer; }
+function computeFinalBonusesAndShow(){
+  if(gameState.finalBonusesApplied){renderFinalResults();return;}
+  const players=gameState.players;players.forEach(ensurePlayerStats);
+  const maxLand=Math.max(0,...players.map(getPlayerUniqueLandCount));
+  const maxAttr=Math.max(0,...players.map(p=>p.collected.length));
+  const maxCorr=Math.max(0,...players.map(p=>p.stats.correctGuesses||0));
+  const maxRisk=Math.max(0,...players.map(p=>p.stats.totalRisked||0));
+  players.forEach(p=>{
+    p.bonusTotal=0;
+    p.finalBonusBreakdown={topLandCollector:0,topAttractionCollector:0,bestGuesser:0,mostRiskyPlayer:0};
+    const lc=getPlayerUniqueLandCount(p);
+    const ac=p.collected.length;
+    const cc=p.stats.correctGuesses||0;
+    const rc=p.stats.totalRisked||0;
+    if(lc>0&&lc===maxLand){p.bonusTotal+=FINAL_BONUS_POINTS.topLandCollector;p.finalBonusBreakdown.topLandCollector=FINAL_BONUS_POINTS.topLandCollector;}
+    if(ac>0&&ac===maxAttr){p.bonusTotal+=FINAL_BONUS_POINTS.topAttractionCollector;p.finalBonusBreakdown.topAttractionCollector=FINAL_BONUS_POINTS.topAttractionCollector;}
+    if(cc>0&&cc===maxCorr){p.bonusTotal+=FINAL_BONUS_POINTS.bestGuesser;p.finalBonusBreakdown.bestGuesser=FINAL_BONUS_POINTS.bestGuesser;}
+    if(rc>0&&rc===maxRisk){p.bonusTotal+=FINAL_BONUS_POINTS.mostRiskyPlayer;p.finalBonusBreakdown.mostRiskyPlayer=FINAL_BONUS_POINTS.mostRiskyPlayer;}
   });
-
-  players.forEach(p => { p.score += p.bonusTotal; });
-  gameState.finalBonusesApplied = true;
+  players.forEach(p=>{p.score+=p.bonusTotal;});
+  gameState.finalBonusesApplied=true;
   saveState();
   renderFinalResults();
 }
-
-function renderFinalResults() {
-  const sorted   = [...gameState.players].sort((a, b) => b.score === a.score ? b.wins - a.wins : b.score - a.score);
-  const topScore = sorted[0].score;
-  const topWins  = sorted[0].wins;
-  const winners  = sorted.filter(p => p.score === topScore && p.wins === topWins);
-
-  const banner = $("wsd-winner-banner");
-  if (banner) {
-    banner.innerHTML = `🎉 ${winners.map(w => w.name).join(" & ")} wins! Time to collect that snack!`;
-    banner.classList.remove("wsd-anim-pop");
-    void banner.offsetWidth;
+function renderFinalResults(){
+  const sorted=[...gameState.players].sort((a,b)=>b.score===a.score?b.wins-a.wins:b.score-a.score);
+  const topScore=sorted[0].score,topWins=sorted[0].wins;
+  const winners=sorted.filter(p=>p.score===topScore&&p.wins===topWins);
+  const banner=$("wsd-winner-banner");
+  if(banner){
+    banner.innerHTML=`🎉 ${winners.map(w=>w.name).join(" & ")} wins! Time to collect that snack!`;
+    banner.classList.remove("wsd-anim-pop");void banner.offsetWidth;
     banner.classList.add("wsd-anim-pop");
   }
-
   spawnConfetti($("wsd-confetti-wrap-end"));
-
-  const container = $("wsd-final-results");
-  if (!container) return;
-  container.innerHTML = "";
-  sorted.forEach((p, i) => {
-    const row = document.createElement("div");
-    row.className = "wsd-score-row wsd-anim-fade-up";
-    row.style.animationDelay = `${i * 0.08}s`;
-    const bd = p.finalBonusBreakdown || {};
-    row.innerHTML = `
+  const c=$("wsd-final-results");if(!c)return;
+  c.innerHTML="";
+  sorted.forEach((p,i)=>{
+    const row=document.createElement("div");
+    row.className="wsd-score-row wsd-anim-fade-up";
+    row.style.animationDelay=`${i*0.08}s`;
+    const bd=p.finalBonusBreakdown||{};
+    row.innerHTML=`
       <div>
         <div class="wsd-score-name">${medal(i)}${p.name}</div>
         <div class="wsd-score-meta">Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)} · Bonus: +${p.bonusTotal}</div>
-        <div class="wsd-text-small">🗺️ +${bd.topLandCollector || 0} · 🎢 +${bd.topAttractionCollector || 0} · 🧠 +${bd.bestGuesser || 0} · 🎲 +${bd.mostRiskyPlayer || 0}</div>
+        <div class="wsd-text-small">🗺️ +${bd.topLandCollector||0} · 🎢 +${bd.topAttractionCollector||0} · 🧠 +${bd.bestGuesser||0} · 🎲 +${bd.mostRiskyPlayer||0}</div>
       </div>
       <div class="wsd-score-value">${p.score}</div>`;
-    container.appendChild(row);
+    c.appendChild(row);
   });
 }
 
-// --- Round management ----------------------------------------
-
-function abandonRound() {
-  if (gameState) gameState.roundNumber = Math.max(0, gameState.roundNumber - 1);
+function abandonRound(){
+  if(gameState)gameState.roundNumber=Math.max(0,gameState.roundNumber-1);
   startNewRoundCore();
-  if (gameState && gameState.history.length > 0) {
-    renderScoresScreen();
-    showScreen("scores");
-  } else {
-    showScreen("setup-question");
-    startNewRoundCore();
+  if(gameState&&gameState.history.length>0){
+    renderScoresScreen();showScreen("scores");
+  }else{
+    showScreen("setup-question");startNewRoundCore();
   }
 }
 
-// --- Events --------------------------------------------------
-
-function wireEvents() {
+function wireEvents(){
   debugLog("wireEvents starting");
-
-  $("wsd-start-game").addEventListener("click", startGameFromSetup);
-
-  $("wsd-reset-setup").addEventListener("click", () => {
-    const err = $("wsd-setup-error");
-    const ps  = $("wsd-park-select");
-    if (err) err.textContent = "";
-    if (ps)  ps.value = "";
-    $$("#wsd-player-inputs input").forEach((el, i) => {
-      if (i < 3) el.value = ""; else el.remove();
-    });
+  $("wsd-start-game").addEventListener("click",startGameFromSetup);
+  $("wsd-reset-setup").addEventListener("click",()=>{
+    const err=$("wsd-setup-error"),ps=$("wsd-park-select");
+    if(err)err.textContent="";
+    if(ps)ps.value="";
+    $$("#wsd-player-inputs input").forEach((el,i)=>{if(i<3)el.value="";else el.remove();});
   });
-
-  $("wsd-add-player").addEventListener("click", () => {
-    const c = $("wsd-player-inputs");
-    if (!c || c.querySelectorAll("input").length >= 8) return;
+  $("wsd-add-player").addEventListener("click",()=>{
+    const c=$("wsd-player-inputs");if(!c||c.querySelectorAll("input").length>=8)return;
     addPlayerInput(c);
   });
-
-  $("wsd-park-select").addEventListener("change", () => {
-    const name  = $("wsd-park-select").value;
-    const label = $("wsd-park-label");
-    if (label) label.textContent = name || "Not set";
+  $("wsd-park-select").addEventListener("change",()=>{
+    const name=$("wsd-park-select").value,label=$("wsd-park-label");
+    if(label)label.textContent=name||"Not set";
     applyParkTheme(name);
   });
-
-  $("wsd-attraction-select").addEventListener("change",    onAttractionChange);
-  $("wsd-generate-question").addEventListener("click",     onGenerateNewQuestion);
-  $("wsd-enter-custom-question").addEventListener("click", onEnterCustomQuestion);
-  $("wsd-to-answers").addEventListener("click",            proceedToAnswers);
-  $("wsd-abandon-from-setupq").addEventListener("click",   abandonRound);
-
-  $("wsd-save-answer").addEventListener("click",        () => saveAnswerForCurrentPlayer(false));
-  $("wsd-skip-player").addEventListener("click",        () => saveAnswerForCurrentPlayer(true));
-  $("wsd-abandon-from-answers").addEventListener("click", abandonRound);
-
-  $("wsd-select-again").addEventListener("click", () => {
-    showPickOverlay(() => { pickRandomAnswer(); renderSelectAnswerScreen(); saveState(); });
+  $("wsd-attraction-select").addEventListener("change",onAttractionChange);
+  $("wsd-generate-question").addEventListener("click",onGenerateNewQuestion);
+  $("wsd-enter-custom-question").addEventListener("click",onEnterCustomQuestion);
+  $("wsd-to-answers").addEventListener("click",proceedToAnswers);
+  $("wsd-abandon-from-setupq").addEventListener("click",abandonRound);
+  $("wsd-save-answer").addEventListener("click",()=>saveAnswerForCurrentPlayer(false));
+  $("wsd-skip-player").addEventListener("click",()=>saveAnswerForCurrentPlayer(true));
+  $("wsd-abandon-from-answers").addEventListener("click",abandonRound);
+  $("wsd-select-again").addEventListener("click",()=>{
+    showPickOverlay(()=>{pickRandomAnswer();renderSelectAnswerScreen();saveState();});
   });
-
-  $("wsd-to-wagers").addEventListener("click",          goToGuessWager);
-  $("wsd-abandon-from-select").addEventListener("click", abandonRound);
-  $("wsd-lock-wagers").addEventListener("click",         lockWagers);
-  $("wsd-clear-wagers").addEventListener("click",        clearWagersUI);
-  $("wsd-abandon-from-gw").addEventListener("click",     abandonRound);
-
-  $("wsd-to-scores").addEventListener("click", () => { renderScoresScreen(); showScreen("scores"); });
-  $("wsd-start-round").addEventListener("click", () => { startNewRoundCore(); showScreen("setup-question"); });
-  $("wsd-view-history").addEventListener("click", () => { renderHistoryScreen(); showScreen("history"); });
-  $("wsd-end-game").addEventListener("click", () => { computeFinalBonusesAndShow(); showScreen("game-end"); });
-  $("wsd-restart-game").addEventListener("click",    resetGame);
-  $("wsd-play-again").addEventListener("click",      resetGame);
-  $("wsd-view-history-end").addEventListener("click", () => { renderHistoryScreen(); showScreen("history"); });
-
-  $("wsd-close-history").addEventListener("click", () => {
-    const fb = gameState
-      ? gameState.screen === "history" ? "scores" : gameState.screen
-      : "setup-game";
-    if (fb === "scores")   renderScoresScreen();
-    if (fb === "game-end") renderFinalResults();
+  $("wsd-to-wagers").addEventListener("click",goToGuessWager);
+  $("wsd-abandon-from-select").addEventListener("click",abandonRound);
+  $("wsd-lock-wagers").addEventListener("click",lockWagers);
+  $("wsd-clear-wagers").addEventListener("click",clearWagersUI);
+  $("wsd-abandon-from-gw").addEventListener("click",abandonRound);
+  $("wsd-to-scores").addEventListener("click",()=>{renderScoresScreen();showScreen("scores");});
+  $("wsd-start-round").addEventListener("click",()=>{startNewRoundCore();showScreen("setup-question");});
+  $("wsd-view-history").addEventListener("click",()=>{renderHistoryScreen();showScreen("history");});
+  $("wsd-end-game").addEventListener("click",()=>{computeFinalBonusesAndShow();showScreen("game-end");});
+  $("wsd-restart-game").addEventListener("click",resetGame);
+  $("wsd-play-again").addEventListener("click",resetGame);
+  $("wsd-view-history-end").addEventListener("click",()=>{renderHistoryScreen();showScreen("history");});
+  $("wsd-close-history").addEventListener("click",()=>{
+    const fb=gameState? (gameState.screen==="history"?"scores":gameState.screen):"setup-game";
+    if(fb==="scores")renderScoresScreen();
+    if(fb==="game-end")renderFinalResults();
     showScreen(fb);
   });
-
-  const invertBtn = $("wsd-invert-scores");
-  if (invertBtn) invertBtn.addEventListener("click", invertCurrentScores);
-
-  $("wsd-nav-home").addEventListener("click", () => showScreen("setup-game"));
-
-  $("wsd-nav-round").addEventListener("click", requireState(() => {
-    showScreen(ROUND_SCREENS.includes(gameState.screen) ? gameState.screen : "setup-question");
+  const invertBtn=$("wsd-invert-scores");
+  if(invertBtn)invertBtn.addEventListener("click",invertCurrentScores);
+  $("wsd-nav-home").addEventListener("click",()=>showScreen("setup-game"));
+  $("wsd-nav-round").addEventListener("click",requireState(()=>{
+    showScreen(ROUND_SCREENS.includes(gameState.screen)?gameState.screen:"setup-question");
   }));
-
-  $("wsd-nav-scores").addEventListener("click", requireState(() => {
-    renderScoresScreen();
-    showScreen("scores");
-  }));
-
-  $("wsd-nav-history").addEventListener("click", requireState(() => {
-    renderHistoryScreen();
-    showScreen("history");
-  }));
+  $("wsd-nav-scores").addEventListener("click",requireState(()=>{renderScoresScreen();showScreen("scores");}));
+  $("wsd-nav-history").addEventListener("click",requireState(()=>{renderHistoryScreen();showScreen("history");}));
 }
 
-// --- Boot ----------------------------------------------------
-
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded",()=>{
   loadState();
   ensureStateShape();
   initSetupScreen();
   wireEvents();
-
-  if (gameState) {
-    const parkName = gameState.settings?.park || "Not set";
-    const parkLabel = $("wsd-park-label");
-    if (parkLabel) parkLabel.textContent = parkName;
+  if(gameState){
+    const parkName=gameState.settings?.park||"Not set";
+    const parkLabel=$("wsd-park-label");if(parkLabel)parkLabel.textContent=parkName;
     applyParkTheme(parkName);
     renderAttractionOptions();
-    const scr = gameState.screen || "setup-game";
-    if (scr === "scores")   renderScoresScreen();
-    if (scr === "history")  renderHistoryScreen();
-    if (scr === "game-end") renderFinalResults();
+    const scr=gameState.screen||"setup-game";
+    if(scr==="scores")renderScoresScreen();
+    if(scr==="history")renderHistoryScreen();
+    if(scr==="game-end")renderFinalResults();
     showScreen(scr);
-  } else {
+  }else{
     showScreen("setup-game");
   }
 });
