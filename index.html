@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8"/>
   <title>Who Said Diz</title>
-  <!-- Prevent zoom -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -52,16 +51,9 @@
     <section id="screen-setup-game" class="wsd-screen wsd-screen-active">
       <div class="wsd-card">
 
-        <!-- Header + tutorial + bonus explainer -->
+        <!-- Header + tutorial (BONUS LINK REMOVED FROM HERE) -->
         <div class="d-flex justify-content-between align-items-center mb-1">
-          <div>
-            <div class="wsd-section-title mb-0">Setup game</div>
-            <button type="button" class="wsd-btn-tertiary"
-                    style="width:auto;padding-left:0;"
-                    data-bs-toggle="modal" data-bs-target="#modal-bonuses">
-              Bonus explanation
-            </button>
-          </div>
+          <div class="wsd-section-title mb-0">Setup game</div>
           <button type="button" class="wsd-btn-tertiary" style="width:auto;"
                   data-bs-toggle="modal" data-bs-target="#modal-welcome">
             How to play
@@ -256,11 +248,9 @@
         <div class="wsd-answer-spotlight mb-3"
              id="wsd-reveal-answer-text"></div>
 
-        <!-- Countdown -->
         <div id="wsd-reveal-countdown"
              class="wsd-countdown-num text-center mb-1"></div>
 
-        <!-- Author reveal -->
         <div id="wsd-reveal-author-wrap"
              class="text-center mb-2" style="display:none;">
           <div class="wsd-text-small mb-1">
@@ -269,10 +259,8 @@
           <div id="wsd-reveal-author" class="wsd-author-reveal"></div>
         </div>
 
-        <!-- Confetti container -->
         <div id="wsd-confetti-wrap" class="wsd-confetti-wrap"></div>
 
-        <!-- Results table -->
         <div id="wsd-reveal-results"></div>
 
         <div class="wsd-actions-stack" id="wsd-reveal-next-wrap"
@@ -333,8 +321,10 @@
         </div>
 
         <div class="wsd-actions-stack wsd-mt-3">
+          <!-- Added margin via inline style for mobile simplicity -->
           <button id="wsd-start-round"
-                  class="wsd-btn-primary" type="button">
+                  class="wsd-btn-primary" type="button"
+                  style="margin-top:1.25rem;">
             Start new round
           </button>
           <button id="wsd-invert-scores"
@@ -399,21 +389,15 @@
                 background:rgba(0,110,153,0.93);
                 display:none; flex-direction:column;
                 align-items:center; justify-content:center; gap:1rem;">
-
-      <!-- Spinning emoji -->
       <div id="wsd-pick-spinner"
            style="font-size:4rem; animation:wsdSpin 0.7s linear infinite;">
         🎲
       </div>
-
-      <!-- Animated text -->
       <div id="wsd-pick-label"
            style="color:#fff; font-size:1.1rem; font-weight:700;
                   letter-spacing:0.04em; animation:wsdPulse 0.8s ease infinite;">
         Picking an answer...
       </div>
-
-      <!-- Dot loader -->
       <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
         <div class="wsd-dot-bounce" style="animation-delay:0s;"></div>
         <div class="wsd-dot-bounce" style="animation-delay:0.15s;"></div>
@@ -446,7 +430,8 @@
   </nav>
 </div>
 
-<!-- ===== MODAL: Welcome / How to play ===== -->
+<!-- MODALS (only one text change in no-correct modal title) -->
+
 <div class="modal fade" id="modal-welcome" tabindex="-1"
      aria-labelledby="modal-welcome-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -487,7 +472,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL: Author + House bonus info ===== -->
+<!-- Modal: Summary (header text simplified) -->
 <div class="modal fade" id="modal-no-correct" tabindex="-1"
      aria-labelledby="modal-no-correct-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -496,7 +481,7 @@
            style="background:linear-gradient(135deg,#ff3b30,#ff9500);
                   color:#fff;border:none;">
         <h5 class="modal-title fw-bold" id="modal-no-correct-label">
-          Bonus Summary
+          Summary
         </h5>
         <button type="button"
                 class="btn-close btn-close-white"
@@ -517,7 +502,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL: Bonus topics explainer ===== -->
+<!-- Bonus topics explainer modal stays as-is -->
 <div class="modal fade" id="modal-bonuses" tabindex="-1"
      aria-labelledby="modal-bonuses-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -622,6 +607,7 @@
     } catch (e) {}
   });
 
+  // UPDATED: collections screen now shows only counts + bars, no attraction names
   window.renderCollectionsScreen = function () {
     var container = document.getElementById("wsd-collections-progress");
     if (!container || (!window.gameState && typeof gameState === "undefined")) return;
@@ -665,10 +651,6 @@
           <div class="wsd-text-small mb-1">Lands collected (${collectedLands}/${totalLands})</div>
           <div class="progress mb-2" style="height:10px;border-radius:999px;">
             <div class="progress-bar" role="progressbar" style="width:${landPct}%;background:linear-gradient(90deg,#ffcc00,#ff9500);" aria-valuenow="${landPct}" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-
-          <div class="wsd-text-small">
-            ${player.collected && player.collected.length ? player.collected.join(", ") : "No attractions collected yet."}
           </div>
         </div>`;
     });
