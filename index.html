@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8"/>
   <title>Who Said Diz</title>
-  <!-- Prevent zoom -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -21,7 +20,6 @@
 <div class="wsd-app-shell">
   <main class="wsd-main">
 
-    <!-- Hero header -->
     <header class="wsd-hero">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
@@ -35,7 +33,6 @@
       </div>
     </header>
 
-    <!-- Floating instruction card (updates per screen) -->
     <div class="wsd-hero-card-wrapper">
       <div class="wsd-hero-card">
         <div class="wsd-avatar" id="wsd-step-icon">🎮</div>
@@ -48,11 +45,8 @@
       </div>
     </div>
 
-    <!-- ===== SCREEN: SETUP_GAME ===== -->
     <section id="screen-setup-game" class="wsd-screen wsd-screen-active">
       <div class="wsd-card">
-
-        <!-- Header + tutorial trigger -->
         <div class="d-flex justify-content-between align-items-center mb-1">
           <div class="wsd-section-title mb-0">Setup game</div>
           <button type="button" class="wsd-btn-tertiary" style="width:auto;"
@@ -62,7 +56,6 @@
         </div>
         <hr class="wsd-divider"/>
 
-        <!-- Park -->
         <div class="mb-3">
           <label class="wsd-form-label" for="wsd-park-select">Park</label>
           <select class="form-select wsd-form-select" id="wsd-park-select">
@@ -70,7 +63,6 @@
           </select>
         </div>
 
-        <!-- Players -->
         <div class="mb-3">
           <label class="wsd-form-label">Players (min 3, max 8)</label>
           <div id="wsd-player-inputs"></div>
@@ -78,22 +70,19 @@
                   class="wsd-btn-tertiary wsd-mt-2">+ Add player</button>
         </div>
 
-        <!-- Bonus points with info trigger -->
         <div class="mb-3">
           <div class="d-flex justify-content-between align-items-center">
-            <label class="wsd-form-label mb-0" for="wsd-bonus-value">
-              Bonus point value
+            <label class="wsd-form-label mb-0">
+              End-of-game bonuses
             </label>
             <button type="button" class="wsd-btn-tertiary" style="width:auto;"
                     data-bs-toggle="modal" data-bs-target="#modal-bonuses">
-              What are bonuses?
+              Bonus Summary
             </button>
           </div>
-          <input type="number" min="0"
-                 class="form-control wsd-form-control wsd-mt-1"
-                 id="wsd-bonus-value" value="1"/>
           <div class="wsd-text-small wsd-mt-1">
-            Awarded per attraction bonus category at end of game.
+            Fixed bonus values: Top Land Collector +3, Top Attraction Collector +3,
+            Best Guesser +2, Most Risky Player +2.
           </div>
         </div>
 
@@ -110,7 +99,6 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: SETUP_QUESTION ===== -->
     <section id="screen-setup-question" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Choose attraction</div>
@@ -158,7 +146,6 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: ENTER_ANSWERS ===== -->
     <section id="screen-enter-answers" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Enter answers</div>
@@ -194,7 +181,6 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: SELECT_ANSWER ===== -->
     <section id="screen-select-answer" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Selected answer</div>
@@ -220,7 +206,6 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: GUESS_WAGER ===== -->
     <section id="screen-guess-wager" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Guess &amp; wager</div>
@@ -232,9 +217,10 @@
             House bonus this round
           </label>
           <input type="number" min="0" id="wsd-house-bonus"
+                 inputmode="numeric" pattern="[0-9]*"
                  class="form-control wsd-form-control" value="0"/>
           <div class="wsd-text-small wsd-mt-1">
-            Host can add extra points into play for this round.
+            Extra points are only awarded if they can be split evenly among all correct guessers.
           </div>
         </div>
 
@@ -259,7 +245,6 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: REVEAL ===== -->
     <section id="screen-reveal" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Reveal</div>
@@ -267,11 +252,9 @@
         <div class="wsd-answer-spotlight mb-3"
              id="wsd-reveal-answer-text"></div>
 
-        <!-- Countdown -->
         <div id="wsd-reveal-countdown"
              class="wsd-countdown-num text-center mb-1"></div>
 
-        <!-- Author reveal -->
         <div id="wsd-reveal-author-wrap"
              class="text-center mb-2" style="display:none;">
           <div class="wsd-text-small mb-1">
@@ -280,10 +263,8 @@
           <div id="wsd-reveal-author" class="wsd-author-reveal"></div>
         </div>
 
-        <!-- Confetti container -->
         <div id="wsd-confetti-wrap" class="wsd-confetti-wrap"></div>
 
-        <!-- Results table -->
         <div id="wsd-reveal-results"></div>
 
         <div class="wsd-actions-stack" id="wsd-reveal-next-wrap"
@@ -295,7 +276,6 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: SCORES ===== -->
     <section id="screen-scores" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Scores</div>
@@ -303,7 +283,24 @@
 
         <hr class="wsd-divider"/>
         <div class="wsd-form-label mb-2">Bonus progress</div>
+        <div class="wsd-text-small mb-2">
+          End of game bonuses: 🗺️ Top Land Collector +3, 🎢 Top Attraction Collector +3,
+          🧠 Best Guesser +2, 🎲 Most Risky Player +2.
+        </div>
         <div id="wsd-bonus-progress"></div>
+
+        <hr class="wsd-divider"/>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="wsd-form-label mb-0">Collections progress</div>
+          <button type="button" class="wsd-btn-tertiary" style="width:auto;"
+                  data-bs-toggle="collapse" data-bs-target="#wsd-collections-panel"
+                  aria-expanded="true" aria-controls="wsd-collections-panel">
+            Show / hide
+          </button>
+        </div>
+        <div class="collapse show" id="wsd-collections-panel">
+          <div id="wsd-collections-progress"></div>
+        </div>
 
         <hr class="wsd-divider"/>
         <div class="wsd-form-label mb-1">Manual adjustments</div>
@@ -313,6 +310,10 @@
           <button id="wsd-start-round"
                   class="wsd-btn-primary" type="button">
             Start new round
+          </button>
+          <button id="wsd-invert-scores"
+                  class="wsd-btn-secondary" type="button">
+            Invert scores
           </button>
           <button id="wsd-view-history"
                   class="wsd-btn-secondary" type="button">
@@ -330,7 +331,6 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: GAME_END ===== -->
     <section id="screen-game-end" class="wsd-screen">
       <div class="wsd-card">
         <div id="wsd-winner-banner" class="wsd-winner-banner"></div>
@@ -352,7 +352,6 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: HISTORY ===== -->
     <section id="screen-history" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Round history</div>
@@ -366,27 +365,23 @@
       </div>
     </section>
 
-    <!-- ===== Answer pick loading overlay ===== -->
     <div id="wsd-pick-overlay"
          style="position:fixed; inset:0; z-index:50;
                 background:rgba(0,110,153,0.93);
                 display:none; flex-direction:column;
                 align-items:center; justify-content:center; gap:1rem;">
 
-      <!-- Spinning emoji -->
       <div id="wsd-pick-spinner"
            style="font-size:4rem; animation:wsdSpin 0.7s linear infinite;">
         🎲
       </div>
 
-      <!-- Animated text -->
       <div id="wsd-pick-label"
            style="color:#fff; font-size:1.1rem; font-weight:700;
                   letter-spacing:0.04em; animation:wsdPulse 0.8s ease infinite;">
         Picking an answer...
       </div>
 
-      <!-- Dot loader -->
       <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
         <div class="wsd-dot-bounce" style="animation-delay:0s;"></div>
         <div class="wsd-dot-bounce" style="animation-delay:0.15s;"></div>
@@ -396,7 +391,6 @@
 
   </main>
 
-  <!-- Bottom nav -->
   <nav class="wsd-bottom-nav">
     <div class="wsd-bottom-nav-inner">
       <button class="wsd-nav-item wsd-nav-item-active"
@@ -419,7 +413,6 @@
   </nav>
 </div>
 
-<!-- ===== MODAL: Welcome / How to play ===== -->
 <div class="modal fade" id="modal-welcome" tabindex="-1"
      aria-labelledby="modal-welcome-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -436,31 +429,19 @@
                 data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" style="font-size:0.9rem;">
-        <p><strong>Who Said Diz</strong> is a points game you play
-          while waiting in line at Disney. The player with the most
-          points at the end of the day wins a park snack paid for
-          everyone else.</p>
+        <p><strong>Who Said Diz</strong> is a pass-the-phone guessing game for waiting in line at the park.</p>
         <hr/>
-        <p><strong>Each round:</strong></p>
+        <p><strong>Basic steps:</strong></p>
         <ol>
-          <li>Choose the attraction you're waiting for.</li>
-          <li>Everyone secretly answers a question about it.</li>
-          <li>One answer is randomly selected.</li>
+          <li>Pick the attraction and question.</li>
+          <li>Everyone secretly enters an answer.</li>
+          <li>One answer is chosen at random.</li>
           <li>Everyone guesses who wrote it and wagers points.</li>
-          <li>If you guess correctly, you gain the points you wagered.
-              If you're wrong, you lose the points you wagered.</li>
-          <li>The author earns +1 point for every player who wagered
-              and guessed wrong.</li>
-          <li>Guess correctly on an attraction round to
-              <em>collect</em> it for end-of-day bonuses.</li>
+          <li>Right guesses gain points, wrong guesses lose points, and the author gains points from wrong guesses.</li>
         </ol>
         <hr/>
-        <p><strong>Points:</strong> Everyone starts with 10.
-           Nobody goes below 3.</p>
-        <p><strong>Bonuses</strong> are awarded at the end for
-           attraction collection milestones.</p>
-        <p><strong>Tiebreaker:</strong> Most correct guesses (wins)
-           wins the tie.</p>
+        <p><strong>How to win:</strong> Finish the day with the most points after end-of-game bonuses.</p>
+        <p><strong>Bonus note:</strong> A house bonus only applies if it can be split evenly among correct guessers.</p>
       </div>
       <div class="modal-footer border-0">
         <button type="button" class="wsd-btn-primary"
@@ -472,7 +453,6 @@
   </div>
 </div>
 
-<!-- ===== MODAL: Author + House bonus info ===== -->
 <div class="modal fade" id="modal-no-correct" tabindex="-1"
      aria-labelledby="modal-no-correct-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -481,7 +461,7 @@
            style="background:linear-gradient(135deg,#ff3b30,#ff9500);
                   color:#fff;border:none;">
         <h5 class="modal-title fw-bold" id="modal-no-correct-label">
-          Author bonus
+          Bonus Summary
         </h5>
         <button type="button"
                 class="btn-close btn-close-white"
@@ -502,7 +482,6 @@
   </div>
 </div>
 
-<!-- ===== MODAL: Bonus topics explainer ===== -->
 <div class="modal fade" id="modal-bonuses" tabindex="-1"
      aria-labelledby="modal-bonuses-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -512,64 +491,66 @@
            style="background:linear-gradient(135deg,#ff9500,#ffcc00);
                   color:#fff;border:none;">
         <h5 class="modal-title fw-bold" id="modal-bonuses-label">
-          🏅 End-of-day bonuses
+          🏅 Bonus Summary
         </h5>
         <button type="button"
                 class="btn-close btn-close-white"
                 data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" style="font-size:0.9rem;">
-        <p>You collect an attraction by
-          <strong>guessing the correct author</strong> in a round
-          tied to that attraction. Bonuses are awarded at the end
-          of the game.</p>
-        <p>All bonuses use the same <strong>bonus point value</strong>
-          you set at setup.</p>
+        <p>At the end of the game, these fixed bonuses are added to the final score:</p>
 
         <div class="wsd-bonus-topic">
           <div class="wsd-bonus-topic-icon">🗺️</div>
           <div>
             <div class="wsd-bonus-topic-title">
-              Bonus A – Lands covered
+              Top Land Collector — +3
             </div>
             <div class="wsd-bonus-topic-desc">
-              Have at least one collected attraction in every land
-              that appeared in the game.
+              Player with the most unique lands collected. Ties all earn it.
             </div>
           </div>
         </div>
 
         <div class="wsd-bonus-topic">
-          <div class="wsd-bonus-topic-icon">⭐</div>
+          <div class="wsd-bonus-topic-icon">🎢</div>
           <div>
             <div class="wsd-bonus-topic-title">
-              Bonus B – Deep in a land
+              Top Attraction Collector — +3
             </div>
             <div class="wsd-bonus-topic-desc">
-              For each land where you have 2 or more different
-              attractions collected, earn one bonus
-              (one per qualifying land).
+              Player with the most unique attractions collected. Ties all earn it.
             </div>
           </div>
         </div>
 
         <div class="wsd-bonus-topic">
-          <div class="wsd-bonus-topic-icon">🏆</div>
+          <div class="wsd-bonus-topic-icon">🧠</div>
           <div>
             <div class="wsd-bonus-topic-title">
-              Bonus C – Top collector
+              Best Guesser — +2
             </div>
             <div class="wsd-bonus-topic-desc">
-              Have the most total attractions collected overall.
-              Ties all earn it.
+              Player with the most correct guesses. Ties all earn it.
+            </div>
+          </div>
+        </div>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">🎲</div>
+          <div>
+            <div class="wsd-bonus-topic-title">
+              Most Risky Player — +2
+            </div>
+            <div class="wsd-bonus-topic-desc">
+              Player who risked the most total points during the game. Ties all earn it.
             </div>
           </div>
         </div>
 
         <hr/>
         <p class="wsd-text-small">
-          Example: if bonus value = 2 and you earn bonus A + bonus C,
-          you get +4 bonus points added to your final score.
+          House bonus reminder: extra round points are only awarded if they divide evenly among all correct guessers.
         </p>
       </div>
       <div class="modal-footer border-0">
@@ -582,14 +563,76 @@
   </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Park data -->
 <script src="data-mk.js"></script>
 <script src="data-epcot.js"></script>
-
-<!-- Game logic -->
 <script src="game.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    try {
+      var welcomeEl = document.getElementById("modal-welcome");
+      if (welcomeEl && typeof bootstrap !== "undefined") {
+        setTimeout(function () {
+          var modal = new bootstrap.Modal(welcomeEl);
+          modal.show();
+        }, 250);
+      }
+    } catch (e) {}
+  });
+
+  window.renderCollectionsScreen = function () {
+    var container = document.getElementById("wsd-collections-progress");
+    if (!container || (!window.gameState && typeof gameState === "undefined")) return;
+
+    var state = typeof gameState !== "undefined" ? gameState : window.gameState;
+    if (!state || !state.players || !state.attractions) return;
+
+    var totalAttractions = state.attractions.length || 0;
+    var landSet = new Set();
+    state.attractions.forEach(function (a) {
+      if (a && a.land) landSet.add(a.land);
+    });
+    var totalLands = landSet.size;
+
+    var html = "";
+    state.players.forEach(function (player) {
+      var collectedAttractions = Array.isArray(player.collected) ? player.collected.length : 0;
+      var collectedLandSet = new Set();
+      (player.collected || []).forEach(function (name) {
+        var attraction = state.attractions.find(function (a) { return a.name === name; });
+        if (attraction && attraction.land) collectedLandSet.add(attraction.land);
+      });
+      var collectedLands = collectedLandSet.size;
+      var attractionPct = totalAttractions ? Math.round((collectedAttractions / totalAttractions) * 100) : 0;
+      var landPct = totalLands ? Math.round((collectedLands / totalLands) * 100) : 0;
+
+      html += `
+        <div class="mb-3 pb-2 border-bottom">
+          <div class="wsd-score-row mb-2">
+            <div>
+              <div class="wsd-score-name">${player.name}</div>
+              <div class="wsd-score-meta">${collectedAttractions} attractions · ${collectedLands} lands</div>
+            </div>
+          </div>
+
+          <div class="wsd-text-small mb-1">Attractions collected (${collectedAttractions}/${totalAttractions})</div>
+          <div class="progress mb-2" style="height:10px;border-radius:999px;">
+            <div class="progress-bar" role="progressbar" style="width:${attractionPct}%;background:linear-gradient(90deg,#4fc3f7,#006e99);" aria-valuenow="${attractionPct}" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+
+          <div class="wsd-text-small mb-1">Lands collected (${collectedLands}/${totalLands})</div>
+          <div class="progress mb-2" style="height:10px;border-radius:999px;">
+            <div class="progress-bar" role="progressbar" style="width:${landPct}%;background:linear-gradient(90deg,#ffcc00,#ff9500);" aria-valuenow="${landPct}" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+
+          <div class="wsd-text-small">
+            ${player.collected && player.collected.length ? player.collected.join(", ") : "No attractions collected yet."}
+          </div>
+        </div>`;
+    });
+
+    container.innerHTML = html || '<div class="wsd-text-small">No progress yet.</div>';
+  };
+</script>
 </body>
 </html>
