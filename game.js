@@ -555,22 +555,31 @@ function runRevealAnimation(){
         }else houseLine.textContent="";
       }
       try{
-        const modalEl=$("modal-no-correct");
-        if(modalEl&&typeof bootstrap!=="undefined"){
-          const titleEl=modalEl.querySelector(".modal-title");
-          if(titleEl){
-            const winnerNames=r.correctGuessers.length
-              ? r.correctGuessers
-                  .map(pid=>gameState.players.find(p=>p.id===pid)?.name)
-                  .filter(Boolean).join(" & ")
-              : null;
-            titleEl.textContent = winnerNames
-              ? `Summary — ${winnerNames} got it!`
-              : `Summary — nobody guessed ${author?author.name:"the author"}!`;
-          }
-          setTimeout(()=>new bootstrap.Modal(modalEl).show(),400);
-        }
-      }catch(e){}
+  const modalEl = $("modal-no-correct");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    const titleEl  = modalEl.querySelector(".modal-title");
+    const authorLine = $("wsd-no-correct-author-line");
+    if (titleEl) titleEl.textContent = "Summary";
+
+    const winnerNames = r.correctGuessers.length
+      ? r.correctGuessers
+          .map(pid => gameState.players.find(p => p.id === pid)?.name)
+          .filter(Boolean).join(" & ")
+      : null;
+
+    if (authorLine) {
+      if (winnerNames) {
+        authorLine.textContent = `✅ ${winnerNames} got it right this round.`;
+      } else {
+        authorLine.textContent =
+          `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+      }
+    }
+
+    setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
+  }
+} catch(e) {}
+
     }
 
     r.payouts.forEach((payout,i)=>{
