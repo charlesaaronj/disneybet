@@ -894,19 +894,17 @@ function wireEvents(){
 const invertBtn = $("wsd-invert-scores");
 if (invertBtn) {
   invertBtn.addEventListener("click", () => {
-    // Existing behavior: flip scores and re-render
-    invertScores();
-    renderScores();
+    // Use the existing inversion logic
+    invertCurrentScores();
 
-    // New: inline feedback under the buttons
+    // Inline feedback under the buttons
     const statusEl = $("wsd-invert-status");
     if (statusEl) {
-      statusEl.textContent = "Scores inverted for this view. Tap again to flip back.";
+      statusEl.textContent = "Scores inverted. Tap again to flip back.";
       statusEl.style.color = "#007aff";
 
       setTimeout(() => {
-        // Only clear if it hasn't been overwritten by something else
-        if (statusEl.textContent === "Scores inverted for this view. Tap again to flip back.") {
+        if (statusEl.textContent === "Scores inverted. Tap again to flip back.") {
           statusEl.textContent = "";
         }
       }, 2200);
