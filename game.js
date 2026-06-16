@@ -503,106 +503,123 @@ function applyRoundResults(authorId){
 }
 
 function runRevealAnimation(){
-  const r=gameState.currentRound;
-  const author=gameState.players.find(p=>p.id===r.selectedAnswer.playerId);
-  const countEl=$("wsd-reveal-countdown"),authWrap=$("wsd-reveal-author-wrap"),
-        authEl=$("wsd-reveal-author"),resultsEl=$("wsd-reveal-results"),
-        nextWrap=$("wsd-reveal-next-wrap"),confettiEl=$("wsd-confetti-wrap"),
-        qEl=$("wsd-reveal-question"),ansEl=$("wsd-reveal-answer-text");
-  if(qEl)qEl.textContent=r.question;
-  if(ansEl)ansEl.textContent=`"${r.selectedAnswer.text}"`;
-  if(authWrap)authWrap.style.display="none";
-  if(resultsEl)resultsEl.innerHTML="";
-  if(nextWrap)nextWrap.style.display="none";
-  if(confettiEl)confettiEl.innerHTML="";
+  const r  = gameState.currentRound;
+  const author = gameState.players.find(p => p.id === r.selectedAnswer?.playerId);
+  const countEl    = $("wsd-reveal-countdown");
+  const authWrap   = $("wsd-reveal-author-wrap");
+  const authEl     = $("wsd-reveal-author");
+  const resultsEl  = $("wsd-reveal-results");
+  const nextWrap   = $("wsd-reveal-next-wrap");
+  const confettiEl = $("wsd-confetti-wrap");
+  const qEl        = $("wsd-reveal-question");
+  const ansEl      = $("wsd-reveal-answer-text");
+
+  if (qEl) qEl.textContent = r.question;
+  if (ansEl && r.selectedAnswer) ansEl.textContent = `"${r.selectedAnswer.text}"`;
+  if (authWrap)  authWrap.style.display = "none";
+  if (resultsEl) resultsEl.innerHTML    = "";
+  if (nextWrap)  nextWrap.style.display = "none";
+  if (confettiEl) confettiEl.innerHTML  = "";
+
   ["3","2","1"].forEach((n,i)=>{
     setTimeout(()=>{
-      if(!countEl)return;
-      countEl.textContent=n;
-      countEl.classList.remove("wsd-anim-pop");void countEl.offsetWidth;
+      if (!countEl) return;
+      countEl.textContent = n;
+      countEl.classList.remove("wsd-anim-pop");
+      void countEl.offsetWidth;
       countEl.classList.add("wsd-anim-pop");
-    },i*700);
+    }, i * 700);
   });
+
   setTimeout(()=>{
-    if(countEl)countEl.textContent="";
-    if(authEl)authEl.textContent=author?author.name:"Unknown";
-    if(authWrap){
-      authWrap.style.display="block";
-      authWrap.classList.remove("wsd-anim-pop");void authWrap.offsetWidth;
+    if (countEl) countEl.textContent = "";
+    if (authEl)  authEl.textContent  = author ? author.name : "Unknown";
+    if (authWrap) {
+      authWrap.style.display = "block";
+      authWrap.classList.remove("wsd-anim-pop");
+      void authWrap.offsetWidth;
       authWrap.classList.add("wsd-anim-pop");
     }
-    if(r.correctGuessers.length>0&&confettiEl)spawnConfetti(confettiEl);
 
-    if(r.wrongGuessCount>0||r.houseBonusAmount>0){
-      const authorLine=$("wsd-no-correct-author-line");
-      if(authorLine){
-        if(r.wrongGuessCount>0){
-          const b=r.authorBonus||0,w=r.wrongGuessCount;
-          authorLine.textContent=
-            `✍️ ${author?author.name:"the author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
-        }else authorLine.textContent="";
+    if (r.correctGuessers.length > 0 && confettiEl) {
+      spawnConfetti(confettiEl);
+    }
+
+    // Only show the summary modal when there were wrong guesses or a house bonus amount
+    if (r.wrongGuessCount > 0 || r.houseBonusAmount > 0) {
+      const authorLine = $("wsd-no-correct-author-line");
+      const houseLine  = $("wsd-house-bonus-line");
+
+      // Winner / nobody line
+      const winnerNames = r.correctGuessers.length
+        ? r.correctGuessers
+            .map(pid => gameState.players.find(p => p.id === pid)?.name)
+            .filter(Boolean)
+            .join(" & ")
+        : null;
+
+      if (authorLine) {
+        if (winnerNames) {
+          authorLine.textContent = `✅ ${winnerNames} got it right this round.`;
+        } else {
+          authorLine.textContent =
+            `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+        }
       }
-      const houseLine=$("wsd-house-bonus-line");
-      if(houseLine){
-        if(r.houseBonusApplied){
-          const names=r.houseBonusRecipients.map(hr=>{
-            const p=gameState.players.find(pl=>pl.id===hr.playerId);
-            return p?`${p.name} (+${hr.extra})`:`Player ${hr.playerId} (+${hr.extra})`;
+
+      // House bonus line (your existing logic)
+      if (houseLine) {
+        if (r.houseBonusApplied) {
+          const names = r.houseBonusRecipients.map(hr => {
+            const p = gameState.players.find(pl => pl.id === hr.playerId);
+            return p ? `${p.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
           }).join(", ");
-          houseLine.textContent=`🏠 House bonus +${r.houseBonusResolved} was split evenly between: ${names}.`;
-        }else if(r.houseBonusAmount>0){
-          houseLine.textContent=`🏠 ${r.houseBonusReason||"House bonus was not applied."}`;
-        }else houseLine.textContent="";
+          houseLine.textContent =
+            `🏠 House bonus +${r.houseBonusResolved} was split evenly between: ${names}.`;
+        } else if (r.houseBonusAmount > 0) {
+          houseLine.textContent =
+            `🏠 ${r.houseBonusReason || "House bonus was not applied."}`;
+        } else {
+          houseLine.textContent = "";
+        }
       }
-      try{
-  const modalEl = $("modal-no-correct");
-  if (modalEl && typeof bootstrap !== "undefined") {
-    const titleEl  = modalEl.querySelector(".modal-title");
-    const authorLine = $("wsd-no-correct-author-line");
-    if (titleEl) titleEl.textContent = "Summary";
 
-    const winnerNames = r.correctGuessers.length
-      ? r.correctGuessers
-          .map(pid => gameState.players.find(p => p.id === pid)?.name)
-          .filter(Boolean).join(" & ")
-      : null;
-
-    if (authorLine) {
-      if (winnerNames) {
-        authorLine.textContent = `✅ ${winnerNames} got it right this round.`;
-      } else {
-        authorLine.textContent =
-          `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
-      }
+      // Show the modal
+      try {
+        const modalEl = $("modal-no-correct");
+        if (modalEl && typeof bootstrap !== "undefined") {
+          const titleEl = modalEl.querySelector(".modal-title");
+          if (titleEl) titleEl.textContent = "Summary";
+          setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
+        }
+      } catch (e) {}
     }
 
-    setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
-  }
-} catch(e) {}
-
-    }
-
+    // Result rows
     r.payouts.forEach((payout,i)=>{
       setTimeout(()=>{
-        const p=gameState.players.find(pl=>pl.id===payout.playerId);
-        const wager=r.wagers.find(w=>w.playerId===payout.playerId);
-        const guess=wager&&gameState.players.find(pl=>pl.id===wager.guessedAuthorId);
-        const ok=r.correctGuessers.includes(payout.playerId);
-        const dStr=`${payout.delta>=0?"+":""}${payout.delta}`;
-        const row=document.createElement("div");
-        row.className="wsd-result-row";
-        row.style.animationDelay=`${i*0.07}s`;
-        row.innerHTML=`
+        const p     = gameState.players.find(pl => pl.id === payout.playerId);
+        const wager = r.wagers.find(w => w.playerId === payout.playerId);
+        const guess = wager && gameState.players.find(pl => pl.id === wager.guessedAuthorId);
+        const ok    = r.correctGuessers.includes(payout.playerId);
+        const dStr  = `${payout.delta >= 0 ? "+" : ""}${payout.delta}`;
+        const row   = document.createElement("div");
+        row.className = "wsd-result-row";
+        row.style.animationDelay = `${i * 0.07}s`;
+        row.innerHTML = `
           <div>
-            <div class="wsd-score-name">${p.name} ${ok?"✅":"❌"}</div>
-            <div class="wsd-score-meta">Guess: ${guess?guess.name:"—"} • Wager: ${wager?wager.amount:0}</div>
+            <div class="wsd-score-name">${p.name} ${ok ? "✅" : "❌"}</div>
+            <div class="wsd-score-meta">Guess: ${guess ? guess.name : "—"} • Wager: ${wager ? wager.amount : 0}</div>
           </div>
-          <div class="wsd-score-value ${payout.delta>=0?"text-success":"text-danger"}">${dStr}</div>`;
-        if(resultsEl)resultsEl.appendChild(row);
-      },i*120);
+          <div class="wsd-score-value ${payout.delta >= 0 ? "text-success" : "text-danger"}">${dStr}</div>`;
+        if (resultsEl) resultsEl.appendChild(row);
+      }, i * 120);
     });
-    setTimeout(()=>{if(nextWrap)nextWrap.style.display="block";},r.payouts.length*120+300);
-  },2100);
+
+    setTimeout(()=>{
+      if (nextWrap) nextWrap.style.display = "block";
+    }, r.payouts.length * 120 + 300);
+  }, 2100);
 }
 function spawnConfetti(container){
   if(!container)return;
