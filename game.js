@@ -431,7 +431,7 @@ function computeRevealAndScoring(){
   if(hb>0){
     const cc=r.correctGuessers.length;
     if(cc===0){
-      r.houseBonusReason="No house bonus: nobody guessed correctly.";
+      r.houseBonusReason="No house bonus: No correct guesses.";
     }else if(hb%cc!==0){
       r.houseBonusReason="No house bonus: it could not be split evenly among correct guessers.";
     }else{
@@ -554,23 +554,34 @@ function runRevealAnimation(){
           houseLine.textContent=`🏠 ${r.houseBonusReason||"House bonus was not applied."}`;
         }else houseLine.textContent="";
       }
-      try{
-        const modalEl=$("modal-no-correct");
-        if(modalEl&&typeof bootstrap!=="undefined"){
-          const titleEl=modalEl.querySelector(".modal-title");
-          if(titleEl){
-            const winnerNames=r.correctGuessers.length
-              ? r.correctGuessers
-                  .map(pid=>gameState.players.find(p=>p.id===pid)?.name)
-                  .filter(Boolean).join(" & ")
-              : null;
-            titleEl.textContent = winnerNames
-              ? `Summary — ${winnerNames} got it!`
-              : `Summary — nobody guessed ${author?author.name:"the author"}!`;
-          }
-          setTimeout(()=>new bootstrap.Modal(modalEl).show(),400);
-        }
-      }catch(e){}
+      try {
+  const modalEl = $("modal-no-correct");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    // Header: always just "Summary"
+    const titleEl = modalEl.querySelector(".modal-title");
+    if (titleEl) titleEl.textContent = "Summary";
+
+    // Body: show who got it right or that nobody did
+    const authorLine = $("wsd-no-correct-author-line");
+    if (authorLine) {
+      const winnerNames = r.correctGuessers.length
+        ? r.correctGuessers
+            .map(pid => gameState.players.find(p => p.id === pid)?.name)
+            .filter(Boolean)
+            .join(" & ")
+        : null;
+
+      if (winnerNames) {
+        authorLine.textContent = `✅ ${winnerNames} got it right this round.`;
+      } else {
+        authorLine.textContent =
+          `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+      }
+    }
+
+    setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
+  }
+} catch (e) {}
     }
 
     r.payouts.forEach((payout,i)=>{
