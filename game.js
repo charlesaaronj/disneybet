@@ -891,6 +891,28 @@ function wireEvents(){
   $("wsd-nav-scores").addEventListener("click",requireState(()=>{renderScoresScreen();showScreen("scores");}));
   $("wsd-nav-history").addEventListener("click",requireState(()=>{renderHistoryScreen();showScreen("history");}));
 }
+const invertBtn = $("wsd-invert-scores");
+if (invertBtn) {
+  invertBtn.addEventListener("click", () => {
+    // Existing behavior: flip scores and re-render
+    invertScores();
+    renderScores();
+
+    // New: inline feedback under the buttons
+    const statusEl = $("wsd-invert-status");
+    if (statusEl) {
+      statusEl.textContent = "Scores inverted for this view. Tap again to flip back.";
+      statusEl.style.color = "#007aff";
+
+      setTimeout(() => {
+        // Only clear if it hasn't been overwritten by something else
+        if (statusEl.textContent === "Scores inverted for this view. Tap again to flip back.") {
+          statusEl.textContent = "";
+        }
+      }, 2200);
+    }
+  });
+}
 
 document.addEventListener("DOMContentLoaded",()=>{
   loadState();
