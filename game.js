@@ -351,7 +351,7 @@ function goToGuessWager(){
     gameState.players.forEach(p2=>{
       const opt=document.createElement("option");
       opt.value=p2.id;
-      opt.textContent=p2.name+(p2.id===p.id?" (you)":"");
+      opt.textContent=p2.name;
       guessSel.appendChild(opt);
     });
     const wagerInput=document.createElement("input");
