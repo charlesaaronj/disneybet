@@ -590,15 +590,29 @@ function runRevealAnimation(){
         }
       }
 
-      // Show the modal
+            // Show the modal (debug-safe version)
       try {
         const modalEl = $("modal-no-correct");
+        console.log("summary modal:", !!modalEl, "bootstrap:", typeof bootstrap);
+
         if (modalEl && typeof bootstrap !== "undefined") {
           const titleEl = modalEl.querySelector(".modal-title");
           if (titleEl) titleEl.textContent = "Summary";
-          setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
+
+          // Ensure any previous instance is cleaned up
+          if (bootstrap.Modal.getInstance(modalEl)) {
+            bootstrap.Modal.getInstance(modalEl).hide();
+          }
+
+          const m = new bootstrap.Modal(modalEl, {
+            backdrop: true,
+            focus: true
+          });
+          m.show();
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Error showing summary modal", e);
+      }
     }
 
     // Result rows
