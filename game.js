@@ -545,12 +545,12 @@ function runRevealAnimation(){
       spawnConfetti(confettiEl);
     }
 
-    // Show the summary modal ONLY if there is an author bonus or a house bonus amount
+        // Only show the summary modal when there were wrong guesses or a house bonus amount
     if (r.wrongGuessCount > 0 || r.houseBonusAmount > 0) {
       const authorLine = $("wsd-no-correct-author-line");
       const houseLine  = $("wsd-house-bonus-line");
 
-      // Winner / nobody line
+      // Winner / nobody + author bonus
       const winnerNames = r.correctGuessers.length
         ? r.correctGuessers
             .map(pid => gameState.players.find(p => p.id === pid)?.name)
@@ -559,7 +559,6 @@ function runRevealAnimation(){
         : null;
 
       if (authorLine) {
-        // Always show who got it right / nobody, plus author bonus if any
         let baseText = winnerNames
           ? `✅ ${winnerNames} got it right this round.`
           : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
@@ -567,9 +566,8 @@ function runRevealAnimation(){
         if (r.wrongGuessCount > 0) {
           const b = r.authorBonus || 0;
           const w = r.wrongGuessCount;
-          baseText += ` ${author ? author.name : "The author"} earned +${b} point${b === 1 ? "" : "s"} from ${w} wrong guess${w === 1 ? "" : "es"}.`;
+          baseText += ` ${author ? author.name : "The author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
         }
-
         authorLine.textContent = baseText;
       }
 
@@ -590,24 +588,27 @@ function runRevealAnimation(){
         }
       }
 
-            // Show the modal (debug-safe version)
+      // Show the summary modal, closing any other open modal first
       try {
         const modalEl = $("modal-no-correct");
         console.log("summary modal:", !!modalEl, "bootstrap:", typeof bootstrap);
 
         if (modalEl && typeof bootstrap !== "undefined") {
+          // Close any currently-open Bootstrap modal (e.g., welcome)
+          const openModalEl = document.querySelector(".modal.show");
+          if (openModalEl) {
+            const existing = bootstrap.Modal.getInstance(openModalEl);
+            if (existing) existing.hide();
+          }
+
           const titleEl = modalEl.querySelector(".modal-title");
           if (titleEl) titleEl.textContent = "Summary";
 
-          // Ensure any previous instance is cleaned up
-          if (bootstrap.Modal.getInstance(modalEl)) {
-            bootstrap.Modal.getInstance(modalEl).hide();
-          }
+          // Ensure we use a fresh instance
+          const existingSummary = bootstrap.Modal.getInstance(modalEl);
+          if (existingSummary) existingSummary.hide();
 
-          const m = new bootstrap.Modal(modalEl, {
-            backdrop: true,
-            focus: true
-          });
+          const m = new bootstrap.Modal(modalEl, { backdrop:true, focus:true });
           m.show();
         }
       } catch (e) {
