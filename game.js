@@ -893,24 +893,9 @@ function wireEvents(){
 }
 const invertBtn = $("wsd-invert-scores");
 if (invertBtn) {
-  invertBtn.addEventListener("click", () => {
-    // Use the existing inversion logic
-    invertCurrentScores();
-
-    // Inline feedback under the buttons
-    const statusEl = $("wsd-invert-status");
-    if (statusEl) {
-      statusEl.textContent = "Scores inverted. Tap again to flip back.";
-      statusEl.style.color = "#007aff";
-
-      setTimeout(() => {
-        if (statusEl.textContent === "Scores inverted. Tap again to flip back.") {
-          statusEl.textContent = "";
-        }
-      }, 2200);
-    }
-  });
+  invertBtn.addEventListener("click", invertCurrentScores);
 }
+
 
 document.addEventListener("DOMContentLoaded",()=>{
   loadState();
