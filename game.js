@@ -545,7 +545,7 @@ function runRevealAnimation(){
       spawnConfetti(confettiEl);
     }
 
-    // Only show the summary modal when there were wrong guesses or a house bonus amount
+    // Show the summary modal ONLY if there is an author bonus or a house bonus amount
     if (r.wrongGuessCount > 0 || r.houseBonusAmount > 0) {
       const authorLine = $("wsd-no-correct-author-line");
       const houseLine  = $("wsd-house-bonus-line");
@@ -559,15 +559,21 @@ function runRevealAnimation(){
         : null;
 
       if (authorLine) {
-        if (winnerNames) {
-          authorLine.textContent = `✅ ${winnerNames} got it right this round.`;
-        } else {
-          authorLine.textContent =
-            `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+        // Always show who got it right / nobody, plus author bonus if any
+        let baseText = winnerNames
+          ? `✅ ${winnerNames} got it right this round.`
+          : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+
+        if (r.wrongGuessCount > 0) {
+          const b = r.authorBonus || 0;
+          const w = r.wrongGuessCount;
+          baseText += ` ${author ? author.name : "The author"} earned +${b} point${b === 1 ? "" : "s"} from ${w} wrong guess${w === 1 ? "" : "es"}.`;
         }
+
+        authorLine.textContent = baseText;
       }
 
-      // House bonus line (your existing logic)
+      // House bonus line
       if (houseLine) {
         if (r.houseBonusApplied) {
           const names = r.houseBonusRecipients.map(hr => {
