@@ -20,6 +20,7 @@
 <div class="wsd-app-shell">
   <main class="wsd-main">
 
+    <!-- Hero header -->
     <header class="wsd-hero">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
@@ -33,6 +34,7 @@
       </div>
     </header>
 
+    <!-- Floating instruction card (updates per screen) -->
     <div class="wsd-hero-card-wrapper">
       <div class="wsd-hero-card">
         <div class="wsd-avatar" id="wsd-step-icon">🎮</div>
@@ -45,8 +47,11 @@
       </div>
     </div>
 
+    <!-- ===== SCREEN: SETUP_GAME ===== -->
     <section id="screen-setup-game" class="wsd-screen wsd-screen-active">
       <div class="wsd-card">
+
+        <!-- Header + tutorial trigger -->
         <div class="d-flex justify-content-between align-items-center mb-1">
           <div class="wsd-section-title mb-0">Setup game</div>
           <button type="button" class="wsd-btn-tertiary" style="width:auto;"
@@ -56,6 +61,7 @@
         </div>
         <hr class="wsd-divider"/>
 
+        <!-- Park -->
         <div class="mb-3">
           <label class="wsd-form-label" for="wsd-park-select">Park</label>
           <select class="form-select wsd-form-select" id="wsd-park-select">
@@ -63,27 +69,12 @@
           </select>
         </div>
 
+        <!-- Players -->
         <div class="mb-3">
           <label class="wsd-form-label">Players (min 3, max 8)</label>
           <div id="wsd-player-inputs"></div>
           <button id="wsd-add-player" type="button"
                   class="wsd-btn-tertiary wsd-mt-2">+ Add player</button>
-        </div>
-
-        <div class="mb-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <label class="wsd-form-label mb-0">
-              End-of-game bonuses
-            </label>
-            <button type="button" class="wsd-btn-tertiary" style="width:auto;"
-                    data-bs-toggle="modal" data-bs-target="#modal-bonuses">
-              Bonus Summary
-            </button>
-          </div>
-          <div class="wsd-text-small wsd-mt-1">
-            Fixed bonus values: Top Land Collector +3, Top Attraction Collector +3,
-            Best Guesser +2, Most Risky Player +2.
-          </div>
         </div>
 
         <div class="wsd-actions-stack">
@@ -99,6 +90,7 @@
       </div>
     </section>
 
+    <!-- ===== SCREEN: SETUP_QUESTION ===== -->
     <section id="screen-setup-question" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Choose attraction</div>
@@ -146,6 +138,7 @@
       </div>
     </section>
 
+    <!-- ===== SCREEN: ENTER_ANSWERS ===== -->
     <section id="screen-enter-answers" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Enter answers</div>
@@ -181,6 +174,7 @@
       </div>
     </section>
 
+    <!-- ===== SCREEN: SELECT_ANSWER ===== -->
     <section id="screen-select-answer" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Selected answer</div>
@@ -206,6 +200,7 @@
       </div>
     </section>
 
+    <!-- ===== SCREEN: GUESS_WAGER ===== -->
     <section id="screen-guess-wager" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Guess &amp; wager</div>
@@ -245,6 +240,7 @@
       </div>
     </section>
 
+    <!-- ===== SCREEN: REVEAL ===== -->
     <section id="screen-reveal" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Reveal</div>
@@ -252,9 +248,11 @@
         <div class="wsd-answer-spotlight mb-3"
              id="wsd-reveal-answer-text"></div>
 
+        <!-- Countdown -->
         <div id="wsd-reveal-countdown"
              class="wsd-countdown-num text-center mb-1"></div>
 
+        <!-- Author reveal -->
         <div id="wsd-reveal-author-wrap"
              class="text-center mb-2" style="display:none;">
           <div class="wsd-text-small mb-1">
@@ -263,8 +261,10 @@
           <div id="wsd-reveal-author" class="wsd-author-reveal"></div>
         </div>
 
+        <!-- Confetti container -->
         <div id="wsd-confetti-wrap" class="wsd-confetti-wrap"></div>
 
+        <!-- Results table -->
         <div id="wsd-reveal-results"></div>
 
         <div class="wsd-actions-stack" id="wsd-reveal-next-wrap"
@@ -276,32 +276,41 @@
       </div>
     </section>
 
+    <!-- ===== SCREEN: SCORES ===== -->
     <section id="screen-scores" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Scores</div>
         <div id="wsd-scores-list" class="mb-3"></div>
 
+        <!-- Bonus progress (collapsed by default) -->
         <hr class="wsd-divider"/>
-        <div class="wsd-form-label mb-2">Bonus progress</div>
-        <div class="wsd-text-small mb-2">
-          End of game bonuses: 🗺️ Top Land Collector +3, 🎢 Top Attraction Collector +3,
-          🧠 Best Guesser +2, 🎲 Most Risky Player +2.
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="wsd-form-label mb-0">Bonus progress</div>
+          <button type="button" class="wsd-btn-tertiary" style="width:auto;"
+                  data-bs-toggle="collapse" data-bs-target="#wsd-bonus-panel"
+                  aria-expanded="false" aria-controls="wsd-bonus-panel">
+            Show / hide
+          </button>
         </div>
-        <div id="wsd-bonus-progress"></div>
+        <div class="collapse" id="wsd-bonus-panel">
+          <div id="wsd-bonus-progress"></div>
+        </div>
 
+        <!-- Collections progress (collapsed by default) -->
         <hr class="wsd-divider"/>
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div class="wsd-form-label mb-0">Collections progress</div>
           <button type="button" class="wsd-btn-tertiary" style="width:auto;"
                   data-bs-toggle="collapse" data-bs-target="#wsd-collections-panel"
-                  aria-expanded="true" aria-controls="wsd-collections-panel">
+                  aria-expanded="false" aria-controls="wsd-collections-panel">
             Show / hide
           </button>
         </div>
-        <div class="collapse show" id="wsd-collections-panel">
+        <div class="collapse" id="wsd-collections-panel">
           <div id="wsd-collections-progress"></div>
         </div>
 
+        <!-- Manual adjustments -->
         <hr class="wsd-divider"/>
         <div class="wsd-form-label mb-1">Manual adjustments</div>
         <div id="wsd-manual-adjustments"></div>
@@ -331,6 +340,7 @@
       </div>
     </section>
 
+    <!-- ===== SCREEN: GAME_END ===== -->
     <section id="screen-game-end" class="wsd-screen">
       <div class="wsd-card">
         <div id="wsd-winner-banner" class="wsd-winner-banner"></div>
@@ -352,6 +362,7 @@
       </div>
     </section>
 
+    <!-- ===== SCREEN: HISTORY ===== -->
     <section id="screen-history" class="wsd-screen">
       <div class="wsd-card">
         <div class="wsd-section-title">Round history</div>
@@ -365,23 +376,27 @@
       </div>
     </section>
 
+    <!-- ===== Answer pick loading overlay ===== -->
     <div id="wsd-pick-overlay"
          style="position:fixed; inset:0; z-index:50;
                 background:rgba(0,110,153,0.93);
                 display:none; flex-direction:column;
                 align-items:center; justify-content:center; gap:1rem;">
 
+      <!-- Spinning emoji -->
       <div id="wsd-pick-spinner"
            style="font-size:4rem; animation:wsdSpin 0.7s linear infinite;">
         🎲
       </div>
 
+      <!-- Animated text -->
       <div id="wsd-pick-label"
            style="color:#fff; font-size:1.1rem; font-weight:700;
                   letter-spacing:0.04em; animation:wsdPulse 0.8s ease infinite;">
         Picking an answer...
       </div>
 
+      <!-- Dot loader -->
       <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
         <div class="wsd-dot-bounce" style="animation-delay:0s;"></div>
         <div class="wsd-dot-bounce" style="animation-delay:0.15s;"></div>
@@ -391,6 +406,7 @@
 
   </main>
 
+  <!-- Bottom nav -->
   <nav class="wsd-bottom-nav">
     <div class="wsd-bottom-nav-inner">
       <button class="wsd-nav-item wsd-nav-item-active"
@@ -413,6 +429,7 @@
   </nav>
 </div>
 
+<!-- ===== MODAL: Welcome / How to play ===== -->
 <div class="modal fade" id="modal-welcome" tabindex="-1"
      aria-labelledby="modal-welcome-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -453,6 +470,7 @@
   </div>
 </div>
 
+<!-- ===== MODAL: Author + House bonus info ===== -->
 <div class="modal fade" id="modal-no-correct" tabindex="-1"
      aria-labelledby="modal-no-correct-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -482,6 +500,7 @@
   </div>
 </div>
 
+<!-- ===== MODAL: Bonus topics explainer ===== -->
 <div class="modal fade" id="modal-bonuses" tabindex="-1"
      aria-labelledby="modal-bonuses-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -563,10 +582,16 @@
   </div>
 </div>
 
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Park data -->
 <script src="data-mk.js"></script>
 <script src="data-epcot.js"></script>
+
+<!-- Game logic -->
 <script src="game.js"></script>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     try {
