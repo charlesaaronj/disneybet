@@ -146,15 +146,25 @@ function startGameFromSetup(){
   if(!parkName||!PARKS[parkName]){
     if(errEl)errEl.textContent="Please select a park.";return;
   }
+
   const names=$$("#wsd-player-inputs input").map(i=>i.value.trim()).filter(Boolean);
   if(names.length<3){
     if(errEl)errEl.textContent="Please enter at least three player names.";return;
   }
+
+  // NEW: prevent duplicate names (case-insensitive)
+  const uniqueNames=new Set(names.map(n=>n.toLowerCase()));
+  if(uniqueNames.size!==names.length){
+    if(errEl)errEl.textContent="Each player must have a unique name.";
+    return;
+  }
+
   const parkData=PARKS[parkName];
   const players=names.map((name,id)=>({
     id,name,score:START_POINTS,wins:0,collected:[],bonusTotal:0,
     stats:{correctGuesses:0,totalRisked:0,uniqueLands:[]}
   }));
+  
   const usedQuestions={attractions:{},generic:shuffle(parkData.genericQuestions),genericIndex:0};
   parkData.attractions.forEach(a=>{
     usedQuestions.attractions[a.name]={questions:shuffle(a.questions),index:0};
