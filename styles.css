@@ -465,4 +465,9 @@ body {
   background: rgba(255, 255, 255, 0.85);
   animation: wsdDotBounce 1s ease infinite;
 }
-
+#wsd-no-correct-author-line,
+#wsd-author-bonus-line,
+#wsd-house-bonus-line {
+  margin-top: 0;
+  margin-bottom: 4px;
+}
