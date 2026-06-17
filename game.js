@@ -588,7 +588,7 @@ function runRevealAnimation(){
   if (r.authorBonus > 0) {
     const b = r.authorBonus;
     const w = r.wrongGuessCount;
-    text += ` ✍️ ${author ? author.name : "The author"} earned +${b} point${b === 1 ? "" : "s"} from ${w} wrong guess${w === 1 ? "" : "es"}.`;
+    text += ` <br>✍️ ${author ? author.name : "The author"} earned +${b} point${b === 1 ? "" : "s"} from ${w} wrong guess${w === 1 ? "" : "es"}.`;
   }
 
   authorLine.textContent = text;
