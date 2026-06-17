@@ -574,25 +574,31 @@ function runRevealAnimation(){
     // Body: show who got it right or that nobody did
     const authorLine = $("wsd-no-correct-author-line");
     if (authorLine) {
-      const winnerNames = r.correctGuessers.length
-        ? r.correctGuessers
-            .map(pid => gameState.players.find(p => p.id === pid)?.name)
-            .filter(Boolean)
-            .join(" & ")
-        : null;
+  const winnerNames = r.correctGuessers.length
+    ? r.correctGuessers
+        .map(pid => gameState.players.find(p => p.id === pid)?.name)
+        .filter(Boolean)
+        .join(" & ")
+    : null;
 
-      if (winnerNames) {
-        authorLine.textContent = `✅ ${winnerNames} got it right this round.`;
-      } else {
-        authorLine.textContent =
-          `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
-      }
-    }
+  let text = winnerNames
+    ? `✅ ${winnerNames} got it right this round.`
+    : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+
+  if (r.authorBonus > 0) {
+    const b = r.authorBonus;
+    const w = r.wrongGuessCount;
+    text += ` ✍️ ${author ? author.name : "The author"} earned +${b} point${b === 1 ? "" : "s"} from ${w} wrong guess${w === 1 ? "" : "es"}.`;
+  }
+
+  authorLine.textContent = text;
+}
 
     setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
   }
 } catch (e) {}
     }
+
 
     r.payouts.forEach((payout,i)=>{
       setTimeout(()=>{
