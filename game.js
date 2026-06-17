@@ -349,7 +349,6 @@ function proceedToAnswers(){
 }
 
 // -------------- Answers, wagers, scoring --------------
-// (from here through computeRevealAndScoring use your existing logic)
 
 function saveAnswerForCurrentPlayer(skip){
   const r=gameState.currentRound,idx=r.answerIndex||0,player=gameState.players[idx];
@@ -718,12 +717,209 @@ function spawnConfetti(container){
 }
 
 // -------------- Scores, history, final bonuses --------------
-// (use your existing renderScoresScreen, renderBonusProgress,
-// renderManualAdjustmentsUI, adjustPlayerScore, invertCurrentScores,
-// renderHistoryScreen, computeFinalBonusesAndShow, renderFinalResults)
-// For brevity not repeated again here since they were not causing errors.
 
-// -------------- abandonRound (MUST exist before wireEvents) --------------
+function maybeRenderCollectionsScreen(){
+  if(typeof window.renderCollectionsScreen==="function")window.renderCollectionsScreen();
+}
+function renderScoresScreen(){
+  const list=$("wsd-scores-list");if(!list)return;
+  list.innerHTML="";
+  [...gameState.players].sort((a,b)=>b.score-a.score||b.wins-a.wins)
+    .forEach((p,i)=>{
+      const row=document.createElement("div");
+      row.className="wsd-score-row wsd-anim-fade-up";
+      row.style.animationDelay=`${i*0.05}s`;
+      row.innerHTML=`
+        <div>
+          <div class="wsd-score-name">${medal(i)}${p.name}</div>
+          <div class="wsd-score-meta">Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)}</div>
+        </div>
+        <div class="wsd-score-value">${p.score}</div>`;
+      list.appendChild(row);
+    });
+  renderBonusProgress();
+  renderManualAdjustmentsUI();
+  maybeRenderCollectionsScreen();
+}
+function renderBonusProgress(){
+  const el=$("wsd-bonus-progress");if(!el)return;
+  const players=gameState.players;players.forEach(ensurePlayerStats);
+  const maxLand=Math.max(0,...players.map(getPlayerUniqueLandCount));
+  const maxAttr=Math.max(0,...players.map(p=>p.collected.length));
+  const maxCorr=Math.max(0,...players.map(p=>p.stats.correctGuesses||0));
+  const maxRisk=Math.max(0,...players.map(p=>p.stats.totalRisked||0));
+  let html="";
+  players.forEach(p=>{
+    const lc=getPlayerUniqueLandCount(p);
+    const ac=p.collected.length;
+    const cc=p.stats.correctGuesses||0;
+    const rc=p.stats.totalRisked||0;
+    const lb=lc>0&&lc===maxLand?FINAL_BONUS_POINTS.topLandCollector:0;
+    const ab=ac>0&&ac===maxAttr?FINAL_BONUS_POINTS.topAttractionCollector:0;
+    const gb=cc>0&&cc===maxCorr?FINAL_BONUS_POINTS.bestGuesser:0;
+    const rb=rc>0&&rc===maxRisk?FINAL_BONUS_POINTS.mostRiskyPlayer:0;
+    const tot=lb+ab+gb+rb;
+    html+=`
+      <div class="wsd-bonus-topic">
+        <div class="wsd-bonus-topic-icon">🎯</div>
+        <div>
+          <div class="wsd-bonus-topic-title">${p.name} — projected +${tot} pts</div>
+          <div class="wsd-bonus-topic-desc">
+            🗺️ Top land collector: ${lb>0?"✅ +3":`${lc} lands`}<br/>
+            🎢 Top attraction collector: ${ab>0?"✅ +3":`${ac} attractions`}<br/>
+            🧠 Best guesser: ${gb>0?"✅ +2":`${cc} correct`}<br/>
+            🎲 Most risky player: ${rb>0?"✅ +2":`${rc} risked`}
+          </div>
+        </div>
+      </div>`;
+  });
+  html+=`
+    <div class="wsd-text-small mt-2 text-center">
+      <a href="#" data-bs-toggle="modal" data-bs-target="#modal-bonuses">
+        How are bonuses calculated?
+      </a>
+    </div>`;
+  el.innerHTML = html || "<div class='wsd-text-small'>No rounds played yet.</div>";
+}
+function renderManualAdjustmentsUI(){
+  const c=$("wsd-manual-adjustments");if(!c)return;
+  c.innerHTML="";
+  gameState.players.forEach(p=>{
+    const row=document.createElement("div");
+    row.className="wsd-score-row";
+    row.innerHTML=`
+      <div class="wsd-score-name">${p.name}</div>
+      <div>
+        <button type="button" class="btn btn-sm btn-outline-secondary me-1" data-adj="-1" data-player="${p.id}">−1</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary me-1" data-adj="1"  data-player="${p.id}">+1</button>
+      </div>`;
+    c.appendChild(row);
+  });
+  c.querySelectorAll("button").forEach(btn=>{
+    btn.addEventListener("click",()=>adjustPlayerScore(parseInt(btn.dataset.player,10),parseInt(btn.dataset.adj,10)));
+  });
+}
+function adjustPlayerScore(pid,delta){
+  const p=gameState.players.find(pl=>pl.id===pid);if(!p)return;
+  p.score+=delta;
+  if(p.score<gameState.settings.minPoints)p.score=gameState.settings.minPoints;
+  if(gameState.history.length>0){
+    const last=gameState.history[gameState.history.length-1];
+    (last.manualAdjustments||[]).push({playerId:pid,delta,note:"Manual"});
+  }
+  saveState();renderScoresScreen();
+}
+function invertCurrentScores(){
+  if(!gameState||gameState.players.length<2)return;
+  const ranked=[...gameState.players].sort((a,b)=>b.score-a.score||b.wins-a.wins||a.id-b.id);
+  const scoreValues=ranked.map(p=>p.score).sort((a,b)=>a-b);
+  const before={};
+  ranked.forEach((p,i)=>{before[p.id]=p.score;p.score=scoreValues[i];});
+  if(gameState.history.length>0){
+    const last=gameState.history[gameState.history.length-1];
+    (last.manualAdjustments||[]).push({type:"invertScores",before,note:"Invert scores"});
+  }
+  saveState();renderScoresScreen();
+}
+function renderHistoryScreen(){
+  const c=$("wsd-history-list");if(!c)return;
+  c.innerHTML="";
+  if(!gameState.history.length){c.textContent="No rounds played yet.";return;}
+  [...gameState.history].reverse().forEach(h=>{
+    const author=gameState.players.find(p=>p.id===h.authorId);
+    const wrap=document.createElement("div");
+    wrap.className="mb-3 pb-2 border-bottom";
+    let html=`<div><strong>Round ${h.roundNumber}</strong>`;
+    if(h.park)html+=` — ${h.park}`;
+    if(h.land)html+=` · ${h.land}`;
+    if(h.attraction)html+=` · <em>${h.attraction}</em>`;
+    html+=`</div>`;
+    html+=`<div class="wsd-text-small">Q: ${h.question}</div>`;
+    html+=`<div class="wsd-text-small">Answer: &ldquo;${h.selectedAnswerText}&rdquo;</div>`;
+    html+=`<div class="wsd-text-small">Author: <strong>${author?author.name:"Unknown"}</strong></div>`;
+    h.payouts.forEach(pt=>{
+      const pl=gameState.players.find(x=>x.id===pt.playerId);
+      const wager=h.wagers.find(w=>w.playerId===pt.playerId);
+      const guess=wager&&gameState.players.find(x=>x.id===wager.guessedAuthorId);
+      const ok=h.correctGuessers.includes(pt.playerId);
+      html+=`<div class="wsd-text-small">&nbsp;&nbsp;${pl?pl.name:"?"}: guess ${guess?guess.name:"—"}, wager ${wager?wager.amount:0}, ${ok?"✅":"❌"}, ${pt.delta>=0?"+":""}${pt.delta} pts</div>`;
+    });
+    if(h.authorBonus>0){
+      html+=`<div class="wsd-text-small">&nbsp;&nbsp;Author bonus: +${h.authorBonus}</div>`;
+    }
+    if(h.houseBonusAmount>0||h.houseBonusResolved>0||h.houseBonusReason){
+      const names=(h.houseBonusRecipients||[]).map(hr=>{
+        const pl=gameState.players.find(x=>x.id===hr.playerId);
+        return pl?`${pl.name} (+${hr.extra})`:`Player ${hr.playerId} (+${hr.extra})`;
+      }).join(", ");
+      html+=`<div class="wsd-text-small">&nbsp;&nbsp;House bonus: ${h.houseBonusApplied?`+${h.houseBonusResolved} split evenly: ${names}`:(h.houseBonusReason||"Not applied")}</div>`;
+    }
+    (h.manualAdjustments||[]).forEach(adj=>{
+      if(adj.type==="invertScores"){
+        html+=`<div class="wsd-text-small">&nbsp;&nbsp;Manual: scores inverted</div>`;
+      }else{
+        const pl=gameState.players.find(x=>x.id===adj.playerId);
+        html+=`<div class="wsd-text-small">&nbsp;&nbsp;Manual: ${pl?pl.name:"?"} ${adj.delta>=0?"+":""}${adj.delta}</div>`;
+      }
+    });
+    wrap.innerHTML=html;
+    c.appendChild(wrap);
+  });
+}
+function computeFinalBonusesAndShow(){
+  if(gameState.finalBonusesApplied){renderFinalResults();return;}
+  const players=gameState.players;players.forEach(ensurePlayerStats);
+  const maxLand=Math.max(0,...players.map(getPlayerUniqueLandCount));
+  const maxAttr=Math.max(0,...players.map(p=>p.collected.length));
+  const maxCorr=Math.max(0,...players.map(p=>p.stats.correctGuesses||0));
+  const maxRisk=Math.max(0,...players.map(p=>p.stats.totalRisked||0));
+  players.forEach(p=>{
+    p.bonusTotal=0;
+    p.finalBonusBreakdown={topLandCollector:0,topAttractionCollector:0,bestGuesser:0,mostRiskyPlayer:0};
+    const lc=getPlayerUniqueLandCount(p);
+    const ac=p.collected.length;
+    const cc=p.stats.correctGuesses||0;
+    const rc=p.stats.totalRisked||0;
+    if(lc>0&&lc===maxLand){p.bonusTotal+=FINAL_BONUS_POINTS.topLandCollector;p.finalBonusBreakdown.topLandCollector=FINAL_BONUS_POINTS.topLandCollector;}
+    if(ac>0&&ac===maxAttr){p.bonusTotal+=FINAL_BONUS_POINTS.topAttractionCollector;p.finalBonusBreakdown.topAttractionCollector=FINAL_BONUS_POINTS.topAttractionCollector;}
+    if(cc>0&&cc===maxCorr){p.bonusTotal+=FINAL_BONUS_POINTS.bestGuesser;p.finalBonusBreakdown.bestGuesser=FINAL_BONUS_POINTS.bestGuesser;}
+    if(rc>0&&rc===maxRisk){p.bonusTotal+=FINAL_BONUS_POINTS.mostRiskyPlayer;p.finalBonusBreakdown.mostRiskyPlayer=FINAL_BONUS_POINTS.mostRiskyPlayer;}
+  });
+  players.forEach(p=>{p.score+=p.bonusTotal;});
+  gameState.finalBonusesApplied=true;
+  saveState();
+  renderFinalResults();
+}
+function renderFinalResults(){
+  const sorted=[...gameState.players].sort((a,b)=>b.score===a.score?b.wins-a.wins:b.score-a.score);
+  const topScore=sorted[0].score,topWins=sorted[0].wins;
+  const winners=sorted.filter(p=>p.score===topScore&&p.wins===topWins);
+  const banner=$("wsd-winner-banner");
+  if(banner){
+    banner.innerHTML=`🎉 ${winners.map(w=>w.name).join(" & ")} wins! Time to collect that snack!`;
+    banner.classList.remove("wsd-anim-pop");void banner.offsetWidth;
+    banner.classList.add("wsd-anim-pop");
+  }
+  spawnConfetti($("wsd-confetti-wrap-end"));
+  const c=$("wsd-final-results");if(!c)return;
+  c.innerHTML="";
+  sorted.forEach((p,i)=>{
+    const row=document.createElement("div");
+    row.className="wsd-score-row wsd-anim-fade-up";
+    row.style.animationDelay=`${i*0.08}s`;
+    const bd=p.finalBonusBreakdown||{};
+    row.innerHTML=`
+      <div>
+        <div class="wsd-score-name">${medal(i)}${p.name}</div>
+        <div class="wsd-score-meta">Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)} · Bonus: +${p.bonusTotal}</div>
+        <div class="wsd-text-small">🗺️ +${bd.topLandCollector||0} · 🎢 +${bd.topAttractionCollector||0} · 🧠 +${bd.bestGuesser||0} · 🎲 +${bd.mostRiskyPlayer||0}</div>
+      </div>
+      <div class="wsd-score-value">${p.score}</div>`;
+    c.appendChild(row);
+  });
+}
+
+// -------------- abandonRound (must exist before wireEvents) --------------
 
 function abandonRound(){
   if(gameState)gameState.roundNumber=Math.max(0,gameState.roundNumber-1);
