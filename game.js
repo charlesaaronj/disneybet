@@ -568,31 +568,43 @@ function runRevealAnimation(){
   const modalEl = $("modal-no-correct");
   if (modalEl && typeof bootstrap !== "undefined") {
     // Header: always just "Summary"
-    const titleEl = modalEl.querySelector(".modal-title");
+        const titleEl = modalEl.querySelector(".modal-title");
     if (titleEl) titleEl.textContent = "Summary";
 
     // Body: show who got it right or that nobody did
     const authorLine = $("wsd-no-correct-author-line");
     if (authorLine) {
-  const winnerNames = r.correctGuessers.length
-    ? r.correctGuessers
-        .map(pid => gameState.players.find(p => p.id === pid)?.name)
-        .filter(Boolean)
-        .join(" & ")
-    : null;
+      const winnerNames = r.correctGuessers.length
+        ? r.correctGuessers
+            .map(pid => gameState.players.find(p => p.id === pid)?.name)
+            .filter(Boolean)
+            .join(" & ")
+        : null;
 
-  let text = winnerNames
-    ? `✅ ${winnerNames} got it right this round.`
-    : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+      // First line: winner / nobody
+      authorLine.textContent = winnerNames
+        ? `✅ ${winnerNames} got it right this round.`
+        : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
 
-  if (r.authorBonus > 0) {
-    const b = r.authorBonus;
-    const w = r.wrongGuessCount;
-    text += ` <br>✍️ ${author ? author.name : "The author"} earned +${b} point${b === 1 ? "" : "s"} from ${w} wrong guess${w === 1 ? "" : "es"}.`;
-  }
+      // Second line: separate <p> for author bonus, only if there was a bonus
+      const existingBonus = document.getElementById("wsd-author-bonus-line");
+      if (existingBonus) existingBonus.remove();
 
-  authorLine.textContent = text;
-}
+      if (r.authorBonus > 0) {
+        const b = r.authorBonus;
+        const w = r.wrongGuessCount;
+        const bonusLine = document.createElement("p");
+        bonusLine.id = "wsd-author-bonus-line";
+        bonusLine.className = "mb-0";
+        bonusLine.textContent =
+          `✍️ ${author ? author.name : "The author"} earned ` +
+          `+${b} point${b === 1 ? "" : "s"} from ` +
+          `${w} wrong guess${w === 1 ? "" : "es"}.`;
+
+        authorLine.insertAdjacentElement("afterend", bonusLine);
+      }
+    }
+
 
     setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
   }
