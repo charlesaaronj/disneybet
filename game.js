@@ -564,51 +564,58 @@ function runRevealAnimation(){
           houseLine.textContent=`🏠 ${r.houseBonusReason||"House bonus was not applied."}`;
         }else houseLine.textContent="";
       }
-      try {
-  const modalEl = $("modal-no-correct");
-  if (modalEl && typeof bootstrap !== "undefined") {
-    // Header: always just "Summary"
-        const titleEl = modalEl.querySelector(".modal-title");
-    if (titleEl) titleEl.textContent = "Summary";
+            try {
+        const modalEl = $("modal-no-correct");
+        if (modalEl && typeof bootstrap !== "undefined") {
+          // Header: always just "Summary"
+          const titleEl = modalEl.querySelector(".modal-title");
+          if (titleEl) titleEl.textContent = "Summary";
 
-    // Body: show who got it right or that nobody did
-    const authorLine = $("wsd-no-correct-author-line");
-    if (authorLine) {
-      const winnerNames = r.correctGuessers.length
-        ? r.correctGuessers
-            .map(pid => gameState.players.find(p => p.id === pid)?.name)
-            .filter(Boolean)
-            .join(" & ")
-        : null;
+          // Body elements
+          const authorLine = $("wsd-no-correct-author-line");
+          const houseLine  = $("wsd-house-bonus-line");
 
-      // First line: winner / nobody
-      authorLine.textContent = winnerNames
-        ? `✅ ${winnerNames} got it right this round.`
-        : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+          // Winner / nobody line
+          if (authorLine) {
+            const winnerNames = r.correctGuessers.length
+              ? r.correctGuessers
+                  .map(pid => gameState.players.find(p => p.id === pid)?.name)
+                  .filter(Boolean)
+                  .join(" & ")
+              : null;
 
-      // Second line: separate <p> for author bonus, only if there was a bonus
-      const existingBonus = document.getElementById("wsd-author-bonus-line");
-      if (existingBonus) existingBonus.remove();
+            authorLine.textContent = winnerNames
+              ? `✅ ${winnerNames} got it right this round.`
+              : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+          }
 
-      if (r.authorBonus > 0) {
-        const b = r.authorBonus;
-        const w = r.wrongGuessCount;
-        const bonusLine = document.createElement("p");
-        bonusLine.id = "wsd-author-bonus-line";
-        bonusLine.className = "mb-0";
-        bonusLine.textContent =
-          `✍️ ${author ? author.name : "The author"} earned ` +
-          `+${b} point${b === 1 ? "" : "s"} from ` +
-          `${w} wrong guess${w === 1 ? "" : "es"}.`;
+          // Author bonus line: separate element, same style as house bonus
+          let bonusLine = document.getElementById("wsd-author-bonus-line");
+          if (bonusLine) bonusLine.remove(); // clear old one
 
-        authorLine.insertAdjacentElement("afterend", bonusLine);
-      }
-    }
+          if (r.authorBonus > 0) {
+            const b = r.authorBonus;
+            const w = r.wrongGuessCount;
 
+            bonusLine = document.createElement("p");
+            bonusLine.id = "wsd-author-bonus-line";
+            // match style of the house bonus line
+            bonusLine.className = houseLine ? houseLine.className : "wsd-text-small";
 
-    setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
-  }
-} catch (e) {}
+            bonusLine.textContent =
+              `✍️ ${author ? author.name : "The author"} earned ` +
+              `+${b} point${b === 1 ? "" : "s"} from ` +
+              `${w} wrong guess${w === 1 ? "" : "es"}.`;
+
+            if (authorLine) authorLine.insertAdjacentElement("afterend", bonusLine);
+          }
+
+          // House bonus line (keep your existing logic above this try/catch)
+          // (we assume you've already set houseLine.textContent earlier)
+
+          setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
+        }
+      } catch (e) {}
     }
 
 
