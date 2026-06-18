@@ -193,6 +193,11 @@ function updateQuestionLock(){
 
 // ----------------- Setup screen -----------------
 
+function updateSetupStartResumeButtons() {
+  $("wsd-start-game").style.display  = gameState ? "none" : "";
+  $("wsd-resume-game").style.display = gameState ? ""     : "none";
+}
+
 function initSetupScreen(){
   debugLog("initSetupScreen starting");
   const sel=$("wsd-park-select"),container=$("wsd-player-inputs");
@@ -208,7 +213,9 @@ function initSetupScreen(){
     for(let i=0;i<3;i++)addPlayerInput(container);
   }
   updatePlayerInputLock();
+  updateSetupStartResumeButtons(); 
   debugLog("Setup screen ready");
+  
 }
 function addPlayerInput(container){
   const inp=document.createElement("input");
@@ -218,6 +225,7 @@ function addPlayerInput(container){
   container.appendChild(inp);
 }
 function startGameFromSetup(){
+  if (gameState) return; // already have a game, do nothing
   const errEl=$("wsd-setup-error"),parkSel=$("wsd-park-select");
   const parkName=parkSel?parkSel.value:"";
   if(errEl)errEl.textContent="";
@@ -1050,6 +1058,9 @@ function wireEvents(){
     onAttractionChange();
     updateQuestionLock();
   });
+  $("wsd-resume-game")?.addEventListener("click", () => {
+  showScreen(gameState?.screen || "setup-question");
+});
   $("wsd-generate-question").addEventListener("click",onGenerateNewQuestion);
   $("wsd-enter-custom-question").addEventListener("click",onEnterCustomQuestion);
   $("wsd-to-answers").addEventListener("click",proceedToAnswers);
@@ -1152,17 +1163,22 @@ document.addEventListener("DOMContentLoaded",()=>{
   ensureStateShape();
   initSetupScreen();
   wireEvents();
+
   if(gameState){
-    const parkName=gameState.settings?.park||"Not set";
-    const parkLabel=$("wsd-park-label");if(parkLabel)parkLabel.textContent=parkName;
+    const parkName = gameState.settings?.park || "Not set";
+    const parkLabel = $("wsd-park-label");
+    if (parkLabel) parkLabel.textContent = parkName;
     applyParkTheme(parkName);
     renderAttractionOptions();
-    const scr=gameState.screen||"setup-game";
-    if(scr==="scores")renderScoresScreen();
-    if(scr==="history")renderHistoryScreen();
-    if(scr==="game-end")renderFinalResults();
+    const scr = gameState.screen || "setup-game";
+    if (scr === "scores") renderScoresScreen();
+    if (scr === "history") renderHistoryScreen();
+    if (scr === "game-end") renderFinalResults();
     showScreen(scr);
-  }else{
+  } else {
     showScreen("setup-game");
   }
+
+  // NEW: toggle Start vs Resume based on whether a game exists
+  updateSetupStartResumeButtons();
 });
