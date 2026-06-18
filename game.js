@@ -193,20 +193,6 @@ function updateQuestionLock(){
 
 // ----------------- Setup screen -----------------
 
-function updateSetupStartResumeButtons() {
-  const startBtn  = $("wsd-start-game");
-  const resumeBtn = $("wsd-resume-game");
-  if (!startBtn || !resumeBtn) return;
-
-  if (gameState) {
-    startBtn.style.display  = "none";
-    resumeBtn.style.display = "";
-  } else {
-    startBtn.style.display  = "";
-    resumeBtn.style.display = "none";
-  }
-}
-
 function initSetupScreen(){
   debugLog("initSetupScreen starting");
   const sel=$("wsd-park-select"),container=$("wsd-player-inputs");
@@ -222,7 +208,6 @@ function initSetupScreen(){
     for(let i=0;i<3;i++)addPlayerInput(container);
   }
   updatePlayerInputLock();
-  updateSetupStartResumeButtons(); 
   debugLog("Setup screen ready");
   
 }
@@ -234,7 +219,6 @@ function addPlayerInput(container){
   container.appendChild(inp);
 }
 function startGameFromSetup(){
-  if (gameState) return; // already have a game, do nothing
   const errEl=$("wsd-setup-error"),parkSel=$("wsd-park-select");
   const parkName=parkSel?parkSel.value:"";
   if(errEl)errEl.textContent="";
@@ -1067,21 +1051,6 @@ function wireEvents(){
     onAttractionChange();
     updateQuestionLock();
   });
-  $("wsd-resume-game")?.addEventListener("click", () => {
-  if (!gameState) {
-    showScreen("setup-game");
-    return;
-  }
-  // Go back to whatever screen the game was last on,
-  // or fall back to setup-question.
-  const scr = gameState.screen || "setup-question";
-
-  if (scr === "scores")        renderScoresScreen();
-  else if (scr === "history")  renderHistoryScreen();
-  else if (scr === "game-end") renderFinalResults();
-
-  showScreen(scr);
-});
   $("wsd-generate-question").addEventListener("click",onGenerateNewQuestion);
   $("wsd-enter-custom-question").addEventListener("click",onEnterCustomQuestion);
   $("wsd-to-answers").addEventListener("click",proceedToAnswers);
@@ -1199,7 +1168,4 @@ document.addEventListener("DOMContentLoaded",()=>{
   } else {
     showScreen("setup-game");
   }
-
-  // NEW: toggle Start vs Resume based on whether a game exists
-  updateSetupStartResumeButtons();
 });
