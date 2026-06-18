@@ -542,6 +542,9 @@ body {
   box-shadow: none;
   color: #fff;
 }
+#modal-confirm-reset .wsd-btn-danger:hover {
+  filter: brightness(1.05);
+}
 #wsd-invert-scores {
   position: relative;
   overflow: hidden;
@@ -558,8 +561,5 @@ body {
   0%   { transform: scale(1); }
   50%  { transform: scale(1.03); }
   100% { transform: scale(1); }
-}
-#modal-confirm-reset .wsd-btn-danger:hover {
-  filter: brightness(1.05);
 }
 
