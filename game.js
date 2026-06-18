@@ -469,7 +469,7 @@ function goToGuessWager(){
     const playerLabel=document.createElement("div");
     playerLabel.className="wsd-score-row mb-1";
     const dotColor = p.badgeColor || "#888888";
-    playerLabel.innerHTML = `
+  playerLabel.innerHTML = `
     <div>
       <div class="wsd-score-name">
         <span class="wsd-player-dot" style="
