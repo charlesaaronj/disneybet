@@ -29,7 +29,11 @@ function shuffle(a) {
 // NOTE: still hard-resets everything; we can later change this to keep players.
 function resetGame() { localStorage.removeItem("whoSaidDiz"); location.reload(); }
 
-function confirmThenReset(message) {
+// tracks what the confirm modal is for: "end" or "restart"
+let confirmAction = null;
+
+function confirmThenReset(message, action) {
+  confirmAction = action || "restart";
   const body = $("modal-confirm-reset-body");
   if (body) body.textContent = message || "This will end the current game and all progress will be lost.";
   const modalEl = $("modal-confirm-reset");
@@ -112,7 +116,9 @@ function applyParkTheme(parkName){
     [".wsd-bottom-nav","backgroundColor",t?.nav||"rgba(255,255,255,0.9)"],
     [".wsd-avatar","backgroundImage",t?.avatar||""],
     ["#modal-no-correct .modal-header","backgroundImage",t?.hero||""],
-    ["#modal-no-correct .modal-header","color",t?"#fff":""]
+    ["#modal-no-correct .modal-header","color",t?"#fff":""],
+    ["#modal-confirm-reset .modal-header","backgroundImage",t?.hero||""],
+    ["#modal-confirm-reset .modal-header","color",t?"#fff":""]
   ].forEach(([sel,prop,val])=>{const el=document.querySelector(sel);if(el)el.style[prop]=val;});
 }
 const ALL_SCREENS=Object.keys(SCREEN_META);
@@ -836,7 +842,6 @@ function renderBonusProgress(){
   el.innerHTML = html || "<div class='wsd-text-small'>No rounds played yet.</div>";
 }
 
-
 function renderManualAdjustmentsUI(){
   const c=$("wsd-manual-adjustments");if(!c)return;
   c.innerHTML="";
@@ -1033,16 +1038,26 @@ function wireEvents(){
   $("wsd-to-scores").addEventListener("click",()=>{renderScoresScreen();showScreen("scores");});
   $("wsd-start-round").addEventListener("click",()=>{startNewRoundCore();showScreen("setup-question");});
   $("wsd-view-history").addEventListener("click",()=>{renderHistoryScreen();showScreen("history");});
-// End game: confirm before wiping the game
-$("wsd-end-game").addEventListener("click", () => {
-  confirmThenReset("End this game and clear all scores and history?");
-});
-// Restart (from end screen): also confirm
-$("wsd-restart-game").addEventListener("click", () => {
-  confirmThenReset("Restart this game and clear all scores and history?");
-});
-// Play again: immediate fresh game with no extra prompt
-$("wsd-play-again").addEventListener("click", resetGame);
+
+  // End game: confirm and then go to final scores (no hard reset)
+  $("wsd-end-game").addEventListener("click", () => {
+    confirmThenReset(
+      "End this game and show final scores? You cannot keep playing this game afterward.",
+      "end"
+    );
+  });
+
+  // Restart: confirm and then hard reset
+  $("wsd-restart-game").addEventListener("click", () => {
+    confirmThenReset(
+      "Restart this game and clear all scores and history?",
+      "restart"
+    );
+  });
+
+  // Play again: immediate new game (no confirm)
+  $("wsd-play-again").addEventListener("click", resetGame);
+
   $("wsd-view-history-end").addEventListener("click",()=>{renderHistoryScreen();showScreen("history");});
   $("wsd-close-history").addEventListener("click",()=>{
     const fb=gameState? (gameState.screen==="history"?"scores":gameState.screen):"setup-game";
@@ -1058,14 +1073,21 @@ $("wsd-play-again").addEventListener("click", resetGame);
   }));
   $("wsd-nav-scores").addEventListener("click",requireState(()=>{renderScoresScreen();showScreen("scores");}));
   $("wsd-nav-history").addEventListener("click",requireState(()=>{renderHistoryScreen();showScreen("history");}));
+
+  // Confirmation modal YES button
   const confirmYes = $("modal-confirm-reset-yes");
-if (confirmYes) confirmYes.addEventListener("click", () => {
-  const modalEl = $("modal-confirm-reset");
-  if (modalEl && typeof bootstrap !== "undefined") {
-    bootstrap.Modal.getInstance(modalEl)?.hide();
-  }
-  resetGame();
-});
+  if (confirmYes) confirmYes.addEventListener("click", () => {
+    const modalEl = $("modal-confirm-reset");
+    if (modalEl && typeof bootstrap !== "undefined") {
+      bootstrap.Modal.getInstance(modalEl)?.hide();
+    }
+    if (confirmAction === "end") {
+      computeFinalBonusesAndShow();
+      showScreen("game-end");
+    } else {
+      resetGame();
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
