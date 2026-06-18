@@ -5,6 +5,14 @@
 const $ = id => document.getElementById(id);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const medal = i => ["🥇 ","🥈 ","🥉 "][i] || "";
+const PLAYER_BADGE_COLORS = [
+  "#ff3b30", // red
+  "#ffcc00", // yellow
+  "#34c759", // green
+  "#007aff", // blue
+  "#ff9500", // orange
+  "#af52de"  // purple
+];
 
 // ---------------- Core helpers ----------------
 
@@ -238,10 +246,23 @@ function startGameFromSetup(){
   }
 
   const parkData=PARKS[parkName];
-  const players=names.map((name,id)=>({
-    id,name,score:START_POINTS,wins:0,collected:[],bonusTotal:0,
-    stats:{correctGuesses:0,totalRisked:0,uniqueLands:[]}
-  }));
+  const players = names.map((name, id) => ({
+  id,
+  name,
+  score: START_POINTS,
+  wins: 0,
+  collected: [],
+  bonusTotal: 0,
+  stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
+  badgeColor: null   // will set next
+}));
+
+// Assign each player a unique badge color (no repeats)
+const palette = PLAYER_BADGE_COLORS.slice();
+players.forEach(p => {
+  const color = palette.shift() || "#999999"; // fallback if more players than colors
+  p.badgeColor = color;
+});
   
   const usedQuestions={attractions:{},generic:shuffle(parkData.genericQuestions),genericIndex:0};
   parkData.attractions.forEach(a=>{
@@ -447,11 +468,22 @@ function goToGuessWager(){
     row.className="mb-3 pb-2 border-bottom";
     const playerLabel=document.createElement("div");
     playerLabel.className="wsd-score-row mb-1";
-    playerLabel.innerHTML=`
-      <div>
-        <div class="wsd-score-name">${p.name}</div>
-        <div class="wsd-score-meta">Current score: ${p.score}</div>
-      </div>`;
+    const dotColor = p.badgeColor || "#888888";
+    playerLabel.innerHTML = `
+    <div>
+      <div class="wsd-score-name">
+        <span class="wsd-player-dot" style="
+          display:inline-block;
+          width:8px;
+          height:8px;
+          border-radius:50%;
+          margin-right:6px;
+          background-color:${dotColor};
+        "></span>
+        ${p.name}
+      </div>
+      <div class="wsd-score-meta">Current score: ${p.score}</div>
+    </div>`;
     row.appendChild(playerLabel);
     const inner=document.createElement("div");
     inner.className="d-flex gap-2";
