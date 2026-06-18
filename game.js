@@ -260,7 +260,14 @@ function startGameFromSetup(){
 }));
 
 // Assign each player a unique badge color (no repeats)
-const palette = PLAYER_BADGE_COLORS.slice();
+const palette = PLAYER_BADGE_COLORS.slice(); // copy the array
+
+// Shuffle palette in-place
+for (let i = palette.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [palette[i], palette[j]] = [palette[j], palette[i]];
+}
+
 players.forEach(p => {
   const color = palette.shift() || "#999999"; // fallback if more players than colors
   p.badgeColor = color;
