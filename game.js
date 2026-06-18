@@ -29,6 +29,15 @@ function shuffle(a) {
 // NOTE: still hard-resets everything; we can later change this to keep players.
 function resetGame() { localStorage.removeItem("whoSaidDiz"); location.reload(); }
 
+function confirmThenReset(message) {
+  const body = $("modal-confirm-reset-body");
+  if (body) body.textContent = message || "This will end the current game and all progress will be lost.";
+  const modalEl = $("modal-confirm-reset");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    new bootstrap.Modal(modalEl).show();
+  }
+}
+
 function requireState(fn){return()=>{if(!gameState){showScreen("setup-game");return;}fn();};}
 
 const MIN_POINTS=3, START_POINTS=10;
@@ -978,8 +987,14 @@ function wireEvents(){
   $("wsd-start-round").addEventListener("click",()=>{startNewRoundCore();showScreen("setup-question");});
   $("wsd-view-history").addEventListener("click",()=>{renderHistoryScreen();showScreen("history");});
   $("wsd-end-game").addEventListener("click",()=>{computeFinalBonusesAndShow();showScreen("game-end");});
-  $("wsd-restart-game").addEventListener("click",resetGame);
-  $("wsd-play-again").addEventListener("click",resetGame);
+// confirm before restart/play-again
+$("wsd-restart-game").addEventListener("click", () =>
+  confirmThenReset("End this game? All scores and history will be lost.")
+);
+$("wsd-play-again").addEventListener("click", () =>
+  confirmThenReset("Start a new game? All scores and history will be lost.")
+);
+
   $("wsd-view-history-end").addEventListener("click",()=>{renderHistoryScreen();showScreen("history");});
   $("wsd-close-history").addEventListener("click",()=>{
     const fb=gameState? (gameState.screen==="history"?"scores":gameState.screen):"setup-game";
@@ -995,6 +1010,14 @@ function wireEvents(){
   }));
   $("wsd-nav-scores").addEventListener("click",requireState(()=>{renderScoresScreen();showScreen("scores");}));
   $("wsd-nav-history").addEventListener("click",requireState(()=>{renderHistoryScreen();showScreen("history");}));
+  const confirmYes = $("modal-confirm-reset-yes");
+if (confirmYes) confirmYes.addEventListener("click", () => {
+  const modalEl = $("modal-confirm-reset");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    bootstrap.Modal.getInstance(modalEl)?.hide();
+  }
+  resetGame();
+});
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
