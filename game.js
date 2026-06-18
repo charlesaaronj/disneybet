@@ -63,7 +63,8 @@ const PARK_THEMES = {
   "Magic Kingdom":    {hero:"linear-gradient(180deg,#4b0082,#ff69b4)",nav:"rgba(75,0,130,0.95)",avatar:"linear-gradient(135deg,#ff69b4,#800080)"},
   "EPCOT":            {hero:"linear-gradient(180deg,#003366,#66ccff)",nav:"rgba(0,51,102,0.95)",avatar:"linear-gradient(135deg,#66ccff,#ffffff)"},
   "Hollywood Studios":{hero:"linear-gradient(180deg,#3b3b3b,#ffcc00)",nav:"rgba(59,59,59,0.95)",avatar:"linear-gradient(135deg,#ffcc00,#c6a530)"},
-  "Animal Kingdom":   {hero:"linear-gradient(180deg,#014422,#8bc34a)",nav:"rgba(1,68,34,0.95)",avatar:"linear-gradient(135deg,#8bc34a,#ffe082)"}
+  "Animal Kingdom":   {hero:"linear-gradient(180deg,#014422,#8bc34a)",nav:"rgba(1,68,34,0.95)",avatar:"linear-gradient(135deg,#8bc34a,#ffe082)"},
+  "Dollywood":         {hero: "linear-gradient(180deg,#1c3b3f,#6c8e9d)",nav: "rgba(28,59,63,0.95)",avatar: "linear-gradient(135deg,#a0baca,#605b73)"}
 };
 const NAV_MAP = {
   "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
@@ -75,10 +76,9 @@ const ROUND_SCREENS = ["setup-question","enter-answers","select-answer","guess-w
 const PARKS = {};
 if (typeof PARK_MAGIC_KINGDOM!=="undefined") PARKS[PARK_MAGIC_KINGDOM.name]=PARK_MAGIC_KINGDOM;
 if (typeof PARK_EPCOT!=="undefined") PARKS[PARK_EPCOT.name]=PARK_EPCOT;
-if (typeof PARK_HOLLYWOOD_STUDIOS !== "undefined") {
-  PARKS[PARK_HOLLYWOOD_STUDIOS.name] = PARK_HOLLYWOOD_STUDIOS;
-  if (typeof PARK_ANIMAL_KINGDOM !== "undefined") {
-  PARKS[PARK_ANIMAL_KINGDOM.name] = PARK_ANIMAL_KINGDOM;
+if (typeof PARK_HOLLYWOOD_STUDIOS !== "undefined") {PARKS[PARK_HOLLYWOOD_STUDIOS.name] = PARK_HOLLYWOOD_STUDIOS;
+if (typeof PARK_ANIMAL_KINGDOM !== "undefined") {PARKS[PARK_ANIMAL_KINGDOM.name] = PARK_ANIMAL_KINGDOM;
+if (typeof PARK_DOLLYWOOD !== "undefined") {PARKS[PARK_DOLLYWOOD.name] = PARK_DOLLYWOOD;
 }
 
 }
