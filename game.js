@@ -900,6 +900,7 @@ function invertCurrentScores(){
     (last.manualAdjustments||[]).push({type:"invertScores",before,note:"Invert scores"});
   }
   saveState();renderScoresScreen();
+  alert("Scores inverted: highest and lowest scores have been swapped.");
 }
 function renderHistoryScreen(){
   const c=$("wsd-history-list");if(!c)return;
@@ -1084,15 +1085,21 @@ function wireEvents(){
     if(fb==="game-end")renderFinalResults();
     showScreen(fb);
   });
-  const invertBtn=$("wsd-invert-scores");
-  if(invertBtn)invertBtn.addEventListener("click",invertCurrentScores);
-  $("wsd-nav-home").addEventListener("click",()=>showScreen("setup-game"));
-  $("wsd-nav-round").addEventListener("click",requireState(()=>{
-    showScreen(ROUND_SCREENS.includes(gameState.screen)?gameState.screen:"setup-question");
-  }));
-  $("wsd-nav-scores").addEventListener("click",requireState(()=>{renderScoresScreen();showScreen("scores");}));
-  $("wsd-nav-history").addEventListener("click",requireState(()=>{renderHistoryScreen();showScreen("history");}));
-
+const invertBtn = $("wsd-invert-scores");
+if (invertBtn) {
+  invertBtn.addEventListener("click", () => {
+    invertCurrentScores();
+    invertBtn.classList.add("wsd-invert-active");
+    setTimeout(() => invertBtn.classList.remove("wsd-invert-active"), 250);
+  });
+}
+$("wsd-nav-home").addEventListener("click",()=>showScreen("setup-game"));
+$("wsd-nav-round").addEventListener("click",requireState(()=>{
+  showScreen(ROUND_SCREENS.includes(gameState.screen)?gameState.screen:"setup-question");
+}));
+$("wsd-nav-scores").addEventListener("click",requireState(()=>{renderScoresScreen();showScreen("scores");}));
+$("wsd-nav-history").addEventListener("click",requireState(()=>{renderHistoryScreen();showScreen("history");}));
+  
   // Confirmation modal YES button
   const confirmYes = $("modal-confirm-reset-yes");
   if (confirmYes) confirmYes.addEventListener("click", () => {
