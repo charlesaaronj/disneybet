@@ -752,44 +752,56 @@ function renderScoresScreen(){
 }
 function renderBonusProgress(){
   const el=$("wsd-bonus-progress");if(!el)return;
-  const players=gameState.players;players.forEach(ensurePlayerStats);
-  const maxLand=Math.max(0,...players.map(getPlayerUniqueLandCount));
-  const maxAttr=Math.max(0,...players.map(p=>p.collected.length));
-  const maxCorr=Math.max(0,...players.map(p=>p.stats.correctGuesses||0));
-  const maxRisk=Math.max(0,...players.map(p=>p.stats.totalRisked||0));
+  const players=gameState.players;
+  players.forEach(ensurePlayerStats);
+
+  const categories=[
+    {
+      icon:"🗺️",
+      label:"Top Land Collector",
+      getValue:p=>getPlayerUniqueLandCount(p),
+      unit:"land"
+    },
+    {
+      icon:"🎢",
+      label:"Top Attraction Collector",
+      getValue:p=>p.collected.length,
+      unit:"attraction"
+    },
+    {
+      icon:"🧠",
+      label:"Best Guesser",
+      getValue:p=>p.stats.correctGuesses||0,
+      unit:"correct guess"
+    },
+    {
+      icon:"🎲",
+      label:"Most Risky Player",
+      getValue:p=>p.stats.totalRisked||0,
+      unit:"point risked"
+    }
+  ];
+
   let html="";
-  players.forEach(p=>{
-    const lc=getPlayerUniqueLandCount(p);
-    const ac=p.collected.length;
-    const cc=p.stats.correctGuesses||0;
-    const rc=p.stats.totalRisked||0;
-    const lb=lc>0&&lc===maxLand?FINAL_BONUS_POINTS.topLandCollector:0;
-    const ab=ac>0&&ac===maxAttr?FINAL_BONUS_POINTS.topAttractionCollector:0;
-    const gb=cc>0&&cc===maxCorr?FINAL_BONUS_POINTS.bestGuesser:0;
-    const rb=rc>0&&rc===maxRisk?FINAL_BONUS_POINTS.mostRiskyPlayer:0;
-    const tot=lb+ab+gb+rb;
+  categories.forEach(cat=>{
+    const best=Math.max(0,...players.map(cat.getValue));
+    const leaders=players.filter(p=>cat.getValue(p)===best&&best>0);
+    const leaderText=leaders.length
+      ? `${leaders.map(p=>p.name).join(" & ")} — ${best} ${cat.unit}${best===1?"":"s"}`
+      : "No leader yet";
+
     html+=`
-      <div class="wsd-bonus-topic">
-        <div class="wsd-bonus-topic-icon">🎯</div>
+      <div class="wsd-score-row" style="align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.07)">
         <div>
-          <div class="wsd-bonus-topic-title">${p.name} — projected +${tot} pts</div>
-          <div class="wsd-bonus-topic-desc">
-            🗺️ Top land collector: ${lb>0?"✅ +3":`${lc} lands`}<br/>
-            🎢 Top attraction collector: ${ab>0?"✅ +3":`${ac} attractions`}<br/>
-            🧠 Best guesser: ${gb>0?"✅ +2":`${cc} correct`}<br/>
-            🎲 Most risky player: ${rb>0?"✅ +2":`${rc} risked`}
-          </div>
+          <div class="wsd-score-name">${cat.icon} ${cat.label}</div>
+          <div class="wsd-score-meta">${leaderText}</div>
         </div>
       </div>`;
   });
-  html+=`
-    <div class="wsd-text-small mt-2 text-center">
-      <a href="#" data-bs-toggle="modal" data-bs-target="#modal-bonuses">
-        How are bonuses calculated?
-      </a>
-    </div>`;
-  el.innerHTML = html || "<div class='wsd-text-small'>No rounds played yet.</div>";
+
+  el.innerHTML=html||"<div class='wsd-text-small'>No rounds played yet.</div>";
 }
+
 function renderManualAdjustmentsUI(){
   const c=$("wsd-manual-adjustments");if(!c)return;
   c.innerHTML="";
