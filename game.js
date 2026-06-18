@@ -767,21 +767,25 @@ function renderBonusProgress(){
     {
       icon: "🗺️",
       label: "Top Land Collector",
+      bonus: FINAL_BONUS_POINTS.topLandCollector,
       getValue: p => getPlayerUniqueLandCount(p),
     },
     {
       icon: "🎢",
       label: "Top Attraction Collector",
+      bonus: FINAL_BONUS_POINTS.topAttractionCollector,
       getValue: p => p.collected.length,
     },
     {
       icon: "🧠",
       label: "Best Guesser",
+      bonus: FINAL_BONUS_POINTS.bestGuesser,
       getValue: p => p.stats.correctGuesses || 0,
     },
     {
       icon: "🎲",
       label: "Most Risky Player",
+      bonus: FINAL_BONUS_POINTS.mostRiskyPlayer,
       getValue: p => p.stats.totalRisked || 0,
     }
   ];
@@ -831,6 +835,7 @@ function renderBonusProgress(){
       <div style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.07)">
         <div class="wsd-score-name" style="margin-bottom:4px">
           ${cat.icon} ${cat.label}
+          <span style="font-weight:normal;opacity:0.6;font-size:0.8rem;margin-left:4px">(+${cat.bonus})</span>
         </div>
         <div style="margin-left:4px">
           ${rankingHtml}
@@ -838,6 +843,12 @@ function renderBonusProgress(){
       </div>
     `;
   });
+
+  html += `
+    <div class="wsd-text-small mt-2 text-center">
+      <a href="#" data-bs-toggle="modal" data-bs-target="#modal-bonuses">How are bonuses calculated?</a>
+    </div>
+  `;
 
   el.innerHTML = html || "<div class='wsd-text-small'>No rounds played yet.</div>";
 }
