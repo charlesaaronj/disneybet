@@ -542,7 +542,23 @@ body {
   box-shadow: none;
   color: #fff;
 }
+#wsd-invert-scores {
+  position: relative;
+  overflow: hidden;
+}
 
+#wsd-invert-scores.wsd-invert-active {
+  background-color: #ffe9a3;
+  border-color: #ffbf00;
+  color: #6c4a00;
+  animation: wsd-invert-pulse 0.25s ease-out;
+}
+
+@keyframes wsd-invert-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
 #modal-confirm-reset .wsd-btn-danger:hover {
   filter: brightness(1.05);
 }
