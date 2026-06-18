@@ -64,7 +64,7 @@ const PARK_THEMES = {
   "EPCOT":            {hero:"linear-gradient(180deg,#003366,#66ccff)",nav:"rgba(0,51,102,0.95)",avatar:"linear-gradient(135deg,#66ccff,#ffffff)"},
   "Hollywood Studios":{hero:"linear-gradient(180deg,#3b3b3b,#ffcc00)",nav:"rgba(59,59,59,0.95)",avatar:"linear-gradient(135deg,#ffcc00,#c6a530)"},
   "Animal Kingdom":   {hero:"linear-gradient(180deg,#014422,#8bc34a)",nav:"rgba(1,68,34,0.95)",avatar:"linear-gradient(135deg,#8bc34a,#ffe082)"},
-  "Dollywood":         {hero: "linear-gradient(180deg,#1c3b3f,#6c8e9d)",nav: "rgba(28,59,63,0.95)",avatar: "linear-gradient(135deg,#a0baca,#605b73)"}
+  "Dollywood":         {hero: "linear-gradient(180deg,#feb234,#c87b2d)",nav: "rgba(28,59,63,0.95)",avatar: "linear-gradient(135deg,#feb234,#c87b2d)"}
 };
 const NAV_MAP = {
   "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
