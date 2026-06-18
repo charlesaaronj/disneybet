@@ -6,12 +6,14 @@ const $ = id => document.getElementById(id);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const medal = i => ["🥇 ","🥈 ","🥉 "][i] || "";
 const PLAYER_BADGE_COLORS = [
-  "#ff3b30", // red
-  "#ffcc00", // yellow
-  "#34c759", // green
-  "#007aff", // blue
-  "#ff9500", // orange
-  "#af52de"  // purple
+  "#FFB3BA", // soft pink
+  "#FFDFBA", // light peach
+  "#FFFFBA", // pale yellow
+  "#BAFFC9", // mint green
+  "#BAE1FF", // baby blue
+  "#E0BBFF", // lavender
+  "#FFD1DC", // blush
+  "#C5E1A5"  // muted green
 ];
 
 // ---------------- Core helpers ----------------
