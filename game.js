@@ -194,8 +194,17 @@ function updateQuestionLock(){
 // ----------------- Setup screen -----------------
 
 function updateSetupStartResumeButtons() {
-  $("wsd-start-game").style.display  = gameState ? "none" : "";
-  $("wsd-resume-game").style.display = gameState ? ""     : "none";
+  const startBtn  = $("wsd-start-game");
+  const resumeBtn = $("wsd-resume-game");
+  if (!startBtn || !resumeBtn) return;
+
+  if (gameState) {
+    startBtn.style.display  = "none";
+    resumeBtn.style.display = "";
+  } else {
+    startBtn.style.display  = "";
+    resumeBtn.style.display = "none";
+  }
 }
 
 function initSetupScreen(){
