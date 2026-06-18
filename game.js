@@ -751,56 +751,91 @@ function renderScoresScreen(){
   maybeRenderCollectionsScreen();
 }
 function renderBonusProgress(){
-  const el=$("wsd-bonus-progress");if(!el)return;
-  const players=gameState.players;
+  const el = $("wsd-bonus-progress");
+  if (!el) return;
+
+  const players = gameState.players;
   players.forEach(ensurePlayerStats);
 
-  const categories=[
+  const categories = [
     {
-      icon:"🗺️",
-      label:"Top Land Collector",
-      getValue:p=>getPlayerUniqueLandCount(p),
-      unit:"land"
+      icon: "🗺️",
+      label: "Top Land Collector",
+      getValue: p => getPlayerUniqueLandCount(p),
     },
     {
-      icon:"🎢",
-      label:"Top Attraction Collector",
-      getValue:p=>p.collected.length,
-      unit:"attraction"
+      icon: "🎢",
+      label: "Top Attraction Collector",
+      getValue: p => p.collected.length,
     },
     {
-      icon:"🧠",
-      label:"Best Guesser",
-      getValue:p=>p.stats.correctGuesses||0,
-      unit:"correct guess"
+      icon: "🧠",
+      label: "Best Guesser",
+      getValue: p => p.stats.correctGuesses || 0,
     },
     {
-      icon:"🎲",
-      label:"Most Risky Player",
-      getValue:p=>p.stats.totalRisked||0,
-      unit:"point risked"
+      icon: "🎲",
+      label: "Most Risky Player",
+      getValue: p => p.stats.totalRisked || 0,
     }
   ];
 
-  let html="";
-  categories.forEach(cat=>{
-    const best=Math.max(0,...players.map(cat.getValue));
-    const leaders=players.filter(p=>cat.getValue(p)===best&&best>0);
-    const leaderText=leaders.length
-      ? `${leaders.map(p=>p.name).join(" & ")} — ${best} ${cat.unit}${best===1?"":"s"}`
-      : "No leader yet";
+  let html = "";
 
-    html+=`
-      <div class="wsd-score-row" style="align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.07)">
-        <div>
-          <div class="wsd-score-name">${cat.icon} ${cat.label}</div>
-          <div class="wsd-score-meta">${leaderText}</div>
+  categories.forEach(cat => {
+    const scored = players
+      .map(p => ({ name: p.name, val: cat.getValue(p) }))
+      .sort((a, b) => b.val - a.val);
+
+    const best = scored[0]?.val || 0;
+
+    let rankingHtml = "";
+
+    if (!scored.length || best === 0) {
+      rankingHtml = `<div class="wsd-score-meta" style="margin-top:6px">No leader yet</div>`;
+    } else {
+      let rank = 1;
+      let i = 0;
+
+      while (i < scored.length) {
+        const tierVal = scored[i].val;
+        const tierPlayers = scored.filter(s => s.val === tierVal);
+        const isLeader = tierVal === best;
+        const gap = best - tierVal;
+
+        const names = tierPlayers.map(s => s.name).join(" & ");
+        const gapLabel = isLeader || gap === 0 ? "" : ` (-${gap})`;
+
+        rankingHtml += `
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px">
+            <div class="wsd-score-meta">
+              <span style="opacity:0.5;margin-right:8px">#${rank}</span>
+              <strong style="${isLeader ? "" : "font-weight:normal"}">${names}</strong>
+              <span style="opacity:0.7">${gapLabel}</span>
+            </div>
+          </div>
+        `;
+
+        rank += tierPlayers.length;
+        i += tierPlayers.length;
+      }
+    }
+
+    html += `
+      <div style="padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.07)">
+        <div class="wsd-score-name" style="margin-bottom:4px">
+          ${cat.icon} ${cat.label}
         </div>
-      </div>`;
+        <div style="margin-left:4px">
+          ${rankingHtml}
+        </div>
+      </div>
+    `;
   });
 
-  el.innerHTML=html||"<div class='wsd-text-small'>No rounds played yet.</div>";
+  el.innerHTML = html || "<div class='wsd-text-small'>No rounds played yet.</div>";
 }
+
 
 function renderManualAdjustmentsUI(){
   const c=$("wsd-manual-adjustments");if(!c)return;
