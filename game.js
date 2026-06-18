@@ -8,10 +8,10 @@ const medal = i => ["🥇 ","🥈 ","🥉 "][i] || "";
 const PLAYER_BADGE_COLORS = [
   "#FFB3BA", // soft pink
   "#FFDFBA", // light peach
-  "#FFFFBA", // pale yellow
+  "#E0BBFF", // lavender
+  "#E5E5A6", // pale yellow
   "#BAFFC9", // mint green
   "#BAE1FF", // baby blue
-  "#E0BBFF", // lavender
   "#FFD1DC", // blush
   "#C5E1A5"  // muted green
 ];
