@@ -62,7 +62,7 @@ const SCREEN_META = {
 const PARK_THEMES = {
   "Magic Kingdom":    {hero:"linear-gradient(180deg,#4b0082,#ff69b4)",nav:"rgba(75,0,130,0.95)",avatar:"linear-gradient(135deg,#ff69b4,#800080)"},
   "EPCOT":            {hero:"linear-gradient(180deg,#003366,#66ccff)",nav:"rgba(0,51,102,0.95)",avatar:"linear-gradient(135deg,#66ccff,#ffffff)"},
-  "Hollywood Studios":{hero:"linear-gradient(180deg,#3b3b3b,#ffcc00)",nav:"rgba(59,59,59,0.95)",avatar:"linear-gradient(135deg,#ffcc00,#ff4081)"},
+  "Hollywood Studios":{hero:"linear-gradient(180deg,#3b3b3b,#ffcc00)",nav:"rgba(59,59,59,0.95)",avatar:"linear-gradient(135deg,#ffcc00,#c6a530)"},
   "Animal Kingdom":   {hero:"linear-gradient(180deg,#014422,#8bc34a)",nav:"rgba(1,68,34,0.95)",avatar:"linear-gradient(135deg,#8bc34a,#ffe082)"}
 };
 const NAV_MAP = {
