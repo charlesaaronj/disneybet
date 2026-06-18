@@ -74,15 +74,26 @@ const NAV_MAP = {
 const ROUND_SCREENS = ["setup-question","enter-answers","select-answer","guess-wager","reveal"];
 
 const PARKS = {};
-if (typeof PARK_MAGIC_KINGDOM!=="undefined") PARKS[PARK_MAGIC_KINGDOM.name]=PARK_MAGIC_KINGDOM;
-if (typeof PARK_EPCOT!=="undefined") PARKS[PARK_EPCOT.name]=PARK_EPCOT;
-if (typeof PARK_HOLLYWOOD_STUDIOS !== "undefined") {PARKS[PARK_HOLLYWOOD_STUDIOS.name] = PARK_HOLLYWOOD_STUDIOS;
-if (typeof PARK_ANIMAL_KINGDOM !== "undefined") {PARKS[PARK_ANIMAL_KINGDOM.name] = PARK_ANIMAL_KINGDOM;
-if (typeof PARK_DOLLYWOOD !== "undefined") {PARKS[PARK_DOLLYWOOD.name] = PARK_DOLLYWOOD;
+
+if (typeof PARK_MAGIC_KINGDOM !== "undefined") {
+  PARKS[PARK_MAGIC_KINGDOM.name] = PARK_MAGIC_KINGDOM;
 }
 
+if (typeof PARK_EPCOT !== "undefined") {
+  PARKS[PARK_EPCOT.name] = PARK_EPCOT;
 }
 
+if (typeof PARK_HOLLYWOOD_STUDIOS !== "undefined") {
+  PARKS[PARK_HOLLYWOOD_STUDIOS.name] = PARK_HOLLYWOOD_STUDIOS;
+}
+
+if (typeof PARK_ANIMAL_KINGDOM !== "undefined") {
+  PARKS[PARK_ANIMAL_KINGDOM.name] = PARK_ANIMAL_KINGDOM;
+}
+
+if (typeof PARK_DOLLYWOOD !== "undefined") {
+  PARKS[PARK_DOLLYWOOD.name] = PARK_DOLLYWOOD;
+}
 
 let gameState=null;
 
