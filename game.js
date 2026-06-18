@@ -1068,7 +1068,19 @@ function wireEvents(){
     updateQuestionLock();
   });
   $("wsd-resume-game")?.addEventListener("click", () => {
-  showScreen(gameState?.screen || "setup-question");
+  if (!gameState) {
+    showScreen("setup-game");
+    return;
+  }
+  // Go back to whatever screen the game was last on,
+  // or fall back to setup-question.
+  const scr = gameState.screen || "setup-question";
+
+  if (scr === "scores")        renderScoresScreen();
+  else if (scr === "history")  renderHistoryScreen();
+  else if (scr === "game-end") renderFinalResults();
+
+  showScreen(scr);
 });
   $("wsd-generate-question").addEventListener("click",onGenerateNewQuestion);
   $("wsd-enter-custom-question").addEventListener("click",onEnterCustomQuestion);
