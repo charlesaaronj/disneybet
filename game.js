@@ -900,7 +900,6 @@ function invertCurrentScores(){
     (last.manualAdjustments||[]).push({type:"invertScores",before,note:"Invert scores"});
   }
   saveState();renderScoresScreen();
-  alert("Scores inverted: highest and lowest scores have been swapped.");
 }
 function renderHistoryScreen(){
   const c=$("wsd-history-list");if(!c)return;
