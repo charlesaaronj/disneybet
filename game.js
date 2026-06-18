@@ -798,12 +798,25 @@ function renderScoresScreen(){
       const row=document.createElement("div");
       row.className="wsd-score-row wsd-anim-fade-up";
       row.style.animationDelay=`${i*0.05}s`;
-      row.innerHTML=`
-        <div>
-          <div class="wsd-score-name">${medal(i)}${p.name}</div>
-          <div class="wsd-score-meta">Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)}</div>
+          const dotColor = p.badgeColor || "#888888";
+    row.innerHTML = `
+      <div>
+        <div class="wsd-score-name">
+          <span class="wsd-player-dot" style="
+            display:inline-block;
+            width:8px;
+            height:8px;
+            border-radius:50%;
+            margin-right:6px;
+            background-color:${dotColor};
+          "></span>
+          ${medal(i)}${p.name}
         </div>
-        <div class="wsd-score-value">${p.score}</div>`;
+        <div class="wsd-score-meta">
+          Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)}
+        </div>
+      </div>
+      <div class="wsd-score-value">${p.score}</div>`;
       list.appendChild(row);
     });
   renderBonusProgress();
