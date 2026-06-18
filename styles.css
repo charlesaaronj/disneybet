@@ -472,57 +472,49 @@ body {
   margin-bottom: 4px;
 }
 
-/* Base modal look to match Who Said Diz card style */
-.wsd-modal .modal-dialog {
+/* Base look for the confirm modal so it feels like the game */
+#modal-confirm-reset .modal-dialog {
   max-width: 420px;
 }
 
-.wsd-modal-content {
+#modal-confirm-reset .modal-content {
   border-radius: 18px;
   border: none;
   overflow: hidden;
   box-shadow: 0 18px 40px rgba(0,0,0,0.25);
 }
 
-/* Header picks up the current park gradient via JS (same as hero) */
-.wsd-modal-header {
+/* Header color (gradient + text color) is set by applyParkTheme in JS */
+#modal-confirm-reset .modal-header {
   align-items: center;
   border-bottom: none;
   padding: 14px 18px;
-  background: linear-gradient(135deg, #4b0082, #ff69b4); /* fallback */
-  color: #fff;
 }
 
-.wsd-modal-header-icon {
-  font-size: 1.4rem;
-  margin-right: 8px;
-}
-
-.wsd-modal-title {
+/* Title and icon */
+#modal-confirm-reset .modal-title {
   font-size: 1rem;
   font-weight: 600;
   margin: 0;
 }
 
-/* Close button tuned for dark header */
-.wsd-modal-close {
-  filter: invert(1);
+#modal-confirm-reset .btn-close {
+  filter: invert(1);          /* white close icon on dark gradient */
   opacity: 0.8;
 }
-
-.wsd-modal-close:hover {
+#modal-confirm-reset .btn-close:hover {
   opacity: 1;
 }
 
-/* Body text to match the app typography */
-.wsd-modal-body {
+/* Body text */
+#modal-confirm-reset .modal-body {
   padding: 16px 18px 6px;
   font-size: 0.9rem;
   color: #333;
 }
 
-/* Footer buttons spaced like your in-game buttons */
-.wsd-modal-footer {
+/* Footer buttons aligned like in-game controls */
+#modal-confirm-reset .modal-footer {
   border-top: none;
   padding: 8px 18px 14px;
   display: flex;
@@ -530,24 +522,26 @@ body {
   gap: 8px;
 }
 
-/* Button styles that feel like the game */
-.wsd-btn-secondary {
+/* Button styles to feel like your app */
+#modal-confirm-reset .wsd-btn-secondary {
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.85rem;
   border: 1px solid rgba(0,0,0,0.08);
+  background-color: #fff;
 }
 
-.wsd-btn-danger {
+#modal-confirm-reset .wsd-btn-danger {
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.85rem;
   background: linear-gradient(135deg, #ff4b5c, #ff7a45);
   border: none;
   box-shadow: 0 6px 16px rgba(255,75,92,0.5);
+  color: #fff;
 }
 
-.wsd-btn-danger:hover {
+#modal-confirm-reset .wsd-btn-danger:hover {
   filter: brightness(1.05);
 }
 
