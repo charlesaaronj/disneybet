@@ -1033,15 +1033,16 @@ function wireEvents(){
   $("wsd-to-scores").addEventListener("click",()=>{renderScoresScreen();showScreen("scores");});
   $("wsd-start-round").addEventListener("click",()=>{startNewRoundCore();showScreen("setup-question");});
   $("wsd-view-history").addEventListener("click",()=>{renderHistoryScreen();showScreen("history");});
-  $("wsd-end-game").addEventListener("click",()=>{computeFinalBonusesAndShow();showScreen("game-end");});
-// confirm before restart/play-again
-$("wsd-restart-game").addEventListener("click", () =>
-  confirmThenReset("End this game? All scores and history will be lost.")
-);
-$("wsd-play-again").addEventListener("click", () =>
-  confirmThenReset("Start a new game? All scores and history will be lost.")
-);
-
+// End game: confirm before wiping the game
+$("wsd-end-game").addEventListener("click", () => {
+  confirmThenReset("End this game and clear all scores and history?");
+});
+// Restart (from end screen): also confirm
+$("wsd-restart-game").addEventListener("click", () => {
+  confirmThenReset("Restart this game and clear all scores and history?");
+});
+// Play again: immediate fresh game with no extra prompt
+$("wsd-play-again").addEventListener("click", resetGame);
   $("wsd-view-history-end").addEventListener("click",()=>{renderHistoryScreen();showScreen("history");});
   $("wsd-close-history").addEventListener("click",()=>{
     const fb=gameState? (gameState.screen==="history"?"scores":gameState.screen):"setup-game";
