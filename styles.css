@@ -535,9 +535,9 @@ body {
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.85rem;
-  background: linear-gradient(135deg, #ff4b5c, #ff7a45);
+  background: #dc3545;
   border: none;
-  box-shadow: 0 6px 16px rgba(255,75,92,0.5);
+  box-shadow: none;
   color: #fff;
 }
 
