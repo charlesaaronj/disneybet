@@ -221,12 +221,35 @@ function initSetupScreen(){
   debugLog("Setup screen ready");
   
 }
-function addPlayerInput(container){
-  const inp=document.createElement("input");
-  inp.type="text";
-  inp.className="form-control wsd-form-control wsd-player-input";
-  inp.placeholder="Player name";
-  container.appendChild(inp);
+function addPlayerInput(container, name = "") {
+  const wrap = document.createElement("div");
+  wrap.className = "d-flex align-items-center mb-1";
+
+  const inp = document.createElement("input");
+  inp.type = "text";
+  inp.className = "form-control wsd-form-control wsd-player-input";
+  inp.placeholder = "Player name";
+  inp.value = name;
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "×";
+  btn.className = "btn btn-sm btn-outline-secondary";
+  btn.style.marginLeft = "0.5rem";
+
+  btn.addEventListener("click", () => {
+    const allInputs = $$("#wsd-player-inputs input");
+    if (allInputs.length <= 3) {
+      const errEl = $("wsd-setup-error");
+      if (errEl) errEl.textContent = "You need at least three players.";
+      return;
+    }
+    wrap.remove();
+  });
+
+  wrap.appendChild(inp);
+  wrap.appendChild(btn);
+  container.appendChild(wrap);
 }
 function startGameFromSetup(){
   const errEl = $("wsd-setup-error");
