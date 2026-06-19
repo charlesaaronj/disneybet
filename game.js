@@ -418,32 +418,26 @@ function saveAnswerForCurrentPlayer(skip){
 }
 function pickRandomAnswer(){
   const r = gameState.currentRound;
-  let pool = r.answers;
+  const base = r.answers || [];
+  const hasGhostPool = gameState.ghostPool && gameState.ghostPool.length > 0;
+  let pool = base;
 
-  // Maybe inject a Ghost answer from previous unused answers
-  try {
-    gameState.ghostPool ||= [];
-    const ghostPool = gameState.ghostPool;
-    const canUseGhost = ghostPool.length > 0 && pool.length > 0;
-    const useGhostThisRound = canUseGhost && Math.random() < 0.33; // ~1 in 3 rounds
-
-    if (useGhostThisRound) {
-      const ghost = ghostPool[Math.floor(Math.random() * ghostPool.length)];
-      pool = pool.slice(); // clone so we don't mutate r.answers
-      pool.push({
-        playerId: null,
-        text: ghost.text,
-        isGhost: true
-      });
-      r.usedGhost = true;
-    } else {
-      r.usedGhost = false;
+  if (hasGhostPool) {
+    // 25% chance to inject one ghost answer (tweak probability if you like)
+    const roll = Math.random();
+    if (roll < 0.25) {
+      const ghostSource = gameState.ghostPool[Math.floor(Math.random()*gameState.ghostPool.length)];
+      const ghostAnswer = {
+        text: ghostSource.text,
+        isGhost: true,
+        fromRound: ghostSource.fromRound,
+        fromPlayerId: ghostSource.fromPlayerId
+      };
+      pool = [...base, ghostAnswer];
     }
-  } catch (e) {
-    r.usedGhost = false;
   }
 
-  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  const chosen = pool[Math.floor(Math.random()*pool.length)];
   r.selectedAnswer = chosen;
 }
 function renderSelectAnswerScreen(){
@@ -555,7 +549,7 @@ function lockWagers(){
     if(isNaN(amount)||amount<0)amount=0;
     const player=gameState.players.find(pl=>pl.id===pid);
     if(player&&amount>player.score)amount=player.score;
-    wagers.push({playerId:pid,guessedAuthorId:parseInt(sel.value,10),amount});
+    wagers.push({playerId:pid,guessedAuthorId:sel.value,amount});
   });
   if(wagers.filter(w=>w.amount>0).length<2){
     if(err)err.textContent="At least two players must wager more than 0.";return;
