@@ -295,7 +295,7 @@ function startNewRoundCore(){
     wagers:[],pot:0,correctGuessers:[],payouts:[],
     scoreBefore:{},scoreAfter:{},collectionsThisRound:[],
     wrongGuessCount:0,authorBonus:0,houseBonusResolved:0,
-    houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:""
+    houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:"",
     usedGhost:false 
   };
   saveState();
