@@ -532,7 +532,7 @@ function goToGuessWager(){
     row.appendChild(playerLabel);
 
     const inner=document.createElement("div");
-    inner.className="d-flex gap-2";
+    inner.className="d-flex gap-1";
 
     const guessSel=document.createElement("select");
     guessSel.className="form-select wsd-form-select";
