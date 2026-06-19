@@ -229,65 +229,106 @@ function addPlayerInput(container){
   container.appendChild(inp);
 }
 function startGameFromSetup(){
-  const errEl=$("wsd-setup-error"),parkSel=$("wsd-park-select");
-  const parkName=parkSel?parkSel.value:"";
-  if(errEl)errEl.textContent="";
-  if(!parkName||!PARKS[parkName]){
-    if(errEl)errEl.textContent="Please select a park.";return;
-  }
+  const errEl = $("wsd-setup-error");
+  const parkSel = $("wsd-park-select");
+  const parkName = parkSel ? parkSel.value : "";
 
-  const names=$$("#wsd-player-inputs input").map(i=>i.value.trim()).filter(Boolean);
-  if(names.length<3){
-    if(errEl)errEl.textContent="Please enter at least three player names.";return;
-  }
+  if (errEl) errEl.textContent = "";
 
-  const uniqueNames=new Set(names.map(n=>n.toLowerCase()));
-  if(uniqueNames.size!==names.length){
-    if(errEl)errEl.textContent="Each player must have a unique name.";
+  if (!parkName || !PARKS[parkName]) {
+    if (errEl) errEl.textContent = "Please select a park.";
     return;
   }
 
-  const parkData=PARKS[parkName];
-  const players = names.map((name, id) => ({
-  id,
-  name,
-  score: START_POINTS,
-  wins: 0,
-  collected: [],
-  bonusTotal: 0,
-  stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
-  badgeColor: null   // will set next
-}));
+  const names = $$("#wsd-player-inputs input")
+    .map(i => i.value.trim())
+    .filter(Boolean);
 
-// Assign each player a unique badge color (no repeats)
-const palette = PLAYER_BADGE_COLORS.slice(); // copy the array
+  if (names.length < 3) {
+    if (errEl) errEl.textContent = "Please enter at least three player names.";
+    return;
+  }
 
-// Shuffle palette in-place
-for (let i = palette.length - 1; i > 0; i--) {
-  const j = Math.floor(Math.random() * (i + 1));
-  [palette[i], palette[j]] = [palette[j], palette[i]];
-}
+  const uniqueNames = new Set(names.map(n => n.toLowerCase()));
+  if (uniqueNames.size !== names.length) {
+    if (errEl) errEl.textContent = "Each player must have a unique name.";
+    return;
+  }
 
-players.forEach(p => {
-  const color = palette.shift() || "#999999"; // fallback if more players than colors
-  p.badgeColor = color;
-});
-  
-  const usedQuestions={attractions:{},generic:shuffle(parkData.genericQuestions),genericIndex:0};
-  parkData.attractions.forEach(a=>{
-    usedQuestions.attractions[a.name]={questions:shuffle(a.questions),index:0};
-  });
-  gameState={
-    screen:"setup-question",roundNumber:0,
-    settings:{park:parkName,startingPoints:START_POINTS,minPoints:MIN_POINTS},
-    players,
-    lands:[...new Set(parkData.attractions.map(a=>a.land).filter(Boolean))],
-    attractions:parkData.attractions,genericQuestions:parkData.genericQuestions,
-    usedQuestions,currentRound:null,history:[],finalBonusesApplied:false
-  };
-  const parkLabel=$("wsd-park-label"); if(parkLabel)parkLabel.textContent=parkName;
+  const parkData = PARKS[parkName];
+
+  // ---------- NEW: only create a game if none exists ----------
+  if (!gameState) {
+    const players = names.map((name, id) => ({
+      id,
+      name,
+      score: START_POINTS,
+      wins: 0,
+      collected: [],
+      bonusTotal: 0,
+      stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
+      badgeColor: null
+    }));
+
+    const palette = PLAYER_BADGE_COLORS.slice();
+    for (let i = palette.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [palette[i], palette[j]] = [palette[j], palette[i]];
+    }
+    players.forEach(p => {
+      const color = palette.shift() || "#999999";
+      p.badgeColor = color;
+    });
+
+    const usedQuestions = {
+      attractions: {},
+      generic: shuffle(parkData.genericQuestions),
+      genericIndex: 0
+    };
+    parkData.attractions.forEach(a => {
+      usedQuestions.attractions[a.name] = {
+        questions: shuffle(a.questions),
+        index: 0
+      };
+    });
+
+    gameState = {
+      screen: "setup-question",
+      roundNumber: 0,
+      settings: { park: parkName, startingPoints: START_POINTS, minPoints: MIN_POINTS },
+      players,
+      lands: [...new Set(parkData.attractions.map(a => a.land).filter(Boolean))],
+      attractions: parkData.attractions,
+      genericQuestions: parkData.genericQuestions,
+      usedQuestions,
+      currentRound: null,
+      history: [],
+      finalBonusesApplied: false
+    };
+  } else {
+    // Existing game: just update park data; DO NOT reset scores
+    gameState.settings.park = parkName;
+    gameState.attractions = parkData.attractions;
+    gameState.genericQuestions = parkData.genericQuestions;
+    gameState.lands = [...new Set(parkData.attractions.map(a => a.land).filter(Boolean))];
+  }
+
+  // ---------- shared UI updates ----------
+  const parkLabel = $("wsd-park-label");
+  if (parkLabel) parkLabel.textContent = parkName;
+
   applyParkTheme(parkName);
-  const summary=$("wsd-player-summary"); if(summary)summary.textContent=`${players.length} players`;
+
+  const summary = $("wsd-player-summary");
+  if (summary && gameState && gameState.players) {
+    summary.textContent = `${gameState.players.length} players`;
+  }
+
+  const startBtn = $("wsd-start-game");
+  if (startBtn) {
+    startBtn.textContent = gameState ? "Resume game" : "Start game";
+  }
+
   renderAttractionOptions();
   saveState();
   showScreen("setup-question");
@@ -1223,13 +1264,19 @@ $("wsd-nav-history")?.addEventListener("click", () => {
 });
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
   loadState();
   ensureStateShape();
   initSetupScreen();
   wireEvents();
 
-  if(gameState){
+  // NEW: set Start/Resume label based on whether a game is saved
+  const startBtn = $("wsd-start-game");
+  if (startBtn) {
+    startBtn.textContent = gameState ? "Resume game" : "Start game";
+  }
+
+  if (gameState) {
     const parkName = gameState.settings?.park || "Not set";
     const parkLabel = $("wsd-park-label");
     if (parkLabel) parkLabel.textContent = parkName;
