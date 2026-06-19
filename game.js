@@ -1118,47 +1118,65 @@ function invertCurrentScores(){
   renderScoresScreen();
 }
 function renderHistoryScreen(){
-  const c=$("wsd-history-list");if(!c)return;
-  c.innerHTML="";
-  if(!gameState.history.length){c.textContent="No rounds played yet.";return;}
-  [...gameState.history].reverse().forEach(h=>{
-    const author=gameState.players.find(p=>p.id===h.authorId);
-    const wrap=document.createElement("div");
-    wrap.className="mb-3 pb-2 border-bottom";
-    let html=`<div><strong>Round ${h.roundNumber}</strong>`;
-    if(h.park)html+=` — ${h.park}`;
-    if(h.land)html+=` · ${h.land}`;
-    if(h.attraction)html+=` · <em>${h.attraction}</em>`;
-    html+=`</div>
+  const c = $("wsd-history-list");
+  if (!c) return;
+  c.innerHTML = "";
+  if (!gameState.history.length) {
+    c.textContent = "No rounds played yet.";
+    return;
+  }
+
+  [...gameState.history].reverse().forEach(h => {
+    const author = gameState.players.find(p => p.id === h.authorId);
+    const isGhost = !!h.isGhostAnswer;
+
+    const wrap = document.createElement("div");
+    wrap.className = "mb-3 pb-2 border-bottom";
+
+    let html = `<div><strong>Round ${h.roundNumber}</strong>`;
+    if (h.park) html += ` — ${h.park}`;
+    if (h.land) html += ` · ${h.land}`;
+    if (h.attraction) html += ` · <em>${h.attraction}</em>`;
+    html += `</div>
       <div class="wsd-text-small">Q: ${h.question}</div>
       <div class="wsd-text-small">Answer: &ldquo;${h.selectedAnswerText}&rdquo;</div>
-      <div class="wsd-text-small">Author: <strong>${isGhost ? "👻 Ghost" : (author ? author.name : "Unknown")}</strong></div>`;
-    h.payouts.forEach(pt=>{
-  const pl = gameState.players.find(x=>x.id===pt.playerId);
-  const ok = h.correctGuessers.includes(pt.playerId);
-  const deltaStr = `${pt.delta>=0?"+":""}${pt.delta}`;
-  html += `<div class="wsd-text-small">&nbsp;&nbsp;${pl ? pl.name : "?"} ${ok ? "✅" : "❌"} (${deltaStr} pts)</div>`;
-});
+      <div class="wsd-text-small">
+        Author: <strong>${isGhost ? "👻 Ghost" : (author ? author.name : "Unknown")}</strong>
+      </div>`;
+
+    h.payouts.forEach(pt => {
+      const pl = gameState.players.find(x => x.id === pt.playerId);
+      const ok = h.correctGuessers.includes(pt.playerId);
+      const deltaStr = `${pt.delta >= 0 ? "+" : ""}${pt.delta}`;
+      html += `<div class="wsd-text-small">&nbsp;&nbsp;${pl ? pl.name : "?"} ${ok ? "✅" : "❌"} (${deltaStr} pts)</div>`;
     });
-    if(h.authorBonus>0)html+=`<div class="wsd-text-small">&nbsp;&nbsp;Author bonus: +${h.authorBonus}</div>`;
-    if(h.houseBonusAmount>0||h.houseBonusResolved>0||h.houseBonusReason){
-      const names=(h.houseBonusRecipients||[]).map(hr=>{
-        const pl=gameState.players.find(x=>x.id===hr.playerId);
-        return pl?`${pl.name} (+${hr.extra})`:`Player ${hr.playerId} (+${hr.extra})`;
+
+    if (h.authorBonus > 0) {
+      html += `<div class="wsd-text-small">&nbsp;&nbsp;Author bonus: +${h.authorBonus}</div>`;
+    }
+
+    if (h.houseBonusAmount > 0 || h.houseBonusResolved > 0 || h.houseBonusReason) {
+      const names = (h.houseBonusRecipients || []).map(hr => {
+        const pl = gameState.players.find(x => x.id === hr.playerId);
+        return pl ? `${pl.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
       }).join(", ");
-      html+=`<div class="wsd-text-small">&nbsp;&nbsp;House bonus: ${
-        h.houseBonusApplied?`+${h.houseBonusResolved} split evenly: ${names}`:(h.houseBonusReason||"Not applied")
+      html += `<div class="wsd-text-small">&nbsp;&nbsp;House bonus: ${
+        h.houseBonusApplied
+          ? `+${h.houseBonusResolved} split evenly: ${names}`
+          : (h.houseBonusReason || "Not applied")
       }</div>`;
     }
-    (h.manualAdjustments||[]).forEach(adj=>{
-      if(adj.type==="invertScores"){
-        html+=`<div class="wsd-text-small">&nbsp;&nbsp;Manual: scores inverted</div>`;
-      }else{
-        const pl=gameState.players.find(x=>x.id===adj.playerId);
-        html+=`<div class="wsd-text-small">&nbsp;&nbsp;Manual: ${pl?pl.name:"?"} ${adj.delta>=0?"+":""}${adj.delta}</div>`;
+
+    (h.manualAdjustments || []).forEach(adj => {
+      if (adj.type === "invertScores") {
+        html += `<div class="wsd-text-small">&nbsp;&nbsp;Manual: scores inverted</div>`;
+      } else {
+        const pl = gameState.players.find(x => x.id === adj.playerId);
+        html += `<div class="wsd-text-small">&nbsp;&nbsp;Manual: ${pl ? pl.name : "?"} ${adj.delta >= 0 ? "+" : ""}${adj.delta}</div>`;
       }
     });
-    wrap.innerHTML=html;
+
+    wrap.innerHTML = html;
     c.appendChild(wrap);
   });
 }
