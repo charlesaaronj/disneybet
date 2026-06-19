@@ -821,14 +821,16 @@ function renderBonusProgress(){
       rankingHtml=`<div class="wsd-score-meta" style="margin-top:6px">No leader yet</div>`;
     }else{
       let rank=1,i=0;
-      while(i<scored.length){
-        const tierVal=scored[i].val;
-        const tierPlayers=scored.filter(s=>s.val===tierVal);
-        const isLeader=tierVal===best;
-        const gap=best-tierVal;
-        const names=tierPlayers.map(s=>s.name).join(" & ");
-        const leaderClass=isLeader?"wsd-bonus-leader":"";
-        rankingHtml+=`
+        while(i<scored.length){
+        const tierVal = scored[i].val;
+        const tierPlayers = scored.filter(s => s.val === tierVal);
+        const isLeader = tierVal === best;
+        const gap = best - tierVal;
+        const names = tierPlayers.map(s => s.name).join(" & ");
+        const gapLabel = (isLeader || gap === 0) ? "" : ` (-${gap})`;
+        const leaderClass = isLeader ? "wsd-bonus-leader" : "";
+
+        rankingHtml += `
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px">
             <div class="wsd-score-meta">
               <span style="opacity:0.5;margin-right:8px">#${rank}</span>
@@ -836,8 +838,8 @@ function renderBonusProgress(){
               <span style="opacity:0.7">${gapLabel}</span>
             </div>
           </div>`;
-        rank+=tierPlayers.length;
-        i+=tierPlayers.length;
+        rank += tierPlayers.length;
+        i += tierPlayers.length;
       }
     }
     html+=`
