@@ -1168,7 +1168,7 @@ function renderHistoryScreen(){
 
     (h.manualAdjustments || []).forEach(adj => {
       if (adj.type === "invertScores") {
-        html += `<div class="wsd-text-small">&nbsp;&nbsp;Manual: scores inverted</div>`;
+        html += `<div class="wsd-text-small">Manual: scores inverted</div>`;
       } else {
         const pl = gameState.players.find(x => x.id === adj.playerId);
         html += `<div class="wsd-text-small">Manual: ${pl ? pl.name : "?"} ${adj.delta >= 0 ? "+" : ""}${adj.delta}</div>`;
