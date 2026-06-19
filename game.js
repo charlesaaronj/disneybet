@@ -822,6 +822,9 @@ function renderScoresScreen(){
         <div class="wsd-score-meta">
           Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)}
         </div>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#modal-scoring">
+  How does scoring work?
+</a>
       </div>
       <div class="wsd-score-value">${p.score}</div>`;
       list.appendChild(row);
