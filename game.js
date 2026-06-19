@@ -1204,15 +1204,26 @@ function abandonRound(){
 function wireEvents(){
   debugLog("wireEvents starting");
   $("wsd-start-game").addEventListener("click",startGameFromSetup);
-  $("wsd-reset-setup").addEventListener("click",()=>{
-    const err=$("wsd-setup-error"),ps=$("wsd-park-select"),label=$("wsd-park-label");
-    if(err)err.textContent="";
-    if(ps)ps.value="";
-    if(label)label.textContent="Not set";
-    $$("#wsd-player-inputs input").forEach((el,i)=>{if(i<3)el.value="";else el.remove();});
-    applyParkTheme("");
-    updatePlayerInputLock();
-  });
+$("wsd-reset-setup").addEventListener("click", () => {
+  const err = $("wsd-setup-error");
+  const ps = $("wsd-park-select");
+  const label = $("wsd-park-label");
+  const container = $("wsd-player-inputs");
+
+  if (err) err.textContent = "";
+  if (ps) ps.value = "";
+  if (label) label.textContent = "Not set";
+
+  // Wipe everything and rebuild 3 clean inputs
+  if (container) {
+    container.innerHTML = "";
+    for (let i = 0; i < 3; i++) addPlayerInput(container);
+  }
+
+  applyParkTheme("");
+  updatePlayerInputLock();
+});
+
   $("wsd-add-player").addEventListener("click",()=>{
     const c=$("wsd-player-inputs");if(!c||c.querySelectorAll("input").length>=8)return;
     addPlayerInput(c);
