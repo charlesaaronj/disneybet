@@ -167,8 +167,6 @@ body {
   border: 1px solid #dde1eb;
   font-size: 16px;
   padding: 0.55rem 0.75rem;
-  min-height: 10rem;
-  min
 }
 .wsd-player-input + .wsd-player-input {
   margin-top: 0.4rem;
