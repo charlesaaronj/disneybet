@@ -379,6 +379,7 @@ function renderAnswerProgress(){
   if (label) label.textContent = player ? player.name : "";
 }
 function proceedToAnswers(){
+  console.log("proceedToAnswers called");
   const err = $("wsd-setupq-error");
   if (err) err.textContent = "";
   if (!gameState) return;
