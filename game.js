@@ -40,7 +40,7 @@ const MIN_POINTS=3,START_POINTS=10;
 const FINAL_BONUS_POINTS={topLandCollector:3,topAttractionCollector:3,bestGuesser:2,mostRiskyPlayer:2};
 const SCREEN_META={
   "setup-game":    {icon:"🎮",title:"Setup game",instruction:"Pick your park, add players, and choose your settings."},
-  "setup-question":{icon:"🎢",title:"Choose attraction",instruction:"Pick the attraction you're are queued for. A question will be selected for you."},
+  "setup-question":{icon:"🎢",title:"Choose attraction",instruction:"Pick the attraction you are queued for. A question will be selected for you."},
   "enter-answers": {icon:"✏️",title:"Enter answers",instruction:"Pass the phone around. Each player secretly types their answer."},
   "select-answer": {icon:"🎲",title:"Selected answer",instruction:"A random answer has been chosen. No peeking at who wrote it!"},
   "guess-wager":   {icon:"💰",title:"Guess & wager",instruction:"Everyone guesses the author and places their bet."},
