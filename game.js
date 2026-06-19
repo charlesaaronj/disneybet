@@ -738,7 +738,7 @@ function applyRoundResults(authorId){
 
 function runRevealAnimation(){
   const r = gameState.currentRound;
-  const isGhostAnswer = !!r.selectedAnswer.isGhost;                 // NEW
+  const isGhostAnswer = !!r.selectedAnswer.isGhost;
   const author = isGhostAnswer
     ? null
     : gameState.players.find(p => p.id === r.selectedAnswer.playerId);
@@ -795,7 +795,7 @@ function runRevealAnimation(){
     if (r.wrongGuessCount > 0 || r.houseBonusAmount > 0){
       const authorLineSummary = $("wsd-no-correct-author-line");
       if (authorLineSummary){
-        if (r.wrongGuessCount > 0 && !isGhostAnswer) {              // skip author bonus text for Ghost
+        if (r.wrongGuessCount > 0 && !isGhostAnswer) {
           const b = r.authorBonus || 0, w = r.wrongGuessCount;
           authorLineSummary.textContent =
             `✍️ ${author ? author.name : "the author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
@@ -837,7 +837,6 @@ function runRevealAnimation(){
               : null;
 
             if (isGhostAnswer) {
-              // Ghost-specific text
               authorLine.textContent = winnerNames
                 ? `✅ ${winnerNames} correctly guessed Ghost.`
                 : `❌ Nobody guessed Ghost this round.`;
@@ -851,7 +850,7 @@ function runRevealAnimation(){
           let bonusLine = document.getElementById("wsd-author-bonus-line");
           if (bonusLine) bonusLine.remove();
 
-          if (r.authorBonus > 0 && !isGhostAnswer){                 // no author bonus line for Ghost
+          if (r.authorBonus > 0 && !isGhostAnswer){
             const b = r.authorBonus, w = r.wrongGuessCount;
             bonusLine = document.createElement("p");
             bonusLine.id = "wsd-author-bonus-line";
@@ -865,30 +864,35 @@ function runRevealAnimation(){
         }
       }catch(e){}
     }
-  },2100);
-}
+
+    // Animate payouts list
     r.payouts.forEach((payout,i)=>{
       setTimeout(()=>{
-        const p=gameState.players.find(pl=>pl.id===payout.playerId);
-        const wager=r.wagers.find(w=>w.playerId===payout.playerId);
-        const guess=wager&&gameState.players.find(pl=>pl.id===wager.guessedAuthorId);
-        const ok=r.correctGuessers.includes(payout.playerId);
-        const dStr=`${payout.delta>=0?"+":""}${payout.delta}`;
-        const row=document.createElement("div");
-        row.className="wsd-result-row";
-        row.style.animationDelay=`${i*0.07}s`;
-        row.innerHTML=`
+        const p = gameState.players.find(pl=>pl.id===payout.playerId);
+        const wager = r.wagers.find(w=>w.playerId===payout.playerId);
+        const guess = wager && gameState.players.find(pl=>pl.id===wager.guessedAuthorId);
+        const ok = r.correctGuessers.includes(payout.playerId);
+        const dStr = `${payout.delta>=0?"+":""}${payout.delta}`;
+        const row = document.createElement("div");
+        row.className = "wsd-result-row";
+        row.style.animationDelay = `${i*0.07}s`;
+        row.innerHTML = `
           <div>
             <div class="wsd-score-name">${p.name} ${ok?"✅":"❌"}</div>
             <div class="wsd-score-meta">Guess: ${guess?guess.name:"—"} · Wager: ${wager?wager.amount:0}</div>
           </div>
           <div class="wsd-score-value ${payout.delta>=0?"text-success":"text-danger"}">${dStr}</div>`;
-        if(resultsEl)resultsEl.appendChild(row);
-      },i*120);
+        if (resultsEl) resultsEl.appendChild(row);
+      }, i*120);
     });
-    setTimeout(()=>{if(nextWrap)nextWrap.style.display="block";},r.payouts.length*120+300);
+
+    setTimeout(()=>{
+      if (nextWrap) nextWrap.style.display = "block";
+    }, r.payouts.length*120 + 300);
+
   },2100);
 }
+
 function spawnConfetti(container){
   if(!container)return;
   const colors=["#ff3b30","#ffcc00","#34c759","#007aff","#ff9500","#af52de"];
