@@ -1131,13 +1131,13 @@ function renderHistoryScreen(){
     html+=`</div>
       <div class="wsd-text-small">Q: ${h.question}</div>
       <div class="wsd-text-small">Answer: &ldquo;${h.selectedAnswerText}&rdquo;</div>
-      <div class="wsd-text-small">Author: <strong>${author?author.name:"Unknown"}</strong></div>`;
+      <div class="wsd-text-small">Author: <strong>${isGhost ? "👻 Ghost" : (author ? author.name : "Unknown")}</strong></div>`;
     h.payouts.forEach(pt=>{
-      const pl=gameState.players.find(x=>x.id===pt.playerId);
-      const wager=h.wagers.find(w=>w.playerId===pt.playerId);
-      const guess=wager&&gameState.players.find(x=>x.id===wager.guessedAuthorId);
-      const ok=h.correctGuessers.includes(pt.playerId);
-      html+=`<div class="wsd-text-small">&nbsp;&nbsp;${pl?pl.name:"?"}: guess ${guess?guess.name:"—"}, wager ${wager?wager.amount:0}, ${ok?"✅":"❌"}, ${pt.delta>=0?"+":""}${pt.delta} pts</div>`;
+  const pl = gameState.players.find(x=>x.id===pt.playerId);
+  const ok = h.correctGuessers.includes(pt.playerId);
+  const deltaStr = `${pt.delta>=0?"+":""}${pt.delta}`;
+  html += `<div class="wsd-text-small">&nbsp;&nbsp;${pl ? pl.name : "?"} ${ok ? "✅" : "❌"} (${deltaStr} pts)</div>`;
+});
     });
     if(h.authorBonus>0)html+=`<div class="wsd-text-small">&nbsp;&nbsp;Author bonus: +${h.authorBonus}</div>`;
     if(h.houseBonusAmount>0||h.houseBonusResolved>0||h.houseBonusReason){
