@@ -46,7 +46,7 @@ const SCREEN_META={
   "guess-wager":   {icon:"💰",title:"Guess & wager",instruction:"Everyone guesses the author and places their bet."},
   "reveal":        {icon:"🔍",title:"Reveal",instruction:"Find out who really said that!"},
   "scores":        {icon:"📊",title:"Scores",instruction:"Check standings and bonus progress. Start the next round when ready."},
-  "game-end":      {icon:"🏆",title:"Game over",instruction:"Bonuses applied! The player with most points wins the snack."},
+  "game-end":      {icon:"🏆",title:"Game over",instruction:"Bonuses applied! The player with most points wins a family-determined prize."},
   "history":       {icon:"📋",title:"Round history",instruction:"A full log of every round played."}
 };
 const PARK_THEMES={
@@ -1209,7 +1209,7 @@ function renderFinalResults(){
   const winners=sorted.filter(p=>p.score===topScore&&p.wins===topWins);
   const banner=$("wsd-winner-banner");
   if(banner){
-    banner.innerHTML=`🎉 ${winners.map(w=>w.name).join(" & ")} wins! Time to collect that snack!`;
+    banner.innerHTML=`🎉 ${winners.map(w=>w.name).join(" & ")} wins! Time to collect that prize!`;
     banner.classList.remove("wsd-anim-pop");void banner.offsetWidth;
     banner.classList.add("wsd-anim-pop");
   }
