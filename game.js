@@ -797,42 +797,60 @@ function spawnConfetti(container){
 function maybeRenderCollectionsScreen(){
   if(typeof window.renderCollectionsScreen==="function")window.renderCollectionsScreen();
 }
+
 function renderScoresScreen(){
-  const list=$("wsd-scores-list");if(!list)return;
-  list.innerHTML="";
-  [...gameState.players].sort((a,b)=>b.score-a.score||b.wins-a.wins)
+  const list = $("wsd-scores-list");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  // 1) Render each player row
+  [...gameState.players]
+    .sort((a,b)=>b.score-a.score||b.wins-a.wins)
     .forEach((p,i)=>{
-      const row=document.createElement("div");
-      row.className="wsd-score-row wsd-anim-fade-up";
-      row.style.animationDelay=`${i*0.05}s`;
-          const dotColor = p.badgeColor || "#888888";
-    row.innerHTML = `
-      <div>
-        <div class="wsd-score-name">
-          <span class="wsd-player-dot" style="
-            display:inline-block;
-            width:8px;
-            height:8px;
-            border-radius:50%;
-            margin-right:6px;
-            background-color:${dotColor};
-          "></span>
-          ${medal(i)}${p.name}
+      const row = document.createElement("div");
+      row.className = "wsd-score-row wsd-anim-fade-up";
+      row.style.animationDelay = `${i*0.05}s`;
+
+      const dotColor = p.badgeColor || "#888888";
+
+      row.innerHTML = `
+        <div>
+          <div class="wsd-score-name">
+            <span class="wsd-player-dot" style="
+              display:inline-block;
+              width:8px;
+              height:8px;
+              border-radius:50%;
+              margin-right:6px;
+              background-color:${dotColor};
+            "></span>
+            ${medal(i)}${p.name}
+          </div>
+          <div class="wsd-score-meta">
+            Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)}
+          </div>
         </div>
-        <div class="wsd-score-meta">
-          Wins: ${p.wins} · Attractions: ${p.collected.length} · Lands: ${getPlayerUniqueLandCount(p)}
-        </div>
-        <a href="#" data-bs-toggle="modal" data-bs-target="#modal-scoring">
-  How does scoring work?
-</a>
-      </div>
-      <div class="wsd-score-value">${p.score}</div>`;
+        <div class="wsd-score-value">${p.score}</div>
+      `;
       list.appendChild(row);
     });
+
+  // 2) Add a single footer link under the panel, similar style to bonus link
+  const footer = document.createElement("div");
+  footer.className = "wsd-text-small mt-2 text-center";
+  footer.innerHTML = `
+    <a href="#" data-bs-toggle="modal" data-bs-target="#modal-scoring">
+      How does scoring work?
+    </a>
+  `;
+  list.appendChild(footer);
+
   renderBonusProgress();
   renderManualAdjustmentsUI();
   maybeRenderCollectionsScreen();
 }
+
 function renderBonusProgress(){
   const el = $("wsd-bonus-progress");
   if (!el) return;
