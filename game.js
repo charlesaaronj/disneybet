@@ -1147,11 +1147,11 @@ function renderHistoryScreen(){
       const pl = gameState.players.find(x => x.id === pt.playerId);
       const ok = h.correctGuessers.includes(pt.playerId);
       const deltaStr = `${pt.delta >= 0 ? "+" : ""}${pt.delta}`;
-      html += `<div class="wsd-text-small">&nbsp;&nbsp;${pl ? pl.name : "?"} ${ok ? "✅" : "❌"} (${deltaStr} pts)</div>`;
+      html += `<div class="wsd-text-small">${pl ? pl.name : "?"} ${ok ? "✅" : "❌"} (${deltaStr} pts)</div>`;
     });
 
     if (h.authorBonus > 0) {
-      html += `<div class="wsd-text-small">&nbsp;&nbsp;Author bonus: +${h.authorBonus}</div>`;
+      html += `<div class="wsd-text-small">Author bonus: +${h.authorBonus}</div>`;
     }
 
     if (h.houseBonusAmount > 0 || h.houseBonusResolved > 0 || h.houseBonusReason) {
@@ -1159,7 +1159,7 @@ function renderHistoryScreen(){
         const pl = gameState.players.find(x => x.id === hr.playerId);
         return pl ? `${pl.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
       }).join(", ");
-      html += `<div class="wsd-text-small">&nbsp;&nbsp;House bonus: ${
+      html += `<div class="wsd-text-small">House bonus: ${
         h.houseBonusApplied
           ? `+${h.houseBonusResolved} split evenly: ${names}`
           : (h.houseBonusReason || "Not applied")
@@ -1171,7 +1171,7 @@ function renderHistoryScreen(){
         html += `<div class="wsd-text-small">&nbsp;&nbsp;Manual: scores inverted</div>`;
       } else {
         const pl = gameState.players.find(x => x.id === adj.playerId);
-        html += `<div class="wsd-text-small">&nbsp;&nbsp;Manual: ${pl ? pl.name : "?"} ${adj.delta >= 0 ? "+" : ""}${adj.delta}</div>`;
+        html += `<div class="wsd-text-small">Manual: ${pl ? pl.name : "?"} ${adj.delta >= 0 ? "+" : ""}${adj.delta}</div>`;
       }
     });
 
