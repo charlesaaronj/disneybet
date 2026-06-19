@@ -296,6 +296,7 @@ function startNewRoundCore(){
     scoreBefore:{},scoreAfter:{},collectionsThisRound:[],
     wrongGuessCount:0,authorBonus:0,houseBonusResolved:0,
     houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:"",
+    answerOrder: shuffle(gameState.players.map(p => p.id)),
     usedGhost:false 
   };
   saveState();
@@ -366,11 +367,16 @@ function onEnterCustomQuestion(){
 // -------- Answers flow --------
 
 function renderAnswerProgress(){
-  const r=gameState.currentRound,idx=r.answerIndex||0;
-  const prog=$("wsd-answer-progress"),label=$("wsd-current-player-label");
-  const player=gameState.players[idx];
-  if(prog)prog.textContent=`Player ${idx+1} of ${gameState.players.length}`;
-  if(label)label.textContent=player?`${player.name}'s answer`:"Done";
+  const r = gameState.currentRound;
+  const idx = r.answerIndex || 0;
+  const order = r.answerOrder || gameState.players.map(p => p.id);
+  const playerId = order[idx];
+  const player = gameState.players.find(p => p.id === playerId);
+
+  const prog = $("wsd-answer-progress");
+  const label = $("wsd-current-player-label");
+  if (prog) prog.textContent = `Player ${idx+1} of ${order.length}`;
+  if (label) label.textContent = player ? player.name : "";
 }
 function proceedToAnswers(){
   const err=$("wsd-setupq-error");
@@ -395,23 +401,38 @@ function proceedToAnswers(){
 // -------------- Answers, wagers, scoring --------------
 
 function saveAnswerForCurrentPlayer(skip){
-  const r=gameState.currentRound,idx=r.answerIndex||0,player=gameState.players[idx];
-  const ansInp=$("wsd-answer-input"),err=$("wsd-answers-error");
-  const text=ansInp?ansInp.value.trim():"";
-  if(err)err.textContent="";
-  if(!skip&&!text){
-    if(err)err.textContent="Please enter an answer or skip.";return;
+  const r = gameState.currentRound;
+  const idx = r.answerIndex || 0;
+  const order = r.answerOrder || gameState.players.map(p => p.id);
+  const playerId = order[idx];
+  const player = gameState.players.find(p => p.id === playerId);
+
+  const ansInp = $("wsd-answer-input");
+  const err = $("wsd-answers-error");
+  const text = ansInp ? ansInp.value.trim() : "";
+
+  if (err) err.textContent = "";
+
+  if (!skip && !text) {
+    if (err) err.textContent = "Please enter an answer or skip.";
+    return;
   }
-  if(!skip)r.answers.push({playerId:player.id,text});
-  if(ansInp)ansInp.value="";
-  r.answerIndex=idx+1;
-  if(r.answerIndex>=gameState.players.length){
-    if(!r.answers.length){
-      if(err)err.textContent="No answers were entered. Abandon or go back.";return;
+
+  if (!skip) {
+    r.answers.push({playerId: player.id, text});
+  }
+
+  if (ansInp) ansInp.value = "";
+  r.answerIndex = idx + 1;
+
+  if (r.answerIndex >= order.length) {
+    if (!r.answers.length) {
+      if (err) err.textContent = "No answers were entered. Abandon or go back.";
+      return;
     }
     saveState();
     showPickOverlay(()=>{pickRandomAnswer();renderSelectAnswerScreen();showScreen("select-answer");});
-  }else{
+  } else {
     renderAnswerProgress();
     saveState();
   }
@@ -422,8 +443,12 @@ function pickRandomAnswer(){
   const hasGhostPool = gameState.ghostPool && gameState.ghostPool.length > 0;
   let pool = base;
 
+  let ghostIndexInPool = -1;
+  let ghostSourceIndex = -1;
+
   if (hasGhostPool) {
     const ghostSource = gameState.ghostPool[Math.floor(Math.random()*gameState.ghostPool.length)];
+    ghostSourceIndex = gameState.ghostPool.indexOf(ghostSource);
     const ghostAnswer = {
       text: ghostSource.text,
       isGhost: true,
@@ -431,10 +456,17 @@ function pickRandomAnswer(){
       fromPlayerId: ghostSource.fromPlayerId
     };
     pool = [...base, ghostAnswer];
+    ghostIndexInPool = pool.length - 1;
   }
 
-  const chosen = pool[Math.floor(Math.random()*pool.length)];
+  const chosenIndex = Math.floor(Math.random()*pool.length);
+  const chosen = pool[chosenIndex];
   r.selectedAnswer = chosen;
+
+  // If we actually used the ghost answer, remove it from ghostPool
+  if (hasGhostPool && ghostIndexInPool !== -1 && chosenIndex === ghostIndexInPool && ghostSourceIndex !== -1) {
+    gameState.ghostPool.splice(ghostSourceIndex, 1);
+  }
 }
 function renderSelectAnswerScreen(){
   const r=gameState.currentRound,qEl=$("wsd-select-question"),ansEl=$("wsd-selected-answer");
@@ -471,9 +503,14 @@ function goToGuessWager(){
   const container=$("wsd-gw-players");
   if(!container)return;
   container.innerHTML="";
-  gameState.players.forEach(p=>{
+
+  // NEW: use a shuffled copy of players for row order
+  const playersShuffled = shuffle(gameState.players);
+
+  playersShuffled.forEach(p=>{
     const row=document.createElement("div");
     row.className="mb-3 pb-2 border-bottom";
+
     const playerLabel=document.createElement("div");
     playerLabel.className="wsd-score-row mb-1";
     const dotColor=p.badgeColor||"#888888";
@@ -493,35 +530,46 @@ function goToGuessWager(){
         <div class="wsd-score-meta">Current score: ${p.score}</div>
       </div>`;
     row.appendChild(playerLabel);
+
     const inner=document.createElement("div");
     inner.className="d-flex gap-2";
+
     const guessSel=document.createElement("select");
-guessSel.className="form-select wsd-form-select";
-guessSel.dataset.playerId=p.id;
+    guessSel.className="form-select wsd-form-select";
+    guessSel.dataset.playerId=p.id;
 
-// Real players
-gameState.players.forEach(p2=>{
-  const opt=document.createElement("option");
-  opt.value = String(p2.id);
-  opt.textContent = p2.name;
-  guessSel.appendChild(opt);
-});
+    // Real players (same as before)
+    gameState.players.forEach(p2=>{
+      const opt=document.createElement("option");
+      opt.value=String(p2.id);
+      opt.textContent=p2.name;
+      guessSel.appendChild(opt);
+    });
 
-// Ghost option
-const ghostOpt = document.createElement("option");
-ghostOpt.value = "ghost";
-ghostOpt.textContent = "Ghost";
-guessSel.appendChild(ghostOpt);
-    
+    // Ghost option (same as before)
+    const ghostOpt=document.createElement("option");
+    ghostOpt.value="ghost";
+    ghostOpt.textContent="Ghost";
+    guessSel.appendChild(ghostOpt);
+
     const wagerInput=document.createElement("input");
-    Object.assign(wagerInput,{type:"number",min:0,max:p.score,value:Math.min(1,p.score),inputMode:"numeric",pattern:"[0-9]*"});
+    Object.assign(wagerInput,{
+      type:"number",
+      min:0,
+      max:p.score,
+      value:Math.min(1,p.score),
+      inputMode:"numeric",
+      pattern:"[0-9]*"
+    });
     wagerInput.className="form-control wsd-form-control";
     wagerInput.style.maxWidth="90px";
     wagerInput.dataset.playerId=p.id;
+
     inner.append(guessSel,wagerInput);
     row.appendChild(inner);
     container.appendChild(row);
   });
+
   showScreen("guess-wager");
 }
 function clearWagersUI(){
