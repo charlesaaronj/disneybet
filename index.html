@@ -677,26 +677,87 @@
   </div>
 </div>
 
-  <div class="modal fade" id="modal-wager-help" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">How wagering works</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal fade" id="modal-wager-help" tabindex="-1"
+     aria-labelledby="modal-wager-help-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:20px; overflow:hidden;">
+      <div class="modal-header"
+           style="background:linear-gradient(135deg,#007aff,#34aadc);
+                  color:#fff;border:none;">
+        <h5 class="modal-title fw-bold" id="modal-wager-help-label">
+          🎲 Wagers &amp; House Bonus
+        </h5>
+        <button type="button" class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <p class="wsd-text-small mb-2">
-          You earn points equal to your wager for a correct guess, and lose your wager for a wrong guess.
+
+      <div class="modal-body" style="font-size:0.9rem;">
+        <p>
+          Each round, you choose who wrote the answer and how many points to wager.
+          Correct guesses win your wager back; wrong guesses lose it.
         </p>
-        <p class="wsd-text-small mb-2">
-          Select <strong>Ghost</strong> if you think no one wrote this answer this round.
-        </p>
-        <p class="wsd-text-small mb-0">
-          The author earns bonus points when other players guess them incorrectly.
-        </p>
-        <p class="wsd-text-small mb-0">
-    The <strong>house bonus</strong> is an extra pot of points that can be added for a round. If at least one player guesses correctly and the bonus can be split evenly, those correct guessers share it.
-  </p>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">✅</div>
+          <div>
+            <div class="wsd-bonus-topic-title">Correct guess</div>
+            <div class="wsd-bonus-topic-desc">
+              You earn your wager amount. Wager 3, gain 3.
+            </div>
+          </div>
+        </div>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">❌</div>
+          <div>
+            <div class="wsd-bonus-topic-title">Wrong guess</div>
+            <div class="wsd-bonus-topic-desc">
+              You lose your wager amount. Wager 3, lose 3.
+            </div>
+          </div>
+        </div>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">👻</div>
+          <div>
+            <div class="wsd-bonus-topic-title">Ghost guess</div>
+            <div class="wsd-bonus-topic-desc">
+              Select <strong>Ghost</strong> if you think no one wrote this answer
+              this round. If the answer is really a Ghost answer, Ghost guesses
+              count as correct.
+            </div>
+          </div>
+        </div>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">✍️</div>
+          <div>
+            <div class="wsd-bonus-topic-title">Author bonus</div>
+            <div class="wsd-bonus-topic-desc">
+              If you wrote the selected answer, you earn +1 point for every player
+              who guessed wrong (except on Ghost rounds).
+            </div>
+          </div>
+        </div>
+
+        <div class="wsd-bonus-topic">
+          <div class="wsd-bonus-topic-icon">🏠</div>
+          <div>
+            <div class="wsd-bonus-topic-title">House bonus</div>
+            <div class="wsd-bonus-topic-desc">
+              An optional extra pot added by the host. If at least one player
+              guesses correctly and the bonus divides evenly, those correct
+              guessers split it.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer border-0">
+        <button type="button" class="wsd-btn-primary"
+                style="max-width:200px;" data-bs-dismiss="modal">
+          Got it!
+        </button>
       </div>
     </div>
   </div>
