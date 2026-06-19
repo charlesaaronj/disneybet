@@ -156,10 +156,322 @@ function updateQuestionLock(){
 }
 
 // ----------------- Setup screen -----------------
-// (unchanged setup / question / answer flow here…)
+
+function initSetupScreen(){
+  debugLog("initSetupScreen starting");
+  const sel=$("wsd-park-select"),container=$("wsd-player-inputs");
+  debugLog(`wsd-park-select exists? ${!!sel}`);
+  debugLog(`wsd-player-inputs exists? ${!!container}`);
+  if(!sel||!container)return;
+  sel.innerHTML='<option value="">Select a park</option>';
+  Object.keys(PARKS).forEach(name=>{
+    const opt=document.createElement("option");
+    opt.value=name;opt.textContent=name;sel.appendChild(opt);
+  });
+  if(!container.querySelectorAll("input").length)for(let i=0;i<3;i++)addPlayerInput(container);
+  updatePlayerInputLock();
+  debugLog("Setup screen ready");
+}
+function addPlayerInput(container,name=""){
+  const wrap=document.createElement("div");
+  wrap.className="d-flex align-items-center mb-1";
+  const inp=document.createElement("input");
+  inp.type="text";
+  inp.className="form-control wsd-form-control wsd-player-input";
+  inp.placeholder="Player name";
+  inp.value=name;
+  const btn=document.createElement("button");
+  btn.type="button";
+  btn.textContent="×";
+  btn.className="btn btn-sm btn-outline-secondary";
+  btn.style.marginLeft="0.5rem";
+  btn.addEventListener("click",()=>{
+    const allInputs=$$("#wsd-player-inputs input");
+    if(allInputs.length<=3){
+      const errEl=$("wsd-setup-error");
+      if(errEl)errEl.textContent="You need at least three players.";
+      return;
+    }
+    wrap.remove();
+  });
+  wrap.append(inp,btn);
+  container.appendChild(wrap);
+}
+function startGameFromSetup(){
+  const errEl=$("wsd-setup-error");
+  const parkSel=$("wsd-park-select");
+  const parkName=parkSel?parkSel.value:"";
+  if(errEl)errEl.textContent="";
+  if(!parkName||!PARKS[parkName]){
+    if(errEl)errEl.textContent="Please select a park.";
+    return;
+  }
+  const names=$$("#wsd-player-inputs input").map(i=>i.value.trim()).filter(Boolean);
+  if(names.length<3){
+    if(errEl)errEl.textContent="Please enter at least three player names.";
+    return;
+  }
+  const uniqueNames=new Set(names.map(n=>n.toLowerCase()));
+  if(uniqueNames.size!==names.length){
+    if(errEl)errEl.textContent="Each player must have a unique name.";
+    return;
+  }
+  const parkData=PARKS[parkName];
+  if(!gameState){
+    const players=names.map((name,id)=>({
+      id,name,score:START_POINTS,wins:0,collected:[],bonusTotal:0,
+      stats:{correctGuesses:0,totalRisked:0,uniqueLands:[]},badgeColor:null
+    }));
+    const palette=shuffle(PLAYER_BADGE_COLORS.slice());
+    players.forEach(p=>{p.badgeColor=palette.shift()||"#999999";});
+    const usedQuestions={attractions:{},generic:shuffle(parkData.genericQuestions),genericIndex:0};
+    parkData.attractions.forEach(a=>{
+      usedQuestions.attractions[a.name]={questions:shuffle(a.questions),index:0};
+    });
+    gameState={
+      screen:"setup-question",
+      roundNumber:0,
+      settings:{park:parkName,startingPoints:START_POINTS,minPoints:MIN_POINTS},
+      players,
+      lands:[...new Set(parkData.attractions.map(a=>a.land).filter(Boolean))],
+      attractions:parkData.attractions,
+      genericQuestions:parkData.genericQuestions,
+      usedQuestions,
+      currentRound:null,
+      history:[],
+      finalBonusesApplied:false
+    };
+  }else{
+    const parkAttrs=parkData.attractions;
+    Object.assign(gameState.settings,{park:parkName});
+    Object.assign(gameState,{
+      attractions:parkAttrs,
+      genericQuestions:parkData.genericQuestions,
+      lands:[...new Set(parkAttrs.map(a=>a.land).filter(Boolean))]
+    });
+    const existingPlayers=gameState.players||[];
+    gameState.players=names.map((name,index)=>{
+      const old=existingPlayers.find(p=>p.name.toLowerCase()===name.toLowerCase());
+      if(old){old.name=name;return old;}
+      const newId=existingPlayers.length?Math.max(...existingPlayers.map(p=>p.id))+1:index;
+      return{
+        id:newId,name,
+        score:gameState.settings?.startingPoints??START_POINTS,
+        wins:0,collected:[],bonusTotal:0,
+        stats:{correctGuesses:0,totalRisked:0,uniqueLands:[]},
+        badgeColor:PLAYER_BADGE_COLORS[index%PLAYER_BADGE_COLORS.length]||"#999999"
+      };
+    });
+  }
+  const parkLabel=$("wsd-park-label");if(parkLabel)parkLabel.textContent=parkName;
+  applyParkTheme(parkName);
+  const summary=$("wsd-player-summary");
+  if(summary&&gameState?.players)summary.textContent=`${gameState.players.length} players`;
+  const startBtn=$("wsd-start-game");
+  if(startBtn)startBtn.textContent=gameState?"Resume game":"Start game";
+  renderAttractionOptions();
+  saveState();
+  showScreen("setup-question");
+  startNewRoundCore();
+}
+
+// -------------- Question setup --------------
+
+function renderAttractionOptions(){
+  const sel=$("wsd-attraction-select");
+  if(!sel||!gameState)return;
+  sel.innerHTML='<option value="">Select an attraction</option>';
+  gameState.attractions.forEach((a,i)=>{
+    const opt=document.createElement("option");
+    opt.value=String(i);opt.textContent=a.name;sel.appendChild(opt);
+  });
+}
+function startNewRoundCore(){
+  if(!gameState)return;
+  gameState.roundNumber+=1;
+  gameState.currentRound={
+    attraction:null,question:"",questionType:"",answers:[],
+    selectedAnswer:null,answerIndex:0,houseBonusAmount:0,
+    wagers:[],pot:0,correctGuessers:[],payouts:[],
+    scoreBefore:{},scoreAfter:{},collectionsThisRound:[],
+    wrongGuessCount:0,authorBonus:0,houseBonusResolved:0,
+    houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:"",
+    usedGhost:false 
+  };
+  saveState();
+  [
+    ["wsd-house-bonus",el=>{el.value="0";}],
+    ["wsd-question-text",el=>{el.readOnly=true;el.value="";}],
+    ["wsd-question-type-badge",el=>{el.textContent="";}],
+    ["wsd-attraction-select",el=>{el.value="";}],
+    ["wsd-attraction-meta",el=>{el.textContent="";}],
+    ["wsd-setupq-error",el=>{el.textContent="";}]
+  ].forEach(([id,fn])=>{const el=$(id);if(el)fn(el);});
+  updateQuestionLock();
+}
+function onAttractionChange(){
+  if(!gameState)return;
+  const attrSel=$("wsd-attraction-select");
+  const idx=attrSel?parseInt(attrSel.value,10):NaN;
+  const meta=$("wsd-attraction-meta"),qTxt=$("wsd-question-text"),badge=$("wsd-question-type-badge");
+  if(meta)meta.textContent="";
+  if(qTxt)qTxt.value="";
+  if(badge)badge.textContent="";
+  if(isNaN(idx)||!gameState.attractions[idx]){
+    Object.assign(gameState.currentRound,{attraction:null,question:""});
+    updateQuestionLock();return;
+  }
+  const attraction=gameState.attractions[idx];
+  gameState.currentRound.attraction=attraction;
+  if(meta)meta.textContent=`${attraction.park} • ${attraction.land}`;
+  const {q,type}=drawQuestion(attraction);
+  Object.assign(gameState.currentRound,{question:q,questionType:type});
+  if(qTxt)qTxt.value=q;
+  if(badge)badge.textContent=labelForType(type);
+  saveState();
+  updateQuestionLock();
+}
+function drawQuestion(attraction){
+  const uq=gameState.usedQuestions,entry=uq.attractions[attraction.name];
+  if(entry&&entry.index<entry.questions.length)return{q:entry.questions[entry.index++],type:"attraction"};
+  if(uq.genericIndex<uq.generic.length)return{q:uq.generic[uq.genericIndex++],type:"generic"};
+  const pool=gameState.genericQuestions;
+  return pool.length
+    ?{q:pool[Math.floor(Math.random()*pool.length)],type:"generic"}
+    :{q:"No questions available.",type:"generic"};
+}
+const labelForType=t=>t==="attraction"?"Attraction question":t==="generic"?"Generic question":"Custom question";
+function onGenerateNewQuestion(){
+  const err=$("wsd-setupq-error");
+  if(!gameState||!gameState.currentRound.attraction){
+    if(err)err.textContent="Select an attraction first.";return;
+  }
+  if(err)err.textContent="";
+  const {q,type}=drawQuestion(gameState.currentRound.attraction);
+  Object.assign(gameState.currentRound,{question:q,questionType:type});
+  const qTxt=$("wsd-question-text"),badge=$("wsd-question-type-badge");
+  if(qTxt)qTxt.value=q;
+  if(badge)badge.textContent=labelForType(type);
+  saveState();
+}
+function onEnterCustomQuestion(){
+  const qTxt=$("wsd-question-text");if(!qTxt)return;
+  qTxt.readOnly=false;qTxt.value="";
+  const badge=$("wsd-question-type-badge");
+  if(badge)badge.textContent="Custom question";
+  gameState.currentRound.questionType="custom";
+  qTxt.focus();saveState();
+}
+
+// -------- Answers flow --------
+
+function renderAnswerProgress(){
+  const r=gameState.currentRound,idx=r.answerIndex||0;
+  const prog=$("wsd-answer-progress"),label=$("wsd-current-player-label");
+  const player=gameState.players[idx];
+  if(prog)prog.textContent=`Player ${idx+1} of ${gameState.players.length}`;
+  if(label)label.textContent=player?`${player.name}'s answer`:"Done";
+}
+function proceedToAnswers(){
+  const err=$("wsd-setupq-error");
+  if(err)err.textContent="";
+  if(!gameState)return;
+  const qTxt=$("wsd-question-text");
+  const q=qTxt?qTxt.value.trim():"";
+  if(!q){
+    if(err)err.textContent="Please enter a question.";
+    return;
+  }
+  Object.assign(gameState.currentRound,{question:q,answers:[],answerIndex:0});
+  saveState();
+  const enterQ=$("wsd-enter-question");
+  if(enterQ)enterQ.textContent=q;
+  const ansInp=$("wsd-answer-input");
+  if(ansInp)ansInp.value="";
+  renderAnswerProgress();
+  showScreen("enter-answers");
+}
 
 // -------------- Answers, wagers, scoring --------------
 
+function saveAnswerForCurrentPlayer(skip){
+  const r=gameState.currentRound,idx=r.answerIndex||0,player=gameState.players[idx];
+  const ansInp=$("wsd-answer-input"),err=$("wsd-answers-error");
+  const text=ansInp?ansInp.value.trim():"";
+  if(err)err.textContent="";
+  if(!skip&&!text){
+    if(err)err.textContent="Please enter an answer or skip.";return;
+  }
+  if(!skip)r.answers.push({playerId:player.id,text});
+  if(ansInp)ansInp.value="";
+  r.answerIndex=idx+1;
+  if(r.answerIndex>=gameState.players.length){
+    if(!r.answers.length){
+      if(err)err.textContent="No answers were entered. Abandon or go back.";return;
+    }
+    saveState();
+    showPickOverlay(()=>{pickRandomAnswer();renderSelectAnswerScreen();showScreen("select-answer");});
+  }else{
+    renderAnswerProgress();
+    saveState();
+  }
+}
+function pickRandomAnswer(){
+  const r = gameState.currentRound;
+  let pool = r.answers;
+
+  // Maybe inject a Ghost answer from previous unused answers
+  try {
+    gameState.ghostPool ||= [];
+    const ghostPool = gameState.ghostPool;
+    const canUseGhost = ghostPool.length > 0 && pool.length > 0;
+    const useGhostThisRound = canUseGhost && Math.random() < 0.33; // ~1 in 3 rounds
+
+    if (useGhostThisRound) {
+      const ghost = ghostPool[Math.floor(Math.random() * ghostPool.length)];
+      pool = pool.slice(); // clone so we don't mutate r.answers
+      pool.push({
+        playerId: null,
+        text: ghost.text,
+        isGhost: true
+      });
+      r.usedGhost = true;
+    } else {
+      r.usedGhost = false;
+    }
+  } catch (e) {
+    r.usedGhost = false;
+  }
+
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  r.selectedAnswer = chosen;
+}
+function renderSelectAnswerScreen(){
+  const r=gameState.currentRound,qEl=$("wsd-select-question"),ansEl=$("wsd-selected-answer");
+  if(qEl)qEl.textContent=r.question;
+  if(!ansEl)return;
+  ansEl.classList.remove("wsd-anim-pop");void ansEl.offsetWidth;
+  ansEl.textContent=`"${r.selectedAnswer.text}"`;
+  ansEl.classList.add("wsd-anim-pop","wsd-answer-highlight");
+}
+function showPickOverlay(onDone){
+  const overlay=$("wsd-pick-overlay");
+  if(!overlay){onDone();return;}
+  const labelEl=$("wsd-pick-label");
+  if(labelEl)labelEl.textContent="Selecting an answer...";
+  overlay.style.display="flex";
+  overlay.style.opacity="1";
+  setTimeout(()=>{
+    overlay.style.transition="opacity 0.35s ease";
+    overlay.style.opacity="0";
+    setTimeout(()=>{
+      overlay.style.display="none";
+      overlay.style.opacity="1";
+      overlay.style.transition="";
+      onDone();
+    },350);
+  },1400);
+}
 function goToGuessWager(){
   const errEl=$("wsd-gw-error");if(errEl)errEl.textContent="";
   const hb=$("wsd-house-bonus");if(hb)hb.value="0";
@@ -194,23 +506,23 @@ function goToGuessWager(){
     const inner=document.createElement("div");
     inner.className="d-flex gap-2";
     const guessSel=document.createElement("select");
-    guessSel.className="form-select wsd-form-select";
-    guessSel.dataset.playerId=p.id;
+guessSel.className="form-select wsd-form-select";
+guessSel.dataset.playerId=p.id;
 
-    // real players
-    gameState.players.forEach(p2=>{
-      const opt=document.createElement("option");
-      opt.value=String(p2.id);
-      opt.textContent=p2.name;
-      guessSel.appendChild(opt);
-    });
+// Real players
+gameState.players.forEach(p2=>{
+  const opt=document.createElement("option");
+  opt.value = String(p2.id);
+  opt.textContent = p2.name;
+  guessSel.appendChild(opt);
+});
 
-    // ghost option
-    const ghostOpt=document.createElement("option");
-    ghostOpt.value="ghost";
-    ghostOpt.textContent="Ghost";
-    guessSel.appendChild(ghostOpt);
-
+// Ghost option
+const ghostOpt = document.createElement("option");
+ghostOpt.value = "ghost";
+ghostOpt.textContent = "Ghost";
+guessSel.appendChild(ghostOpt);
+    
     const wagerInput=document.createElement("input");
     Object.assign(wagerInput,{type:"number",min:0,max:p.score,value:Math.min(1,p.score),inputMode:"numeric",pattern:"[0-9]*"});
     wagerInput.className="form-control wsd-form-control";
@@ -243,8 +555,7 @@ function lockWagers(){
     if(isNaN(amount)||amount<0)amount=0;
     const player=gameState.players.find(pl=>pl.id===pid);
     if(player&&amount>player.score)amount=player.score;
-    // store guessedAuthorId as raw string ("3" or "ghost")
-    wagers.push({playerId:pid,guessedAuthorId:sel.value,amount});
+    wagers.push({playerId:pid,guessedAuthorId:parseInt(sel.value,10),amount});
   });
   if(wagers.filter(w=>w.amount>0).length<2){
     if(err)err.textContent="At least two players must wager more than 0.";return;
@@ -255,30 +566,6 @@ function lockWagers(){
   runRevealAnimation();
   saveState();
 }
-
-function pickRandomAnswer(){
-  const r=gameState.currentRound;
-  const base=r.answers||[];
-  const hasGhostPool=gameState.ghostPool && gameState.ghostPool.length>0;
-  let pool=base;
-
-  if(hasGhostPool){
-    const roll=Math.random();
-    if(roll<0.25){ // 25% chance to inject a ghost answer
-      const ghostSource=gameState.ghostPool[Math.floor(Math.random()*gameState.ghostPool.length)];
-      const ghostAnswer={
-        text:ghostSource.text,
-        isGhost:true,
-        fromRound:ghostSource.fromRound,
-        fromPlayerId:ghostSource.fromPlayerId
-      };
-      pool=[...base,ghostAnswer];
-    }
-  }
-  const chosen=pool[Math.floor(Math.random()*pool.length)];
-  r.selectedAnswer=chosen;
-}
-
 function computeRevealAndScoring(){
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
@@ -291,13 +578,14 @@ function computeRevealAndScoring(){
     let delta = 0;
 
     if (we) {
-      const rawGuess = we.guessedAuthorId; // string: "3" or "ghost"
+      const rawGuess = we.guessedAuthorId;
       const amount = Math.max(0, parseInt(we.amount,10) || 0);
       ensurePlayerStats(p);
       p.stats.totalRisked += amount;
 
       if (amount > 0) {
         if (isGhostAnswer) {
+          // Only "ghost" guess is correct when the answer is a Ghost
           if (rawGuess === "ghost") {
             delta += amount;
           } else {
@@ -305,6 +593,7 @@ function computeRevealAndScoring(){
             wrong++;
           }
         } else {
+          // Normal round: real author id
           const guessedId = parseInt(rawGuess,10);
           if (guessedId === authorId) {
             delta += amount;
@@ -328,10 +617,7 @@ function computeRevealAndScoring(){
 
   r.correctGuessers = isGhostAnswer
     ? r.wagers
-        .filter(w => {
-          const amount = Math.max(0, parseInt(w.amount,10) || 0);
-          return amount > 0 && w.guessedAuthorId === "ghost";
-        })
+        .filter(w => Math.max(0, parseInt(w.amount,10) || 0) > 0 && w.guessedAuthorId === "ghost")
         .map(w => w.playerId)
     : r.wagers
         .filter(w => {
@@ -340,6 +626,7 @@ function computeRevealAndScoring(){
         })
         .map(w => w.playerId);
 
+  // House bonus logic
   const hb = Math.max(0, parseInt(r.houseBonusAmount,10) || 0);
   Object.assign(r, {
     houseBonusResolved: 0,
@@ -375,7 +662,6 @@ function computeRevealAndScoring(){
   r.pot = 0;
   applyRoundResults(authorId);
 }
-
 function applyRoundResults(authorId){
   const r=gameState.currentRound,scoreBefore={},scoreAfter={};
   gameState.players.forEach(p=>{
@@ -486,9 +772,13 @@ function runRevealAnimation(){
   setTimeout(()=>{
     if (countEl) countEl.textContent = "";
 
+    // AUTHOR NAME OR GHOST EMOJI
     if (authEl) {
-      if (isGhostAnswer) authEl.textContent = "👻 Ghost";
-      else authEl.textContent = author ? author.name : "Unknown";
+      if (isGhostAnswer) {
+        authEl.textContent = "👻 Ghost";
+      } else {
+        authEl.textContent = author ? author.name : "Unknown";
+      }
     }
 
     if (authWrap){
@@ -497,6 +787,7 @@ function runRevealAnimation(){
       authWrap.classList.add("wsd-anim-pop");
     }
 
+    // Only do confetti for real-author rounds
     if (!isGhostAnswer && r.correctGuessers.length > 0 && confettiEl) {
       spawnConfetti(confettiEl);
     }
@@ -574,7 +865,7 @@ function runRevealAnimation(){
       }catch(e){}
     }
 
-    // animate payouts
+    // Animate payouts list
     r.payouts.forEach((payout,i)=>{
       setTimeout(()=>{
         const p = gameState.players.find(pl=>pl.id===payout.playerId);
@@ -619,10 +910,6 @@ function spawnConfetti(container){
     container.appendChild(dot);
   }
 }
-
-// -------------- Scores, history, final bonuses --------------
-// (rest of your scores/history/final bonus/wireEvents code unchanged)
-
 
 // -------------- Scores, history, final bonuses --------------
 
