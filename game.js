@@ -706,7 +706,8 @@ function applyRoundResults(authorId){
     houseBonusReason:r.houseBonusReason,
     authorBonus:r.authorBonus,
     wrongGuessCount:r.wrongGuessCount,
-    houseBonusAmount:r.houseBonusAmount
+    houseBonusAmount:r.houseBonusAmount,
+    isGhostAnswer: !!r.selectedAnswer.isGhost
   });
   try {
     gameState.ghostPool ||= [];
