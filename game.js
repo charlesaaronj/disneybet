@@ -382,12 +382,32 @@ function proceedToAnswers(){
   const err=$("wsd-setupq-error");
   if(err)err.textContent="";
   if(!gameState)return;
+
+  // Require an attraction before proceeding
+  const attrSel = $("wsd-attraction-select");
+  const hasAttraction = !!(attrSel && attrSel.value);
+  if (!hasAttraction) {
+    if (err) err.textContent = "Please select an attraction first.";
+    return;
+  }
+
   const qTxt=$("wsd-question-text");
   const q=qTxt?qTxt.value.trim():"";
   if(!q){
     if(err)err.textContent="Please enter a question.";
     return;
   }
+
+  // ...rest of your existing proceedToAnswers logic...
+  Object.assign(gameState.currentRound,{question:q,answers:[],answerIndex:0});
+  saveState();
+  const enterQ=$("wsd-enter-question");
+  if(enterQ)enterQ.textContent=q;
+  const ansInp=$("wsd-answer-input");
+  if(ansInp)ansInp.value="";
+  renderAnswerProgress();
+  showScreen("enter-answers");
+}
   Object.assign(gameState.currentRound,{question:q,answers:[],answerIndex:0});
   saveState();
   const enterQ=$("wsd-enter-question");
