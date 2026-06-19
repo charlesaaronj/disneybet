@@ -83,6 +83,7 @@ function ensureStateShape(){
   gameState.settings.minPoints||=MIN_POINTS;
   gameState.players||=[];
   gameState.history||=[];
+  gameState.ghostPool ||= [];
   gameState.players.forEach(p=>{
     if(!Array.isArray(p.collected))p.collected=[];
     if(typeof p.wins!=="number")p.wins=0;
@@ -295,6 +296,7 @@ function startNewRoundCore(){
     scoreBefore:{},scoreAfter:{},collectionsThisRound:[],
     wrongGuessCount:0,authorBonus:0,houseBonusResolved:0,
     houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:""
+    usedGhost:false 
   };
   saveState();
   [
@@ -415,8 +417,34 @@ function saveAnswerForCurrentPlayer(skip){
   }
 }
 function pickRandomAnswer(){
-  const pool=gameState.currentRound.answers;
-  gameState.currentRound.selectedAnswer=pool[Math.floor(Math.random()*pool.length)];
+  const r = gameState.currentRound;
+  let pool = r.answers;
+
+  // Maybe inject a Ghost answer from previous unused answers
+  try {
+    gameState.ghostPool ||= [];
+    const ghostPool = gameState.ghostPool;
+    const canUseGhost = ghostPool.length > 0 && pool.length > 0;
+    const useGhostThisRound = canUseGhost && Math.random() < 0.33; // ~1 in 3 rounds
+
+    if (useGhostThisRound) {
+      const ghost = ghostPool[Math.floor(Math.random() * ghostPool.length)];
+      pool = pool.slice(); // clone so we don't mutate r.answers
+      pool.push({
+        playerId: null,
+        text: ghost.text,
+        isGhost: true
+      });
+      r.usedGhost = true;
+    } else {
+      r.usedGhost = false;
+    }
+  } catch (e) {
+    r.usedGhost = false;
+  }
+
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  r.selectedAnswer = chosen;
 }
 function renderSelectAnswerScreen(){
   const r=gameState.currentRound,qEl=$("wsd-select-question"),ansEl=$("wsd-selected-answer");
@@ -478,14 +506,23 @@ function goToGuessWager(){
     const inner=document.createElement("div");
     inner.className="d-flex gap-2";
     const guessSel=document.createElement("select");
-    guessSel.className="form-select wsd-form-select";
-    guessSel.dataset.playerId=p.id;
-    gameState.players.forEach(p2=>{
-      const opt=document.createElement("option");
-      opt.value=p2.id;
-      opt.textContent=p2.name;
-      guessSel.appendChild(opt);
-    });
+guessSel.className="form-select wsd-form-select";
+guessSel.dataset.playerId=p.id;
+
+// Real players
+gameState.players.forEach(p2=>{
+  const opt=document.createElement("option");
+  opt.value = String(p2.id);
+  opt.textContent = p2.name;
+  guessSel.appendChild(opt);
+});
+
+// Ghost option
+const ghostOpt = document.createElement("option");
+ghostOpt.value = "ghost";
+ghostOpt.textContent = "Ghost";
+guessSel.appendChild(ghostOpt);
+    
     const wagerInput=document.createElement("input");
     Object.assign(wagerInput,{type:"number",min:0,max:p.score,value:Math.min(1,p.score),inputMode:"numeric",pattern:"[0-9]*"});
     wagerInput.className="form-control wsd-form-control";
@@ -530,31 +567,75 @@ function lockWagers(){
   saveState();
 }
 function computeRevealAndScoring(){
-  const r=gameState.currentRound,authorId=r.selectedAnswer.playerId;
-  const payouts=[];let wrong=0;
-  gameState.players.forEach(p=>{
-    const we=r.wagers.find(w=>w.playerId===p.id);
-    let delta=0;
-    if(we){
-      const amount=Math.max(0,parseInt(we.amount,10)||0);
+  const r = gameState.currentRound;
+  const isGhostAnswer = !!r.selectedAnswer.isGhost;
+  const authorId = isGhostAnswer ? null : r.selectedAnswer.playerId;
+  const payouts = [];
+  let wrong = 0;
+
+  gameState.players.forEach(p => {
+    const we = r.wagers.find(w => w.playerId === p.id);
+    let delta = 0;
+
+    if (we) {
+      const rawGuess = we.guessedAuthorId;
+      const amount = Math.max(0, parseInt(we.amount,10) || 0);
       ensurePlayerStats(p);
-      p.stats.totalRisked+=amount;
-      if(amount>0){
-        if(parseInt(we.guessedAuthorId,10)===authorId)delta+=amount;
-        else{delta-=amount;wrong++;}
+      p.stats.totalRisked += amount;
+
+      if (amount > 0) {
+        if (isGhostAnswer) {
+          // Only "ghost" guess is correct when the answer is a Ghost
+          if (rawGuess === "ghost") {
+            delta += amount;
+          } else {
+            delta -= amount;
+            wrong++;
+          }
+        } else {
+          // Normal round: real author id
+          const guessedId = parseInt(rawGuess,10);
+          if (guessedId === authorId) {
+            delta += amount;
+          } else {
+            delta -= amount;
+            wrong++;
+          }
+        }
       }
     }
-    payouts.push({playerId:p.id,delta});
+    payouts.push({ playerId: p.id, delta });
   });
-  r.wrongGuessCount=wrong;
-  r.authorBonus=wrong;
-  if(wrong>0){
-    const ap=payouts.find(pt=>pt.playerId===authorId);
-    if(ap)ap.delta+=wrong;
+
+  r.wrongGuessCount = wrong;
+  r.authorBonus = isGhostAnswer ? 0 : wrong;
+
+  if (!isGhostAnswer && wrong > 0) {
+    const ap = payouts.find(pt => pt.playerId === authorId);
+    if (ap) ap.delta += wrong;
   }
-  r.correctGuessers=r.wagers
-    .filter(w=>Math.max(0,parseInt(w.amount,10)||0)>0&&parseInt(w.guessedAuthorId,10)===authorId)
-    .map(w=>w.playerId);
+
+  r.correctGuessers = isGhostAnswer
+    ? r.wagers
+        .filter(w => Math.max(0, parseInt(w.amount,10) || 0) > 0 && w.guessedAuthorId === "ghost")
+        .map(w => w.playerId)
+    : r.wagers
+        .filter(w => {
+          const amount = Math.max(0, parseInt(w.amount,10) || 0);
+          return amount > 0 && parseInt(w.guessedAuthorId,10) === authorId;
+        })
+        .map(w => w.playerId);
+
+  const hb = Math.max(0, parseInt(r.houseBonusAmount,10) || 0);
+  Object.assign(r, {
+    houseBonusResolved:0,
+    houseBonusRecipients:[],
+    houseBonusApplied:false,
+    houseBonusReason:""
+  });
+
+  // ... keep your existing house bonus logic here, unchanged ...
+  
   const hb=Math.max(0,parseInt(r.houseBonusAmount,10)||0);
   Object.assign(r,{houseBonusResolved:0,houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:""});
   if(hb>0){
@@ -627,93 +708,156 @@ function applyRoundResults(authorId){
     wrongGuessCount:r.wrongGuessCount,
     houseBonusAmount:r.houseBonusAmount
   });
+  try {
+    gameState.ghostPool ||= [];
+    const rAnswers = r.answers || [];
+    if (r.selectedAnswer) {
+      rAnswers
+        .filter(a => a.text && a !== r.selectedAnswer)
+        .forEach(a => {
+          gameState.ghostPool.push({
+            text: a.text,
+            fromRound: gameState.roundNumber,
+            fromPlayerId: a.playerId
+          });
+        });
+    }
+  } catch(e) {}
 }
 
 // -------------- Reveal animation & summary modal --------------
 
 function runRevealAnimation(){
-  const r=gameState.currentRound;
-  const author=gameState.players.find(p=>p.id===r.selectedAnswer.playerId);
-  const countEl=$("wsd-reveal-countdown"),
-        authWrap=$("wsd-reveal-author-wrap"),
-        authEl=$("wsd-reveal-author"),
-        resultsEl=$("wsd-reveal-results"),
-        nextWrap=$("wsd-reveal-next-wrap"),
-        confettiEl=$("wsd-confetti-wrap"),
-        qEl=$("wsd-reveal-question"),
-        ansEl=$("wsd-reveal-answer-text");
-  if(qEl)qEl.textContent=r.question;
-  if(ansEl)ansEl.textContent=`"${r.selectedAnswer.text}"`;
-  if(authWrap)authWrap.style.display="none";
-  if(resultsEl)resultsEl.innerHTML="";
-  if(nextWrap)nextWrap.style.display="none";
-  if(confettiEl)confettiEl.innerHTML="";
+  const r = gameState.currentRound;
+  const isGhostAnswer = !!r.selectedAnswer.isGhost;                 // NEW
+  const author = isGhostAnswer
+    ? null
+    : gameState.players.find(p => p.id === r.selectedAnswer.playerId);
+
+  const countEl   = $("wsd-reveal-countdown"),
+        authWrap  = $("wsd-reveal-author-wrap"),
+        authEl    = $("wsd-reveal-author"),
+        resultsEl = $("wsd-reveal-results"),
+        nextWrap  = $("wsd-reveal-next-wrap"),
+        confettiEl= $("wsd-confetti-wrap"),
+        qEl       = $("wsd-reveal-question"),
+        ansEl     = $("wsd-reveal-answer-text");
+
+  if (qEl)  qEl.textContent = r.question;
+  if (ansEl) ansEl.textContent = `"${r.selectedAnswer.text}"`;
+
+  if (authWrap)  authWrap.style.display = "none";
+  if (resultsEl) resultsEl.innerHTML = "";
+  if (nextWrap)  nextWrap.style.display = "none";
+  if (confettiEl) confettiEl.innerHTML = "";
+
   ["3","2","1"].forEach((n,i)=>{
     setTimeout(()=>{
-      if(!countEl)return;
-      countEl.textContent=n;
-      countEl.classList.remove("wsd-anim-pop");void countEl.offsetWidth;
+      if (!countEl) return;
+      countEl.textContent = n;
+      countEl.classList.remove("wsd-anim-pop"); void countEl.offsetWidth;
       countEl.classList.add("wsd-anim-pop");
-    },i*700);
+    }, i*700);
   });
+
   setTimeout(()=>{
-    if(countEl)countEl.textContent="";
-    if(authEl)authEl.textContent=author?author.name:"Unknown";
-    if(authWrap){
-      authWrap.style.display="block";
-      authWrap.classList.remove("wsd-anim-pop");void authWrap.offsetWidth;
+    if (countEl) countEl.textContent = "";
+
+    // AUTHOR NAME OR GHOST EMOJI
+    if (authEl) {
+      if (isGhostAnswer) {
+        authEl.textContent = "👻 Ghost";
+      } else {
+        authEl.textContent = author ? author.name : "Unknown";
+      }
+    }
+
+    if (authWrap){
+      authWrap.style.display = "block";
+      authWrap.classList.remove("wsd-anim-pop"); void authWrap.offsetWidth;
       authWrap.classList.add("wsd-anim-pop");
     }
-    if(r.correctGuessers.length>0&&confettiEl)spawnConfetti(confettiEl);
-    if(r.wrongGuessCount>0||r.houseBonusAmount>0){
-      const authorLineSummary=$("wsd-no-correct-author-line");
-      if(authorLineSummary){
-        if(r.wrongGuessCount>0){
-          const b=r.authorBonus||0,w=r.wrongGuessCount;
-          authorLineSummary.textContent=`✍️ ${author?author.name:"the author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
-        }else authorLineSummary.textContent="";
+
+    // Only do confetti for real-author rounds
+    if (!isGhostAnswer && r.correctGuessers.length > 0 && confettiEl) {
+      spawnConfetti(confettiEl);
+    }
+
+    if (r.wrongGuessCount > 0 || r.houseBonusAmount > 0){
+      const authorLineSummary = $("wsd-no-correct-author-line");
+      if (authorLineSummary){
+        if (r.wrongGuessCount > 0 && !isGhostAnswer) {              // skip author bonus text for Ghost
+          const b = r.authorBonus || 0, w = r.wrongGuessCount;
+          authorLineSummary.textContent =
+            `✍️ ${author ? author.name : "the author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
+        } else {
+          authorLineSummary.textContent = "";
+        }
       }
-      const houseLineText=$("wsd-house-bonus-line");
-      if(houseLineText){
-        if(r.houseBonusApplied){
-          const names=r.houseBonusRecipients.map(hr=>{
-            const p=gameState.players.find(pl=>pl.id===hr.playerId);
-            return p?`${p.name} (+${hr.extra})`:`Player ${hr.playerId} (+${hr.extra})`;
+
+      const houseLineText = $("wsd-house-bonus-line");
+      if (houseLineText){
+        if (r.houseBonusApplied){
+          const names = r.houseBonusRecipients.map(hr=>{
+            const p = gameState.players.find(pl=>pl.id===hr.playerId);
+            return p ? `${p.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
           }).join(", ");
-          houseLineText.textContent=`🏠 House bonus +${r.houseBonusResolved} was split evenly between: ${names}.`;
-        }else if(r.houseBonusAmount>0){
-          houseLineText.textContent=`🏠 ${r.houseBonusReason||"House bonus was not applied."}`;
-        }else houseLineText.textContent="";
+          houseLineText.textContent =
+            `🏠 House bonus +${r.houseBonusResolved} was split evenly between: ${names}.`;
+        } else if (r.houseBonusAmount > 0){
+          houseLineText.textContent = `🏠 ${r.houseBonusReason || "House bonus was not applied."}`;
+        } else {
+          houseLineText.textContent = "";
+        }
       }
+
       try{
-        const modalEl=$("modal-no-correct");
-        if(modalEl&&typeof bootstrap!=="undefined"){
-          const titleEl=modalEl.querySelector(".modal-title");
-          if(titleEl)titleEl.textContent="Summary";
-          const authorLine=$("wsd-no-correct-author-line");
-          const houseLine=$("wsd-house-bonus-line");
-          if(authorLine){
-            const winnerNames=r.correctGuessers.length
-              ?r.correctGuessers.map(pid=>gameState.players.find(p=>p.id===pid)?.name).filter(Boolean).join(" & ")
-              :null;
-            authorLine.textContent=winnerNames
-              ?`✅ ${winnerNames} got it right this round.`
-              :`❌ Nobody guessed ${author?author.name:"the author"} this round.`;
+        const modalEl = $("modal-no-correct");
+        if (modalEl && typeof bootstrap!=="undefined"){
+          const titleEl = modalEl.querySelector(".modal-title");
+          if (titleEl) titleEl.textContent = "Summary";
+          const authorLine = $("wsd-no-correct-author-line");
+          const houseLine  = $("wsd-house-bonus-line");
+
+          if (authorLine){
+            const winnerNames = r.correctGuessers.length
+              ? r.correctGuessers
+                  .map(pid => gameState.players.find(p=>p.id===pid)?.name)
+                  .filter(Boolean)
+                  .join(" & ")
+              : null;
+
+            if (isGhostAnswer) {
+              // Ghost-specific text
+              authorLine.textContent = winnerNames
+                ? `✅ ${winnerNames} correctly guessed Ghost.`
+                : `❌ Nobody guessed Ghost this round.`;
+            } else {
+              authorLine.textContent = winnerNames
+                ? `✅ ${winnerNames} got it right this round.`
+                : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
+            }
           }
-          let bonusLine=document.getElementById("wsd-author-bonus-line");
-          if(bonusLine)bonusLine.remove();
-          if(r.authorBonus>0){
-            const b=r.authorBonus,w=r.wrongGuessCount;
-            bonusLine=document.createElement("p");
-            bonusLine.id="wsd-author-bonus-line";
-            bonusLine.className=houseLine?houseLine.className:"wsd-text-small";
-            bonusLine.textContent=`✍️ ${author?author.name:"The author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
-            if(authorLine)authorLine.insertAdjacentElement("afterend",bonusLine);
+
+          let bonusLine = document.getElementById("wsd-author-bonus-line");
+          if (bonusLine) bonusLine.remove();
+
+          if (r.authorBonus > 0 && !isGhostAnswer){                 // no author bonus line for Ghost
+            const b = r.authorBonus, w = r.wrongGuessCount;
+            bonusLine = document.createElement("p");
+            bonusLine.id = "wsd-author-bonus-line";
+            bonusLine.className = houseLine ? houseLine.className : "wsd-text-small";
+            bonusLine.textContent =
+              `✍️ ${author ? author.name : "The author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
+            if (authorLine) authorLine.insertAdjacentElement("afterend", bonusLine);
           }
+
           setTimeout(()=>new bootstrap.Modal(modalEl).show(),400);
         }
       }catch(e){}
     }
+  },2100);
+}
     r.payouts.forEach((payout,i)=>{
       setTimeout(()=>{
         const p=gameState.players.find(pl=>pl.id===payout.playerId);
