@@ -208,22 +208,21 @@
         <div class="wsd-section-title">Guess &amp; wager</div>
         <div class="wsd-text-small mb-1" id="wsd-gw-question"></div>
         <div class="wsd-answer-spotlight mb-3" id="wsd-gw-answer"></div>
+        <div class="wsd-text-small mt-2 text-center">
+  <a href="#" data-bs-toggle="modal" data-bs-target="#modal-wager-help">
+    How do wagers work?
+  </a>
+</div>
 
         <div id="wsd-gw-players"></div>
-        <div class="wsd-text-small wsd-mt-1">
-            Choose Ghost if you think this answer was reused from an earlier round
-          </div>
 
         <div class="mb-3">
           <label class="wsd-form-label" for="wsd-house-bonus">
-            Add extra points to pot
+            Add house bonus
           </label>
           <input type="number" min="0" id="wsd-house-bonus"
                  inputmode="numeric" pattern="[0-9]*"
                  class="form-control wsd-form-control" value="0"/>
-          <div class="wsd-text-small wsd-mt-1">
-            House points are only awarded if they can be split evenly.
-          </div>
         </div>
 
         <div class="wsd-actions-stack">
@@ -673,6 +672,31 @@
                 style="max-width:200px;" data-bs-dismiss="modal">
           Got it!
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="modal fade" id="modal-wager-help" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">How wagering works</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="wsd-text-small mb-2">
+          You earn points equal to your wager for a correct guess, and lose your wager for a wrong guess.
+        </p>
+        <p class="wsd-text-small mb-2">
+          Select <strong>Ghost</strong> if you think no one wrote this answer this round.
+        </p>
+        <p class="wsd-text-small mb-0">
+          The author earns bonus points when other players guess them incorrectly.
+        </p>
+        <p class="wsd-text-small mb-0">
+    The <strong>house bonus</strong> is an extra pot of points that can be added for a round. If at least one player guesses correctly and the bonus can be split evenly, those correct guessers share it.
+  </p>
       </div>
     </div>
   </div>
