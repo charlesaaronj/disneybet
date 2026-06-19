@@ -442,7 +442,7 @@ function renderSelectAnswerScreen(){
   if(!ansEl)return;
   ansEl.classList.remove("wsd-anim-pop");void ansEl.offsetWidth;
   ansEl.textContent=`"${r.selectedAnswer.text}"`;
-  ansEl.classList.add("wsd-anim-pop");
+  ansEl.classList.add("wsd-anim-pop", "wsd-answer-highlight");
 }
 function showPickOverlay(onDone){
   const overlay=$("wsd-pick-overlay");
