@@ -306,12 +306,49 @@ function startGameFromSetup(){
       finalBonusesApplied: false
     };
   } else {
-    // Existing game: just update park data; DO NOT reset scores
-    gameState.settings.park = parkName;
-    gameState.attractions = parkData.attractions;
-    gameState.genericQuestions = parkData.genericQuestions;
-    gameState.lands = [...new Set(parkData.attractions.map(a => a.land).filter(Boolean))];
-  }
+  // Existing game: update park AND players list without resetting scores
+
+  // 1) Update park data
+  gameState.settings.park = parkName;
+  gameState.attractions = parkData.attractions;
+  gameState.genericQuestions = parkData.genericQuestions;
+  gameState.lands = [...new Set(parkData.attractions.map(a => a.land).filter(Boolean))];
+
+  // 2) Rebuild players from current name list
+  const existingPlayers = gameState.players || [];
+
+  const updatedPlayers = names.map((name, index) => {
+    // Try to find an existing player with this name (case-insensitive)
+    const old = existingPlayers.find(
+      p => p.name.toLowerCase() === name.toLowerCase()
+    );
+    if (old) {
+      // Keep their score, wins, collections, stats, badge color, id
+      old.name = name; // in case you changed capitalization
+      return old;
+    }
+
+    // New player: join mid-game with starting points
+    const newId = existingPlayers.length
+      ? Math.max(...existingPlayers.map(p => p.id)) + 1
+      : index;
+
+    return {
+      id: newId,
+      name,
+      score: gameState.settings?.startingPoints ?? START_POINTS,
+      wins: 0,
+      collected: [],
+      bonusTotal: 0,
+      stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
+      badgeColor:
+        PLAYER_BADGE_COLORS[index % PLAYER_BADGE_COLORS.length] || "#999999"
+    };
+  });
+
+  // 3) Assign back; any players whose names were removed in Setup are dropped
+  gameState.players = updatedPlayers;
+}
 
   // ---------- shared UI updates ----------
   const parkLabel = $("wsd-park-label");
@@ -320,9 +357,9 @@ function startGameFromSetup(){
   applyParkTheme(parkName);
 
   const summary = $("wsd-player-summary");
-  if (summary && gameState && gameState.players) {
-    summary.textContent = `${gameState.players.length} players`;
-  }
+if (summary && gameState && gameState.players) {
+  summary.textContent = `${gameState.players.length} players`;
+}
 
   const startBtn = $("wsd-start-game");
   if (startBtn) {
