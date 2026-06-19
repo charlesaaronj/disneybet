@@ -423,18 +423,14 @@ function pickRandomAnswer(){
   let pool = base;
 
   if (hasGhostPool) {
-    // 25% chance to inject one ghost answer (tweak probability if you like)
-    const roll = Math.random();
-    if (roll < 0.25) {
-      const ghostSource = gameState.ghostPool[Math.floor(Math.random()*gameState.ghostPool.length)];
-      const ghostAnswer = {
-        text: ghostSource.text,
-        isGhost: true,
-        fromRound: ghostSource.fromRound,
-        fromPlayerId: ghostSource.fromPlayerId
-      };
-      pool = [...base, ghostAnswer];
-    }
+    const ghostSource = gameState.ghostPool[Math.floor(Math.random()*gameState.ghostPool.length)];
+    const ghostAnswer = {
+      text: ghostSource.text,
+      isGhost: true,
+      fromRound: ghostSource.fromRound,
+      fromPlayerId: ghostSource.fromPlayerId
+    };
+    pool = [...base, ghostAnswer];
   }
 
   const chosen = pool[Math.floor(Math.random()*pool.length)];
@@ -860,31 +856,42 @@ function runRevealAnimation(){
     }
 
     // Animate payouts list
-    r.payouts.forEach((payout,i)=>{
-      setTimeout(()=>{
-        const p = gameState.players.find(pl=>pl.id===payout.playerId);
-        const wager = r.wagers.find(w=>w.playerId===payout.playerId);
-        const guess = wager && gameState.players.find(pl=>pl.id===wager.guessedAuthorId);
-        const ok = r.correctGuessers.includes(payout.playerId);
-        const dStr = `${payout.delta>=0?"+":""}${payout.delta}`;
-        const row = document.createElement("div");
-        row.className = "wsd-result-row";
-        row.style.animationDelay = `${i*0.07}s`;
-        row.innerHTML = `
-          <div>
-            <div class="wsd-score-name">${p.name} ${ok?"✅":"❌"}</div>
-            <div class="wsd-score-meta">Guess: ${guess?guess.name:"—"} · Wager: ${wager?wager.amount:0}</div>
-          </div>
-          <div class="wsd-score-value ${payout.delta>=0?"text-success":"text-danger"}">${dStr}</div>`;
-        if (resultsEl) resultsEl.appendChild(row);
-      }, i*120);
-    });
+r.payouts.forEach((payout,i)=>{
+  setTimeout(()=>{
+    const p = gameState.players.find(pl=>pl.id===payout.playerId);
+    const wager = r.wagers.find(w=>w.playerId===payout.playerId);
 
-    setTimeout(()=>{
-      if (nextWrap) nextWrap.style.display = "block";
-    }, r.payouts.length*120 + 300);
+    let guessName = "—";
+    if (wager) {
+      if (wager.guessedAuthorId === "ghost") {
+        guessName = "Ghost";
+      } else {
+        const guessedId = parseInt(wager.guessedAuthorId,10);
+        const guessedPlayer = gameState.players.find(pl=>pl.id===guessedId);
+        if (guessedPlayer) guessName = guessedPlayer.name;
+      }
+    }
 
-  },2100);
+    const ok = r.correctGuessers.includes(payout.playerId);
+    const dStr = `${payout.delta>=0?"+":""}${payout.delta}`;
+    const row = document.createElement("div");
+    row.className = "wsd-result-row";
+    row.style.animationDelay = `${i*0.07}s`;
+    row.innerHTML = `
+      <div>
+        <div class="wsd-score-name">${p.name} ${ok?"✅":"❌"}</div>
+        <div class="wsd-score-meta">Guess: ${guessName} · Wager: ${wager?wager.amount:0}</div>
+      </div>
+      <div class="wsd-score-value ${payout.delta>=0?"text-success":"text-danger"}">${dStr}</div>`;
+    if (resultsEl) resultsEl.appendChild(row);
+  }, i*120);
+});
+
+setTimeout(()=>{
+  if (nextWrap) nextWrap.style.display = "block";
+}, r.payouts.length*120 + 300);
+
+},2100);
 }
 
 function spawnConfetti(container){
