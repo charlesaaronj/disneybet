@@ -613,10 +613,6 @@ function goToGuessWager(){
     wagerInput.className="form-control wsd-form-control";
     wagerInput.style.maxWidth="90px";wagerInput.dataset.playerId=p.id;
     
-    wagerInput.addEventListener("focus", function () {
-  this.select(); // selects all text so typing replaces it
-});
-    
     inner.appendChild(guessSel);inner.appendChild(wagerInput);
     row.appendChild(inner);
     container.appendChild(row);
