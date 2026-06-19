@@ -626,32 +626,40 @@ function computeRevealAndScoring(){
         })
         .map(w => w.playerId);
 
+  // House bonus logic
   const hb = Math.max(0, parseInt(r.houseBonusAmount,10) || 0);
   Object.assign(r, {
-    houseBonusResolved:0,
-    houseBonusRecipients:[],
-    houseBonusApplied:false,
-    houseBonusReason:""
+    houseBonusResolved: 0,
+    houseBonusRecipients: [],
+    houseBonusApplied: false,
+    houseBonusReason: ""
   });
 
-  // ... keep your existing house bonus logic here, unchanged ...
-  
-  const hb=Math.max(0,parseInt(r.houseBonusAmount,10)||0);
-  Object.assign(r,{houseBonusResolved:0,houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:""});
-  if(hb>0){
-    const cc=r.correctGuessers.length;
-    if(cc===0)r.houseBonusReason="No house bonus: No correct guesses.";
-    else if(hb%cc!==0)r.houseBonusReason="No house bonus: it could not be split evenly among correct guessers.";
-    else{
-      const share=hb/cc;
-      r.correctGuessers.forEach(pid=>{
-        const pt=payouts.find(p=>p.playerId===pid);
-        if(pt){pt.delta+=share;r.houseBonusRecipients.push({playerId:pid,extra:share});}
+  if (hb > 0) {
+    const cc = r.correctGuessers.length;
+    if (cc === 0) {
+      r.houseBonusReason = "No house bonus: No correct guesses.";
+    } else if (hb % cc !== 0) {
+      r.houseBonusReason = "No house bonus: it could not be split evenly among correct guessers.";
+    } else {
+      const share = hb / cc;
+      r.correctGuessers.forEach(pid => {
+        const pt = payouts.find(p => p.playerId === pid);
+        if (pt) {
+          pt.delta += share;
+          r.houseBonusRecipients.push({ playerId: pid, extra: share });
+        }
       });
-      Object.assign(r,{houseBonusResolved:hb,houseBonusApplied:true,houseBonusReason:"House bonus applied evenly."});
+      Object.assign(r, {
+        houseBonusResolved: hb,
+        houseBonusApplied: true,
+        houseBonusReason: "House bonus applied evenly."
+      });
     }
   }
-  r.payouts=payouts;r.pot=0;
+
+  r.payouts = payouts;
+  r.pot = 0;
   applyRoundResults(authorId);
 }
 function applyRoundResults(authorId){
