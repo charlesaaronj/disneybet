@@ -827,12 +827,12 @@ function renderBonusProgress(){
         const isLeader=tierVal===best;
         const gap=best-tierVal;
         const names=tierPlayers.map(s=>s.name).join(" & ");
-        const gapLabel=isLeader||gap===0?"":` (-${gap})`;
+        const leaderClass=isLeader?"wsd-bonus-leader":"";
         rankingHtml+=`
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px">
             <div class="wsd-score-meta">
               <span style="opacity:0.5;margin-right:8px">#${rank}</span>
-              <strong style="${isLeader?"":"font-weight:normal"}">${names}</strong>
+              <span class="${leaderClass}">${names}</span>
               <span style="opacity:0.7">${gapLabel}</span>
             </div>
           </div>`;
