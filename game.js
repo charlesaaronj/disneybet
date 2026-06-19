@@ -408,15 +408,6 @@ function proceedToAnswers(){
   renderAnswerProgress();
   showScreen("enter-answers");
 }
-  Object.assign(gameState.currentRound,{question:q,answers:[],answerIndex:0});
-  saveState();
-  const enterQ=$("wsd-enter-question");
-  if(enterQ)enterQ.textContent=q;
-  const ansInp=$("wsd-answer-input");
-  if(ansInp)ansInp.value="";
-  renderAnswerProgress();
-  showScreen("enter-answers");
-}
 
 // -------------- Answers, wagers, scoring --------------
 
