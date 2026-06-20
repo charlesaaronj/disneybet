@@ -339,48 +339,79 @@ function renderAttractionOptions(){
   });
 }
 function startNewRoundCore(){
-  if(!gameState)return;
-  gameState.roundNumber+=1;
-  gameState.currentRound={
-    attraction:null,question:"",questionType:"",answers:[],
-    selectedAnswer:null,answerIndex:0,houseBonusAmount:0,
-    wagers:[],pot:0,correctGuessers:[],payouts:[],
-    scoreBefore:{},scoreAfter:{},collectionsThisRound:[],
-    wrongGuessCount:0,authorBonus:0,houseBonusResolved:0,
-    houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:"",
-    answerOrder:shuffle(gameState.players.map(p=>p.id)),
-    usedGhost:false
+  if (!gameState) return;
+  gameState.roundNumber += 1;
+  gameState.currentRound = {
+    attraction: null,
+    question: "",
+    questionType: "",
+    answers: [],
+    selectedAnswer: null,
+    answerIndex: 0,
+    houseBonusAmount: 0,
+    wagers: [],
+    pot: 0,
+    correctGuessers: [],
+    payouts: [],
+    scoreBefore: {},
+    scoreAfter: {},
+    collectionsThisRound: [],
+    wrongGuessCount: 0,
+    authorBonus: 0,
+    houseBonusResolved: 0,
+    houseBonusRecipients: [],
+    houseBonusApplied: false,
+    houseBonusReason: "",
+    answerOrder: shuffle(gameState.players.map(p => p.id)),
+    usedGhost: false
   };
   saveState();
+
   [
-    ["wsd-house-bonus",         el=>{el.value="0";}],
-    ["wsd-question-type-badge", el=>{el.textContent="";}],
-    ["wsd-attraction-select",   el=>{el.value="";}],
-    ["wsd-attraction-meta",     el=>{el.textContent="";}],
-    ["wsd-setupq-error",        el=>{el.textContent="";}]
-  ].forEach(([id,fn])=>{const el=$(id);if(el)fn(el);});
-  setQuestionDisplay("");
+    ["wsd-house-bonus", el => { el.value = "0"; }],
+    ["wsd-attraction-select", el => { el.value = ""; }],
+    ["wsd-attraction-meta", el => { el.textContent = ""; }],
+    ["wsd-setupq-error", el => { el.textContent = ""; }]
+  ].forEach(([id, fn]) => {
+    const el = $(id);
+    if (el) fn(el);
+  });
+
+  // Placeholder question and badge
+  setQuestionDisplay("Select an attraction from the dropdown to get a question.");
+  const badge = $("wsd-question-type-badge");
+  if (badge) badge.textContent = "Pending";
+
   updateQuestionLock();
 }
+
 function onAttractionChange(){
-  if(!gameState)return;
-  const attrSel=$("wsd-attraction-select");
-  const idx=attrSel?parseInt(attrSel.value,10):NaN;
-  const meta=$("wsd-attraction-meta"),badge=$("wsd-question-type-badge");
-  if(meta)meta.textContent="";
-  if(badge)badge.textContent="";
-  if(isNaN(idx)||!gameState.attractions[idx]){
-    Object.assign(gameState.currentRound,{attraction:null,question:"",questionType:""});
-    setQuestionDisplay("");
-    updateQuestionLock();return;
+  if (!gameState) return;
+  const attrSel = $("wsd-attraction-select");
+  const idx = attrSel ? parseInt(attrSel.value, 10) : NaN;
+  const meta = $("wsd-attraction-meta");
+  const badge = $("wsd-question-type-badge");
+
+  if (meta) meta.textContent = "";
+  if (badge) badge.textContent = "Pending";
+
+  if (isNaN(idx) || !gameState.attractions[idx]) {
+    Object.assign(gameState.currentRound, { attraction: null, question: "", questionType: "" });
+    setQuestionDisplay("Select an attraction from the dropdown to get a question.");
+    updateQuestionLock();
+    return;
   }
-  const attraction=gameState.attractions[idx];
-  gameState.currentRound.attraction=attraction;
-  if(meta)meta.textContent=`${attraction.park} • ${attraction.land}`;
-  const{q,type,categoryName}=drawQuestion(attraction);
-  Object.assign(gameState.currentRound,{question:q,questionType:type});
+
+  const attraction = gameState.attractions[idx];
+  gameState.currentRound.attraction = attraction;
+  if (meta) meta.textContent = `${attraction.park} • ${attraction.land}`;
+
+  const { q, type, categoryName } = drawQuestion(attraction);
+  Object.assign(gameState.currentRound, { question: q, questionType: type });
+
   setQuestionDisplay(q);
-  if(badge)badge.textContent=categoryName||labelForType(type);
+  if (badge) badge.textContent = categoryName || labelForType(type);
+
   saveState();
   updateQuestionLock();
 }
@@ -400,7 +431,6 @@ function onGenerateNewQuestion(){
   const { q, type, categoryName } = drawQuestion(gameState.currentRound.attraction);
   Object.assign(gameState.currentRound, { question: q, questionType: type });
 
-  // UPDATE THE VISIBLE QUESTION
   setQuestionDisplay(q);
 
   const badge = $("wsd-question-type-badge");
