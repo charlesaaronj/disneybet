@@ -602,7 +602,13 @@ body {
   line-height: 1.5;
   color: #333;
   min-height: 2rem;
+
+  /* Add these: */
+  animation-duration: 0.4s;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
 }
+
 @keyframes wsdQuestionFlash {
   0%   { opacity: 0; transform: scale(0.97); }
   60%  { opacity: 1; transform: scale(1.01); }
