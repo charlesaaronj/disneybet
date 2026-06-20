@@ -158,16 +158,17 @@ function setQuestionDisplay(text){
   const textarea = $("wsd-question-text");
 
   if (display) {
-    // Always show the div when there's text
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
 
-    // Reset and re-add the animation class
-    display.classList.remove("wsd-question-flash");
-    // simple reflow trigger:
-    display.offsetHeight;
+    // Hard reset animation on the element itself
+    display.style.animationName = "none";
+    // force reflow
+    void display.offsetWidth;
     if (text) {
-      display.classList.add("wsd-question-flash");
+      display.style.animationName = "wsdQuestionFlash";
+    } else {
+      display.style.animationName = "none";
     }
   }
 
@@ -176,9 +177,6 @@ function setQuestionDisplay(text){
     textarea.style.display = "none";
   }
 }
-
-
-
 
 function showCustomTextarea(){
   const display = $("wsd-question-display");
