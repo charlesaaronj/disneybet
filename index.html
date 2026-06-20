@@ -112,9 +112,12 @@
             <span id="wsd-question-type-badge"
                   class="wsd-badge-pill">&nbsp;</span>
           </div>
-          <textarea id="wsd-question-text"
-                    class="form-control wsd-form-control"
-                    rows="3" readonly></textarea>
+       <!-- shown by default: displays the generated question -->
+<div id="wsd-question-display" class="wsd-question-display"></div>
+
+<!-- hidden by default: only shown for custom entry -->
+<textarea id="wsd-question-text" class="form-control wsd-form-control" rows="4" style="display:none;"></textarea>
+
         </div>
 
         <div class="wsd-actions-stack">
