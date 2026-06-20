@@ -1328,18 +1328,12 @@ function abandonRound(){
 function wireEvents(){
   debugLog("wireEvents starting");
   $("wsd-start-game").addEventListener("click",startGameFromSetup);
-  $("wsd-reset-setup").addEventListener("click",()=>{
-    const err=$("wsd-setup-error"),ps=$("wsd-park-select"),label=$("wsd-park-label"),container=$("wsd-player-inputs");
-    if(err)err.textContent="";
-    if(ps)ps.value="";
-    if(label)label.textContent="Not set";
-    if(container){
-      container.innerHTML="";
-      for(let i=0;i<3;i++)addPlayerInput(container);
-    }
-    applyParkTheme("");
-    updatePlayerInputLock();
-  });
+  $("wsd-reset-setup").addEventListener("click", () => {
+  confirmThenReset(
+    "Restart this game and clear all scores and history?",
+    "restart"
+  );
+});
   $("wsd-add-player").addEventListener("click",()=>{
     const c=$("wsd-player-inputs");
     if(!c||c.querySelectorAll("input").length>=8)return;
