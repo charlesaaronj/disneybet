@@ -149,11 +149,32 @@ function updateQuestionLock(){
   const hasAttraction=!!(attrSel&&attrSel.value);
   const hint=$("wsd-attraction-hint");
   if(hint)hint.style.display=hasAttraction?"none":"block";
-  const qTxt=$("wsd-question-text");
-  if(qTxt){qTxt.disabled=!hasAttraction;qTxt.placeholder=hasAttraction?"":"Select an attraction first";}
   ["wsd-generate-question","wsd-enter-custom-question","wsd-to-answers"].forEach(id=>{
     const btn=$(id);if(btn)btn.disabled=!hasAttraction;
   });
+}
+function setQuestionDisplay(text){
+  const display = $("wsd-question-display");
+  const textarea = $("wsd-question-text");
+  if (display) {
+    display.textContent = text;
+    display.style.display = text ? "block" : "none";
+  }
+  if (textarea) {
+    textarea.value = text;
+    textarea.style.display = "none";
+  }
+}
+
+function showCustomTextarea(){
+  const display = $("wsd-question-display");
+  const textarea = $("wsd-question-text");
+  if (display) display.style.display = "none";
+  if (textarea) {
+    textarea.style.display = "block";
+    textarea.value = "";
+    textarea.readOnly = false;
+  }
 }
 
 // ----------------- Setup screen -----------------
@@ -370,12 +391,13 @@ function onGenerateNewQuestion(){
   saveState();
 }
 function onEnterCustomQuestion(){
-  const qTxt=$("wsd-question-text");if(!qTxt)return;
-  qTxt.readOnly=false;qTxt.value="";
+  showCustomTextarea();
   const badge=$("wsd-question-type-badge");
   if(badge)badge.textContent="Custom question";
   gameState.currentRound.questionType="custom";
-  qTxt.focus();saveState();
+  const textarea=$("wsd-question-text");
+  if(textarea)textarea.focus();
+  saveState();
 }
 
 // -------- Answers flow --------
@@ -392,31 +414,26 @@ function renderAnswerProgress(){
   if (prog) prog.textContent = `Player ${idx+1} of ${order.length}`;
   if (label) label.textContent = player ? player.name : "";
 }
-function proceedToAnswers() {
-  const err = $("wsd-setupq-error");
-  if (err) err.textContent = "";
-  if (!gameState) return;
-
-  const qTxt = $("wsd-question-text");
-  const q = qTxt ? qTxt.value.trim() : "";
-  if (!q) {
-    if (err) err.textContent = "Please enter a question.";
+function proceedToAnswers(){
+  const err=$("wsd-setupq-error");
+  if(err)err.textContent="";
+  if(!gameState)return;
+  const textarea=$("wsd-question-text");
+  const display=$("wsd-question-display");
+  const isCustom=textarea&&textarea.style.display!=="none";
+  const q=isCustom
+    ?(textarea?textarea.value.trim():"")
+    :(display?display.textContent.trim():"");
+  if(!q){
+    if(err)err.textContent="Please enter a question.";
     return;
   }
-
-  Object.assign(gameState.currentRound, {
-    question: q,
-    answers: [],
-    answerIndex: 0
-  });
+  Object.assign(gameState.currentRound,{question:q,answers:[],answerIndex:0});
   saveState();
-
-  const enterQ = $("wsd-enter-question");
-  if (enterQ) enterQ.textContent = q;
-
-  const ansInp = $("wsd-answer-input");
-  if (ansInp) ansInp.value = "";
-
+  const enterQ=$("wsd-enter-question");
+  if(enterQ)enterQ.textContent=q;
+  const ansInp=$("wsd-answer-input");
+  if(ansInp)ansInp.value="";
   renderAnswerProgress();
   showScreen("enter-answers");
 }
