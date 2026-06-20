@@ -176,6 +176,18 @@ function showCustomTextarea(){
     textarea.readOnly = false;
   }
 }
+function setQuestionDisplay(text){
+  const display = $("wsd-question-display");
+  const textarea = $("wsd-question-text");
+  if (display) {
+    display.textContent = text;
+    display.style.display = text ? "block" : "none";
+  }
+  if (textarea) {
+    textarea.value = text;
+    textarea.style.display = "none";
+  }
+}
 
 // ----------------- Setup screen -----------------
 
