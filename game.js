@@ -390,18 +390,25 @@ function drawQuestion(attraction){
 }
 const labelForType=t=>t==="category"?"Question":t==="custom"?"Custom question":"Question";
 function onGenerateNewQuestion(){
-  const err=$("wsd-setupq-error");
-  if(!gameState||!gameState.currentRound.attraction){
-    if(err)err.textContent="Select an attraction first.";return;
+  const err = $("wsd-setupq-error");
+  if (!gameState || !gameState.currentRound.attraction) {
+    if (err) err.textContent = "Select an attraction first.";
+    return;
   }
-  if(err)err.textContent="";
-  const {q,type,categoryName}=drawQuestion(gameState.currentRound.attraction);
-  Object.assign(gameState.currentRound,{question:q,questionType:type});
-  const qTxt=$("wsd-question-text"),badge=$("wsd-question-type-badge");
-  if(qTxt)qTxt.value=q;
-  if(badge)badge.textContent=categoryName||labelForType(type);
+  if (err) err.textContent = "";
+
+  const { q, type, categoryName } = drawQuestion(gameState.currentRound.attraction);
+  Object.assign(gameState.currentRound, { question: q, questionType: type });
+
+  // UPDATE THE VISIBLE QUESTION
+  setQuestionDisplay(q);
+
+  const badge = $("wsd-question-type-badge");
+  if (badge) badge.textContent = categoryName || labelForType(type);
+
   saveState();
 }
+
 function onEnterCustomQuestion(){
   showCustomTextarea();
   const badge=$("wsd-question-type-badge");
