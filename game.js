@@ -874,169 +874,144 @@ function applyRoundResults(authorId){
 function runRevealAnimation(){
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
-  const author = isGhostAnswer
-    ? null
-    : gameState.players.find(p => p.id === r.selectedAnswer.playerId);
-
-  const countEl   = $("wsd-reveal-countdown"),
-        authWrap  = $("wsd-reveal-author-wrap"),
-        authEl    = $("wsd-reveal-author"),
+  const author = isGhostAnswer ? null : gameState.players.find(p => p.id === r.selectedAnswer.playerId);
+  const countEl = $("wsd-reveal-countdown"),
+        authWrap = $("wsd-reveal-author-wrap"),
+        authEl = $("wsd-reveal-author"),
         resultsEl = $("wsd-reveal-results"),
-        nextWrap  = $("wsd-reveal-next-wrap"),
-        confettiEl= $("wsd-confetti-wrap"),
-        qEl       = $("wsd-reveal-question"),
-        ansEl     = $("wsd-reveal-answer-text");
+        nextWrap = $("wsd-reveal-next-wrap"),
+        confettiEl = $("wsd-confetti-wrap"),
+        qEl = $("wsd-reveal-question"),
+        ansEl = $("wsd-reveal-answer-text");
 
-  if (qEl)  qEl.textContent = r.question;
-  if (ansEl) ansEl.textContent = `"${r.selectedAnswer.text}"`;
+  if(qEl) qEl.textContent = r.question;
+  if(ansEl) ansEl.textContent = r.selectedAnswer.text;
+  if(authWrap) authWrap.style.display = "none";
+  if(resultsEl) resultsEl.innerHTML = "";
+  if(nextWrap) nextWrap.style.display = "none";
+  if(confettiEl) confettiEl.innerHTML = "";
 
-  if (authWrap)  authWrap.style.display = "none";
-  if (resultsEl) resultsEl.innerHTML = "";
-  if (nextWrap)  nextWrap.style.display = "none";
-  if (confettiEl) confettiEl.innerHTML = "";
-
-  ["3","2","1"].forEach((n,i)=>{
-    setTimeout(()=>{
-      if (!countEl) return;
+  // Countdown 3, 2, 1
+  [3,2,1].forEach((n,i) => {
+    setTimeout(() => {
+      if(!countEl) return;
       countEl.textContent = n;
-      countEl.classList.remove("wsd-anim-pop"); void countEl.offsetWidth;
+      countEl.classList.remove("wsd-anim-pop");
+      void countEl.offsetWidth;
       countEl.classList.add("wsd-anim-pop");
-    }, i*700);
+    }, i * 700);
   });
 
-  setTimeout(()=>{
-    if (countEl) countEl.textContent = "";
-
-    // AUTHOR NAME OR GHOST EMOJI
-    if (authEl) {
-      if (isGhostAnswer) {
-        authEl.textContent = "👻 Ghost";
-      } else {
-        authEl.textContent = author ? author.name : "Unknown";
-      }
+  setTimeout(() => {
+    // Show author
+    if(countEl) countEl.textContent = "";
+    if(authEl){
+      authEl.textContent = isGhostAnswer ? "👻 Ghost" : (author ? author.name : "Unknown");
     }
-
-    if (authWrap){
+    if(authWrap){
       authWrap.style.display = "block";
-      authWrap.classList.remove("wsd-anim-pop"); void authWrap.offsetWidth;
+      authWrap.classList.remove("wsd-anim-pop");
+      void authWrap.offsetWidth;
       authWrap.classList.add("wsd-anim-pop");
     }
 
-    // Only do confetti for real-author rounds
-    if (!isGhostAnswer && r.correctGuessers.length > 0 && confettiEl) {
-      spawnConfetti(confettiEl);
-    }
+    // Confetti for correct guesses on real answers
+    if(!isGhostAnswer && r.correctGuessers.length > 0) spawnConfetti(confettiEl);
 
-    if (r.wrongGuessCount > 0 || r.houseBonusAmount > 0){
-      const authorLineSummary = $("wsd-no-correct-author-line");
-      if (authorLineSummary){
-        if (r.wrongGuessCount > 0 && !isGhostAnswer) {
-          const b = r.authorBonus || 0, w = r.wrongGuessCount;
-          authorLineSummary.textContent =
-            `✍️ ${author ? author.name : "the author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
-        } else {
-          authorLineSummary.textContent = "";
-        }
-      }
-
-      const houseLineText = $("wsd-house-bonus-line");
-      if (houseLineText){
-        if (r.houseBonusApplied){
-          const names = r.houseBonusRecipients.map(hr=>{
-            const p = gameState.players.find(pl=>pl.id===hr.playerId);
-            return p ? `${p.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
-          }).join(", ");
-          houseLineText.textContent =
-            `🏠 House bonus +${r.houseBonusResolved} was split evenly between: ${names}.`;
-        } else if (r.houseBonusAmount > 0){
-          houseLineText.textContent = `🏠 ${r.houseBonusReason || "House bonus was not applied."}`;
-        } else {
-          houseLineText.textContent = "";
-        }
-      }
-
-      try{
-        const modalEl = $("modal-no-correct");
-        if (modalEl && typeof bootstrap!=="undefined"){
-          const titleEl = modalEl.querySelector(".modal-title");
-          if (titleEl) titleEl.textContent = "Summary";
-          const authorLine = $("wsd-no-correct-author-line");
-          const houseLine  = $("wsd-house-bonus-line");
-
-          if (authorLine){
-            const winnerNames = r.correctGuessers.length
-              ? r.correctGuessers
-                  .map(pid => gameState.players.find(p=>p.id===pid)?.name)
-                  .filter(Boolean)
-                  .join(" & ")
-              : null;
-
-            if (isGhostAnswer) {
-              authorLine.textContent = winnerNames
-                ? `✅ ${winnerNames} correctly guessed Ghost.`
-                : `❌ Nobody guessed Ghost this round.`;
-            } else {
-              authorLine.textContent = winnerNames
-                ? `✅ ${winnerNames} got it right this round.`
-                : `❌ Nobody guessed ${author ? author.name : "the author"} this round.`;
-            }
-          }
-
-          let bonusLine = document.getElementById("wsd-author-bonus-line");
-          if (bonusLine) bonusLine.remove();
-
-          if (r.authorBonus > 0 && !isGhostAnswer){
-            const b = r.authorBonus, w = r.wrongGuessCount;
-            bonusLine = document.createElement("p");
-            bonusLine.id = "wsd-author-bonus-line";
-            bonusLine.className = houseLine ? houseLine.className : "wsd-text-small";
-            bonusLine.textContent =
-              `✍️ ${author ? author.name : "The author"} earned +${b} point${b===1?"":"s"} from ${w} wrong guess${w===1?"":"es"}.`;
-            if (authorLine) authorLine.insertAdjacentElement("afterend", bonusLine);
-          }
-
-          setTimeout(()=>new bootstrap.Modal(modalEl).show(),400);
-        }
-      }catch(e){}
-    }
-
-    // Animate payouts list
-r.payouts.forEach((payout,i)=>{
-  setTimeout(()=>{
-    const p = gameState.players.find(pl=>pl.id===payout.playerId);
-    const wager = r.wagers.find(w=>w.playerId===payout.playerId);
-
-    let guessName = "—";
-    if (wager) {
-      if (wager.guessedAuthorId === "ghost") {
-        guessName = "Ghost";
+    // Always show summary modal
+    const authorLineSummary = $("wsd-no-correct-author-line");
+    if(authorLineSummary){
+      if(r.wrongGuessCount > 0 && !isGhostAnswer){
+        const b = r.authorBonus || 0, w = r.wrongGuessCount;
+        authorLineSummary.textContent = `${author ? author.name : "The author"} earned ${b} point${b !== 1 ? "s" : ""} from ${w} wrong guess${w !== 1 ? "es" : ""}.`;
       } else {
-        const guessedId = parseInt(wager.guessedAuthorId,10);
-        const guessedPlayer = gameState.players.find(pl=>pl.id===guessedId);
-        if (guessedPlayer) guessName = guessedPlayer.name;
+        authorLineSummary.textContent = "";
+      }
+    }
+    const houseLineText = $("wsd-house-bonus-line");
+    if(houseLineText){
+      if(r.houseBonusApplied){
+        const names = r.houseBonusRecipients.map(hr => {
+          const p = gameState.players.find(pl => pl.id === hr.playerId);
+          return p ? `${p.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
+        }).join(", ");
+        houseLineText.textContent = `House bonus ${r.houseBonusResolved} was split evenly between ${names}.`;
+      } else if(r.houseBonusAmount > 0){
+        houseLineText.textContent = r.houseBonusReason || "House bonus was not applied.";
+      } else {
+        houseLineText.textContent = "";
       }
     }
 
-    const ok = r.correctGuessers.includes(payout.playerId);
-    const dStr = `${payout.delta>=0?"+":""}${payout.delta}`;
-    const row = document.createElement("div");
-    row.className = "wsd-result-row";
-    row.style.animationDelay = `${i*0.07}s`;
-    row.innerHTML = `
-      <div>
-        <div class="wsd-score-name">${p.name} ${ok?"✅":"❌"}</div>
-        <div class="wsd-score-meta">Guess: ${guessName} · Wager: ${wager?wager.amount:0}</div>
-      </div>
-      <div class="wsd-score-value ${payout.delta>=0?"text-success":"text-danger"}">${dStr}</div>`;
-    if (resultsEl) resultsEl.appendChild(row);
-  }, i*120);
-});
+    try {
+      const modalEl = $("modal-no-correct");
+      if(modalEl && typeof bootstrap !== "undefined"){
+        const titleEl = modalEl.querySelector(".modal-title");
+        if(titleEl) titleEl.textContent = "Summary";
+        const authorLine = $("wsd-no-correct-author-line");
+        const houseLine = $("wsd-house-bonus-line");
+        if(authorLine){
+          const winnerNames = r.correctGuessers.length
+            ? r.correctGuessers.map(pid => gameState.players.find(p => p.id === pid)?.name).filter(Boolean).join(", ")
+            : null;
+          if(isGhostAnswer){
+            authorLine.textContent = winnerNames
+              ? `${winnerNames} correctly guessed Ghost.`
+              : "Nobody guessed Ghost this round.";
+          } else {
+            authorLine.textContent = winnerNames
+              ? `${winnerNames} got it right this round.`
+              : `Nobody guessed ${author ? author.name : "the author"} this round.`;
+          }
+        }
+        let bonusLine = document.getElementById("wsd-author-bonus-line");
+        if(bonusLine) bonusLine.remove();
+        if(r.authorBonus > 0 && !isGhostAnswer){
+          const b = r.authorBonus, w = r.wrongGuessCount;
+          bonusLine = document.createElement("p");
+          bonusLine.id = "wsd-author-bonus-line";
+          bonusLine.className = (houseLine ? houseLine.className : "") + " wsd-text-small";
+          bonusLine.textContent = `${author ? author.name : "The author"} earned ${b} point${b !== 1 ? "s" : ""} from ${w} wrong guess${w !== 1 ? "es" : ""}.`;
+          if(authorLine) authorLine.insertAdjacentElement("afterend", bonusLine);
+        }
+        setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
+      }
+    } catch(e) {}
 
-setTimeout(()=>{
-  if (nextWrap) nextWrap.style.display = "block";
-}, r.payouts.length*120 + 300);
+    // Animate payout rows
+    r.payouts.forEach((payout, i) => {
+      setTimeout(() => {
+        const p = gameState.players.find(pl => pl.id === payout.playerId);
+        const wager = r.wagers.find(w => w.playerId === payout.playerId);
+        let guessName = "";
+        if(wager){
+          if(wager.guessedAuthorId === "ghost"){
+            guessName = "Ghost";
+          } else {
+            const guessedPlayer = gameState.players.find(pl => pl.id === parseInt(wager.guessedAuthorId, 10));
+            if(guessedPlayer) guessName = guessedPlayer.name;
+          }
+        }
+        const ok = r.correctGuessers.includes(payout.playerId);
+        const dStr = payout.delta >= 0 ? `+${payout.delta}` : String(payout.delta);
+        const row = document.createElement("div");
+        row.className = "wsd-result-row";
+        row.style.animationDelay = `${i * 0.07}s`;
+        row.innerHTML = `
+          <div>
+            <div class="wsd-score-name">${p ? p.name : "?"}${ok ? " ✓" : ""}</div>
+            <div class="wsd-score-meta">Guess: ${guessName} · Wager: ${wager ? wager.amount : 0}</div>
+          </div>
+          <div class="wsd-score-value ${payout.delta >= 0 ? "text-success" : "text-danger"}">${dStr}</div>`;
+        if(resultsEl) resultsEl.appendChild(row);
+      }, i * 120);
+    });
 
-},2100);
+    setTimeout(() => {
+      if(nextWrap) nextWrap.style.display = "block";
+    }, r.payouts.length * 120 + 300);
+
+  }, 2100);
 }
 
 function spawnConfetti(container){
