@@ -595,3 +595,12 @@ body {
   font-size: 0.9rem;
   font-weight: 700;
 }
+
+.wsd-question-display {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #333;
+  min-height: 2rem;
+}
+
