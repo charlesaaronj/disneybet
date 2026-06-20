@@ -1359,7 +1359,18 @@ function wireEvents(){
     showScreen("history");
   });
 }
+function autoResizeTextarea(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
 
+document.addEventListener("DOMContentLoaded", () => {
+  const qTxt = document.getElementById("wsd-question-text");
+  if (qTxt) {
+    autoResizeTextarea(qTxt);
+    qTxt.addEventListener("input", () => autoResizeTextarea(qTxt));
+  }
+});
 document.addEventListener("DOMContentLoaded",()=>{
   loadState();
   ensureStateShape();
