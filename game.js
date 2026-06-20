@@ -939,7 +939,7 @@ function runRevealAnimation(){
           const p = gameState.players.find(pl => pl.id === hr.playerId);
           return p ? `${p.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
         }).join(", ");
-        houseLineText.textContent = `House bonus ${r.houseBonusResolved} was split evenly between ${names}.`;
+        houseLineText.textContent = `🏡 House bonus ${r.houseBonusResolved} was split evenly between ${names}.`;
       } else if(r.houseBonusAmount > 0){
         houseLineText.textContent = r.houseBonusReason || "House bonus was not applied.";
       } else {
