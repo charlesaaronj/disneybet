@@ -157,21 +157,30 @@ function setQuestionDisplay(text){
   const display = $("wsd-question-display");
   const textarea = $("wsd-question-text");
 
-  if (display) {
-    display.textContent = text;
-    display.style.display = text ? "block" : "none";
-
-    // Trigger flash animation on every new question
+  if(display){
+    // Remove animation class and force reflow BEFORE changing content
     display.classList.remove("wsd-question-flash");
-    void display.offsetWidth; // force reflow so animation restarts
-    if (text) display.classList.add("wsd-question-flash");
+    void display.offsetWidth;
+
+    display.textContent = text;
+
+    if(text){
+      display.style.display = "block";
+      // Add animation class AFTER display is set to block
+      requestAnimationFrame(() => {
+        display.classList.add("wsd-question-flash");
+      });
+    } else {
+      display.style.display = "none";
+    }
   }
 
-  if (textarea) {
+  if(textarea){
     textarea.value = text;
     textarea.style.display = "none";
   }
 }
+
 
 
 function showCustomTextarea(){
