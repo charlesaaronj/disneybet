@@ -315,38 +315,38 @@ function startNewRoundCore(){
     scoreBefore:{},scoreAfter:{},collectionsThisRound:[],
     wrongGuessCount:0,authorBonus:0,houseBonusResolved:0,
     houseBonusRecipients:[],houseBonusApplied:false,houseBonusReason:"",
-    answerOrder: shuffle(gameState.players.map(p => p.id)),
-    usedGhost:false 
+    answerOrder:shuffle(gameState.players.map(p=>p.id)),
+    usedGhost:false
   };
   saveState();
   [
-    ["wsd-house-bonus",el=>{el.value="0";}],
-    ["wsd-question-text",el=>{el.readOnly=true;el.value="";}],
-    ["wsd-question-type-badge",el=>{el.textContent="";}],
-    ["wsd-attraction-select",el=>{el.value="";}],
-    ["wsd-attraction-meta",el=>{el.textContent="";}],
-    ["wsd-setupq-error",el=>{el.textContent="";}]
+    ["wsd-house-bonus",         el=>{el.value="0";}],
+    ["wsd-question-type-badge", el=>{el.textContent="";}],
+    ["wsd-attraction-select",   el=>{el.value="";}],
+    ["wsd-attraction-meta",     el=>{el.textContent="";}],
+    ["wsd-setupq-error",        el=>{el.textContent="";}]
   ].forEach(([id,fn])=>{const el=$(id);if(el)fn(el);});
+  setQuestionDisplay("");
   updateQuestionLock();
 }
 function onAttractionChange(){
   if(!gameState)return;
   const attrSel=$("wsd-attraction-select");
   const idx=attrSel?parseInt(attrSel.value,10):NaN;
-  const meta=$("wsd-attraction-meta"),qTxt=$("wsd-question-text"),badge=$("wsd-question-type-badge");
+  const meta=$("wsd-attraction-meta"),badge=$("wsd-question-type-badge");
   if(meta)meta.textContent="";
-  if(qTxt)qTxt.value="";
   if(badge)badge.textContent="";
   if(isNaN(idx)||!gameState.attractions[idx]){
     Object.assign(gameState.currentRound,{attraction:null,question:"",questionType:""});
+    setQuestionDisplay("");
     updateQuestionLock();return;
   }
   const attraction=gameState.attractions[idx];
   gameState.currentRound.attraction=attraction;
   if(meta)meta.textContent=`${attraction.park} • ${attraction.land}`;
-  const {q,type,categoryName}=drawQuestion(attraction);
+  const{q,type,categoryName}=drawQuestion(attraction);
   Object.assign(gameState.currentRound,{question:q,questionType:type});
-  if(qTxt)qTxt.value=q;
+  setQuestionDisplay(q);
   if(badge)badge.textContent=categoryName||labelForType(type);
   saveState();
   updateQuestionLock();
