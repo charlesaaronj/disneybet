@@ -615,8 +615,4 @@ body {
   100% { opacity: 1; transform: scale(1); }
 }
 
-.wsd-question-flash {
-  animation: wsdQuestionFlash 0.4s ease both;
-}
-
 
