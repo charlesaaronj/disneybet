@@ -1,4 +1,4 @@
-{
+const GAME_QUESTIONS = {
   "categories": [
     {
       "id": 1,
