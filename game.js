@@ -84,6 +84,7 @@ function ensureStateShape(){
   gameState.players||=[];
   gameState.history||=[];
   gameState.ghostPool ||= [];
+  gameState.questionUsage ||= {};  // new: for question tracking per attraction
   gameState.players.forEach(p=>{
     if(!Array.isArray(p.collected))p.collected=[];
     if(typeof p.wins!=="number")p.wins=0;
@@ -224,19 +225,15 @@ function startGameFromSetup(){
     }));
     const palette=shuffle(PLAYER_BADGE_COLORS.slice());
     players.forEach(p=>{p.badgeColor=palette.shift()||"#999999";});
-    const usedQuestions={attractions:{},generic:shuffle(parkData.genericQuestions),genericIndex:0};
-    parkData.attractions.forEach(a=>{
-      usedQuestions.attractions[a.name]={questions:shuffle(a.questions),index:0};
-    });
     gameState={
       screen:"setup-question",
       roundNumber:0,
       settings:{park:parkName,startingPoints:START_POINTS,minPoints:MIN_POINTS},
       players,
       lands:[...new Set(parkData.attractions.map(a=>a.land).filter(Boolean))],
-      attractions:parkData.attractions,
-      genericQuestions:parkData.genericQuestions,
-      usedQuestions,
+      attractions:parkData.attractions,      // only metadata now
+      questionUsage:{},                     // new, used for tracking questions
+      ghostPool:[],
       currentRound:null,
       history:[],
       finalBonusesApplied:false
@@ -246,9 +243,9 @@ function startGameFromSetup(){
     Object.assign(gameState.settings,{park:parkName});
     Object.assign(gameState,{
       attractions:parkAttrs,
-      genericQuestions:parkData.genericQuestions,
       lands:[...new Set(parkAttrs.map(a=>a.land).filter(Boolean))]
     });
+    gameState.questionUsage ||= {};
     const existingPlayers=gameState.players||[];
     gameState.players=names.map((name,index)=>{
       const old=existingPlayers.find(p=>p.name.toLowerCase()===name.toLowerCase());
@@ -276,6 +273,28 @@ function startGameFromSetup(){
 }
 
 // -------------- Question setup --------------
+
+// helper: draw from GAME_QUESTIONS and inject attraction name
+function drawQuestionForAttraction(attraction){
+  const cats = (typeof GAME_QUESTIONS!=="undefined" && GAME_QUESTIONS.categories) ? GAME_QUESTIONS.categories : [];
+  if(!cats.length){
+    return {text:"No questions available.",categoryId:null,categoryName:null};
+  }
+  const catIndex=Math.floor(Math.random()*cats.length);
+  const cat=cats[catIndex];
+  if(!cat.questions||!cat.questions.length){
+    return {text:"No questions available in this category.",categoryId:cat.id,categoryName:cat.name};
+  }
+  const qIndex=Math.floor(Math.random()*cat.questions.length);
+  const raw=cat.questions[qIndex];
+  const attractionName=attraction?.name||"{{attraction}}";
+  const text=raw.replace(/{{attraction}}/g,attractionName);
+  // simple tracking of what we used (optional, for future no-repeats)
+  const key=`${attractionName}::${cat.id}`;
+  if(!gameState.questionUsage[key])gameState.questionUsage[key]=[];
+  gameState.questionUsage[key].push(qIndex);
+  return {text,categoryId:cat.id,categoryName:cat.name};
+}
 
 function renderAttractionOptions(){
   const sel=$("wsd-attraction-select");
@@ -319,40 +338,35 @@ function onAttractionChange(){
   if(qTxt)qTxt.value="";
   if(badge)badge.textContent="";
   if(isNaN(idx)||!gameState.attractions[idx]){
-    Object.assign(gameState.currentRound,{attraction:null,question:""});
+    Object.assign(gameState.currentRound,{attraction:null,question:"",questionType:""});
     updateQuestionLock();return;
   }
   const attraction=gameState.attractions[idx];
   gameState.currentRound.attraction=attraction;
   if(meta)meta.textContent=`${attraction.park} • ${attraction.land}`;
-  const {q,type}=drawQuestion(attraction);
+  const {q,type,categoryName}=drawQuestion(attraction);
   Object.assign(gameState.currentRound,{question:q,questionType:type});
   if(qTxt)qTxt.value=q;
-  if(badge)badge.textContent=labelForType(type);
+  if(badge)badge.textContent=categoryName||labelForType(type);
   saveState();
   updateQuestionLock();
 }
 function drawQuestion(attraction){
-  const uq=gameState.usedQuestions,entry=uq.attractions[attraction.name];
-  if(entry&&entry.index<entry.questions.length)return{q:entry.questions[entry.index++],type:"attraction"};
-  if(uq.genericIndex<uq.generic.length)return{q:uq.generic[uq.genericIndex++],type:"generic"};
-  const pool=gameState.genericQuestions;
-  return pool.length
-    ?{q:pool[Math.floor(Math.random()*pool.length)],type:"generic"}
-    :{q:"No questions available.",type:"generic"};
+  const {text,categoryId,categoryName}=drawQuestionForAttraction(attraction);
+  return {q:text,type:"category",categoryId,categoryName};
 }
-const labelForType=t=>t==="attraction"?"Attraction question":t==="generic"?"Generic question":"Custom question";
+const labelForType=t=>t==="category"?"Question":t==="custom"?"Custom question":"Question";
 function onGenerateNewQuestion(){
   const err=$("wsd-setupq-error");
   if(!gameState||!gameState.currentRound.attraction){
     if(err)err.textContent="Select an attraction first.";return;
   }
   if(err)err.textContent="";
-  const {q,type}=drawQuestion(gameState.currentRound.attraction);
+  const {q,type,categoryName}=drawQuestion(gameState.currentRound.attraction);
   Object.assign(gameState.currentRound,{question:q,questionType:type});
   const qTxt=$("wsd-question-text"),badge=$("wsd-question-type-badge");
   if(qTxt)qTxt.value=q;
-  if(badge)badge.textContent=labelForType(type);
+  if(badge)badge.textContent=categoryName||labelForType(type);
   saveState();
 }
 function onEnterCustomQuestion(){
