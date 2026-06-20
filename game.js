@@ -1,3 +1,4 @@
+
 // ===========================================================
 //  Who Said Diz — game.js (minimized lines, same behavior)
 // ===========================================================
@@ -50,12 +51,33 @@ const SCREEN_META={
   "history":       {icon:"📋",title:"Round history",instruction:"A full log of every round played."}
 };
 const PARK_THEMES={
-  "Magic Kingdom":    {hero:"linear-gradient(180deg,#4b0082,#ff69b4)",nav:"rgba(75,0,130,0.95)",avatar:"linear-gradient(135deg,#ff69b4,#800080)"},
-  "EPCOT":            {hero:"linear-gradient(180deg,#003366,#66ccff)",nav:"rgba(0,51,102,0.95)",avatar:"linear-gradient(135deg,#66ccff,#ffffff)"},
-  "Hollywood Studios":{hero:"linear-gradient(180deg,#3b3b3b,#ffcc00)",nav:"rgba(59,59,59,0.95)",avatar:"linear-gradient(135deg,#ffcc00,#c6a530)"},
-  "Animal Kingdom":   {hero:"linear-gradient(180deg,#014422,#8bc34a)",nav:"rgba(1,68,34,0.95)",avatar:"linear-gradient(135deg,#8bc34a,#ffe082)"},
-  "Dollywood":        {hero:"linear-gradient(180deg,#feb234,#c87b2d)",nav:"rgba(28,59,63,0.95)",avatar:"linear-gradient(135deg,#feb234,#c87b2d)"}
+  "Magic Kingdom":{
+    hero:   "linear-gradient(180deg,#4A1060,#9B3A8A)",
+    nav:    "rgba(74,16,96,0.95)",
+    avatar: "linear-gradient(135deg,#9B3A8A,#D4A0C8)"
+  },
+  "EPCOT":{
+    hero:   "linear-gradient(180deg,#0A2E52,#1A6E8A)",
+    nav:    "rgba(10,46,82,0.95)",
+    avatar: "linear-gradient(135deg,#1A6E8A,#7ABDD4)"
+  },
+  "Hollywood Studios":{
+    hero:   "linear-gradient(180deg,#1C1C1C,#8B6914)",
+    nav:    "rgba(28,28,28,0.95)",
+    avatar: "linear-gradient(135deg,#C4960A,#E8C84A)"
+  },
+  "Animal Kingdom":{
+    hero:   "linear-gradient(180deg,#1A3A1A,#4A7A2A)",
+    nav:    "rgba(26,58,26,0.95)",
+    avatar: "linear-gradient(135deg,#4A7A2A,#C8A83A)"
+  },
+  "Dollywood":{
+    hero:   "linear-gradient(180deg,#7A3A10,#C47820)",
+    nav:    "rgba(122,58,16,0.95)",
+    avatar: "linear-gradient(135deg,#C47820,#E8B84A)"
+  }
 };
+
 const NAV_MAP={
   "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
   "select-answer":"wsd-nav-round","guess-wager":"wsd-nav-round","reveal":"wsd-nav-round",
@@ -939,7 +961,7 @@ function runRevealAnimation(){
           const p = gameState.players.find(pl => pl.id === hr.playerId);
           return p ? `${p.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
         }).join(", ");
-        houseLineText.textContent = `🏡 House bonus ${r.houseBonusResolved} was split evenly between ${names}.`;
+        houseLineText.textContent = `House bonus ${r.houseBonusResolved} was split evenly between ${names}.`;
       } else if(r.houseBonusAmount > 0){
         houseLineText.textContent = r.houseBonusReason || "House bonus was not applied.";
       } else {
