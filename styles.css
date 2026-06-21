@@ -735,4 +735,6 @@ body {
   width: auto;
   min-height: 0;
   padding-inline: 1rem;
+  padding: 0.1rem 1rem;
+  font-size: 0.85rem;
 }
