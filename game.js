@@ -154,7 +154,22 @@ function showScreen(name){
 }
 
 // --------- LOCK HELPERS ---------
+function setQuestionTextWithPulse(text) {
+  const qTxt = $("wsd-question-text");
+  if (!qTxt) return;
 
+  qTxt.value = text || "";
+
+  // Only pulse when we actually have text
+  if (text) {
+    qTxt.classList.remove("wsd-question-pulse");
+    void qTxt.offsetWidth; // force reflow so it can re‑add
+    qTxt.classList.add("wsd-question-pulse");
+    setTimeout(() => {
+      qTxt.classList.remove("wsd-question-pulse");
+    }, 250);
+  }
+}
 function updatePlayerInputLock(){
   const parkSel=$("wsd-park-select");
   const selected=!!(parkSel&&parkSel.value);
@@ -418,33 +433,32 @@ function startNewRoundCore(){
   updateQuestionLock();
 }
 
+
 function onAttractionChange(){
-  if(!gameState) return;
-  const attrSel = $("wsd-attraction-select");
-  const idx = attrSel ? parseInt(attrSel.value,10) : NaN;
-  const meta = $("wsd-attraction-meta");
-  const badge = $("wsd-question-type-badge");
+  if(!gameState)return;
+  const attrSel=$( "wsd-attraction-select" );
+  const idx=attrSel?parseInt(attrSel.value,10):NaN;
+  const meta=$( "wsd-attraction-meta" ),badge=$( "wsd-question-type-badge" );
+  if(meta)meta.textContent="";
+  if(badge)badge.textContent="";
 
-  if(meta)  meta.textContent  = "";
-  if(badge) badge.textContent = "";
-
-  if(isNaN(idx) || !gameState.attractions[idx]){
-    Object.assign(gameState.currentRound,{attraction:null,question:"",questionType:""});
-    setQuestionDisplay("Select an attraction from the dropdown to get a question.");
+  if(isNaN(idx)||!gameState.attractions[idx]){
+    Object.assign(gameState.currentRound,{attraction:null,question:""});
+    setQuestionTextWithPulse("");     // clear and no pulse
     updateQuestionLock();
     return;
   }
 
-  const attraction = gameState.attractions[idx];
-  gameState.currentRound.attraction = attraction;
-  if(meta) meta.textContent = `${attraction.park} • ${attraction.land}`;
+  const attraction=gameState.attractions[idx];
+  gameState.currentRound.attraction=attraction;
+  if(meta)meta.textContent=`${attraction.park} • ${attraction.land}`;
 
-  const { q, type, categoryName } = drawQuestion(attraction);
+  const {q,type}=drawQuestion(attraction);
   Object.assign(gameState.currentRound,{question:q,questionType:type});
 
-  setQuestionDisplay(q);
+  setQuestionTextWithPulse(q);        // <- THIS is your cue
 
-  if(badge) badge.textContent = categoryName || labelForType(type);
+  if(badge)badge.textContent=labelForType(type);
   saveState();
   updateQuestionLock();
 }
@@ -454,21 +468,20 @@ function drawQuestion(attraction){
 }
 const labelForType=t=>t==="category"?"Question":t==="custom"?"Custom question":"Question";
 function onGenerateNewQuestion(){
-  const err = $("wsd-setupq-error");
-  if (!gameState || !gameState.currentRound.attraction) {
-    if (err) err.textContent = "Select an attraction first.";
+  const err=$( "wsd-setupq-error" );
+  if(!gameState||!gameState.currentRound.attraction){
+    if(err)err.textContent="Select an attraction first.";
     return;
   }
-  if (err) err.textContent = "";
+  if(err)err.textContent="";
 
-  const { q, type, categoryName } = drawQuestion(gameState.currentRound.attraction);
-  Object.assign(gameState.currentRound, { question: q, questionType: type });
+  const {q,type}=drawQuestion(gameState.currentRound.attraction);
+  Object.assign(gameState.currentRound,{question:q,questionType:type});
 
-  setQuestionDisplay(q);
+  setQuestionTextWithPulse(q);        // <- reuse helper here
 
-  const badge = $("wsd-question-type-badge");
-  if (badge) badge.textContent = categoryName || labelForType(type);
-
+  const badge=$( "wsd-question-type-badge" );
+  if(badge)badge.textContent=labelForType(type);
   saveState();
 }
 
