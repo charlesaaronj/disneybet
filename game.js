@@ -124,24 +124,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initHowToPlaySpotlight();
 });
 
-function hasExistingSession() {
-  try {
-    return !!localStorage.getItem("whoSaidDiz");
-  } catch (e) {
-    return false;
-  }
-}
 function showHeroSpotlightForScreen(screenName) {
   console.log("[spotlight] called for screen:", screenName);
-  if (!screenName) {
-    console.log("[spotlight] no screenName, abort");
-    return;
-  }
-
-  if (hasExistingSession()) {
-    console.log("[spotlight] existing session found, skipping spotlight");
-    return;
-  }
+  if (!screenName) return;
 
   const storageKey = `wsd_hero_spotlight_${screenName}`;
 
@@ -150,14 +135,12 @@ function showHeroSpotlightForScreen(screenName) {
       console.log("[spotlight] already shown for", screenName);
       return;
     }
-  } catch (e) {
-    console.warn("[spotlight] localStorage error", e);
-  }
+  } catch (e) {}
 
   const heroCard = document.querySelector(".wsd-hero-card");
   const overlay  = document.getElementById("wsd-spotlight-overlay");
   if (!heroCard || !overlay) {
-    console.log("[spotlight] missing heroCard or overlay", { heroCard, overlay });
+    console.log("[spotlight] missing heroCard or overlay");
     return;
   }
 
@@ -177,14 +160,41 @@ function showHeroSpotlightForScreen(screenName) {
     document.removeEventListener("click", onDocClick, true);
   }
 
-  function onDocClick(evt) {
+  function onDocClick() {
     clearSpotlight();
   }
 
   if (backdrop) backdrop.addEventListener("click", clearSpotlight);
   document.addEventListener("click", onDocClick, true);
 }
+let firstSetupGameShown = false;
 
+function showScreen(name){
+  // existing toggling + hero text updates...
+  console.log("[showScreen] showing", name);
+
+  if (name === "setup-game" && !firstSetupGameShown) {
+    firstSetupGameShown = true;
+    // do NOT call spotlight yet; wait for welcome modal
+    return;
+  }
+
+  showHeroSpotlightForScreen(name);
+}
+
+function initHeroSpotlightAfterWelcome() {
+  const modalEl = document.getElementById("modal-howto");
+  if (!modalEl || typeof bootstrap === "undefined") return;
+
+  modalEl.addEventListener("hidden.bs.modal", () => {
+    console.log("[spotlight] welcome modal closed -> spotlight setup-game");
+    showHeroSpotlightForScreen("setup-game");
+  }, { once: true });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initHeroSpotlightAfterWelcome();
+});
 
 const NAV_MAP={
   "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
