@@ -1,16 +1,16 @@
 /* ---------- Base ---------- */
 :root {
-  /* Bright, playful coral + gold on soft cream */
-  --wsd-blue-dark:   #FF7A59;   /* primary coral */
-  --wsd-blue-light:  #FFBE76;   /* warm peachy gold */
-  --wsd-bg:          #FFF7EC;   /* soft cream background */
-  --wsd-card-bg:     #FFFFFF;   /* crisp white cards */
+  /* Slightly brighter, fresher reds & golds, less brown */
+  --wsd-blue-dark:   #A3212C;   /* a bit pinker/brighter than #8C1F26 */
+  --wsd-blue-light:  #F3C46F;   /* lighter, more golden */
+  --wsd-bg:          #FFF8ED;   /* less beige, closer to warm cream */
+  --wsd-card-bg:     #FFFDF8;   /* lighter card */
   --wsd-card-radius: 16px;
-  --wsd-shadow-soft: 0 10px 28px rgba(0,0,0,0.12);
-  --wsd-primary:     #FF7A59;
-  --wsd-accent:      #FFC94A;
-  --wsd-success:     #34C759;   /* bright green */
-  --wsd-danger:      #FF3B30;   /* bright red */
+  --wsd-shadow-soft: 0 10px 28px rgba(120,60,20,0.10);
+  --wsd-primary:     #A3212C;
+  --wsd-accent:      #F6C25E;
+  --wsd-success:     #4E8A48;
+  --wsd-danger:      #B33442;
 }
 
 /* Prevent mobile zoom */
@@ -23,7 +23,7 @@ html, body { height: 100%; margin: 0; padding: 0; }
 body {
   background: var(--wsd-bg);
   font-family: 'Lato', 'Nunito', Georgia, serif;
-  color: #241610;
+  color: #2A1712; /* slightly cooler, less muddy than #261712 */
 }
 
 /* App shell */
@@ -46,8 +46,9 @@ body {
 .wsd-hero {
   position: relative;
   padding: 1.2rem 1.2rem 4.6rem;
-  background: linear-gradient(180deg, var(--wsd-blue-dark), var(--wsd-blue-light));
-  color: #FFFFFF;
+  /* shift gradient to a touch more rosy + light cream */
+  background: linear-gradient(180deg, #A3212C, #F7E0B8);
+  color: #FFFDF8;
   overflow: hidden;
 }
 .wsd-hero-title {
@@ -55,20 +56,20 @@ body {
   font-size: 1.4rem;
   font-weight: 900;
   letter-spacing: 0.05em;
-  color: #FFFFFF;
+  color: #FFFDF8;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.35);
 }
 .wsd-hero-subtitle {
   font-size: 0.9rem;
-  opacity: 0.96;
-  color: #FFF7E8;
+  opacity: 0.95;
+  color: #FFEFD1;
 }
 .wsd-hero::before,
 .wsd-hero::after {
   content: "";
   position: absolute;
   border-radius: 50%;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.1);
 }
 .wsd-hero::before {
   width: 160px;
@@ -92,7 +93,7 @@ body {
 .wsd-hero-card {
   background: var(--wsd-card-bg);
   border-radius: 18px;
-  border: 1px solid #FFE0B3;
+  border: 1px solid #E9D3A8;      /* softer border */
   box-shadow: var(--wsd-shadow-soft);
   padding: 0.9rem 1rem;
   display: flex;
@@ -109,7 +110,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFFFFF;
+  color: #FFFDF8;
   font-weight: 700;
   font-size: 1.4rem;
   flex-shrink: 0;
@@ -117,12 +118,12 @@ body {
 .wsd-hero-text-main {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #241610;
+  color: #2A1712;
   font-family: 'Playfair Display', Georgia, serif;
 }
 .wsd-hero-text-instruction {
   font-size: 0.82rem;
-  color: #8B5C3C;
+  color: #6A4526; /* slightly less dark/brown */
   margin-top: 0.15rem;
 }
 
