@@ -814,7 +814,7 @@ function computeRevealAndScoring(){
       Object.assign(r, {
         houseBonusResolved: hb,
         houseBonusApplied: true,
-        houseBonusReason: "House bonus applied evenly."
+        houseBonusReason: "✅ House bonus applied evenly."
       });
     }
   }
@@ -894,7 +894,6 @@ function applyRoundResults(authorId){
     }
   } catch(e) {}
 }
-
 // -------------- Reveal animation & summary modal --------------
 
 function runRevealAnimation(){
@@ -929,10 +928,12 @@ function runRevealAnimation(){
   });
 
   setTimeout(() => {
-    // Show author
+    // Show author / Ghost label
     if(countEl) countEl.textContent = "";
     if(authEl){
-      authEl.textContent = isGhostAnswer ? "👻 Ghost" : (author ? author.name : "Unknown");
+      authEl.textContent = isGhostAnswer
+        ? "👻 Ghost"
+        : (author ? `🎭 ${author.name}` : "🎭 Unknown");
     }
     if(authWrap){
       authWrap.style.display = "block";
@@ -949,11 +950,14 @@ function runRevealAnimation(){
     if(authorLineSummary){
       if(r.wrongGuessCount > 0 && !isGhostAnswer){
         const b = r.authorBonus || 0, w = r.wrongGuessCount;
-        authorLineSummary.textContent = `${author ? author.name : "The author"} earned ${b} point${b !== 1 ? "s" : ""} from ${w} wrong guess${w !== 1 ? "es" : ""}.`;
+        authorLineSummary.textContent =
+          `⭐ Author bonus: ${author ? author.name : "The author"} earned ` +
+          `${b} point${b !== 1 ? "s" : ""} from ${w} wrong guess${w !== 1 ? "es" : ""}.`;
       } else {
         authorLineSummary.textContent = "";
       }
     }
+
     const houseLineText = $("wsd-house-bonus-line");
     if(houseLineText){
       if(r.houseBonusApplied){
@@ -961,9 +965,11 @@ function runRevealAnimation(){
           const p = gameState.players.find(pl => pl.id === hr.playerId);
           return p ? `${p.name} (+${hr.extra})` : `Player ${hr.playerId} (+${hr.extra})`;
         }).join(", ");
-        houseLineText.textContent = `House bonus ${r.houseBonusResolved} was split evenly between ${names}.`;
+        houseLineText.textContent =
+          `🎟️ House bonus: ${r.houseBonusResolved} split evenly between ${names}.`;
       } else if(r.houseBonusAmount > 0){
-        houseLineText.textContent = r.houseBonusReason || "House bonus was not applied.";
+        houseLineText.textContent =
+          `🎟️ House bonus: ${r.houseBonusReason || "Not applied."}`;
       } else {
         houseLineText.textContent = "";
       }
@@ -973,33 +979,44 @@ function runRevealAnimation(){
       const modalEl = $("modal-no-correct");
       if(modalEl && typeof bootstrap !== "undefined"){
         const titleEl = modalEl.querySelector(".modal-title");
-        if(titleEl) titleEl.textContent = "Summary";
+        if(titleEl) titleEl.textContent = "📝 Round summary";
+
         const authorLine = $("wsd-no-correct-author-line");
-        const houseLine = $("wsd-house-bonus-line");
+        const houseLine  = $("wsd-house-bonus-line");
+
         if(authorLine){
           const winnerNames = r.correctGuessers.length
-            ? r.correctGuessers.map(pid => gameState.players.find(p => p.id === pid)?.name).filter(Boolean).join(", ")
+            ? r.correctGuessers
+                .map(pid => gameState.players.find(p => p.id === pid)?.name)
+                .filter(Boolean)
+                .join(", ")
             : null;
+
           if(isGhostAnswer){
             authorLine.textContent = winnerNames
-              ? `${winnerNames} correctly guessed Ghost.`
-              : "Nobody guessed Ghost this round.";
+              ? `🎉 Winners: ${winnerNames} correctly guessed Ghost.`
+              : "😱 Nobody guessed Ghost this round.";
           } else {
             authorLine.textContent = winnerNames
-              ? `${winnerNames} got it right this round.`
-              : `Nobody guessed ${author ? author.name : "the author"} this round.`;
+              ? `🎉 Winners: ${winnerNames} got it right this round.`
+              : `🤔 Nobody guessed ${author ? author.name : "the author"} this round.`;
           }
         }
+
         let bonusLine = document.getElementById("wsd-author-bonus-line");
         if(bonusLine) bonusLine.remove();
+
         if(r.authorBonus > 0 && !isGhostAnswer){
           const b = r.authorBonus, w = r.wrongGuessCount;
           bonusLine = document.createElement("p");
           bonusLine.id = "wsd-author-bonus-line";
           bonusLine.className = (houseLine ? houseLine.className : "") + " wsd-text-small";
-          bonusLine.textContent = `${author ? author.name : "The author"} earned ${b} point${b !== 1 ? "s" : ""} from ${w} wrong guess${w !== 1 ? "es" : ""}.`;
+          bonusLine.textContent =
+            `⭐ Author bonus: ${author ? author.name : "The author"} earned ` +
+            `${b} point${b !== 1 ? "s" : ""} from ${w} wrong guess${w !== 1 ? "es" : ""}.`;
           if(authorLine) authorLine.insertAdjacentElement("afterend", bonusLine);
         }
+
         setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
       }
     } catch(e) {}
@@ -1012,7 +1029,7 @@ function runRevealAnimation(){
         let guessName = "";
         if(wager){
           if(wager.guessedAuthorId === "ghost"){
-            guessName = "Ghost";
+            guessName = "👻 Ghost";
           } else {
             const guessedPlayer = gameState.players.find(pl => pl.id === parseInt(wager.guessedAuthorId, 10));
             if(guessedPlayer) guessName = guessedPlayer.name;
@@ -1025,8 +1042,12 @@ function runRevealAnimation(){
         row.style.animationDelay = `${i * 0.07}s`;
         row.innerHTML = `
           <div>
-            <div class="wsd-score-name">${p ? p.name : "?"}${ok ? " ✓" : ""}</div>
-            <div class="wsd-score-meta">Guess: ${guessName} · Wager: ${wager ? wager.amount : 0}</div>
+            <div class="wsd-score-name">
+              ${ok ? "✅ " : ""}${p ? p.name : "?"}
+            </div>
+            <div class="wsd-score-meta">
+              Guess: ${guessName || "—"} · Wager: ${wager ? wager.amount : 0}
+            </div>
           </div>
           <div class="wsd-score-value ${payout.delta >= 0 ? "text-success" : "text-danger"}">${dStr}</div>`;
         if(resultsEl) resultsEl.appendChild(row);
