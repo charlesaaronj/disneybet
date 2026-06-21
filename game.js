@@ -79,6 +79,43 @@ const PARK_THEMES={
   }
 };
 
+const SPOTLIGHT_KEY = "wsd_hero_panel_spotlight_shown";
+
+function showHeroPanelSpotlightOnce() {
+  try {
+    if (localStorage.getItem(SPOTLIGHT_KEY) === "1") return;
+  } catch (e) {
+    // if localStorage fails, just show it once in-session
+  }
+
+  const heroCard = document.querySelector(".wsd-hero-card");
+  const overlay  = document.getElementById("wsd-spotlight-overlay");
+  const okBtn    = document.getElementById("wsd-spotlight-ok");
+  if (!heroCard || !overlay || !okBtn) return;
+
+  heroCard.classList.add("wsd-hero-card-spotlight");
+  overlay.style.display = "block";
+
+  okBtn.onclick = () => {
+    heroCard.classList.remove("wsd-hero-card-spotlight");
+    overlay.style.display = "none";
+    try { localStorage.setItem(SPOTLIGHT_KEY, "1"); } catch (e) {}
+  };
+}
+
+function initHowToPlaySpotlight() {
+  const modalEl = document.getElementById("modal-howto");
+  if (!modalEl || typeof bootstrap === "undefined") return;
+
+  modalEl.addEventListener("hidden.bs.modal", () => {
+    showHeroPanelSpotlightOnce();
+  }, { once: true });
+}
+
+// Call during app startup after DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+  initHowToPlaySpotlight();
+});
 
 const NAV_MAP={
   "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
@@ -1350,6 +1387,7 @@ function abandonRound(){
     startNewRoundCore();
   }
 }
+
 
 // -------------- Wire events & bootstrap --------------
 
