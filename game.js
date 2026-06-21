@@ -184,12 +184,14 @@ function showScreen(name){
 }
 
 function initHeroSpotlightAfterWelcome() {
-  const modalEl = document.getElementById("modal-howto");
-  if (!modalEl || typeof bootstrap === "undefined") return;
+  const modalEl = document.getElementById("modal-welcome"); // <- your real id
+  if (!modalEl || typeof bootstrap === "undefined") {
+    console.log("[spotlight] no modal-welcome or bootstrap");
+    return;
+  }
 
   modalEl.addEventListener("hidden.bs.modal", () => {
-    // When the welcome modal closes the first time,
-    // now show the spotlight for setup-game
+    console.log("[spotlight] welcome modal closed -> spotlight setup-game");
     showHeroSpotlightForScreen("setup-game");
   }, { once: true });
 }
@@ -197,6 +199,7 @@ function initHeroSpotlightAfterWelcome() {
 document.addEventListener("DOMContentLoaded", () => {
   initHeroSpotlightAfterWelcome();
 });
+
 
 const NAV_MAP={
   "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
