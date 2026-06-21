@@ -647,7 +647,8 @@ body {
 }
 
 #wsd-question-display {
-  transition: background-color 0.25s ease;
+  /*transition: background-color 0.25s ease;*/
+      animation: wsdAnswerGlow 1.1s ease-in-out 2;
 }
 
 #wsd-question-display.wsd-question-flash {
