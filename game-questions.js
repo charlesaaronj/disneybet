@@ -14,7 +14,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 2,
-      "name": What-If",
+      "name": "What-If",
       "description": "One magical or absurd change is applied to {{attraction}}, and players decide the outcome.",
       "questions": [
         "Cosmic Carpentry Co. misreads the blueprints and changes one rule of physics inside {{attraction}}. What rule changes?",
@@ -170,7 +170,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 15,
-      "name": Pre/Post",
+      "name": "Pre/Post",
       "description": "Focus on phases around {{attraction}}: queue, preshow, postshow.",
       "questions": [
         "QueueTube’s \"Lines We Loved\" gives {{attraction}}’s queue an episode. What recurring gag, detail, or mini-story do they feature?",
