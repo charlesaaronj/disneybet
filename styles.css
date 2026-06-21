@@ -749,3 +749,37 @@ p, h1, h2, h3, h4, h5, h6, span, label, li {
 #tutorial-tooltip.arrow-none::before {
   display: none;
 }
+/* White background on all main form controls */
+.wsd-form-control,
+.wsd-form-select,
+input.wsd-form-control,
+select.wsd-form-select {
+  background-color: #ffffff !important;
+  color: #1a1035 !important;   /* dark text so it stays readable */
+}
+
+/* Placeholders inside white inputs */
+.wsd-form-control::placeholder,
+input.wsd-form-control::placeholder {
+  color: #6b7280;              /* medium gray */
+  opacity: 1;
+}
+
+/* On focus: keep white background, add purple border glow */
+.wsd-form-control:focus,
+.wsd-form-select:focus,
+input.wsd-form-control:focus,
+select.wsd-form-select:focus {
+  background-color: #ffffff !important;
+  color: #1a1035 !important;
+  border-color: var(--bbb-purple-light);
+  box-shadow: 0 0 0 3px rgba(167,139,250,0.35);
+  outline: none;
+}
+
+/* Dropdown options (where supported) */
+.wsd-form-select option {
+  background-color: #ffffff;
+  color: #1a1035;
+}
+
