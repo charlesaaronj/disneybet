@@ -709,7 +709,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   max-width: 480px;        /* was 420px; can go up to your .wsd-main width */
-  width: calc(30% - 2.4rem); /* leave a little side padding on small screens */
+  width: calc(27% - 2.4rem); /* leave a little side padding on small screens */
   background: #FFFDF8;
   border-radius: 16px;
   padding: 0.9rem 1rem 0.9rem;
