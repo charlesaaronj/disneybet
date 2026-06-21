@@ -78,6 +78,7 @@ const PARK_THEMES={
     avatar: "linear-gradient(135deg,#C47820,#E8B84A)"
   }
 };
+let firstSetupGameShown = false;
 
 const SPOTLIGHT_KEY = "wsd_hero_panel_spotlight_shown";
 
@@ -167,7 +168,7 @@ function showHeroSpotlightForScreen(screenName) {
   if (backdrop) backdrop.addEventListener("click", clearSpotlight);
   document.addEventListener("click", onDocClick, true);
 }
-let firstSetupGameShown = false;
+
 
 function showScreen(name){
   // existing toggling + hero text updates...
@@ -187,7 +188,8 @@ function initHeroSpotlightAfterWelcome() {
   if (!modalEl || typeof bootstrap === "undefined") return;
 
   modalEl.addEventListener("hidden.bs.modal", () => {
-    console.log("[spotlight] welcome modal closed -> spotlight setup-game");
+    // When the welcome modal closes the first time,
+    // now show the spotlight for setup-game
     showHeroSpotlightForScreen("setup-game");
   }, { once: true });
 }
@@ -258,18 +260,26 @@ function applyParkTheme(parkName){
 const ALL_SCREENS=Object.keys(SCREEN_META);
 function showScreen(name){
   ALL_SCREENS.forEach(key=>{
-    const el=$(`screen-${key}`);
-    if(el)el.classList.toggle("wsd-screen-active",key===name);
+    const el = $(`screen-${key}`);
+    if (el) el.classList.toggle("wsd-screen-active", key === name);
   });
-  if(gameState){gameState.screen=name;saveState();}
-  const m=SCREEN_META[name]||SCREEN_META["setup-game"];
-  [["wsd-step-icon",m.icon],["wsd-step-title",m.title],["wsd-step-instruction",m.instruction]]
-    .forEach(([id,val])=>{const el=$(id);if(el)el.textContent=val;});
-  $$(".wsd-nav-item").forEach(b=>b.classList.remove("wsd-nav-item-active"));
-  const navId=NAV_MAP[name];
-  if(navId&&$(navId))$(navId).classList.add("wsd-nav-item-active");
+  if (gameState) { gameState.screen = name; saveState(); }
 
-  // After hero panel text is updated, show spotlight once per screen
+  const m = SCREEN_META[name] || SCREEN_META["setup-game"];
+  [["wsd-step-icon",m.icon],["wsd-step-title",m.title],["wsd-step-instruction",m.instruction]]
+    .forEach(([id,val]) => { const el = $(id); if (el) el.textContent = val; });
+
+  $$(".wsd-nav-item").forEach(b => b.classList.remove("wsd-nav-item-active"));
+  const navId = NAV_MAP[name];
+  if (navId && $(navId)) $(navId).classList.add("wsd-nav-item-active");
+
+  // NEW: suppress spotlight the very first time setup-game is shown
+  if (name === "setup-game" && !firstSetupGameShown) {
+    firstSetupGameShown = true;
+    return;   // do NOT call showHeroSpotlightForScreen yet
+  }
+
+  // For all other times / other screens, use normal spotlight logic
   showHeroSpotlightForScreen(name);
 }
 
