@@ -667,3 +667,66 @@ body {
   display: none;
 }
 
+/* ---------- First-time hero-card spotlight ---------- */
+
+.wsd-spotlight-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  pointer-events: none; /* only tooltip/button take clicks */
+}
+
+.wsd-spotlight-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+}
+
+/* Highlight the existing hero card */
+.wsd-hero-card.wsd-hero-card-spotlight {
+  position: relative;
+  z-index: 41;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.9),
+              0 18px 40px rgba(0,0,0,0.45);
+  transform: scale(1.02);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Tooltip anchored below the hero card area */
+.wsd-spotlight-tooltip {
+  position: absolute;
+  top: 120px;          /* tweak if needed based on your hero height */
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 420px;
+  background: #FFFDF8;
+  border-radius: 16px;
+  padding: 0.9rem 1rem 0.9rem;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+  border: 1px solid #D3E3ED;
+  pointer-events: auto;
+}
+
+.wsd-spotlight-title {
+  margin: 0 0 0.25rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1rem;
+  color: #1F2430;
+}
+
+.wsd-spotlight-text {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  color: #5A6574;
+}
+
+.wsd-spotlight-ok {
+  width: auto;
+  min-height: 0;
+  padding-inline: 1rem;
+}
+
