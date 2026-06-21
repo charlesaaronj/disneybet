@@ -684,22 +684,24 @@ body {
   inset: 0;
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(2px);
+  z-index: 40;
 }
 
-/* Highlight the existing hero card */
+/* Keep hero card above the dark backdrop so it looks “cut out” */
 .wsd-hero-card.wsd-hero-card-spotlight {
   position: relative;
-  z-index: 41;
+  z-index: 41;  /* above backdrop, below tooltip */
   box-shadow: 0 0 0 4px rgba(255,255,255,0.9),
               0 18px 40px rgba(0,0,0,0.45);
   transform: scale(1.02);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-/* Tooltip anchored below the hero card area */
+/* Tooltip sits below the hero card and above backdrop */
 .wsd-spotlight-tooltip {
   position: absolute;
-  top: 120px;          /* tweak if needed based on your hero height */
+  /* place it noticeably BELOW the hero card area */
+  top: 220px;          /* adjust until it’s clearly below your hero */
   left: 50%;
   transform: translateX(-50%);
   max-width: 420px;
@@ -709,6 +711,7 @@ body {
   box-shadow: 0 10px 26px rgba(0,0,0,0.35);
   border: 1px solid #D3E3ED;
   pointer-events: auto;
+  z-index: 42;         /* above backdrop and hero card */
 }
 
 .wsd-spotlight-title {
