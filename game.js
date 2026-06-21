@@ -340,6 +340,13 @@ function startGameFromSetup(){
 }
 
 // -------------- Question setup --------------
+function flashQuestionDisplay(){
+  const el = $("wsd-question-display");
+  if(!el) return;
+  el.classList.remove("wsd-question-flash");
+  void el.offsetWidth;          // force reflow so animation can restart
+  el.classList.add("wsd-question-flash");
+}
 
 // helper: draw from GAME_QUESTIONS and inject attraction name
 function drawQuestionForAttraction(attraction){
@@ -420,17 +427,17 @@ function startNewRoundCore(){
 }
 
 function onAttractionChange(){
-  if (!gameState) return;
+  if(!gameState) return;
   const attrSel = $("wsd-attraction-select");
-  const idx = attrSel ? parseInt(attrSel.value, 10) : NaN;
+  const idx = attrSel ? parseInt(attrSel.value,10) : NaN;
   const meta = $("wsd-attraction-meta");
   const badge = $("wsd-question-type-badge");
 
-  if (meta) meta.textContent = "";
-  if (badge) badge.textContent = "Pending";
+  if(meta)  meta.textContent  = "";
+  if(badge) badge.textContent = "";
 
-  if (isNaN(idx) || !gameState.attractions[idx]) {
-    Object.assign(gameState.currentRound, { attraction: null, question: "", questionType: "" });
+  if(isNaN(idx) || !gameState.attractions[idx]){
+    Object.assign(gameState.currentRound,{attraction:null,question:"",questionType:""});
     setQuestionDisplay("Select an attraction from the dropdown to get a question.");
     updateQuestionLock();
     return;
@@ -438,14 +445,15 @@ function onAttractionChange(){
 
   const attraction = gameState.attractions[idx];
   gameState.currentRound.attraction = attraction;
-  if (meta) meta.textContent = `${attraction.park} • ${attraction.land}`;
+  if(meta) meta.textContent = `${attraction.park} • ${attraction.land}`;
 
   const { q, type, categoryName } = drawQuestion(attraction);
-  Object.assign(gameState.currentRound, { question: q, questionType: type });
+  Object.assign(gameState.currentRound,{question:q,questionType:type});
 
   setQuestionDisplay(q);
-  if (badge) badge.textContent = categoryName || labelForType(type);
+  flashQuestionDisplay();              // <- this triggers the visual flash
 
+  if(badge) badge.textContent = categoryName || labelForType(type);
   saveState();
   updateQuestionLock();
 }
