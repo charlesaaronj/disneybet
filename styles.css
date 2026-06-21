@@ -670,5 +670,5 @@ body {
 
 /* Class that triggers the animation */
 .wsd-question-pop {
-  animation: wsdQuestionPop 0.35s ease-out;
+  animation: wsdQuestionPop 0.5s ease-in-out 2;
 }
