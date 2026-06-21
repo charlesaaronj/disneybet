@@ -176,26 +176,37 @@ function updateQuestionLock(){
     const btn=$(id);if(btn)btn.disabled=!hasAttraction;
   });
 }
+function flashQuestionDisplay() {
+  const display = $("wsd-question-display");
+  if (!display) return;
+
+  display.classList.remove("wsd-question-flash");
+  void display.offsetWidth; // restart transition
+  display.classList.add("wsd-question-flash");
+
+  setTimeout(() => {
+    display.classList.remove("wsd-question-flash");
+  }, 250);
+}
 function setQuestionDisplay(text) {
   const display = $("wsd-question-display");
   const textarea = $("wsd-question-text");
 
   if (display) {
-    // Show or hide the display box and set its text
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
 
-    // Flash the background when a non-empty question appears
     if (text) {
-      display.classList.remove("wsd-question-flash");
-      void display.offsetWidth; // restart transition
-      display.classList.add("wsd-question-flash");
-
-      setTimeout(() => {
-        display.classList.remove("wsd-question-flash");
-      }, 250);
+      flashQuestionDisplay();   // <- this makes the div flash
     }
   }
+
+  // Keep textarea in sync for custom questions
+  if (textarea) {
+    textarea.value = text || "";
+    textarea.style.display = "none";
+  }
+}
 
   // Keep textarea in sync for custom-mode / proceedToAnswers
   if (textarea) {
