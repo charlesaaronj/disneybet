@@ -132,26 +132,58 @@ function hasExistingSession() {
   }
 }
 function showHeroSpotlightForScreen(screenName) {
-  if (!screenName) return;
+  console.log("[spotlight] called for screen:", screenName);
+  if (!screenName) {
+    console.log("[spotlight] no screenName, abort");
+    return;
+  }
 
-  // If there is already a saved session, skip all hero spotlights
-  if (hasExistingSession()) return;
+  if (hasExistingSession()) {
+    console.log("[spotlight] existing session found, skipping spotlight");
+    return;
+  }
 
-  // One-time per screen: each screen gets its own flag
   const storageKey = `wsd_hero_spotlight_${screenName}`;
 
   try {
-    if (localStorage.getItem(storageKey) === "1") return;
-  } catch (e) {}
+    if (localStorage.getItem(storageKey) === "1") {
+      console.log("[spotlight] already shown for", screenName);
+      return;
+    }
+  } catch (e) {
+    console.warn("[spotlight] localStorage error", e);
+  }
 
   const heroCard = document.querySelector(".wsd-hero-card");
   const overlay  = document.getElementById("wsd-spotlight-overlay");
-  if (!heroCard || !overlay) return;
+  if (!heroCard || !overlay) {
+    console.log("[spotlight] missing heroCard or overlay", { heroCard, overlay });
+    return;
+  }
 
+  console.log("[spotlight] showing spotlight for", screenName);
   heroCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
 
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
+
+  function clearSpotlight() {
+    console.log("[spotlight] clearing spotlight for", screenName);
+    heroCard.classList.remove("wsd-hero-card-spotlight");
+    overlay.style.display = "none";
+    try { localStorage.setItem(storageKey, "1"); } catch (e) {}
+
+    if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
+    document.removeEventListener("click", onDocClick, true);
+  }
+
+  function onDocClick(evt) {
+    clearSpotlight();
+  }
+
+  if (backdrop) backdrop.addEventListener("click", clearSpotlight);
+  document.addEventListener("click", onDocClick, true);
+}
 
   function clearSpotlight() {
     heroCard.classList.remove("wsd-hero-card-spotlight");
