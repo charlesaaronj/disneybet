@@ -180,10 +180,10 @@ function flashQuestionDisplay() {
   const display = $("wsd-question-display");
   if (!display) return;
 
-  // Remove and re-add to restart the animation
   display.classList.remove("wsd-question-pop");
-  void display.offsetWidth; // force reflow
+  void display.offsetWidth; // restart animation
   display.classList.add("wsd-question-pop");
+}
 }
 function setQuestionDisplay(text) {
   const display = $("wsd-question-display");
