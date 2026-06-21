@@ -104,7 +104,7 @@ function showHeroPanelSpotlightOnce() {
 }
 
 function initHowToPlaySpotlight() {
-  const modalEl = document.getElementById("modal-howto");
+  const modalEl = document.getElementById("modal-welcome");
   if (!modalEl || typeof bootstrap === "undefined") return;
 
   modalEl.addEventListener("hidden.bs.modal", () => {
