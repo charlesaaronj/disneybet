@@ -700,18 +700,18 @@ body {
 /* Tooltip sits below the hero card and above backdrop */
 .wsd-spotlight-tooltip {
   position: absolute;
-  /* place it noticeably BELOW the hero card area */
-  top: 220px;          /* adjust until it’s clearly below your hero */
+  top: 220px;              /* or your JS-calculated top */
   left: 50%;
   transform: translateX(-50%);
-  max-width: 420px;
+  max-width: 480px;        /* was 420px; can go up to your .wsd-main width */
+  width: calc(100% - 2.4rem); /* leave a little side padding on small screens */
   background: #FFFDF8;
   border-radius: 16px;
   padding: 0.9rem 1rem 0.9rem;
   box-shadow: 0 10px 26px rgba(0,0,0,0.35);
   border: 1px solid #D3E3ED;
   pointer-events: auto;
-  z-index: 42;         /* above backdrop and hero card */
+  z-index: 42;
 }
 
 .wsd-spotlight-title {
