@@ -184,7 +184,6 @@ function flashQuestionDisplay() {
   void display.offsetWidth; // restart animation
   display.classList.add("wsd-question-pop");
 }
-}
 function setQuestionDisplay(text) {
   const display = $("wsd-question-display");
   const textarea = $("wsd-question-text");
