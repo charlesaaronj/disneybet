@@ -561,6 +561,7 @@ body {
   border-radius: 10px;
   border-left: 3px solid #C4A265;
   margin-top: 12px;
+  animation: wsdPop 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 
 /* ---------- Global modal theme (all Bootstrap modals) ---------- */
