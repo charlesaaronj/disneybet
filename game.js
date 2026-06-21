@@ -183,14 +183,11 @@ function setQuestionDisplay(text){
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
 
-    // Hard reset animation on the element itself
-    display.style.animationName = "none";
-    // force reflow
-    void display.offsetWidth;
+    // Animate the box (not the text)
+    display.classList.remove("wsd-answer-highlight","wsd-anim-pop");
+    void display.offsetWidth; // force reflow so animations can restart
     if (text) {
-      display.style.animationName = "wsdQuestionFlash";
-    } else {
-      display.style.animationName = "none";
+      display.classList.add("wsd-answer-highlight","wsd-anim-pop");
     }
   }
 
