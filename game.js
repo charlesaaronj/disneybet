@@ -375,24 +375,41 @@ function startGameFromSetup(){
 
 // helper: draw from GAME_QUESTIONS and inject attraction name
 function drawQuestionForAttraction(attraction){
-  const cats = (typeof GAME_QUESTIONS!=="undefined" && GAME_QUESTIONS.categories) ? GAME_QUESTIONS.categories : [];
-  if(!cats.length){
-    return {text:"No questions available.",categoryId:null,categoryName:null};
+  const cats = (typeof GAME_QUESTIONS!=="undefined" && GAME_QUESTIONS.categories)
+    ? GAME_QUESTIONS.categories
+    : [];
+  if (!cats.length) {
+    return { text: "No questions available.", categoryId: null, categoryName: null };
   }
-  const catIndex=Math.floor(Math.random()*cats.length);
-  const cat=cats[catIndex];
-  if(!cat.questions||!cat.questions.length){
-    return {text:"No questions available in this category.",categoryId:cat.id,categoryName:cat.name};
+
+  const catIndex = Math.floor(Math.random() * cats.length);
+  const cat = cats[catIndex];
+  if (!cat.questions || !cat.questions.length) {
+    return {
+      text: "No questions available in this category.",
+      categoryId: cat.id,
+      categoryName: cat.name
+    };
   }
-  const qIndex=Math.floor(Math.random()*cat.questions.length);
-  const raw=cat.questions[qIndex];
-  const attractionName=attraction?.name||"{{attraction}}";
-  const text=raw.replace(/{{attraction}}/g,attractionName);
+
+  const qIndex = Math.floor(Math.random() * cat.questions.length);
+  const raw = cat.questions[qIndex];
+
+  const attractionName = attraction?.name || "{{attraction}}";
+  const landName       = attraction?.land || "{{land}}";
+  const parkName       = attraction?.park || "{{park}}";
+
+  const text = raw
+    .replace(/{{attraction}}/g, attractionName)
+    .replace(/{{land}}/g,       landName)
+    .replace(/{{park}}/g,       parkName);
+
   // simple tracking of what we used (optional, for future no-repeats)
-  const key=`${attractionName}::${cat.id}`;
-  if(!gameState.questionUsage[key])gameState.questionUsage[key]=[];
+  const key = `${attractionName}::${cat.id}`;
+  if (!gameState.questionUsage[key]) gameState.questionUsage[key] = [];
   gameState.questionUsage[key].push(qIndex);
-  return {text,categoryId:cat.id,categoryName:cat.name};
+
+  return { text, categoryId: cat.id, categoryName: cat.name };
 }
 
 function renderAttractionOptions(){
