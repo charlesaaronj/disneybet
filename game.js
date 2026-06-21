@@ -185,26 +185,6 @@ function showHeroSpotlightForScreen(screenName) {
   document.addEventListener("click", onDocClick, true);
 }
 
-  function clearSpotlight() {
-    heroCard.classList.remove("wsd-hero-card-spotlight");
-    overlay.style.display = "none";
-
-    // Mark this screen as “seen”
-    try { localStorage.setItem(storageKey, "1"); } catch (e) {}
-
-    if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
-    document.removeEventListener("click", onDocClick, true);
-  }
-
-  // Any click anywhere dismisses
-  function onDocClick(evt) {
-    clearSpotlight();
-  }
-
-  if (backdrop) backdrop.addEventListener("click", clearSpotlight);
-  document.addEventListener("click", onDocClick, true);
-}
-
 
 const NAV_MAP={
   "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
