@@ -809,7 +809,7 @@
           var modal = new bootstrap.Modal(welcomeEl);
           modal.show();
 
-          // When the welcome modal fully hides, trigger the spotlight tour (first time only)
+          // When the welcome modal fully hides, start the tour (first time only)
           welcomeEl.addEventListener('hidden.bs.modal', function onHidden() {
             if (!localStorage.getItem('wsd_tutorial_done') &&
                 typeof window.replayTutorial === 'function') {
@@ -817,13 +817,12 @@
             }
             welcomeEl.removeEventListener('hidden.bs.modal', onHidden);
           });
-
         }, 250);
       }
     } catch (e) {}
   });
 
-  // UPDATED: collections screen now shows only counts + bars, no attraction names
+  // Collections renderer (unchanged from your version)
   window.renderCollectionsScreen = function () {
     var container = document.getElementById("wsd-collections-progress");
     if (!container || (!window.gameState && typeof gameState === "undefined")) return;
@@ -880,7 +879,7 @@
   const STEPS = [
     {
       target: '#wsd-park-select',
-      text: "Start by picking your park. Your questions and attractions will be pulled from here."
+      text: "Start by picking your park. All your questions and attractions come from here."
     },
     {
       target: '#wsd-player-inputs',
@@ -892,11 +891,7 @@
     },
     {
       target: '#wsd-start-game',
-      text: "When your park and players are ready, tap Start Game to begin your first round."
-    },
-    {
-      target: '[data-bs-target="#modal-wager-help"]',
-      text: "During guessing, use this link if you need a quick reminder about how wagers work."
+      text: "When your park and players are set, tap Start Game to begin your first round."
     }
   ];
 
@@ -912,38 +907,45 @@
   let currentStep = 0;
   const PAD = 10;
 
+  // Use the main app column as the coordinate reference
+  const appShell = document.querySelector('.wsd-main') || document.body;
+
   function positionSpotlight(el) {
     const r = el.getBoundingClientRect();
+    const containerRect = appShell.getBoundingClientRect();
+
+    const top  = r.top  - containerRect.top - PAD;
+    const left = r.left - containerRect.left - PAD;
+
     spotlight.style.width  = `${r.width  + PAD * 2}px`;
     spotlight.style.height = `${r.height + PAD * 2}px`;
-    spotlight.style.top    = `${r.top  + window.scrollY - PAD}px`;
-    spotlight.style.left   = `${r.left - PAD}px`;
+    spotlight.style.top    = `${top}px`;
+    spotlight.style.left   = `${left}px`;
   }
 
   function positionTooltip(el) {
-    const r   = el.getBoundingClientRect();
+    const r  = el.getBoundingClientRect();
+    const containerRect = appShell.getBoundingClientRect();
     const tipW = tooltip.offsetWidth  || 300;
     const tipH = tooltip.offsetHeight || 120;
-    const vw   = window.innerWidth;
-    const vh   = window.innerHeight;
     const GAP  = 14;
 
-    let top;
+    let relTop  = r.bottom - containerRect.top + GAP;
+    let relLeft = r.left   - containerRect.left;
     let arrowClass = '';
 
-    if (r.bottom + GAP + tipH < vh - 12) {
-      top = r.bottom + window.scrollY + GAP;
-    } else {
-      top = r.top + window.scrollY - tipH - GAP;
+    const appHeight = containerRect.height;
+    if (relTop + tipH > appHeight - 12) {
+      relTop = r.top - containerRect.top - tipH - GAP;
       arrowClass = 'arrow-bottom';
     }
 
-    let left = r.left;
-    if (left + tipW > vw - 12) left = vw - tipW - 12;
-    if (left < 12) left = 12;
+    const appWidth = containerRect.width;
+    if (relLeft + tipW > appWidth - 12) relLeft = appWidth - tipW - 12;
+    if (relLeft < 12) relLeft = 12;
 
-    tooltip.style.top  = `${top}px`;
-    tooltip.style.left = `${left}px`;
+    tooltip.style.top  = `${relTop}px`;
+    tooltip.style.left = `${relLeft}px`;
     tooltip.className  = arrowClass || '';
   }
 
@@ -996,6 +998,7 @@
     localStorage.setItem('wsd_tutorial_done', '1');
   }
 
+  // Expose so other code could trigger the tour if needed
   window.replayTutorial = startTutorial;
 
   nextBtn.addEventListener('click', () => {
@@ -1014,7 +1017,14 @@
       showStep(currentStep);
     }
   });
+
+  window.addEventListener('scroll', () => {
+    if (!overlay.classList.contains('tutorial-hidden')) {
+      showStep(currentStep);
+    }
+  }, { passive: true });
 })();
 </script>
+
 </body>
 </html>
