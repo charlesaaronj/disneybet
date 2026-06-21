@@ -706,7 +706,7 @@ body {
   z-index: 40;
 }
 
-/* Keep hero card above the dark backdrop so it looks “cut out” */
+/* Highlight the existing hero card */
 .wsd-hero-card.wsd-hero-card-spotlight {
   position: relative;
   z-index: 41;  /* above backdrop, below tooltip */
@@ -716,21 +716,22 @@ body {
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-/* Tooltip sits below the hero card and above backdrop */
+/* Tooltip box for “watch this panel” */
 .wsd-spotlight-tooltip {
   position: absolute;
-  top: 220px;
+  top: 220px;                  /* can be overridden in JS using getBoundingClientRect */
   left: 50%;
   transform: translateX(-50%);
-  max-width: 480px;
-  width: calc(100% - 2.4rem);
-  background: var(--wsd-card-bg);
+  max-width: 480px;            /* align with .wsd-main max width */
+  width: calc(100% - 2.4rem);  /* inset slightly from screen edges */
+
+  background: #FFFDF8;
   border-radius: 16px;
   padding: 0.9rem 1rem 0.9rem;
   box-shadow: 0 10px 26px rgba(0,0,0,0.35);
-  border: 1px solid var(--wsd-border-soft);
+  border: 1px solid #D3E3ED;
   pointer-events: auto;
-  z-index: 42;
+  z-index: 42;                 /* above backdrop and hero card */
 }
 
 .wsd-spotlight-title {
@@ -742,7 +743,7 @@ body {
 
 .wsd-spotlight-text {
   margin: 0 0 0.6rem;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #5A6574;
 }
 
