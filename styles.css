@@ -649,11 +649,10 @@ body {
   background: linear-gradient(180deg,#8C1F26,#F0B857) !important;
 }
 
-/* Let the question display gently flash when updated */
 #wsd-question-display {
   transition: background-color 0.25s ease;
 }
 
 #wsd-question-display.wsd-question-flash {
-  background-color: #FFE6B8 !important; /* slightly brighter gold */
+  background-color: #FFEB99 !important; /* noticeably brighter/yellower */
 }
