@@ -562,6 +562,9 @@ body {
   border-left: 3px solid #C4A265;
   margin-top: 12px;
 }
+.wsd-question-pulse {
+  background-color: #FFE6B8; /* slightly brighter gold for a moment */
+}
 
 /* ---------- Global modal theme (all Bootstrap modals) ---------- */
 
