@@ -45,7 +45,7 @@ body {
 .wsd-hero {
   position: relative;
   padding: 1.2rem 1.2rem 4.6rem;
-  background: linear-gradient(180deg, #6B1414, #B8780A);
+  background: linear-gradient(180deg, #6B1414, #f2d9ad);
   color: #FDF6E3;
   overflow: hidden;
 }
