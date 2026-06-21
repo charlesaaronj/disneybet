@@ -184,11 +184,12 @@ function setQuestionDisplay(text){
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
 
-    // Animate the box (not the text)
-    display.classList.remove("wsd-answer-highlight","wsd-anim-pop");
-    void display.offsetWidth; // force reflow so animations can restart
     if (text) {
-      display.classList.add("wsd-answer-highlight","wsd-anim-pop");
+      // quick background pulse
+      display.classList.add("wsd-question-pulse");
+      setTimeout(() => {
+        display.classList.remove("wsd-question-pulse");
+      }, 250);
     }
   }
 
