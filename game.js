@@ -193,15 +193,25 @@ function setQuestionDisplay(text) {
   const textarea = $("wsd-question-text");
 
   if (display) {
+    // Always update the text
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
 
+    // Force a visible flash only when there is text
     if (text) {
-      flashQuestionDisplay();   // <- this makes the div flash
+      display.classList.remove("wsd-question-flash");
+      // Debug: confirm in console this runs
+      // console.log("Flashing question display", text);
+      void display.offsetWidth;           // restart transition
+      display.classList.add("wsd-question-flash");
+
+      setTimeout(() => {
+        display.classList.remove("wsd-question-flash");
+      }, 300);
     }
   }
 
-  // Keep textarea in sync for custom questions
+  // Keep textarea in sync for proceedToAnswers custom vs display logic
   if (textarea) {
     textarea.value = text || "";
     textarea.style.display = "none";
