@@ -337,13 +337,6 @@ function startGameFromSetup(){
 }
 
 // -------------- Question setup --------------
-function flashQuestionDisplay(){
-  const el = $("wsd-question-display");
-  if(!el) return;
-  el.classList.remove("wsd-question-flash");
-  void el.offsetWidth;          // force reflow so animation can restart
-  el.classList.add("wsd-question-flash");
-}
 
 // helper: draw from GAME_QUESTIONS and inject attraction name
 function drawQuestionForAttraction(attraction){
@@ -448,7 +441,6 @@ function onAttractionChange(){
   Object.assign(gameState.currentRound,{question:q,questionType:type});
 
   setQuestionDisplay(q);
-  flashQuestionDisplay();              // <- this triggers the visual flash
 
   if(badge) badge.textContent = categoryName || labelForType(type);
   saveState();
