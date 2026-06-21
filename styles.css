@@ -642,3 +642,14 @@ body {
   color: #FDF6E3;
   box-shadow: 0 4px 12px rgba(123,26,26,0.3);
 }
+/* Force all modal headers into the vintage theme, even if they use bg-* classes */
+.modal .modal-header {
+  background: linear-gradient(180deg,#6B1414,#B8780A) !important;
+  color: #FDF6E3 !important;
+  border-bottom: none;
+}
+
+/* If any header has a Bootstrap bg-* class, neutralize it */
+.modal .modal-header[class*="bg-"] {
+  background: linear-gradient(180deg,#6B1414,#B8780A) !important;
+}
