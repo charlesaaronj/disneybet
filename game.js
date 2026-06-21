@@ -176,24 +176,30 @@ function updateQuestionLock(){
     const btn=$(id);if(btn)btn.disabled=!hasAttraction;
   });
 }
-function setQuestionDisplay(text){
+function setQuestionDisplay(text) {
   const display = $("wsd-question-display");
   const textarea = $("wsd-question-text");
 
   if (display) {
+    // Show or hide the display box and set its text
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
 
+    // Flash the background when a non-empty question appears
     if (text) {
-      // quick background pulse
-      display.classList.add("wsd-question-pulse");
+      display.classList.remove("wsd-question-flash");
+      void display.offsetWidth; // restart transition
+      display.classList.add("wsd-question-flash");
+
       setTimeout(() => {
-        display.classList.remove("wsd-question-pulse");
+        display.classList.remove("wsd-question-flash");
       }, 250);
     }
   }
 
+  // Keep textarea in sync for custom-mode / proceedToAnswers
   if (textarea) {
+    // When we’re showing a normal question, keep textarea hidden
     textarea.value = text || "";
     textarea.style.display = "none";
   }
