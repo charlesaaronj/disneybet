@@ -124,6 +124,56 @@ document.addEventListener("DOMContentLoaded", () => {
   initHowToPlaySpotlight();
 });
 
+function hasExistingSession() {
+  try {
+    return !!localStorage.getItem("whoSaidDiz");
+  } catch (e) {
+    return false;
+  }
+}
+function showHeroSpotlightForScreen(screenName) {
+  if (!screenName) return;
+
+  // If there is already a saved session, skip all hero spotlights
+  if (hasExistingSession()) return;
+
+  // One-time per screen: each screen gets its own flag
+  const storageKey = `wsd_hero_spotlight_${screenName}`;
+
+  try {
+    if (localStorage.getItem(storageKey) === "1") return;
+  } catch (e) {}
+
+  const heroCard = document.querySelector(".wsd-hero-card");
+  const overlay  = document.getElementById("wsd-spotlight-overlay");
+  if (!heroCard || !overlay) return;
+
+  heroCard.classList.add("wsd-hero-card-spotlight");
+  overlay.style.display = "block";
+
+  const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
+
+  function clearSpotlight() {
+    heroCard.classList.remove("wsd-hero-card-spotlight");
+    overlay.style.display = "none";
+
+    // Mark this screen as “seen”
+    try { localStorage.setItem(storageKey, "1"); } catch (e) {}
+
+    if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
+    document.removeEventListener("click", onDocClick, true);
+  }
+
+  // Any click anywhere dismisses
+  function onDocClick(evt) {
+    clearSpotlight();
+  }
+
+  if (backdrop) backdrop.addEventListener("click", clearSpotlight);
+  document.addEventListener("click", onDocClick, true);
+}
+
+
 const NAV_MAP={
   "setup-game":"wsd-nav-home","setup-question":"wsd-nav-round","enter-answers":"wsd-nav-round",
   "select-answer":"wsd-nav-round","guess-wager":"wsd-nav-round","reveal":"wsd-nav-round",
@@ -196,7 +246,11 @@ function showScreen(name){
   $$(".wsd-nav-item").forEach(b=>b.classList.remove("wsd-nav-item-active"));
   const navId=NAV_MAP[name];
   if(navId&&$(navId))$(navId).classList.add("wsd-nav-item-active");
+
+  // After hero panel text is updated, show spotlight once per screen
+  showHeroSpotlightForScreen(name);
 }
+
 
 // --------- LOCK HELPERS ---------
 
