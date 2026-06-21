@@ -193,25 +193,11 @@ function setQuestionDisplay(text) {
   const textarea = $("wsd-question-text");
 
   if (display) {
-    // Always update the text
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
-
-    // Force a visible flash only when there is text
-    if (text) {
-      display.classList.remove("wsd-question-flash");
-      // Debug: confirm in console this runs
-      // console.log("Flashing question display", text);
-      void display.offsetWidth;           // restart transition
-      display.classList.add("wsd-question-flash");
-
-      setTimeout(() => {
-        display.classList.remove("wsd-question-flash");
-      }, 300);
-    }
   }
 
-  // Keep textarea in sync for proceedToAnswers custom vs display logic
+  // Keep textarea in sync for proceedToAnswers
   if (textarea) {
     textarea.value = text || "";
     textarea.style.display = "none";
@@ -425,32 +411,35 @@ function startNewRoundCore(){
 }
 
 function onAttractionChange(){
-  if(!gameState) return;
+  if (!gameState) return;
+
   const attrSel = $("wsd-attraction-select");
   const idx = attrSel ? parseInt(attrSel.value,10) : NaN;
   const meta = $("wsd-attraction-meta");
   const badge = $("wsd-question-type-badge");
 
-  if(meta)  meta.textContent  = "";
-  if(badge) badge.textContent = "";
+  if (meta) meta.textContent = "";
+  if (badge) badge.textContent = "";
 
-  if(isNaN(idx) || !gameState.attractions[idx]){
+  if (isNaN(idx) || !gameState.attractions[idx]) {
     Object.assign(gameState.currentRound,{attraction:null,question:"",questionType:""});
-    setQuestionDisplay("Select an attraction from the dropdown to get a question.");
+    setQuestionDisplay("");   // clear display, no flash
     updateQuestionLock();
     return;
   }
 
   const attraction = gameState.attractions[idx];
   gameState.currentRound.attraction = attraction;
-  if(meta) meta.textContent = `${attraction.park} • ${attraction.land}`;
+
+  if (meta) meta.textContent = `${attraction.park} • ${attraction.land}`;
 
   const { q, type, categoryName } = drawQuestion(attraction);
   Object.assign(gameState.currentRound,{question:q,questionType:type});
 
-  setQuestionDisplay(q);
+  setQuestionDisplay(q);      // update text
+  flashQuestionDisplay();     // flash ONLY on selection
 
-  if(badge) badge.textContent = categoryName || labelForType(type);
+  if (badge) badge.textContent = categoryName || labelForType(type);
   saveState();
   updateQuestionLock();
 }
