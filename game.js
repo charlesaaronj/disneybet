@@ -41,15 +41,15 @@ function requireState(fn){return()=>{if(!gameState){showScreen("setup-game");ret
 const MIN_POINTS=3,START_POINTS=10;
 const FINAL_BONUS_POINTS={topLandCollector:3,topAttractionCollector:3,bestGuesser:2,mostRiskyPlayer:2};
 const SCREEN_META={
-  "setup-game":    {icon:"🎮",title:"Setup game",instruction:"Pick your park, add players, and choose your settings."},
-  "setup-question":{icon:"🎢",title:"Choose attraction",instruction:"Pick the attraction you are queued for. A question will be selected for you."},
-  "enter-answers": {icon:"✏️",title:"Enter answers",instruction:"Pass the phone around. Each player secretly types their answer."},
-  "select-answer": {icon:"🎲",title:"Selected answer",instruction:"A random answer has been chosen. No peeking at who wrote it!"},
-  "guess-wager":   {icon:"💰",title:"Guess & wager",instruction:"Everyone guesses the author and places their bet."},
-  "reveal":        {icon:"🔍",title:"Reveal",instruction:"Find out who really said that!"},
-  "scores":        {icon:"📊",title:"Scores",instruction:"Check standings and bonus progress. Start the next round when ready."},
-  "game-end":      {icon:"🏆",title:"Game over",instruction:"Bonuses applied! The player with most points wins a family-determined prize."},
-  "history":       {icon:"📋",title:"Round history",instruction:"A full log of every round played."}
+  "setup-game":    {icon:"🎮",title:"Setup game",instruction:"Pick the park you're in, add 3+ players, and start the game."},
+  "setup-question":{icon:"🎢",title:"Choose attraction",instruction:"Pick the attraction you are queued for, read the selected question aloud."},
+  "enter-answers": {icon:"✏️",title:"Enter answers",instruction:"Pass the phone around & let player secretly submit their answers."},
+  "select-answer": {icon:"🎲",title:"Selected answer",instruction:"A random answer has been chosen."},
+  "guess-wager":   {icon:"💰",title:"Guess & wager",instruction:"Let everyone guess the author & how many points to wager. Add house points to up the stakes."},
+  "reveal":        {icon:"🔍",title:"Reveal",instruction:"Find out who said diz!"},
+  "scores":        {icon:"📊",title:"Scores",instruction:"Check standings, end game bonus progress, and start the next round when ready."},
+  "game-end":      {icon:"🏆",title:"Game over",instruction:"Points + end game bonuses tallied!"},
+  "history":       {icon:"📋",title:"Round history",instruction:"See a full history of every round played."}
 };
 const PARK_THEMES={
   "Magic Kingdom":{
