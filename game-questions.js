@@ -2,19 +2,19 @@ const GAME_QUESTIONS = {
   "categories": [
     {
       "id": 1,
-      "name": "Role / Job in the Story",
+      "name": "Role",
       "description": "Players imagine themselves taking on a role inside {{attraction}}'s world.",
       "questions": [
-        "Marion \"No Liability\" Knox says, \"We’re short-staffed inside {{attraction}}—pick any in-story job for an hour.\" What role do you choose?",
-        "A scout from StarTub Originals decides {{attraction}} needs a live actor and picks you. What character do you play?",
-        "The in-world safety council realizes one job is missing in {{attraction}} and points at you. What ridiculous job title do you get?",
+        "The {{land}} VP posts numerous job openings for {{attraction}} — what job would you want if available?",
+        "A scout from StarTube Originals decides {{attraction}} needs a live actor and picks you. What is your character's name?",
+        "The {{land}} HOA cites {{attraction}} for a violation. What's the violation?",
         "The casting board for {{attraction}} suddenly has one blank name tag, and it magically prints your name on it. What role appears under your name?",
-        "A last-minute show schedule change means {{attraction}} needs a stand-in performer right now. What part do you rush in to cover?"
-      ]
+        "{{attraction}} needs an animatronic, but the {{land}} VP won’t pay for it. How much would you charge to take its place?"
+]
     },
     {
       "id": 2,
-      "name": "World-Change What If",
+      "name": What-If",
       "description": "One magical or absurd change is applied to {{attraction}}, and players decide the outcome.",
       "questions": [
         "Cosmic Carpentry Co. misreads the blueprints and changes one rule of physics inside {{attraction}}. What rule changes?",
@@ -26,7 +26,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 3,
-      "name": "Outlandish Crossover / Mash-Up",
+      "name": "Mash-up",
       "description": "Combine {{attraction}} with some other IP, park, or genre.",
       "questions": [
         "FlickFuzz buys {{attraction}} and forces a crossover with \"Detective Grandma.\" Where does she appear in {{attraction}}?",
@@ -38,7 +38,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 4,
-      "name": "Location Swap / Transplant",
+      "name": "Location Swap",
       "description": "Move {{attraction}} somewhere else and ask what changes.",
       "questions": [
         "A storm from WeatherWrong Inc. blows {{attraction}} into a totally different kind of park. Where does it land?",
@@ -50,7 +50,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 5,
-      "name": "Memory / Personal Story",
+      "name": "Memory",
       "description": "Prompt players to share a real memory linked to {{attraction}}.",
       "questions": [
         "The podcast \"Queue Confessions\" asks for your strangest or funniest memory from {{attraction}}. What story do you tell?",
@@ -62,7 +62,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 6,
-      "name": "Trivia / Deep-Cut Flex",
+      "name": "Trivia",
       "description": "Invite “I know a thing” answers without needing strict accuracy.",
       "questions": [
         "\"Lore Lords Live\" corners you and demands one \"insider fact\" about {{attraction}}, real or invented. What do you give them?",
@@ -74,7 +74,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 7,
-      "name": "Comparison / Versus",
+      "name": "Comparison",
       "description": "Compare {{attraction}} to another attraction, land, park, or company.",
       "questions": [
         "Rival park Adventure Junction tries to copy {{attraction}} but \"improve\" it. What’s the first thing they brag about changing?",
@@ -86,7 +86,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 8,
-      "name": "Character Focus (Best/Worst/Spin-Off)",
+      "name": "Characters",
       "description": "Zoom in on one character, animatronic, or performer choice.",
       "questions": [
         "SideQuest Cinema offers one character from {{attraction}} a low-budget spin-off. Who gets the movie?",
@@ -98,7 +98,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 9,
-      "name": "Line / Quote / Soundbite",
+      "name": "Line",
       "description": "Focus on a specific line, sound, or vocal moment from {{attraction}}.",
       "questions": [
         "Messaging app BlipBlop lets attractions send you one text after you ride. What line or soundbite from {{attraction}} shows up?",
@@ -110,7 +110,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 10,
-      "name": "Single Best / Single Worst Element",
+      "name": "Elements",
       "description": "Pick a peak and/or low point: scene, effect, setpiece, etc.",
       "questions": [
         "Fake awards show \"The Trackies\" gives one trophy to the best moment in {{attraction}}. What moment wins?",
@@ -122,7 +122,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 11,
-      "name": "Immersion / Storytelling",
+      "name": "Storytelling",
       "description": "Ask where {{attraction}}’s storytelling soars or collapses.",
       "questions": [
         "Lila Page from StoryForge Studios asks when you most forget you’re in a park during {{attraction}}. What exact second is it?",
@@ -134,7 +134,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 12,
-      "name": "Tech / Magic / Broken Stuff",
+      "name": "Tech",
       "description": "Focus on effects, tech, and “magic” (or lack thereof) in {{attraction}}.",
       "questions": [
         "Marvelo Systems offers to super-charge one effect in {{attraction}} to \"mind-blowing.\" Which effect gets the upgrade?",
@@ -146,7 +146,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 13,
-      "name": "Pacing / Length / Flow",
+      "name": "Pacing",
       "description": "Ask about what feels too fast, too slow, or just right in {{attraction}}.",
       "questions": [
         "Dr. Tess Tempo from FlowCraft Inc. hands you 10 bonus seconds of ride time for {{attraction}}. Which moment do you stretch?",
@@ -158,7 +158,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 14,
-      "name": "Music / Sound / Voice",
+      "name": "Music",
       "description": "Lean into audio, songs, and iconic loops from {{attraction}}.",
       "questions": [
         "Kiko Rumble from SonicSpell Studios gives you a magic remote to save one musical moment from {{attraction}} forever. What do you pick?",
@@ -170,7 +170,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 15,
-      "name": "Queue / Preshow / Postshow",
+      "name": Pre/Post",
       "description": "Focus on phases around {{attraction}}: queue, preshow, postshow.",
       "questions": [
         "QueueTube’s \"Lines We Loved\" gives {{attraction}}’s queue an episode. What recurring gag, detail, or mini-story do they feature?",
@@ -182,7 +182,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 16,
-      "name": "Smells / Textures / Sensory",
+      "name": "Sensory",
       "description": "Ask about non-visual sensory details inside {{attraction}}.",
       "questions": [
         "AromaVerse adds one brand-new signature smell to {{attraction}}. What does it smell like?",
@@ -194,7 +194,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 17,
-      "name": "Hot Take / Overrated / Underrated",
+      "name": "Hot Take",
       "description": "Invite spicy opinions and debates about {{attraction}}.",
       "questions": [
         "The podcast \"Spicy Queue Takes\" hands you a mic after {{attraction}} and wants one opinion that might get you booed. What do you say?",
@@ -206,7 +206,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 18,
-      "name": "Redesign / Cut / Expand",
+      "name": "Redesign",
       "description": "Let players act as Imagineers making surgical changes to {{attraction}}.",
       "questions": [
         "Tweak & Tinker Imagineering gives you just enough budget to redesign one scene in {{attraction}}. Which scene do you pick?",
@@ -218,7 +218,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 19,
-      "name": "New Scene / New Character / New Prop",
+      "name": "New",
       "description": "Add a new element that fits inside {{attraction}}.",
       "questions": [
         "Hannah Draft from StoryGlue Studios says there’s room for one new scene in {{attraction}}. Where do you insert it?",
@@ -230,7 +230,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 20,
-      "name": "Backstage / Secret Version",
+      "name": "Backstage",
       "description": "Peel back the curtain or imagine a “secret level” of {{attraction}}.",
       "questions": [
         "Night shift supervisor Gus Lantern reveals a secret \"after hours\" version of {{attraction}} just for staff. What extra rule or scene do they add?",
@@ -242,7 +242,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 21,
-      "name": "Tagline / New Name / Marketing",
+      "name": "Marketing",
       "description": "Turn {{attraction}} into a brand or piece of key art.",
       "questions": [
         "Slogan & Soda wins the {{attraction}} ad contract and needs a dramatic tagline. What line goes on the posters?",
@@ -254,7 +254,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 22,
-      "name": "Snack / Merch / Tie-In",
+      "name": "Tie-In",
       "description": "Attach food, merch, or collectibles to {{attraction}}.",
       "questions": [
         "CraveCarts Co. gets to make one exclusive treat for {{attraction}}. What snack do they sell at the exit?",
@@ -266,7 +266,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 23,
-      "name": "Emotional / Vibe Check",
+      "name": "Emotions",
       "description": "Ask about feelings, moods, and vibes of {{attraction}}.",
       "questions": [
         "Daria Glow from FeelFactor Labs asks for three words that sum up {{attraction}}’s vibe. What are they?",
@@ -278,7 +278,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 24,
-      "name": "Time Travel / Era Swap",
+      "name": "Time Travel",
       "description": "Shift {{attraction}} into a different time period.",
       "questions": [
         "Vince Meridian from Epoch Rides pitches a \"1989 Edition\" of {{attraction}}. What’s the most obvious change?",
@@ -290,7 +290,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 25,
-      "name": "Social Media / Content Creator Mode",
+      "name": "Content Creator",
       "description": "Answer as if you’re making a TikTok, vlog, or photo about {{attraction}}.",
       "questions": [
         "ClipStorm hires you to capture one 10-second viral clip from {{attraction}}. What moment do you film?",
@@ -302,7 +302,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 26,
-      "name": "Life Lesson / Moral of the Ride",
+      "name": "Lessons",
       "description": "Treat {{attraction}} like a fable or parable.",
       "questions": [
         "Jasper Glow’s book \"Everything I Needed to Know I Learned in a Theme Park\" needs the lesson of {{attraction}}. What moral do you give him?",
@@ -314,7 +314,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 27,
-      "name": "Lore Expansion / Canon Fixes",
+      "name": "Lore",
       "description": "Fix plot holes or extend {{attraction}}’s story.",
       "questions": [
         "Nia Ledger from The Lore Library gives you one sentence to add to {{attraction}}’s official backstory. What sentence do you add?",
@@ -326,7 +326,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 28,
-      "name": "Guest-Caused Chaos (Player as Disruptor)",
+      "name": "Disruption",
       "description": "Players imagine themselves causing harmless chaos inside {{attraction}}.",
       "questions": [
         "ChaosCo Simulations lets one guest push a big red \"Mild Mayhem\" button on {{attraction}}. You’re picked. What harmless chaos happens?",
@@ -338,7 +338,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 29,
-      "name": "Cast Member POV & War Stories",
+      "name": "Cast Members",
       "description": "Imagine {{attraction}} from a staff member’s point of view.",
       "questions": [
         "The tell-all \"I Worked That Ride\" collects wild staff stories. As a {{attraction}} Cast Member, what story would you submit?",
@@ -350,7 +350,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 30,
-      "name": "Sponsor / Corporate Parody",
+      "name": "Sponsor",
       "description": "Treat {{attraction}} like an over-sponsored TV show.",
       "questions": [
         "MegaMirth Corp. slaps a huge sponsor on {{attraction}}. Which fake company takes over, and what do they plug?",
@@ -362,7 +362,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 31,
-      "name": "Movie Title Maker",
+      "name": "Movie Title",
       "description": "Come up with a movie name based on {{attraction}}.",
       "questions": [
         "Turnstile Pictures adapts {{attraction}} into a movie with a dramatic title and cheesy subtitle. What full name do you give it?",
@@ -374,7 +374,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 32,
-      "name": "Band Name & Music Gig",
+      "name": "Music Gig",
       "description": "Come up with band names, songs, or albums inspired by {{attraction}}.",
       "questions": [
         "Your band The Junkoids must write a hit song about {{attraction}} for Broken Turnstile Records. What’s the song’s title?",
