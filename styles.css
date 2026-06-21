@@ -648,3 +648,9 @@ body {
 .modal .modal-header[class*="bg-"] {
   background: linear-gradient(180deg,#8C1F26,#F0B857) !important;
 }
+
+/* Question textarea subtle pulse */
+.wsd-question-pulse {
+  background-color: #FFE6B8 !important; /* brighter gold */
+  transition: background-color 0.25s ease;
+}
