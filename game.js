@@ -148,6 +148,8 @@ function showHeroSpotlightForScreen(screenName) {
   console.log("[spotlight] showing spotlight for", screenName);
   heroCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
+  
+  heroCard.scrollIntoView({ behavior: "smooth", block: "center" });
 
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
 
