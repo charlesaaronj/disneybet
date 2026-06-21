@@ -15,7 +15,7 @@
 
 /* Prevent mobile zoom */
 :root { touch-action: pan-x pan-y; height: 100%; }
-input, select, textarea { font-size: 16px !important; }
+input, select, textarea { font-size: 16px !important; }f
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; padding: 0; }
@@ -557,7 +557,7 @@ body {
   color: #261712;
   min-height: 2rem;
   font-style: italic;
-  background: #FBF0D9;
+  /*background: #FBF0D9;*/
   border-radius: 10px;
   border-left: 3px solid #C4A265;
   margin-top: 12px;
