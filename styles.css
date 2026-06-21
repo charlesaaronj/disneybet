@@ -105,7 +105,7 @@ body {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  border: 3px solid var(--wsd-accent);
+  border: 2px solid var(--wsd-accent);
   background: linear-gradient(180deg, var(--wsd-blue-dark), var(--wsd-blue-light));
   display: flex;
   align-items: center;
