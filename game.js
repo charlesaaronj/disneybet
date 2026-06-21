@@ -398,6 +398,12 @@ function startNewRoundCore(){
     if (el) fn(el);
   });
 
+  // Explicitly clear any animation class
+  const display = $("wsd-question-display");
+  if (display) {
+    display.classList.remove("wsd-question-pop");
+  }
+
   // Placeholder question and badge
   setQuestionDisplay("Select an attraction from the dropdown to get a question.");
   const badge = $("wsd-question-type-badge");
@@ -405,6 +411,7 @@ function startNewRoundCore(){
 
   updateQuestionLock();
 }
+
 
 function onAttractionChange(){
   if (!gameState) return;
