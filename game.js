@@ -207,15 +207,6 @@ function setQuestionDisplay(text) {
     textarea.style.display = "none";
   }
 }
-
-  // Keep textarea in sync for custom-mode / proceedToAnswers
-  if (textarea) {
-    // When we’re showing a normal question, keep textarea hidden
-    textarea.value = text || "";
-    textarea.style.display = "none";
-  }
-}
-
 function showCustomTextarea(){
   const display = $("wsd-question-display");
   const textarea = $("wsd-question-text");
