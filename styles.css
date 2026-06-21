@@ -15,9 +15,9 @@
   --bbb-radius-md:   12px;
   --bbb-shadow-soft: 0 16px 40px rgba(0,0,0,0.55);
 
-  /* keep these for inputs */
-  --wsd-primary:     #7c3aed;
-  --wsd-accent:      #f5c842;
+  /* keep these for reuse in some components */
+  --wsd-primary:     var(--bbb-purple);
+  --wsd-accent:      var(--bbb-gold);
 }
 
 /* Prevent mobile zoom */
@@ -34,6 +34,27 @@ body {
   background: radial-gradient(circle at top, #352180 0%, #120923 55%, #05030a 100%);
   font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--bbb-text);
+}
+
+/* ---------- Force text to be light ---------- */
+body, .wsd-main, .wsd-app-shell,
+.wsd-card, .wsd-screen, .wsd-hero-card,
+.wsd-score-name, .wsd-section-title,
+.wsd-hero-text-main, .wsd-form-label,
+.wsd-bonus-topic-title, .wsd-result-row,
+p, h1, h2, h3, h4, h5, h6, span, label, li {
+  color: var(--bbb-text);
+}
+
+/* Muted text style */
+.wsd-score-meta,
+.wsd-section-subtitle,
+.wsd-hero-subtitle,
+.wsd-hero-text-instruction,
+.wsd-bonus-topic-desc,
+.wsd-text-small,
+.wsd-nav-item {
+  color: var(--bbb-text-muted);
 }
 
 /* ---------- App shell ---------- */
@@ -73,7 +94,6 @@ body {
 
 .wsd-hero-subtitle {
   font-size: 0.9rem;
-  color: var(--bbb-text-muted);
 }
 
 .wsd-hero::before,
@@ -134,12 +154,10 @@ body {
 .wsd-hero-text-main {
   font-size: 0.95rem;
   font-weight: 800;
-  color: var(--bbb-text);
 }
 
 .wsd-hero-text-instruction {
   font-size: 0.82rem;
-  color: var(--bbb-text-muted);
   margin-top: 0.15rem;
 }
 
@@ -163,16 +181,13 @@ body {
 }
 
 .wsd-section-title {
-  font-family: "Nunito", system-ui, sans-serif;
   font-size: 1.1rem;
   font-weight: 800;
   margin-bottom: 0.4rem;
-  color: var(--bbb-text);
 }
 
 .wsd-section-subtitle {
   font-size: 0.85rem;
-  color: var(--bbb-text-muted);
   margin-bottom: 0.9rem;
 }
 
@@ -182,7 +197,6 @@ body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--bbb-text-muted);
   margin-bottom: 0.25rem;
   display: block;
 }
@@ -194,7 +208,6 @@ body {
   font-size: 16px;
   padding: 0.55rem 0.75rem;
   background: #110827;
-  color: var(--bbb-text);
 }
 .wsd-form-control:focus,
 .wsd-form-select:focus {
@@ -226,11 +239,11 @@ body {
   color: #120823;
   cursor: pointer;
   min-height: 52px;
-  transition: transform 0.1s, filter 0.1s, box-shadow 0.1s;
+  transition: transform 0.1s, filter 0.1s;
   letter-spacing: 0.04em;
-  box-shadow: 0 10px 24px rgba(250,204,21,0.35);
+  box-shadow: none;
 }
-.wsd-btn-primary:hover  { filter: brightness(1.05); box-shadow: 0 12px 30px rgba(250,204,21,0.4); }
+.wsd-btn-primary:hover  { filter: brightness(1.05); }
 .wsd-btn-primary:active { transform: scale(0.97); }
 
 .wsd-btn-secondary {
@@ -245,6 +258,7 @@ body {
   cursor: pointer;
   min-height: 48px;
   font-weight: 600;
+  box-shadow: none;
 }
 .wsd-btn-secondary:hover {
   background: rgba(79,70,229,0.28);
@@ -262,7 +276,7 @@ body {
   color: #fef2f2;
   cursor: pointer;
   min-height: 48px;
-  box-shadow: 0 4px 12px rgba(220,38,38,0.35);
+  box-shadow: none;
 }
 
 .wsd-btn-tertiary {
@@ -295,7 +309,6 @@ body {
   font-size: 0.7rem;
   font-weight: 700;
   background: rgba(79,70,229,0.25);
-  color: var(--bbb-text);
   border: 1px solid rgba(167,139,250,0.8);
 }
 
@@ -309,8 +322,6 @@ body {
 }
 .wsd-score-row:last-child { border-bottom: none; }
 
-.wsd-score-name  { font-weight: 700; color: var(--bbb-text); }
-.wsd-score-meta  { font-size: 0.75rem; color: var(--bbb-text-muted); }
 .wsd-score-value { font-weight: 800; font-size: 1rem; color: var(--bbb-gold); }
 
 .wsd-chip {
@@ -320,7 +331,6 @@ body {
   border-radius: 999px;
   font-size: 0.7rem;
   background: rgba(79,70,229,0.28);
-  color: var(--bbb-text);
   border: 1px solid rgba(167,139,250,0.8);
 }
 
@@ -335,19 +345,7 @@ body {
   padding: 0.6rem 0.7rem;
   margin-bottom: 0.5rem;
 }
-.wsd-bonus-topic-icon {
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-.wsd-bonus-topic-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--bbb-text);
-}
-.wsd-bonus-topic-desc {
-  font-size: 0.75rem;
-  color: var(--bbb-text-muted);
-}
+.wsd-bonus-topic-icon { font-size: 1.3rem; flex-shrink: 0; }
 
 /* ---------- Bottom nav ---------- */
 .wsd-bottom-nav {
@@ -371,7 +369,6 @@ body {
   flex: 1;
   text-align: center;
   font-size: 0.68rem;
-  color: var(--bbb-text-muted);
   border: none;
   background: transparent;
   cursor: pointer;
@@ -446,7 +443,6 @@ body {
   text-align: center;
   border-left: 4px solid var(--bbb-gold);
   animation: wsdFadeSlideUp 0.5s ease both;
-  color: var(--bbb-text);
 }
 
 /* Winner banner */
@@ -460,7 +456,6 @@ body {
   font-weight: 900;
   font-size: 1.2rem;
   margin-bottom: 1rem;
-  box-shadow: 0 10px 30px rgba(250,204,21,0.5);
 }
 
 /* Reveal result rows */
@@ -475,7 +470,7 @@ body {
 .wsd-result-row:last-child { border-bottom: none; }
 
 /* Utility */
-.wsd-text-small { font-size: 0.8rem; color: var(--bbb-text-muted); }
+.wsd-text-small { font-size: 0.8rem; }
 .wsd-mt-1 { margin-top: 0.25rem; }
 .wsd-mt-2 { margin-top: 0.5rem; }
 .wsd-mt-3 { margin-top: 0.75rem; }
@@ -490,7 +485,6 @@ body {
   padding: 0.75rem;
   font-size: 1rem;
   line-height: 1.6;
-  color: var(--bbb-text);
   min-height: 2rem;
   font-style: italic;
   background: #1e1b4b;
@@ -499,14 +493,152 @@ body {
   margin-top: 12px;
 }
 
-/* ---------- Tutorial spotlight overlay (matches new theme) ---------- */
+/* ---------- Modal theme ---------- */
+.modal .modal-dialog {
+  max-width: 480px;
+}
+
+.modal .modal-content {
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,255,0.35);
+  overflow: hidden;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.7);
+  background: #231847;
+}
+
+.modal .modal-header {
+  background: linear-gradient(135deg, #4c1d95, #1a1035) !important;
+  border-bottom: 1px solid rgba(148,163,255,0.25);
+  color: var(--bbb-text) !important;
+  padding: 14px 18px;
+  align-items: center;
+}
+
+.modal .modal-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--bbb-text) !important;
+  font-family: "Nunito", system-ui, sans-serif;
+}
+
+.modal .btn-close {
+  filter: invert(1);
+  opacity: 0.85;
+}
+.modal .btn-close:hover { opacity: 1; }
+
+.modal .modal-body {
+  background: #231847;
+  color: var(--bbb-text);
+  padding: 16px 18px 10px;
+  font-size: 0.9rem;
+}
+
+.modal .modal-body *,
+.modal .modal-footer * {
+  color: var(--bbb-text);
+}
+
+.modal .modal-body .wsd-text-small,
+.modal .modal-body .wsd-score-meta,
+.modal .modal-body .wsd-section-subtitle {
+  color: var(--bbb-text-muted);
+}
+
+.modal .modal-footer {
+  background: #231847;
+  border-top: 1px solid rgba(148,163,255,0.2);
+  padding: 10px 18px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Modal buttons: no fuzz */
+.modal .wsd-btn-primary,
+.modal .wsd-btn-danger {
+  border-radius: 999px;
+  padding: 8px 20px;
+  min-height: unset;
+  width: auto;
+  font-size: 0.875rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  box-shadow: none;
+  filter: none;
+  -webkit-filter: none;
+  background: linear-gradient(135deg, #f97316, #facc15);
+  color: #120823;
+}
+.modal .wsd-btn-primary:hover,
+.modal .wsd-btn-danger:hover {
+  filter: brightness(1.06);
+  box-shadow: none;
+}
+
+.modal .wsd-btn-secondary {
+  border-radius: 999px;
+  padding: 8px 20px;
+  min-height: unset;
+  width: auto;
+  font-size: 0.875rem;
+  font-weight: 700;
+  background: transparent;
+  border: 1.5px solid rgba(148,163,255,0.8);
+  color: var(--bbb-text);
+  box-shadow: none;
+  filter: none;
+  -webkit-filter: none;
+  cursor: pointer;
+}
+.modal .wsd-btn-secondary:hover {
+  background: rgba(79,70,229,0.25);
+  box-shadow: none;
+}
+
+/* Kill Bootstrap focus fuzz */
+.modal .btn:focus,
+.modal button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Form controls inside modals */
+.modal .wsd-form-control,
+.modal .wsd-form-select,
+.modal input,
+.modal select,
+.modal textarea {
+  background: #1a1035;
+  border: 1.5px solid rgba(167,139,250,0.6);
+  color: var(--bbb-text);
+  border-radius: 10px !important;
+}
+.modal .wsd-form-control:focus,
+.modal .wsd-form-select:focus,
+.modal input:focus,
+.modal select:focus {
+  border-color: var(--bbb-purple-light);
+  box-shadow: 0 0 0 3px rgba(167,139,250,0.25);
+  outline: none;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  background-color: #000;
+}
+.modal-backdrop.show {
+  opacity: 0.75;
+}
+
+/* ---------- Tutorial spotlight overlay ---------- */
 #tutorial-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: all;
 }
-
 #tutorial-overlay.tutorial-hidden {
   display: none;
 }
@@ -527,7 +659,7 @@ body {
 
 #tutorial-tooltip {
   position: absolute;
-  background: #fff;
+  background: #ffffff;
   color: #1a1035;
   border-radius: 14px;
   padding: 16px 18px 14px;
@@ -542,7 +674,7 @@ body {
 .tip-step-label {
   font-size: 10px;
   font-weight: 800;
-  color: #7c3aed;
+  color: var(--bbb-purple);
   text-transform: uppercase;
   letter-spacing: 1.2px;
   margin-bottom: 6px;
@@ -602,7 +734,7 @@ body {
   position: absolute;
   width: 12px;
   height: 12px;
-  background: #fff;
+  background: #ffffff;
   transform: rotate(45deg);
   left: 22px;
   top: -6px;
