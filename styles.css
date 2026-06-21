@@ -567,7 +567,7 @@ body {
   100% { opacity: 1; transform: scale(1); }
 }
 .wsd-question-flash {
-  animation: wsdQuestionFlash 0.5s ease-out 0s 2;
+  animation: wsdQuestionFlash 1.1s ease-in-out 2;
 }
 
 /* ---------- Global modal theme (all Bootstrap modals) ---------- */
