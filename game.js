@@ -930,7 +930,7 @@ function runRevealAnimation(){
     if(authEl){
       authEl.textContent = isGhostAnswer
         ? "👻 Ghost"
-        : (author ? `🎭 ${author.name}` : "🎭 Unknown");
+        : (author ? `${author.name}` : "Unknown");
     }
     if(authWrap){
       authWrap.style.display = "block";
