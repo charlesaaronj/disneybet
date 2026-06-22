@@ -1,72 +1,72 @@
-/* ---------- Base ---------- */
 :root {
-  /* ── Core brand (extracted from Who Said Diz? logo) ── */
-  --wsd-blue-dark:   #1B2A6B;   /* Navy — "Who Said" text            */
-  --wsd-blue-light:  #00C5E0;   /* Cyan  — "Diz?" text & icon bg     */
-  --wsd-bg:          #F0FAFD;   /* Very light cyan tint page bg      */
+  /* Core brand - pulled from logo */
+  --wsd-blue-dark:   #00224D;   /* dark navy text/buttons */
+  --wsd-blue-light:  #00AFCF;   /* teal background & accents */
+  --wsd-bg:          #E6F7FB;   /* very light teal page background */
   --wsd-card-bg:     #FFFFFF;
   --wsd-card-radius: 16px;
-  --wsd-shadow-soft: 0 10px 28px rgba(0,100,140,0.09);
-  --wsd-primary:     #00C5E0;   /* Cyan as primary action color      */
-  --wsd-accent:      #1B2A6B;   /* Navy as accent                    */
+  --wsd-shadow-soft: 0 10px 28px rgba(0, 34, 77, 0.10);
+
+  --wsd-primary:     var(--wsd-blue-dark);
+  --wsd-accent:      var(--wsd-blue-light);
   --wsd-success:     #2E9E58;
   --wsd-danger:      #C0392B;
 
-  /* ── Text ── */
-  --wsd-text-main:         #1B2A6B;   /* Navy for headings/body           */
-  --wsd-text-muted:        #2A5070;
-  --wsd-text-softer:       #4A7A90;
-  --wsd-text-nav:          #6A9AB0;
-  --wsd-text-invert:       #FFFFFF;
-  --wsd-text-invert-soft:  #E8F9FD;
-  --wsd-text-gold-deep:    #1B2A6B;   /* Replaced orange-gold → navy      */
+  /* Text */
+  --wsd-text-main:        var(--wsd-blue-dark);
+  --wsd-text-muted:       #11406B;
+  --wsd-text-softer:      #3E6D91;
+  --wsd-text-nav:         #2C517C;
+  --wsd-text-invert:      #FFFFFF;
+  --wsd-text-invert-soft: #E6F7FB;
+  --wsd-text-gold-deep:   #007E92; /* re-used as teal “highlight” */
 
-  /* ── Hero ── */
-  --wsd-hero-grad-start:   #1B2A6B;
-  --wsd-hero-grad-end:     #00C5E0;
-  --wsd-hero-subtitle:     #A8EAF5;
-  --wsd-hero-orb:          rgba(255,255,255,0.13);
+  /* Hero */
+  --wsd-hero-grad-start:  var(--wsd-blue-light);
+  --wsd-hero-grad-end:    var(--wsd-blue-light);
+  --wsd-hero-subtitle:    #BFE8F4;
+  --wsd-hero-orb:         rgba(255,255,255,0.18);
 
-  /* ── Borders ── */
-  --wsd-border-soft:       #B8EAF5;
-  --wsd-border-gold:       #00C5E0;   /* Cyan replaces teal-gold          */
-  --wsd-border-gold-soft:  #A0E0EE;
-  --wsd-border-line:       #C0E8F5;
+  /* Borders */
+  --wsd-border-soft:      #B7E3F1;
+  --wsd-border-gold:      #00AFCF;
+  --wsd-border-gold-soft: #BFE8F4;
+  --wsd-border-line:      #C8DFEF;
 
-  /* ── Surfaces ── */
-  --wsd-surface-input:     #F5FCFE;
-  --wsd-surface-badge:     #E0F7FC;
-  --wsd-surface-bonus:     #EAF9FD;
-  --wsd-surface-nav:       rgba(240,250,253,0.97);
-  --wsd-surface-dot:       rgba(224,247,252,0.90);
-  --wsd-surface-question:  #D0F3FA;
-  --wsd-surface-modal:     #FFFFFF;
+  /* Surfaces */
+  --wsd-surface-input:    #F5FCFE;
+  --wsd-surface-badge:    #DEF3FA;
+  --wsd-surface-bonus:    #EAF6FB;
+  --wsd-surface-nav:      rgba(230,247,251,0.97);
+  --wsd-surface-dot:      rgba(222,243,250,0.95);
+  --wsd-surface-question: #D3F0F8;
+  --wsd-surface-modal:    #FFFFFF;
 
-  /* ── Accents ── */
-  --wsd-primary-grad-mid:  #00C5E0;
-  --wsd-gold-strong:       #1B2A6B;   /* Navy replaces orange             */
+  /* Accents */
+  --wsd-primary-grad-mid: var(--wsd-blue-dark);
+  --wsd-gold-strong:      #00AFCF;
 
-  /* ── Shadows ── */
-  --wsd-shadow-deep:              0 18px 40px rgba(27,42,107,0.18);
-  --wsd-shadow-gold:              0 6px 20px rgba(0,197,224,0.28);
-  --wsd-shadow-btn-primary:       0 4px 14px rgba(0,197,224,0.35);
-  --wsd-shadow-btn-primary-strong:0 4px 14px rgba(0,197,224,0.45);
-  --wsd-shadow-hero-spot:         0 18px 40px rgba(0,0,0,0.35);
-  --wsd-shadow-pop:               0 0 14px rgba(0,0,0,0.12);
-  --wsd-overlay-backdrop:         rgba(0,5,25,0.50);
+  /* Shadows */
+  --wsd-shadow-deep:      0 18px 40px rgba(0, 34, 77, 0.22);
+  --wsd-shadow-gold:      0 6px 20px rgba(0, 175, 207, 0.35);
+  --wsd-shadow-btn-primary:        0 4px 14px rgba(0, 34, 77, 0.35);
+  --wsd-shadow-btn-primary-strong: 0 4px 14px rgba(0, 34, 77, 0.45);
+  --wsd-shadow-hero-spot: 0 18px 40px rgba(0,0,0,0.35);
+  --wsd-shadow-pop:       0 0 14px rgba(0,0,0,0.12);
+  --wsd-overlay-backdrop: rgba(0,10,30,0.50);
 
-  /* ── Gradients ── */
-  --wsd-bg-modal-header-grad: #1B2A6B;
-  --wsd-bg-winner-grad:       #00C5E0;
-  --wsd-bg-answer-grad:       #EAF9FD;
-  --wsd-bg-primary-grad:      #00C5E0;
-  --wsd-bg-hero-grad:         #1B2A6B;
-  --wsd-bg-modal-primary-grad:#1B2A6B;
+  /* Gradients → flat */
+  --wsd-bg-modal-header-grad: var(--wsd-blue-dark);
+  --wsd-bg-winner-grad:       var(--wsd-blue-light);
+  --wsd-bg-answer-grad:       #EAF6FB;
+  --wsd-bg-primary-grad:      var(--wsd-blue-dark);
+  --wsd-bg-hero-grad:         var(--wsd-blue-light);
+  --wsd-bg-modal-primary-grad:var(--wsd-blue-dark);
 
-  /* ── Misc ── */
-  --wsd-white-soft:   #FFFFFF;
-  --wsd-white-hero:   #FFFFFF;
-  --wsd-flash-border: #D0F3FA;
+  /* Misc */
+  --wsd-white-soft:          #FFFFFF;
+  --wsd-white-hero:          #FFFFFF;
+  --wsd-flash-border:        #D3F0F8;
 }
 
 /* Prevent mobile zoom */
