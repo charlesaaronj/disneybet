@@ -159,7 +159,7 @@ body {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  border: 1px solid var(--wsd-accent);
+  border: 1px solid var(--wsd-blue-dark);
   background: var(--wsd-bg-winner-grad);
   display: flex;
   align-items: center;
