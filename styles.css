@@ -160,7 +160,7 @@ body {
   height: 52px;
   border-radius: 50%;
   border: 1px solid var(--wsd-blue-dark);
-  background: var(--wsd-bg-winner-grad);
+  background: var(--wsd-white-soft);
   display: flex;
   align-items: center;
   justify-content: center;
