@@ -51,31 +51,31 @@ const SCREEN_META={
   "game-end":      {icon:"🏆",title:"Game over",instruction:"Points + end game bonuses tallied!"},
   "history":       {icon:"📋",title:"Round history",instruction:"See a full history of every round played."}
 };
-const PARK_THEMES={
-  "Magic Kingdom":{
-    hero:   "linear-gradient(180deg,#4A1060,#9B3A8A)",
-    nav:    "rgba(74,16,96,0.95)",
-    avatar: "linear-gradient(135deg,#9B3A8A,#D4A0C8)"
+const PARK_THEMES = {
+  "Magic Kingdom": {
+    hero:   "linear-gradient(180deg,#2B1450,#FF3E91)",      // royal purple → hot pink
+    nav:    "rgba(18,10,40,0.96)",                          // deep night nav
+    avatar: "linear-gradient(135deg,#FF6BDF,#FFC857)"       // pink → gold “castle fireworks”
   },
-  "EPCOT":{
-    hero:   "linear-gradient(180deg,#0A2E52,#1A6E8A)",
-    nav:    "rgba(10,46,82,0.95)",
-    avatar: "linear-gradient(135deg,#1A6E8A,#7ABDD4)"
+  "EPCOT": {
+    hero:   "linear-gradient(180deg,#0A1638,#3C8CFF)",      // deep space blue → electric blue
+    nav:    "rgba(7,12,30,0.96)",                           // cool, techy blue-black
+    avatar: "linear-gradient(135deg,#3C8CFF,#7ED957)"       // blue → lime “future glow”
   },
-  "Hollywood Studios":{
-    hero:   "linear-gradient(180deg,#1C1C1C,#8B6914)",
-    nav:    "rgba(28,28,28,0.95)",
-    avatar: "linear-gradient(135deg,#C4960A,#E8C84A)"
+  "Hollywood Studios": {
+    hero:   "linear-gradient(180deg,#120F1E,#FFC857)",      // studio night → marquee gold
+    nav:    "rgba(12,10,28,0.96)",                          // dark, cinematic nav
+    avatar: "linear-gradient(135deg,#FFC857,#FF6B4A)"       // gold → orange spotlight
   },
-  "Animal Kingdom":{
-    hero:   "linear-gradient(180deg,#1A3A1A,#4A7A2A)",
-    nav:    "rgba(26,58,26,0.95)",
-    avatar: "linear-gradient(135deg,#4A7A2A,#C8A83A)"
+  "Animal Kingdom": {
+    hero:   "linear-gradient(180deg,#071C16,#2E9E58)",      // jungle shadow → rich green
+    nav:    "rgba(5,18,12,0.96)",                           // deep forest nav
+    avatar: "linear-gradient(135deg,#2E9E58,#C8E66B)"       // green → yellow-green “lush” highlight
   },
-  "Dollywood":{
-    hero:   "linear-gradient(180deg,#7A3A10,#C47820)",
-    nav:    "rgba(122,58,16,0.95)",
-    avatar: "linear-gradient(135deg,#C47820,#E8B84A)"
+  "Dollywood": {
+    hero:   "linear-gradient(180deg,#2A0F14,#FF6B4A)",      // warm Appalachian night → stage orange
+    nav:    "rgba(22,10,16,0.96)",                          // warm dark nav
+    avatar: "linear-gradient(135deg,#FF6B4A,#FFC857)"       // orange → gold, country spotlight
   }
 };
 let firstSetupGameShown = false;
@@ -1506,6 +1506,7 @@ function abandonRound(){
 
 // -------------- Wire events & bootstrap --------------
 
+
 function wireEvents(){
   debugLog("wireEvents starting");
   $("wsd-start-game").addEventListener("click",startGameFromSetup);
@@ -1595,6 +1596,11 @@ function wireEvents(){
     else{renderScoresScreen();showScreen("scores");}
   });
   $("wsd-nav-history")?.addEventListener("click",()=>{
+    if(!gameState)return;
+    renderHistoryScreen();
+    showScreen("history");
+  });
+    $("wsd-nav-history")?.addEventListener("click",()=>{
     if(!gameState)return;
     renderHistoryScreen();
     showScreen("history");
