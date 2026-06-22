@@ -257,9 +257,7 @@ function getPlayerUniqueLandCount(player){
   return s.size;
 }
 function applyParkTheme(parkName) {
-  const t = PARK_THEMES[parkName] || null;
-
-  console.log("applyParkTheme called with:", parkName, "theme =", t);
+  const t = parkName ? PARK_THEMES[parkName] : null;
 
   [
     [".wsd-hero", "backgroundImage", t?.hero || ""],
@@ -275,10 +273,10 @@ function applyParkTheme(parkName) {
   });
 
   if (t && t.btn) {
-    console.log("Setting button bg to:", t.btn);
     document.documentElement.style.setProperty("--wsd-btn-primary-bg", t.btn);
   } else {
-    console.log("NOT setting button bg. t =", t);
+    // going back to "no park" -> remove inline override, fall back to CSS default
+    document.documentElement.style.removeProperty("--wsd-btn-primary-bg");
   }
 }
 
