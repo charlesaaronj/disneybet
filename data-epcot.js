@@ -4,10 +4,10 @@ const PARK_EPCOT = {
     // World Celebration
     { park: "EPCOT", land: "World Celebration", name: "Spaceship Earth" },
     { park: "EPCOT", land: "World Celebration", name: "Figment" },
-    { park: "EPCOT", land: "World Celebration", name: "Short Film Festival" },
+    { park: "EPCOT", land: "World Celebration", name: "Pixar Film Festival" },
 
     // World Discovery
-    { park: "EPCOT", land: "World Discovery", name: "Guardians: Cosmic Rewind" },
+    { park: "EPCOT", land: "World Discovery", name: "Guardians Cosmic Rewind" },
     { park: "EPCOT", land: "World Discovery", name: "Mission: SPACE" },
     { park: "EPCOT", land: "World Discovery", name: "Test Track" },
 
@@ -15,16 +15,17 @@ const PARK_EPCOT = {
     { park: "EPCOT", land: "World Nature", name: "Soarin'" },
     { park: "EPCOT", land: "World Nature", name: "Living with the Land" },
     { park: "EPCOT", land: "World Nature", name: "Journey of Water" },
-    { park: "EPCOT", land: "World Nature", name: "The Seas w/ Nemo & Friends" },
-    { park: "EPCOT", land: "World Nature", name: "Turtle Talk with Crush" },
+    { park: "EPCOT", land: "World Nature", name: "The Seas w/ Nemo" },
+    { park: "EPCOT", land: "World Nature", name: "Turtle Talk" },
+    { park: "EPCOT", land: "World Nature", name: "Awesome Planet" },
 
     // World Showcase
     { park: "EPCOT", land: "Mexico",  name: "Gran Fiesta Tour" },
     { park: "EPCOT", land: "Norway",  name: "Frozen Ever After" },
     { park: "EPCOT", land: "China",   name: "Reflections of China" },
-    { park: "EPCOT", land: "America", name: "The American Adventure" },
-    { park: "EPCOT", land: "France",  name: "Remy's Ratatouille Adventure" },
-    { park: "EPCOT", land: "France",  name: "Beauty & the Beast Sing-Along" },
+    { park: "EPCOT", land: "America", name: "American Adventure" },
+    { park: "EPCOT", land: "France",  name: "Remy" },
+    { park: "EPCOT", land: "France",  name: "Beauty & Beast Sing-Along" },
     { park: "EPCOT", land: "Canada",  name: "Canada Far and Wide" },
   ],
   genericQuestions: [
