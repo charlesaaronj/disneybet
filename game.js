@@ -257,7 +257,8 @@ function getPlayerUniqueLandCount(player){
   return s.size;
 }
 function applyParkTheme(parkName){
-  const t=PARK_THEMES[parkName];
+  const t = PARK_THEMES[parkName];
+
   [
     [".wsd-hero","backgroundImage",t?.hero||""],
     [".wsd-bottom-nav","backgroundColor",t?.nav||"rgba(255,255,255,0.9)"],
@@ -265,8 +266,13 @@ function applyParkTheme(parkName){
     ["#modal-no-correct .modal-header","backgroundImage",t?.hero||""],
     ["#modal-no-correct .modal-header","color",t?"#fff":""],
     ["#modal-confirm-reset .modal-header","backgroundImage",t?.hero||""],
-    ["#modal-confirm-reset .modal-header","color",t?"#fff":""]
-  ].forEach(([sel,prop,val])=>{const el=document.querySelector(sel);if(el)el.style[prop]=val;});
+    ["#modal-confirm-reset .modal-header","color",t?"#fff":""],
+    [".wsd-btn-primary","backgroundImage",t?.btn||""]
+  ].forEach(([sel,prop,val])=>{
+    const els = document.querySelectorAll(sel);
+    if (!els.length) return;
+    els.forEach(el => { el.style[prop] = val; });
+  });
 }
 const ALL_SCREENS=Object.keys(SCREEN_META);
 function showScreen(name){
