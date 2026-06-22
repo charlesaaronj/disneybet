@@ -55,19 +55,19 @@ const SCREEN_META={
 const PARK_THEMES={
   "Magic Kingdom":{
     hero:   "linear-gradient(180deg,#4A1060,#9B3A8A)",
-    nav:    "rgba(74,16,96,0.95)",
+    nav:    "#f7eefff2",
     avatar: "linear-gradient(135deg,#9B3A8A,#D4A0C8)",
     btn: "linear-gradient(180deg,#4A1060,#9B3A8A)"
   },
   "EPCOT":{
     hero:   "linear-gradient(180deg,#0A2E52,#1A6E8A)",
-    nav:    "rgba(10,46,82,0.95)",
+    nav:    "#dbf3f9f2",
     avatar: "linear-gradient(135deg,#1A6E8A,#7ABDD4)",
     btn: "linear-gradient(180deg,#0A2E52,#1A6E8A)"
   },
   "Hollywood Studios":{
     hero:   "linear-gradient(180deg,#1C1C1C,#8B6914)",
-    nav:    "rgba(28,28,28,0.95)",
+    nav:    "#f9f3e8f2",
     avatar: "linear-gradient(135deg,#C4960A,#E8C84A)",
     btn: "linear-gradient(180deg,#1C1C1C,#8B6914)"
   },
@@ -79,7 +79,7 @@ const PARK_THEMES={
   },
   "Dollywood":{
     hero:   "linear-gradient(180deg,#7A3A10,#C47820)",
-    nav:    "rgba(122,58,16,0.95)",
+    nav:    "#ffe2cff2",
     avatar: "linear-gradient(135deg,#C47820,#E8B84A)",
     btn: "linear-gradient(180deg,#7A3A10,#C47820)"
   }
