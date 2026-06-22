@@ -73,7 +73,7 @@ const PARK_THEMES={
   },
   "Animal Kingdom":{
     hero:   "linear-gradient(180deg,#1A3A1A,#4A7A2A)",
-    nav:    "rgba(26,58,26,0.95)",
+    nav:    "#e4ebd5f2",
     avatar: "linear-gradient(135deg,#4A7A2A,#C8A83A)",
     btn: "linear-gradient(180deg,#1A3A1A,#4A7A2A)"
   },
