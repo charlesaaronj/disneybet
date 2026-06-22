@@ -1600,10 +1600,8 @@ function wireEvents(){
     renderHistoryScreen();
     showScreen("history");
   });
-    $("wsd-nav-history")?.addEventListener("click",()=>{
-    if(!gameState)return;
-    renderHistoryScreen();
-    showScreen("history");
+      $("wsd-nav-faq")?.addEventListener("click", () => {
+    showScreen("faq");
   });
 }
 
