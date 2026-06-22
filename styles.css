@@ -748,3 +748,8 @@ body {
   transform: scale(1.02);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
+.wsd-avatar-img {
+  width: 32px;   /* adjust size as needed */
+  height: 32px;
+  display: block;
+}
