@@ -67,6 +67,7 @@
   --wsd-white-soft:          #FFFFFF;
   --wsd-white-hero:          #FFFFFF;
   --wsd-flash-border:        #FFF5A0;
+  --wsd-light-purple:         ##E6E6FA;
 }
 /* Prevent mobile zoom */
 :root { touch-action: pan-x pan-y; height: 100%; }
@@ -160,7 +161,7 @@ body {
   height: 52px;
   border-radius: 50%;
   border: 1px solid var(--wsd-blue-dark);
-  background: var(--wsd-white-soft);
+  background: var(--wsd-light-purple);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -257,7 +258,7 @@ body {
   padding: 0.75rem 1rem;
   font-size: 0.95rem;
   font-weight: 700;
-  background: var(--wsd-btn-primary-bg);
+  background: var(--wsd-light-purple);
   color: var(--wsd-text-invert);
   cursor: pointer;
   min-height: 52px;
