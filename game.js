@@ -266,13 +266,16 @@ function applyParkTheme(parkName){
     ["#modal-no-correct .modal-header","backgroundImage",t?.hero||""],
     ["#modal-no-correct .modal-header","color",t?"#fff":""],
     ["#modal-confirm-reset .modal-header","backgroundImage",t?.hero||""],
-    ["#modal-confirm-reset .modal-header","color",t?"#fff":""],
-    [".wsd-btn-primary","backgroundImage",t?.btn||""]
+    ["#modal-confirm-reset .modal-header","color",t?"#fff":""]
   ].forEach(([sel,prop,val])=>{
-    const els = document.querySelectorAll(sel);
-    if (!els.length) return;
-    els.forEach(el => { el.style[prop] = val; });
+    const el = document.querySelector(sel);
+    if (el) el.style[prop] = val;
   });
+
+  // NEW: make primary buttons use the park's btn gradient
+  if (t && t.btn) {
+    document.documentElement.style.setProperty("--wsd-btn-primary-bg", t.btn);
+  }
 }
 const ALL_SCREENS=Object.keys(SCREEN_META);
 function showScreen(name){
