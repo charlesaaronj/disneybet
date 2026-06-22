@@ -23,7 +23,7 @@
   /* Hero */
   --wsd-hero-grad-start:   #D4243A;
   --wsd-hero-grad-end:     #6B1F3A;
-  --wsd-hero-subtitle:     #FFD9DC;
+  --wsd-hero-subtitle:     #FFFFFF;
   --wsd-hero-orb:          rgba(255,255,255,0.12);
 
   /* Borders */
@@ -160,7 +160,7 @@ body {
   height: 52px;
   border-radius: 50%;
   border: 1px solid var(--wsd-accent);
-  background: var(--wsd-blue-light);
+  background: var(--wsd-accent);
   display: flex;
   align-items: center;
   justify-content: center;
