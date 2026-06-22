@@ -1,4 +1,3 @@
-/* ---------- Base ---------- */
 :root {
   /* Core brand */
   --wsd-blue-dark:   #246ad4;
@@ -56,12 +55,12 @@
   --wsd-overlay-backdrop:  rgba(10,0,5,0.50);
 
   /* Gradients */
-  --wsd-bg-modal-header-grad: linear-gradient(180deg, var(--wsd-blue-dark), --wsd-blue-light);
+  --wsd-bg-modal-header-grad: linear-gradient(180deg, var(--wsd-blue-dark), var(--wsd-blue-light));
   --wsd-bg-winner-grad:       linear-gradient(135deg, var(--wsd-accent), #D4A017);
   --wsd-bg-answer-grad:       linear-gradient(135deg, #FFF8E7, #FFF3CC);
-  --wsd-bg-primary-grad:      linear-gradient(135deg, var(--wsd-blue-dark), --wsd-blue-light);
-  --wsd-bg-hero-grad:         linear-gradient(160deg, var(--wsd-blue-dark), --wsd-blue-light);
-  --wsd-bg-modal-primary-grad:linear-gradient(135deg, var(--wsd-primary), #E8394F);
+  --wsd-bg-primary-grad:      linear-gradient(135deg, var(--wsd-blue-dark), var(--wsd-blue-light));
+  --wsd-bg-hero-grad:         linear-gradient(160deg, var(--wsd-blue-dark), var(--wsd-blue-light));
+  --wsd-bg-modal-primary-grad: linear-gradient(135deg, var(--wsd-primary), #E8394F);
 
   /* Misc */
   --wsd-white-soft:          #FFFFFF;
