@@ -67,7 +67,7 @@
   --wsd-white-soft:          #FFFFFF;
   --wsd-white-hero:          #FFFFFF;
   --wsd-flash-border:        #FFF5A0;
-  --wsd-light-purple:         ##E6E6FA;
+  --wsd-light-purple:         #E6E6FA;
 }
 /* Prevent mobile zoom */
 :root { touch-action: pan-x pan-y; height: 100%; }
