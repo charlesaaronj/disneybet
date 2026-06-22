@@ -101,7 +101,7 @@ function showHeroPanelSpotlightOnce() {
   if (!heroCard || !overlay || !okBtn) return;
 
   heroCard.classList.add("wsd-hero-card-spotlight");
-  overlay.style.display = "block";
+  overlay.style.display = "block"; 
 
   const tooltip = document.querySelector(".wsd-spotlight-tooltip");
   if (heroCard && tooltip) {
