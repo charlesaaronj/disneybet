@@ -1,13 +1,13 @@
 /* ---------- Base ---------- */
 :root {
   /* Core brand */
-  --wsd-blue-dark:   #D4243A;
-  --wsd-blue-light:  #FFBF2B;
+  --wsd-blue-dark:   #246ad4;
+  --wsd-blue-light:  #862bff;
   --wsd-bg:          #FAFAF7;
   --wsd-card-bg:     #FFFFFF;
   --wsd-card-radius: 16px;
   --wsd-shadow-soft: 0 10px 28px rgba(80,20,30,0.09);
-  --wsd-primary:     #D4243A;
+  --wsd-primary:     #0a2957;
   --wsd-accent:      #FFBF2B;
   --wsd-success:     #2E9E58;
   --wsd-danger:      #C0392B;
@@ -56,11 +56,11 @@
   --wsd-overlay-backdrop:  rgba(10,0,5,0.50);
 
   /* Gradients */
-  --wsd-bg-modal-header-grad: linear-gradient(180deg, #D4243A, #FFBF2B);
+  --wsd-bg-modal-header-grad: linear-gradient(180deg, var(--wsd-blue-dark), --wsd-blue-light);
   --wsd-bg-winner-grad:       linear-gradient(135deg, var(--wsd-accent), #D4A017);
   --wsd-bg-answer-grad:       linear-gradient(135deg, #FFF8E7, #FFF3CC);
-  --wsd-bg-primary-grad:      linear-gradient(135deg, var(--wsd-blue-dark), #E8394F);
-  --wsd-bg-hero-grad:         linear-gradient(160deg, #D4243A, #6B1F3A);
+  --wsd-bg-primary-grad:      linear-gradient(135deg, var(--wsd-blue-dark), --wsd-blue-light);
+  --wsd-bg-hero-grad:         linear-gradient(160deg, var(--wsd-blue-dark), --wsd-blue-light);
   --wsd-bg-modal-primary-grad:linear-gradient(135deg, var(--wsd-primary), #E8394F);
 
   /* Misc */
