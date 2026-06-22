@@ -7,6 +7,10 @@ const PARK_HOLLYWOOD_STUDIOS = {
     // Sunset Boulevard
     { park: "Hollywood Studios", land: "Sunset Boulevard",      name: "Tower of Terror" },
     { park: "Hollywood Studios", land: "Sunset Boulevard",      name: "Rock 'n' Roller Coaster" },
+    { park: "Hollywood Studios", land: "Sunset Boulevard",      name: "Fantasmic" },
+    { park: "Hollywood Studios", land: "Sunset Boulevard",      name: "Villians" },
+    { park: "Hollywood Studios", land: "Animation Courtyard",   name: "Journey of Little Mermaid" },
+    { park: "Hollywood Studios", land: "Sunset Boulevard",   name: "Beauty & Beauty" },
 
     // Echo Lake
     { park: "Hollywood Studios", land: "Echo Lake",             name: "Star Tours" },
@@ -22,7 +26,7 @@ const PARK_HOLLYWOOD_STUDIOS = {
     { park: "Hollywood Studios", land: "Toy Story Land",        name: "Alien Swirling Saucers" },
 
     // Galaxy's Edge
-    { park: "Hollywood Studios", land: "Galaxy's Edge",         name: "Millennium Falcon: Smugglers Run" },
+    { park: "Hollywood Studios", land: "Galaxy's Edge",         name: "Smugglers Run" },
     { park: "Hollywood Studios", land: "Galaxy's Edge",         name: "Rise of the Resistance" },
   ],
   genericQuestions: [
