@@ -47,7 +47,7 @@ body {
   position: relative;
   padding: 1.2rem 1.2rem 4.6rem;
   /* shift gradient to a touch more rosy + light cream */
-  background: linear-gradient(180deg, #A3212C, #F7E0B8);
+  background: linear-gradient(180deg, #9b131f, #f3c26a);
   color: #FFFDF8;
   overflow: hidden;
 }
