@@ -259,6 +259,8 @@ function getPlayerUniqueLandCount(player){
 function applyParkTheme(parkName) {
   const t = PARK_THEMES[parkName] || null;
 
+  console.log("applyParkTheme called with:", parkName, "theme =", t);
+
   [
     [".wsd-hero", "backgroundImage", t?.hero || ""],
     [".wsd-bottom-nav", "backgroundColor", t?.nav || "rgba(255,255,255,0.9)"],
@@ -272,11 +274,15 @@ function applyParkTheme(parkName) {
     if (el) el.style[prop] = val;
   });
 
-  // SIMPLER: if we have a theme, set its btn; otherwise do nothing
   if (t && t.btn) {
+    console.log("Setting button bg to:", t.btn);
     document.documentElement.style.setProperty("--wsd-btn-primary-bg", t.btn);
+  } else {
+    console.log("NOT setting button bg. t =", t);
   }
 }
+
+
 const ALL_SCREENS=Object.keys(SCREEN_META);
 function showScreen(name){
   ALL_SCREENS.forEach(key=>{
