@@ -1419,7 +1419,7 @@ function renderHistoryScreen(){
       <div class="wsd-text-small">Q: ${h.question}</div>
       <div class="wsd-text-small">Answer: &ldquo;${h.selectedAnswerText}&rdquo;</div>
       <div class="wsd-text-small">
-        Author: <strong>${isGhost ? "👻 Ghost" : (author ? author.name : "Unknown")}</strong>
+        Author:${isGhost ? "👻 Ghost" : (author ? author.name : "Unknown")}
       </div>`;
 
     h.payouts.forEach(pt => {
