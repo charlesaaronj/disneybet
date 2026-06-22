@@ -63,25 +63,25 @@ const PARK_THEMES={
     hero:   "linear-gradient(180deg,#0A2E52,#1A6E8A)",
     nav:    "rgba(10,46,82,0.95)",
     avatar: "linear-gradient(135deg,#1A6E8A,#7ABDD4)",
-    btn: "linear-gradient(180deg,#4A1060,#9B3A8A)"
+    btn: "linear-gradient(180deg,#0A2E52,#1A6E8A)"
   },
   "Hollywood Studios":{
     hero:   "linear-gradient(180deg,#1C1C1C,#8B6914)",
     nav:    "rgba(28,28,28,0.95)",
     avatar: "linear-gradient(135deg,#C4960A,#E8C84A)",
-    btn: "linear-gradient(180deg,#4A1060,#9B3A8A)"
+    btn: "linear-gradient(180deg,#1C1C1C,#8B6914)"
   },
   "Animal Kingdom":{
     hero:   "linear-gradient(180deg,#1A3A1A,#4A7A2A)",
     nav:    "rgba(26,58,26,0.95)",
     avatar: "linear-gradient(135deg,#4A7A2A,#C8A83A)",
-    btn: "linear-gradient(180deg,#4A1060,#9B3A8A)"
+    btn: "linear-gradient(180deg,#1A3A1A,#4A7A2A)"
   },
   "Dollywood":{
     hero:   "linear-gradient(180deg,#7A3A10,#C47820)",
     nav:    "rgba(122,58,16,0.95)",
     avatar: "linear-gradient(135deg,#C47820,#E8B84A)",
-    btn: "linear-gradient(180deg,#4A1060,#9B3A8A)"
+    btn: "linear-gradient(180deg,#7A3A10,#C47820)"
   }
 };
 let firstSetupGameShown = false;
