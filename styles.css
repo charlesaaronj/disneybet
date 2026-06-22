@@ -4,24 +4,25 @@
   --wsd-blue-light:  #4FA3E6;
 
   --wsd-primary:     #165FAF;
-  --wsd-accent:      #FF6B4A;  /* existing orange = main “energy” color */
-  --wsd-accent-hot:  #FF3E91;  /* new: hot pink for bonus / special */
-  --wsd-accent-lime: #7ED957;  /* new: lime for wins / success tags */
+  --wsd-accent:      #FF6B4A;  /* main “energy” color */
+  --wsd-accent-hot:  #FF3E91;  /* hot pink for bonus / special */
+  --wsd-accent-lime: #7ED957;  /* lime for wins / success tags */
   --wsd-success:     #2E9E58;
-  --wsd-danger:      #FF3355;  /* more arcade-red than corporate */
+  --wsd-danger:      #FF3355;  /* arcade red */
 
-  --wsd-bg:          #0A1024;  /* deep night-sky backdrop */
-  --wsd-card-bg:     #0E1530;  /* cards slightly lighter than bg */
+  /* Backgrounds – dark but not pure black */
+  --wsd-bg:          #090E20;  /* deep night-sky backdrop */
+  --wsd-card-bg:     #111735;  /* cards slightly lighter than bg */
   --wsd-card-radius: 20px;     /* rounder = more playful */
 
   --wsd-shadow-soft: 0 14px 40px rgba(0,0,0,0.55);
 
-  /* Text */
-  --wsd-text-main:         #FDF7FF;  /* light-on-dark for drama */
-  --wsd-text-muted:        #B4C6FF;
-  --wsd-text-softer:       #8492C8;
-  --wsd-text-nav:          #7FA1FF;
-  --wsd-text-invert:       #FFFFFF;
+  /* Text – tuned for contrast on dark */
+  --wsd-text-main:         #FFFFFF;  /* body text */
+  --wsd-text-muted:        #D0DCFF;  /* secondary */
+  --wsd-text-softer:       #A8B4E8;  /* tertiary labels */
+  --wsd-text-nav:          #E2E8FF;  /* nav and tab labels */
+  --wsd-text-invert:       #111735;  /* for pills on bright surfaces */
   --wsd-text-invert-soft:  #FBEAFF;
   --wsd-text-gold-deep:    #FFC857;  /* “ticket” yellow */
 
@@ -37,14 +38,14 @@
   --wsd-border-gold-soft:  rgba(255,200,87,0.45);
   --wsd-border-line:       rgba(255,255,255,0.08);
 
-  /* Surfaces – make chips & pills pop */
-  --wsd-surface-input:     #141A36;
-  --wsd-surface-badge:     rgba(22,95,175,0.4);
-  --wsd-surface-bonus:     rgba(255,62,145,0.16);
+  /* Surfaces – lighter plates for text-heavy areas */
+  --wsd-surface-input:     #171E3D;
+  --wsd-surface-badge:     rgba(60,140,255,0.35);
+  --wsd-surface-bonus:     rgba(255,62,145,0.22);
   --wsd-surface-nav:       rgba(7,10,30,0.94);
   --wsd-surface-dot:       rgba(79,163,230,0.35);
-  --wsd-surface-question:  rgba(22,95,175,0.50);
-  --wsd-surface-modal:     #0F142C;
+  --wsd-surface-question:  #1A2448; /* solid, readable under white text */
+  --wsd-surface-modal:     #141B3A;
 
   /* Accents */
   --wsd-primary-grad-mid:  #3C8CFF;
@@ -59,10 +60,10 @@
   --wsd-shadow-pop:        0 0 18px rgba(0,0,0,0.5);
   --wsd-overlay-backdrop:  rgba(0,0,0,0.78);
 
-  /* Gradients – more showtime */
+  /* Gradients – showtime */
   --wsd-bg-modal-header-grad: linear-gradient(135deg,#FF6B4A,#FF3E91);
   --wsd-bg-winner-grad:       linear-gradient(135deg,#FFC857,#FF6B4A);
-  --wsd-bg-answer-grad:       #141A36;
+  --wsd-bg-answer-grad:       #141B3A;
   --wsd-bg-primary-grad:      linear-gradient(135deg,#3C8CFF,#7ED957);
   --wsd-bg-hero-grad:         radial-gradient(circle at top,#3C8CFF 0,#0A1024 55%);
   --wsd-bg-modal-primary-grad:linear-gradient(135deg,#165FAF,#FF3E91);
