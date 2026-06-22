@@ -1,75 +1,74 @@
 :root {
-  /* Core brand – more gamey */
-  --wsd-blue-dark:   #165FAF;  /* anchor blue */
-  --wsd-blue-light:  #4FA3E6;
+  /* Core brand – light & playful */
+  --wsd-blue-dark:   #165FAF;   /* primary blue (kept) */
+  --wsd-blue-light:  #4FA3E6;   /* supporting blue */
 
   --wsd-primary:     #165FAF;
-  --wsd-accent:      #FF6B4A;  /* main “energy” color */
-  --wsd-accent-hot:  #FF3E91;  /* hot pink for bonus / special */
-  --wsd-accent-lime: #7ED957;  /* lime for wins / success tags */
+  --wsd-accent:      #FF6B4A;   /* warm orange (kept) */
+  --wsd-accent-pink: #FF4FA3;   /* new: candy pink for bonuses */
+  --wsd-accent-gold: #FFC857;   /* new: “ticket” yellow for wins */
   --wsd-success:     #2E9E58;
-  --wsd-danger:      #FF3355;  /* arcade red */
+  --wsd-danger:      #FF3355;
 
-  /* Backgrounds – dark but not pure black */
-  --wsd-bg:          #090E20;  /* deep night-sky backdrop */
-  --wsd-card-bg:     #111735;  /* cards slightly lighter than bg */
-  --wsd-card-radius: 20px;     /* rounder = more playful */
+  /* Backgrounds / cards */
+  --wsd-bg:          #FDFBFF;   /* warm white, not icy */
+  --wsd-card-bg:     #FFFFFF;
+  --wsd-card-radius: 18px;
+  --wsd-shadow-soft: 0 10px 28px rgba(15,60,120,0.08);
 
-  --wsd-shadow-soft: 0 14px 40px rgba(0,0,0,0.55);
-
-  /* Text – tuned for contrast on dark */
-  --wsd-text-main:         #FFFFFF;  /* body text */
-  --wsd-text-muted:        #D0DCFF;  /* secondary */
-  --wsd-text-softer:       #A8B4E8;  /* tertiary labels */
-  --wsd-text-nav:          #E2E8FF;  /* nav and tab labels */
-  --wsd-text-invert:       #111735;  /* for pills on bright surfaces */
-  --wsd-text-invert-soft:  #FBEAFF;
-  --wsd-text-gold-deep:    #FFC857;  /* “ticket” yellow */
+  /* Text – for light background */
+  --wsd-text-main:         #102136;   /* almost-navy for body */
+  --wsd-text-muted:        #54719A;   /* bluish gray */
+  --wsd-text-softer:       #8A9ABC;
+  --wsd-text-nav:          #5B7FB0;
+  --wsd-text-invert:       #FFFFFF;   /* on primary/accents */
+  --wsd-text-invert-soft:  #FFF7FB;
+  --wsd-text-gold-deep:    #A83200;
 
   /* Hero */
-  --wsd-hero-grad-start:   #1E1C4F;
-  --wsd-hero-grad-end:     #165FAF;
-  --wsd-hero-subtitle:     #C3DFFF;
-  --wsd-hero-orb:          rgba(255,255,255,0.14);
+  --wsd-hero-grad-start:   #EFF5FF;   /* soft blue tint */
+  --wsd-hero-grad-end:     #FFEFF9;   /* soft pink tint */
+  --wsd-hero-subtitle:     #6B86B0;
+  --wsd-hero-orb:          rgba(255,255,255,0.55);
 
   /* Borders */
-  --wsd-border-soft:       rgba(255,255,255,0.06);
+  --wsd-border-soft:       #DFE8FA;
   --wsd-border-gold:       #FFC857;
-  --wsd-border-gold-soft:  rgba(255,200,87,0.45);
-  --wsd-border-line:       rgba(255,255,255,0.08);
+  --wsd-border-gold-soft:  #FFE7A8;
+  --wsd-border-line:       #D1DDF2;
 
-  /* Surfaces – lighter plates for text-heavy areas */
-  --wsd-surface-input:     #171E3D;
-  --wsd-surface-badge:     rgba(60,140,255,0.35);
-  --wsd-surface-bonus:     rgba(255,62,145,0.22);
-  --wsd-surface-nav:       rgba(7,10,30,0.94);
-  --wsd-surface-dot:       rgba(79,163,230,0.35);
-  --wsd-surface-question:  #1A2448; /* solid, readable under white text */
-  --wsd-surface-modal:     #141B3A;
+  /* Surfaces – chips, badges, question cards */
+  --wsd-surface-input:     #F7FAFF;
+  --wsd-surface-badge:     #E8F2FF;
+  --wsd-surface-bonus:     #FFE9F4;   /* light pink wash */
+  --wsd-surface-nav:       rgba(255,255,255,0.96);
+  --wsd-surface-dot:       rgba(79,163,230,0.12);
+  --wsd-surface-question:  #F2F6FF;   /* question cards */
+  --wsd-surface-modal:     #FFFFFF;
 
-  /* Accents */
+  /* Accents / gradients */
   --wsd-primary-grad-mid:  #3C8CFF;
   --wsd-gold-strong:       #FFC857;
 
-  /* Shadows – more dramatic */
-  --wsd-shadow-deep:       0 26px 60px rgba(0,0,0,0.75);
-  --wsd-shadow-gold:       0 0 25px rgba(255,200,87,0.55);
-  --wsd-shadow-btn-primary:        0 0 22px rgba(60,140,255,0.75);
-  --wsd-shadow-btn-primary-strong: 0 0 26px rgba(255,62,145,0.9);
-  --wsd-shadow-hero-spot:  0 40px 80px rgba(0,0,0,0.9);
-  --wsd-shadow-pop:        0 0 18px rgba(0,0,0,0.5);
-  --wsd-overlay-backdrop:  rgba(0,0,0,0.78);
+  /* Shadows */
+  --wsd-shadow-deep:       0 18px 40px rgba(15,50,100,0.16);
+  --wsd-shadow-gold:       0 6px 20px rgba(255,200,87,0.35);
+  --wsd-shadow-btn-primary:        0 4px 14px rgba(22,95,175,0.28);
+  --wsd-shadow-btn-primary-strong: 0 4px 18px rgba(255,79,163,0.35);
+  --wsd-shadow-hero-spot:  0 18px 40px rgba(0,0,0,0.12);
+  --wsd-shadow-pop:        0 0 14px rgba(15,50,100,0.18);
+  --wsd-overlay-backdrop:  rgba(0,10,30,0.35);
 
-  /* Gradients – showtime */
-  --wsd-bg-modal-header-grad: linear-gradient(135deg,#FF6B4A,#FF3E91);
-  --wsd-bg-winner-grad:       linear-gradient(135deg,#FFC857,#FF6B4A);
-  --wsd-bg-answer-grad:       #141B3A;
-  --wsd-bg-primary-grad:      linear-gradient(135deg,#3C8CFF,#7ED957);
-  --wsd-bg-hero-grad:         radial-gradient(circle at top,#3C8CFF 0,#0A1024 55%);
-  --wsd-bg-modal-primary-grad:linear-gradient(135deg,#165FAF,#FF3E91);
+  /* Gradients → “fun but light” */
+  --wsd-bg-modal-header-grad: linear-gradient(135deg,#165FAF,#FF6B4A);
+  --wsd-bg-winner-grad:       linear-gradient(135deg,#FFC857,#FF4FA3);
+  --wsd-bg-answer-grad:       #F2F6FF;
+  --wsd-bg-primary-grad:      linear-gradient(135deg,#3C8CFF,#4FA3E6);
+  --wsd-bg-hero-grad:         linear-gradient(135deg,#EFF5FF,#FFEFF9);
+  --wsd-bg-modal-primary-grad:linear-gradient(135deg,#165FAF,#FF4FA3);
 
   /* Misc */
-  --wsd-white-soft:          #FDF7FF;
+  --wsd-white-soft:          #FFFFFF;
   --wsd-white-hero:          #FFFFFF;
 }
 /* Prevent mobile zoom */
