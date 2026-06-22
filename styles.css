@@ -115,7 +115,7 @@ body {
   text-shadow: 1px 1px 3px rgba(0,0,0,0.35);
 }
 .wsd-hero-subtitle {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   opacity: 0.95;
   color: var(--wsd-hero-subtitle);
 }
