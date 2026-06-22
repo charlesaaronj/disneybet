@@ -49,7 +49,8 @@ const SCREEN_META={
   "reveal":        {icon:"🔍",title:"Reveal",instruction:"Find out who said diz!"},
   "scores":        {icon:"📊",title:"Scores",instruction:"Check standings, end game bonus progress, and start the next round when ready."},
   "game-end":      {icon:"🏆",title:"Game over",instruction:"Points + end game bonuses tallied!"},
-  "history":       {icon:"📋",title:"Round history",instruction:"See a full history of every round played."}
+  "history":       {icon:"📋",title:"Round history",instruction:"See a full history of every round played."},
+  "faq":           {icon:"❓",title:"FAQ",instruction:"Find quick answers about the game, privacy, and support."}
 };
 const PARK_THEMES = {
   "Magic Kingdom": {
