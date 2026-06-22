@@ -272,14 +272,10 @@ function applyParkTheme(parkName) {
     if (el) el.style[prop] = val;
   });
 
-  // Always compute a button gradient, even if parkName is invalid
-  const defaultBtn = getComputedStyle(document.documentElement)
-    .getPropertyValue("--wsd-btn-primary-bg")
-    .trim();
-
-  const nextBtn = (t && t.btn) || defaultBtn;
-
-  document.documentElement.style.setProperty("--wsd-btn-primary-bg", nextBtn);
+  // SIMPLER: if we have a theme, set its btn; otherwise do nothing
+  if (t && t.btn) {
+    document.documentElement.style.setProperty("--wsd-btn-primary-bg", t.btn);
+  }
 }
 const ALL_SCREENS=Object.keys(SCREEN_META);
 function showScreen(name){
