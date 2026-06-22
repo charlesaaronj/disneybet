@@ -81,7 +81,8 @@ const GAME_QUESTIONS = {
         "Which other ride in the park is {{attraction}} most like, and why?",
         "Which other ride feels like {{attraction}}’s sibling or weird cousin?",
         "Which ride would make the best double feature with {{attraction}}?",
-        "What movie or TV show does {{attraction}} feel most like?"
+        "What movie or TV show does {{attraction}} feel most like?",
+        "How do you think {{attraction}} compares to other attractions in {{land}}?"
       ]
     },
     {
