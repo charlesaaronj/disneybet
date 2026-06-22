@@ -256,26 +256,30 @@ function getPlayerUniqueLandCount(player){
   player.collected.forEach(name=>{const a=getAttractionByName(name);if(a?.land)s.add(a.land);});
   return s.size;
 }
-function applyParkTheme(parkName){
-  const t = PARK_THEMES[parkName];
+function applyParkTheme(parkName) {
+  const t = PARK_THEMES[parkName] || null;
 
   [
-    [".wsd-hero","backgroundImage",t?.hero||""],
-    [".wsd-bottom-nav","backgroundColor",t?.nav||"rgba(255,255,255,0.9)"],
-    [".wsd-avatar","backgroundImage",t?.avatar||""],
-    ["#modal-no-correct .modal-header","backgroundImage",t?.hero||""],
-    ["#modal-no-correct .modal-header","color",t?"#fff":""],
-    ["#modal-confirm-reset .modal-header","backgroundImage",t?.hero||""],
-    ["#modal-confirm-reset .modal-header","color",t?"#fff":""]
-  ].forEach(([sel,prop,val])=>{
+    [".wsd-hero", "backgroundImage", t?.hero || ""],
+    [".wsd-bottom-nav", "backgroundColor", t?.nav || "rgba(255,255,255,0.9)"],
+    [".wsd-avatar", "backgroundImage", t?.avatar || ""],
+    ["#modal-no-correct .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-no-correct .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-confirm-reset .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-confirm-reset .modal-header", "color", t ? "#fff" : ""]
+  ].forEach(([sel, prop, val]) => {
     const el = document.querySelector(sel);
     if (el) el.style[prop] = val;
   });
 
-  // NEW: make primary buttons use the park's btn gradient
-  if (t && t.btn) {
-    document.documentElement.style.setProperty("--wsd-btn-primary-bg", t.btn);
-  }
+  // Always compute a button gradient, even if parkName is invalid
+  const defaultBtn = getComputedStyle(document.documentElement)
+    .getPropertyValue("--wsd-btn-primary-bg")
+    .trim();
+
+  const nextBtn = (t && t.btn) || defaultBtn;
+
+  document.documentElement.style.setProperty("--wsd-btn-primary-bg", nextBtn);
 }
 const ALL_SCREENS=Object.keys(SCREEN_META);
 function showScreen(name){
