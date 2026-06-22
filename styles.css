@@ -262,7 +262,6 @@ body {
   min-height: 52px;
   transition: transform 0.1s, filter 0.1s;
   letter-spacing: 0.03em;
-  box-shadow: var(--wsd-shadow-btn-primary);
 }
 .wsd-btn-primary:active { transform: scale(0.97); }
 .wsd-btn-primary:hover  { filter: brightness(1.06); }
@@ -294,7 +293,6 @@ body {
   color: var(--wsd-text-invert-soft);
   cursor: pointer;
   min-height: 48px;
-  box-shadow: 0 4px 12px rgba(179,52,66,0.25);
 }
 
 .wsd-btn-tertiary {
@@ -497,7 +495,6 @@ body {
   font-weight: 900;
   font-size: 1.2rem;
   margin-bottom: 1rem;
-  box-shadow: var(--wsd-shadow-gold);
   text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
 }
 
@@ -679,7 +676,6 @@ body {
   background: var(--wsd-bg-modal-primary-grad);
   border: none;
   color: var(--wsd-text-invert);
-  box-shadow: var(--wsd-shadow-btn-primary-strong);
 }
 
 /* Force all modal headers into the theme even with bg-* classes */
