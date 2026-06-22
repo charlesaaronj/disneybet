@@ -1,70 +1,72 @@
+/* ---------- Base ---------- */
 :root {
   /* Core brand */
-  --wsd-blue-dark:   #1A7FD4;
-  --wsd-blue-light:  #5BB8FF;
-  --wsd-bg:          #F0F7FF;
+  --wsd-blue-dark:   #D4243A;
+  --wsd-blue-light:  #FFBF2B;
+  --wsd-bg:          #FAFAF7;
   --wsd-card-bg:     #FFFFFF;
   --wsd-card-radius: 16px;
-  --wsd-shadow-soft: 0 10px 28px rgba(15,60,120,0.09);
-  --wsd-primary:     #1A7FD4;
-  --wsd-accent:      #FF6B4A;
+  --wsd-shadow-soft: 0 10px 28px rgba(80,20,30,0.09);
+  --wsd-primary:     #D4243A;
+  --wsd-accent:      #FFBF2B;
   --wsd-success:     #2E9E58;
   --wsd-danger:      #C0392B;
 
   /* Text */
-  --wsd-text-main:         #0D1F35;
-  --wsd-text-muted:        #2E5F8A;
-  --wsd-text-softer:       #5A7A9E;
-  --wsd-text-nav:          #7A9EBF;
+  --wsd-text-main:         #1A1014;
+  --wsd-text-muted:        #7A4F38;
+  --wsd-text-softer:       #7A5C6E;
+  --wsd-text-nav:          #9E7E8C;
   --wsd-text-invert:       #FFFFFF;
-  --wsd-text-invert-soft:  #EEF6FF;
-  --wsd-text-gold-deep:    #A83200;
+  --wsd-text-invert-soft:  #FFF5F5;
+  --wsd-text-gold-deep:    #5A3800;
 
   /* Hero */
-  --wsd-hero-grad-start:   #1A7FD4;
-  --wsd-hero-grad-end:     #1A7FD4;
-  --wsd-hero-subtitle:     #BDDEFF;
-  --wsd-hero-orb:          rgba(255,255,255,0.13);
+  --wsd-hero-grad-start:   #D4243A;
+  --wsd-hero-grad-end:     #6B1F3A;
+  --wsd-hero-subtitle:     #FFD9DC;
+  --wsd-hero-orb:          rgba(255,255,255,0.12);
 
   /* Borders */
-  --wsd-border-soft:       #D0E8F8;
-  --wsd-border-gold:       #2EC4C4;
-  --wsd-border-gold-soft:  #A8E0E0;
-  --wsd-border-line:       #C8DFF5;
+  --wsd-border-soft:       #EDE8E0;
+  --wsd-border-gold:       #E8C84A;
+  --wsd-border-gold-soft:  #E0D0A0;
+  --wsd-border-line:       #EDE0D0;
 
   /* Surfaces */
-  --wsd-surface-input:     #F8FCFF;
-  --wsd-surface-badge:     #E8F4FF;
-  --wsd-surface-bonus:     #EEF7FF;
-  --wsd-surface-nav:       rgba(240,247,255,0.97);
-  --wsd-surface-dot:       rgba(238,246,255,0.90);
-  --wsd-surface-question:  #D6F0FF;
+  --wsd-surface-input:     #FDFCFC;
+  --wsd-surface-badge:     #FFF3CC;
+  --wsd-surface-bonus:     #FFF8E7;
+  --wsd-surface-nav:       rgba(250,250,247,0.97);
+  --wsd-surface-dot:       rgba(255,250,240,0.88);
+  --wsd-surface-question:  #FFF5A0;
   --wsd-surface-modal:     #FFFFFF;
 
   /* Accents */
-  --wsd-primary-grad-mid:  #1A7FD4;
-  --wsd-gold-strong:       #E85530;
+  --wsd-primary-grad-mid:  #E8394F;
+  --wsd-gold-strong:       #D4A017;
 
   /* Shadows */
-  --wsd-shadow-deep:       0 18px 40px rgba(15,50,100,0.18);
-  --wsd-shadow-gold:       0 6px 20px rgba(255,107,74,0.25);
-  --wsd-shadow-btn-primary:0 4px 14px rgba(26,127,212,0.32);
-  --wsd-shadow-btn-primary-strong: 0 4px 14px rgba(26,127,212,0.38);
-  --wsd-shadow-hero-spot:  0 18px 40px rgba(0,0,0,0.38);
-  --wsd-shadow-pop:        0 0 14px rgba(0,0,0,0.13);
-  --wsd-overlay-backdrop:  rgba(0,10,30,0.50);
+  --wsd-shadow-deep:       0 18px 40px rgba(60,20,30,0.20);
+  --wsd-shadow-gold:       0 6px 20px rgba(212,160,23,0.30);
+  --wsd-shadow-btn-primary:0 4px 14px rgba(212,36,58,0.30);
+  --wsd-shadow-btn-primary-strong: 0 4px 14px rgba(212,36,58,0.35);
+  --wsd-shadow-hero-spot:  0 18px 40px rgba(0,0,0,0.40);
+  --wsd-shadow-pop:        0 0 14px rgba(0,0,0,0.15);
+  --wsd-overlay-backdrop:  rgba(10,0,5,0.50);
 
-  /* Gradients → all flat now */
-  --wsd-bg-modal-header-grad: #1A7FD4;
-  --wsd-bg-winner-grad:       #FF6B4A;
-  --wsd-bg-answer-grad:       #EEF7FF;
-  --wsd-bg-primary-grad:      #1A7FD4;
-  --wsd-bg-hero-grad:         #1A7FD4;
-  --wsd-bg-modal-primary-grad:#1A7FD4;
+  /* Gradients */
+  --wsd-bg-modal-header-grad: linear-gradient(180deg, #D4243A, #FFBF2B);
+  --wsd-bg-winner-grad:       linear-gradient(135deg, var(--wsd-accent), #D4A017);
+  --wsd-bg-answer-grad:       linear-gradient(135deg, #FFF8E7, #FFF3CC);
+  --wsd-bg-primary-grad:      linear-gradient(135deg, var(--wsd-blue-dark), #E8394F);
+  --wsd-bg-hero-grad:         linear-gradient(160deg, #D4243A, #6B1F3A);
+  --wsd-bg-modal-primary-grad:linear-gradient(135deg, var(--wsd-primary), #E8394F);
 
   /* Misc */
   --wsd-white-soft:          #FFFFFF;
   --wsd-white-hero:          #FFFFFF;
+  --wsd-flash-border:        #FFF5A0;
 }
 /* Prevent mobile zoom */
 :root { touch-action: pan-x pan-y; height: 100%; }
