@@ -1542,12 +1542,23 @@ function wireEvents(){
     if(!c||c.querySelectorAll("input").length>=8)return;
     addPlayerInput(c);
   });
-  $("wsd-park-select").addEventListener("change",()=>{
-    const sel=$("wsd-park-select"),name=sel?sel.value:"",label=$("wsd-park-label");
-    if(label)label.textContent=name||"Not set";
-    applyParkTheme(name);
-    updatePlayerInputLock();
-  });
+  $("wsd-park-select").addEventListener("change", () => {
+  const sel   = $("wsd-park-select");
+  const name  = sel ? sel.value : "";
+  const label = $("wsd-park-label");
+
+  if (!name) {
+    // User picked "Select a park" again -> clear theme + lock inputs
+    if (label) label.textContent = "Not set";
+    applyParkTheme(null);      // tell it to clear styles
+    updatePlayerInputLock();   // you already use this to disable player inputs
+    return;
+  }
+
+  if (label) label.textContent = name;
+  applyParkTheme(name);
+  updatePlayerInputLock();
+});
   $("wsd-attraction-select").addEventListener("change",()=>{onAttractionChange();updateQuestionLock();});
   $("wsd-generate-question").addEventListener("click",onGenerateNewQuestion);
   $("wsd-enter-custom-question").addEventListener("click",onEnterCustomQuestion);
