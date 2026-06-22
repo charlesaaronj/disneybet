@@ -61,7 +61,7 @@
   --wsd-bg-primary-grad:      linear-gradient(135deg, var(--wsd-blue-dark), var(--wsd-blue-light));
   --wsd-bg-hero-grad:         linear-gradient(160deg, var(--wsd-blue-dark), var(--wsd-blue-light));
   --wsd-bg-modal-primary-grad: linear-gradient(135deg, var(--wsd-blue-dark), var(--wsd-blue-light));
-  --wsd-btn-primary-bg: linear-gradient(135deg, var(--wsd-primary), var(--wsd-primary-dark));
+  --wsd-btn-primary-bg:       linear-gradient(180deg, var(--wsd-blue-dark), var(--wsd-blue-light));
 
   /* Misc */
   --wsd-white-soft:          #FFFFFF;
