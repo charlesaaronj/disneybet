@@ -404,10 +404,15 @@ function initHeroSpotlightAfterWelcome() {
     return;
   }
 
-  // Called once after first-time onboarding finishes (from splash)
+// Called once from splash after first-time onboarding completes
 function initHeroSpotlightFirstVisit() {
-  console.log("[spotlight] first-visit init for setup-game");
-  showHeroSpotlightForScreen("setup-game");
+  console.log("[spotlight] first-visit init");
+
+  // Use whatever screen is currently stored, default to setup-game
+  var screenName = (window.gameState && window.gameState.screen) || "setup-game";
+
+  // Only show once per screen; reuse existing helper
+  showHeroSpotlightForScreen(screenName);
 }
 
   modalEl.addEventListener(
