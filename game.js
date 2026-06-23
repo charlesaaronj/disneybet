@@ -277,31 +277,41 @@ function getPlayerUniqueLandCount(player) {
 
 // ---------- Theme application ----------
 
-function applyParkTheme(t) {
-  [
-    [".wsd-hero", "background", t?.bg || ""],
-    [".wsd-main", "background", t?.bg || ""],
-    [".wsd-bottom-nav", "backgroundColor", t?.nav || ""],
-    [".wsd-hero-card", "background", t?.card || ""],
-    [".wsd-card", "borderColor", t?.border || ""],
+function applyParkTheme(parkName) {
+  const t = parkName ? PARK_THEMES[parkName] : null;
 
-    // Modal headers themed by park:
-    ["#modal-scoring .modal-header", "background", t?.bg || ""],
-    ["#modal-bonuses .modal-header", "background", t?.bg || ""],
-    ["#modal-wager-help .modal-header", "background", t?.bg || ""],
-    ["#modal-welcome .modal-header", "background", t?.bg || ""] // ← welcome modal
+  [
+    [".wsd-hero", "backgroundImage", t?.hero || ""],
+    [".wsd-bottom-nav", "backgroundColor", t?.nav || "rgba(255,255,255,0.9)"],
+    [".wsd-avatar", "backgroundImage", t?.avatar || ""],
+    ["#modal-no-correct .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-no-correct .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-confirm-reset .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-confirm-reset .modal-header", "color", t ? "#fff" : ""],
+
+    // NEW: park-themed headers
+    ["#modal-scoring .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-scoring .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-bonuses .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-bonuses .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-wager-help .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-wager-help .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-welcome .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-welcome .modal-header", "color", t ? "#fff" : ""]
   ].forEach(([sel, prop, val]) => {
     const el = document.querySelector(sel);
     if (el) el.style[prop] = val;
   });
 
   if (t?.btn) {
-    document.documentElement.style.setProperty("--wsd-btn-primary-bg", t.btn);
+    document.documentElement.style.setProperty(
+      "--wsd-btn-primary-bg",
+      t.btn
+    );
   } else {
     document.documentElement.style.removeProperty("--wsd-btn-primary-bg");
   }
 }
-
 // ---------- Hero spotlight helpers ----------
 
 function showHeroPanelSpotlightOnce() {
