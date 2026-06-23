@@ -7,9 +7,9 @@ const GAME_QUESTIONS = {
       "questions": [
         "You’ve just been hired at {{attraction}}—what would your dream cast member role be?",
         "You’re filling out your new name tag at {{attraction}}—what fake name are you putting on it?",
-        "Casting gets wild and opens a role just for you—if you joined {{attraction}} as a live character, who would you be?",
-        "For one day you’re turned into an animatronic—if you had to play one figure in {{attraction}}, which would you be and why?",
-        "You’re stationed as the front greeter with a mic—if you were greeting at {{attraction}}’s entrance, what would be your go‑to line?"
+        "If you were the replacement for a character in {{attraction}}, who would it be?",
+        "You’re a greeter at {{attraction}} - what is your go‑to line?",
+        "What cast memeber role on {{attraction}}would you least like to have?"
       ]
     },
     {
@@ -17,12 +17,13 @@ const GAME_QUESTIONS = {
       "name": "Wild What-Ifs",
       "description": "Break the rules inside {{attraction}} and imagine outrageous twists.",
       "questions": [
-        "Tonight all the rules vanish inside {{attraction}}—what ridiculous activity would you love to do on the attraction?",
-        "The creative team wants a more emotional version—if you had to make {{attraction}} sad and emotional, what would you change?",
-        "You’re about to speak in a very opinionated fan group—what opinion about {{attraction}} would probably get you booed by other fans?",
-        "Your friend says, “Give me your spiciest take”—what’s your absolute hottest take about {{attraction}}?",
-        "You’re picturing the tweak that would set social media on fire—what single change to {{attraction}} do you think would make fans furious?",
-        "The genie offers to remove one annoyance forever—if you could delete one annoyance from {{attraction}}, what would it be?"
+        "What outlandish activity would you love to do on {{attraction}}?",
+        "If you were asked to make {{attraction}} sad, what would you change?",
+        "If you were asked to make {{attraction}} scary, what would you change?",
+        "What opinion about {{attraction}} would probably get you booed by other fans?",
+        "What’s your absolute hottest take about {{attraction}}?",
+        "What single change to {{attraction}} do you think would make fans furious?",
+        "If you could delete one annoyance from {{attraction}}, what would it be?"
       ]
     },
     {
@@ -30,13 +31,14 @@ const GAME_QUESTIONS = {
       "name": "Mash-Ups & Crossovers",
       "description": "Blend {{attraction}} with other stories, parks, and formats.",
       "questions": [
-        "The Disney multiverse is colliding—if {{attraction}} crossed over with any other Disney IP, what wild mash‑up would you create?",
-        "The park is hosting a “attraction fusion festival”—if {{attraction}} crossed over with any other attraction, what wild mash‑up would you create?",
-        "Management decides to relocate a headliner—if you picked up {{attraction}} and moved it to another park, where would it fit best?",
-        "A film studio wants to adapt the experience—if {{attraction}} were a movie, what movie would it feel most like?",
-        "A streaming service orders a new series—if {{attraction}} were a TV show, what show would it feel most like?",
-        "The multiverse has opened across the park—if you could drop any other Disney character into {{attraction}}, who joins the story?",
-        "You’re building your personal “same tier” list—what other attraction do you rank exactly the same as this one?"
+        "If {{attraction}} crossed over with any other IP, what wild mash‑up would you create?",
+        "If {{attraction}} crossed over with any other attraction, what wild mash‑up would you create?",
+        "If you had to pick up {{attraction}} and moved it to another park, where would it fit best?",
+        "If {{attraction}} were a direct-to-streaming movie, what would it's title be?",
+        "If {{attraction}} were a direct-to-streaming song, what would it's title be?",
+        "If you could drop any other character into {{attraction}}, who joins the story?",
+        "Where in {{attraction}} would you add the character YOU to the attraction?",
+        "What other attraction do you rank exactly the same as this one?"
       ]
     },
     {
@@ -44,14 +46,15 @@ const GAME_QUESTIONS = {
       "name": "Reimagining the attraction",
       "description": "Change the attraction system, structure, or major scenes.",
       "questions": [
-        "Creative leadership wants to change everything—if you could turn {{attraction}} into a totally different attraction type, what would it become?",
-        "The story team wants a new opening—how would you change the beginning of {{attraction}}?",
-        "The finale needs a fresh payoff—how would you change the ending of {{attraction}}?",
-        "You’ve been handed the blueprints and a free hand—what is the one part of {{attraction}} you’d most like to redesign from scratch?",
-        "There’s room for one more show scene on the track—where would you add a brand new scene in {{attraction}}, and what would happen in it?",
-        "Holiday season is coming and overlays are on the table—what holiday overlay scene would you add to {{attraction}} for a seasonal version?",
-        "A spin‑off mini‑attraction is being planned—which scene in {{attraction}} deserves to be expanded into its own mini‑attraction?",
-        "A blank check lands on the Imagineers’ desk—if budget didn’t matter at all, what wild upgrade would you add to {{attraction}}?"
+        "If you could turn {{attraction}} into a totally different attraction type, what would it become?",
+        "How would you change the beginning of {{attraction}}?",
+        "How would you change the ending of {{attraction}}?",
+        "What is the one part of {{attraction}} you’d most like to redesign from scratch?",
+        "Where would you add a brand new scene in {{attraction}}, and what would happen in it?",
+        "What holiday overlay scene would you add to {{attraction}} for a seasonal version?",
+        "Which scene in {{attraction}} deserves to be expanded into its own mini‑attraction?",
+        "Which scene in {{attraction}} deserves to be expanded into its own mini‑attraction?",
+        "If budget didn’t matter at all, what wild upgrade would you add to {{attraction}}?"
       ]
     },
     {
@@ -59,7 +62,7 @@ const GAME_QUESTIONS = {
       "name": "Marketing & Branding",
       "description": "Turn {{attraction}} into shows, brands, and slogans.",
       "questions": [
-        "You’re driving down a lonely highway and spot a familiar logo—if {{attraction}} were a roadside attraction, what would the big billboard outside say?",
+        "If {{attraction}} were a roadside attraction, what would the big billboard outside say?",
         "A producer wants to take {{attraction}} to Broadway—if it became a stage musical, what would its over‑the‑top title be?",
         "The year is 1994 and your attraction becomes TV—if {{attraction}} were a 90s sitcom, what would its cheesy title be?",
         "Merchandising has gone absolutely wild—what’s the most over‑the‑top souvenir you can imagine for {{attraction}}?",
