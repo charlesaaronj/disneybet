@@ -15,69 +15,208 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
   <style>
-    /* ── Splash screen ── */
+    /* ── Splash / onboarding overlay ── */
     #wsd-splash {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: linear-gradient(180deg, #4A1060, #9B3A8A);
+      background: #3d0754;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: opacity 0.45s ease;
+    }
+    #wsd-splash.wsd-splash-hide { opacity: 0; pointer-events: none; }
+
+    .wsd-splash-track {
+      display: flex;
+      width: 400%;
+      height: 100%;
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .wsd-splash-page {
+      width: 25%;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 2.5rem 2rem 2rem;
       gap: 1rem;
-      transition: opacity 0.5s ease;
+      text-align: center;
+      color: #fff;
+      box-sizing: border-box;
     }
-    #wsd-splash.wsd-splash-hide { opacity: 0; pointer-events: none; }
+
     .wsd-splash-logo {
-      width: 90px;
-      height: 90px;
-      border-radius: 22px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      width: 88px;
+      height: 88px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      margin-bottom: 0.25rem;
     }
     .wsd-splash-title {
       font-family: 'Fredoka', sans-serif;
       font-size: 2rem;
       font-weight: 600;
-      color: #fff;
-      letter-spacing: 0.02em;
+      line-height: 1.1;
     }
     .wsd-splash-sub {
       font-family: 'Nunito', sans-serif;
       font-size: 0.9rem;
-      color: rgba(255,255,255,0.8);
-      margin-top: -0.5rem;
+      color: rgba(255,255,255,0.75);
+      margin-top: -0.25rem;
     }
+    .wsd-splash-body {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.55;
+      max-width: 320px;
+    }
+    .wsd-splash-body strong { color: #fff; }
+    .wsd-splash-body hr { border-color: rgba(255,255,255,0.2); margin: 0.75rem 0; }
+    .wsd-splash-icon-big { font-size: 3rem; margin-bottom: 0.25rem; }
+
     .wsd-splash-dots {
       display: flex;
-      gap: 0.4rem;
-      margin-top: 0.5rem;
+      gap: 6px;
+      margin-top: auto;
+      padding-bottom: 0.25rem;
     }
     .wsd-splash-dot {
-      width: 8px; height: 8px;
+      width: 7px; height: 7px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.6);
-      animation: wsdSplashBounce 0.9s ease infinite;
+      background: rgba(255,255,255,0.35);
+      transition: background 0.25s, transform 0.25s;
     }
-    .wsd-splash-dot:nth-child(2) { animation-delay: 0.15s; }
-    .wsd-splash-dot:nth-child(3) { animation-delay: 0.3s; }
-    @keyframes wsdSplashBounce {
-      0%,80%,100% { transform: scale(1); opacity: 0.6; }
-      40% { transform: scale(1.4); opacity: 1; }
+    .wsd-splash-dot.active {
+      background: #fff;
+      transform: scale(1.25);
     }
+
+    .wsd-splash-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 340px;
+      margin-top: 1.5rem;
+    }
+    .wsd-splash-btn-skip {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.55);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.82rem;
+      cursor: pointer;
+      padding: 0.5rem 0;
+    }
+    .wsd-splash-btn-next {
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.45);
+      color: #fff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 999px;
+      padding: 0.55rem 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.2s;
+    }
+    .wsd-splash-btn-next:active { background: rgba(255,255,255,0.3); }
   </style>
 </head>
 <body>
 
-<!-- ===== SPLASH SCREEN ===== -->
+<!-- ===== SPLASH / ONBOARDING ===== -->
 <div id="wsd-splash">
-  <img src="apple-touch-icon.png" alt="Who Said Diz?" class="wsd-splash-logo"/>
-  <div class="wsd-splash-title">Who Said Diz?</div>
-  <div class="wsd-splash-sub">Every queue line is family game time</div>
-  <div class="wsd-splash-dots">
-    <div class="wsd-splash-dot"></div>
-    <div class="wsd-splash-dot"></div>
-    <div class="wsd-splash-dot"></div>
+  <div class="wsd-splash-track" id="wsd-splash-track">
+
+    <!-- Page 1: Brand (always shown, auto-advances) -->
+    <div class="wsd-splash-page">
+      <img src="apple-touch-icon.png" alt="Who Said Diz?" class="wsd-splash-logo"/>
+      <div class="wsd-splash-title">Who Said Diz?</div>
+      <div class="wsd-splash-sub">Every queue line is family game time</div>
+      <div style="display:flex;gap:6px;margin-top:1rem;">
+        <div class="wsd-splash-dot active" id="wsd-dot-0"></div>
+        <div class="wsd-splash-dot" id="wsd-dot-1"></div>
+        <div class="wsd-splash-dot" id="wsd-dot-2"></div>
+        <div class="wsd-splash-dot" id="wsd-dot-3"></div>
+      </div>
+    </div>
+
+    <!-- Page 2: How to play (first visit only) -->
+    <div class="wsd-splash-page">
+      <div class="wsd-splash-icon-big">🎢</div>
+      <div class="wsd-splash-title">How to play</div>
+      <div class="wsd-splash-body">
+        <p><strong>Who Said Diz?</strong> turns wait times into game time.</p>
+        <hr/>
+        <p><strong>Start</strong> — Add 3+ players, pick your attraction, and answer a question in secret.</p>
+        <p><strong>Guess</strong> — Figure out who said what and place your wager.</p>
+        <p><strong>Win</strong> — Collect attractions and lands all day. Most points at the end wins.</p>
+        <hr/>
+        <p style="font-size:0.75rem;opacity:0.6;">Not affiliated with The Walt Disney Company or any theme park.</p>
+      </div>
+      <div class="wsd-splash-nav">
+        <button class="wsd-splash-btn-skip" id="wsd-splash-skip">Skip</button>
+        <button class="wsd-splash-btn-next" id="wsd-splash-next-2">Next →</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:1rem;">
+        <div class="wsd-splash-dot" id="wsd-dot2-0"></div>
+        <div class="wsd-splash-dot active" id="wsd-dot2-1"></div>
+        <div class="wsd-splash-dot" id="wsd-dot2-2"></div>
+        <div class="wsd-splash-dot" id="wsd-dot2-3"></div>
+      </div>
+    </div>
+
+    <!-- Page 3: Spotlight guide (first visit only) -->
+    <div class="wsd-splash-page">
+      <div class="wsd-splash-icon-big">💡</div>
+      <div class="wsd-splash-title">Follow the guide</div>
+      <div class="wsd-splash-body">
+        <p>At the top of every screen you'll see a <strong>step card</strong> that tells you exactly what to do and who should be holding the phone.</p>
+        <p>Tap the card at any time to get a reminder of what that step is about.</p>
+        <p>It updates automatically as you move through each round — just follow along.</p>
+      </div>
+      <div class="wsd-splash-nav">
+        <button class="wsd-splash-btn-skip" id="wsd-splash-skip-3">Skip</button>
+        <button class="wsd-splash-btn-next" id="wsd-splash-next-3">Next →</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:1rem;">
+        <div class="wsd-splash-dot" id="wsd-dot3-0"></div>
+        <div class="wsd-splash-dot" id="wsd-dot3-1"></div>
+        <div class="wsd-splash-dot active" id="wsd-dot3-2"></div>
+        <div class="wsd-splash-dot" id="wsd-dot3-3"></div>
+      </div>
+    </div>
+
+    <!-- Page 4: Add to home screen (first visit only) -->
+    <div class="wsd-splash-page">
+      <div class="wsd-splash-icon-big">📲</div>
+      <div class="wsd-splash-title">Save to your Home Screen</div>
+      <div class="wsd-splash-body">
+        <p>For the best experience, add Who Said Diz? to your Home Screen — it loads instantly and feels like a real app.</p>
+        <p><strong>iPhone (Safari):</strong> Tap the Share button ↑ then <em>Add to Home Screen</em>.</p>
+        <p><strong>Android (Chrome):</strong> Tap ⋮ menu then <em>Add to Home screen</em>.</p>
+        <p style="font-size:0.75rem;opacity:0.6;">You only need to do this once.</p>
+      </div>
+      <div class="wsd-splash-nav" style="justify-content:flex-end;">
+        <button class="wsd-splash-btn-next" id="wsd-splash-done">Let's play! 🎉</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:1rem;">
+        <div class="wsd-splash-dot" id="wsd-dot4-0"></div>
+        <div class="wsd-splash-dot" id="wsd-dot4-1"></div>
+        <div class="wsd-splash-dot" id="wsd-dot4-2"></div>
+        <div class="wsd-splash-dot active" id="wsd-dot4-3"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -255,7 +394,8 @@
         <hr class="wsd-divider"/>
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div class="wsd-form-label mb-0">End game bonus status</div>
-          <button type="button" class="wsd-btn-tertiary" style="width:auto;" data-bs-toggle="collapse" data-bs-target="#wsd-bonus-panel" aria-expanded="false">Show / hide</button>
+          <button type="button" class="wsd-btn-tertiary" style="width:auto;"
+                  data-bs-toggle="collapse" data-bs-target="#wsd-bonus-panel" aria-expanded="false">Show / hide</button>
         </div>
         <div class="collapse" id="wsd-bonus-panel">
           <div id="wsd-bonus-progress"></div>
@@ -263,7 +403,8 @@
         <hr class="wsd-divider"/>
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div class="wsd-form-label mb-0">Collections progress</div>
-          <button type="button" class="wsd-btn-tertiary" style="width:auto;" data-bs-toggle="collapse" data-bs-target="#wsd-collections-panel" aria-expanded="false">Show / hide</button>
+          <button type="button" class="wsd-btn-tertiary" style="width:auto;"
+                  data-bs-toggle="collapse" data-bs-target="#wsd-collections-panel" aria-expanded="false">Show / hide</button>
         </div>
         <div class="collapse" id="wsd-collections-panel">
           <div id="wsd-collections-progress"></div>
@@ -271,7 +412,8 @@
         <hr class="wsd-divider"/>
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div class="wsd-form-label mb-0">Manual adjustments</div>
-          <button type="button" class="wsd-btn-tertiary" style="width:auto;" data-bs-toggle="collapse" data-bs-target="#wsd-manual-panel" aria-expanded="false">Show / hide</button>
+          <button type="button" class="wsd-btn-tertiary" style="width:auto;"
+                  data-bs-toggle="collapse" data-bs-target="#wsd-manual-panel" aria-expanded="false">Show / hide</button>
         </div>
         <div class="collapse" id="wsd-manual-panel">
           <div id="wsd-manual-adjustments"></div>
@@ -371,7 +513,7 @@
 
 <!-- ===== MODALS ===== -->
 
-<!-- Welcome / How to play -->
+<!-- Welcome / How to play (manual trigger only) -->
 <div class="modal fade" id="modal-welcome" tabindex="-1" aria-labelledby="modal-welcome-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content" style="border-radius:20px;overflow:hidden;">
@@ -391,27 +533,6 @@
       </div>
       <div class="modal-footer border-0">
         <button type="button" class="wsd-btn-primary" style="max-width:200px;" data-bs-dismiss="modal">Got it!</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Add to Home Screen nudge -->
-<div class="modal fade" id="modal-add-to-home" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius:20px;overflow:hidden;">
-      <div class="modal-header" style="background:linear-gradient(135deg,#34c759,#007aff);color:#fff;border:none;">
-        <h5 class="modal-title fw-bold">📲 Add to your Home Screen</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" style="font-size:0.85rem;">
-        <p>Get the best experience by saving Who Said Diz? to your Home Screen — it loads faster and feels like a real app.</p>
-        <p><strong>On iPhone (Safari):</strong><br/>Tap the <strong>Share</strong> button (the box with an arrow) at the bottom of your screen, then tap <strong>Add to Home Screen</strong>.</p>
-        <p><strong>On Android (Chrome):</strong><br/>Tap the <strong>⋮ menu</strong> in the top right, then tap <strong>Add to Home screen</strong>.</p>
-        <p class="wsd-text-small" style="opacity:0.6;">You only need to do this once.</p>
-      </div>
-      <div class="modal-footer border-0">
-        <button type="button" class="wsd-btn-primary" style="max-width:200px;" data-bs-dismiss="modal" id="wsd-ath-got-it">Got it!</button>
       </div>
     </div>
   </div>
@@ -546,102 +667,16 @@
 <script src="game.js" defer></script>
 
 <script>
-// ── Splash screen ──
-// Always shows on load, fades out after 1.5s
-window.addEventListener("load", function () {
-  var splash = document.getElementById("wsd-splash");
-  if (!splash) return;
-  setTimeout(function () {
-    splash.classList.add("wsd-splash-hide");
-    setTimeout(function () { splash.style.display = "none"; }, 500);
-  }, 1500);
-});
-
-// ── First-visit flow: welcome modal → add-to-home-screen nudge ──
-document.addEventListener("DOMContentLoaded", function () {
+(function () {
   var FIRST_VISIT_KEY = "wsd_first_visit_done";
-  var ATH_KEY        = "wsd_ath_shown";
-  var hasSession     = !!localStorage.getItem("whoSaidDiz");
-  var firstVisitDone = !!localStorage.getItem(FIRST_VISIT_KEY);
+  var hasSession      = !!localStorage.getItem("whoSaidDiz");
+  var firstVisitDone  = !!localStorage.getItem(FIRST_VISIT_KEY);
+  var isFirstVisit    = !hasSession && !firstVisitDone;
+  var isStandalone    = window.navigator.standalone === true ||
+                        window.matchMedia("(display-mode: standalone)").matches;
 
-  // Only show welcome + ATH nudge if this is a true first visit (no session, never shown before)
-  if (!hasSession && !firstVisitDone) {
-    localStorage.setItem(FIRST_VISIT_KEY, "1");
+  var splash  = document.getElementById("wsd-splash");
+  var track   = document.getElementById("wsd-splash-track");
+  var current = 0;
 
-    var welcomeEl = document.getElementById("modal-welcome");
-    if (welcomeEl && typeof bootstrap !== "undefined") {
-      // Show welcome after splash finishes (~1.8s)
-      setTimeout(function () {
-        var welcomeModal = new bootstrap.Modal(welcomeEl);
-        welcomeModal.show();
-
-        // After welcome is dismissed, show ATH nudge if not already shown
-        // and not already running as a standalone PWA
-        welcomeEl.addEventListener("hidden.bs.modal", function () {
-          var alreadyShownATH = !!localStorage.getItem(ATH_KEY);
-          var isStandalone    = window.navigator.standalone === true ||
-                                window.matchMedia("(display-mode: standalone)").matches;
-
-          if (!alreadyShownATH && !isStandalone) {
-            localStorage.setItem(ATH_KEY, "1");
-            var athEl = document.getElementById("modal-add-to-home");
-            if (athEl) {
-              setTimeout(function () {
-                new bootstrap.Modal(athEl).show();
-              }, 300);
-            }
-          }
-        }, { once: true });
-      }, 1800);
-    }
-  }
-});
-
-// ── Collections screen renderer ──
-window.renderCollectionsScreen = function () {
-  var container = document.getElementById("wsd-collections-progress");
-  if (!container) return;
-  var state = typeof gameState !== "undefined" ? gameState : window.gameState;
-  if (!state || !state.players || !state.attractions) return;
-
-  var totalAttractions = state.attractions.length || 0;
-  var landSet = new Set();
-  state.attractions.forEach(function (a) { if (a && a.land) landSet.add(a.land); });
-  var totalLands = landSet.size;
-
-  var html = "";
-  state.players.forEach(function (player) {
-    var collectedAttractions = Array.isArray(player.collected) ? player.collected.length : 0;
-    var collectedLandSet = new Set();
-    (player.collected || []).forEach(function (name) {
-      var a = state.attractions.find(function (x) { return x.name === name; });
-      if (a && a.land) collectedLandSet.add(a.land);
-    });
-    var collectedLands   = collectedLandSet.size;
-    var attractionPct    = totalAttractions ? Math.round((collectedAttractions / totalAttractions) * 100) : 0;
-    var landPct          = totalLands       ? Math.round((collectedLands / totalLands) * 100) : 0;
-
-    html += `
-      <div class="mb-3 pb-2 border-bottom">
-        <div class="wsd-score-row mb-2">
-          <div>
-            <div class="wsd-score-name">${player.name}</div>
-            <div class="wsd-score-meta">${collectedAttractions} attractions · ${collectedLands} lands</div>
-          </div>
-        </div>
-        <div class="wsd-text-small mb-1">Attractions collected (${collectedAttractions}/${totalAttractions})</div>
-        <div class="progress mb-2" style="height:10px;border-radius:999px;">
-          <div class="progress-bar" role="progressbar" style="width:${attractionPct}%;background:linear-gradient(90deg,#4fc3f7,#006e99);" aria-valuenow="${attractionPct}" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        <div class="wsd-text-small mb-1">Lands collected (${collectedLands}/${totalLands})</div>
-        <div class="progress mb-2" style="height:10px;border-radius:999px;">
-          <div class="progress-bar" role="progressbar" style="width:${landPct}%;background:linear-gradient(90deg,#ffcc00,#ff9500);" aria-valuenow="${landPct}" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-      </div>`;
-  });
-
-  container.innerHTML = html || '<div class="wsd-text-small">No progress yet.</div>';
-};
-</script>
-</body>
-</html>
+  var dotSets = 
