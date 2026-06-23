@@ -310,17 +310,25 @@ function showScreen(name){
 
 // --------- LOCK HELPERS ---------
 
-function updatePlayerInputLock(){
-  const parkSel=$("wsd-park-select");
-  const selected=!!(parkSel&&parkSel.value);
-  const hint=$("wsd-park-hint");
-  if(hint)hint.style.display=selected?"none":"block";
-  $$("#wsd-player-inputs input").forEach(inp=>{
-    inp.disabled=!selected;
-    inp.placeholder=selected?"Player name":"Select a park first";
+function updatePlayerInputLock() {
+  const parkSel = $("wsd-park-select");
+  const selected = !!(parkSel && parkSel.value);
+  const hint = $("wsd-park-hint");
+  if (hint) hint.style.display = selected ? "none" : "block";
+
+  $$("#wsd-player-inputs input").forEach(inp => {
+    inp.disabled = !selected;
+    inp.placeholder = selected ? "Player name" : "Select a park first";
   });
-  const addBtn=$("wsd-add-player");
-  if(addBtn)addBtn.disabled=!selected;
+
+  const addBtn = $("wsd-add-player");
+  if (addBtn) addBtn.disabled = !selected;
+
+  // NEW: show/hide start and restart buttons
+  const startBtn  = $("wsd-start-game");
+  const resetBtn  = $("wsd-reset-setup");
+  if (startBtn) startBtn.style.display = selected ? "block" : "none";
+  if (resetBtn) resetBtn.style.display = selected ? "block" : "none";
 }
 function updateQuestionLock(){
   const attrSel=$("wsd-attraction-select");
