@@ -397,6 +397,7 @@ body {
   background: var(--wsd-surface-nav);
   border-top: 1px solid var(--wsd-border-gold-soft);
   z-index: 20;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
 }
 .wsd-bottom-nav-inner {
   max-width: 480px;
