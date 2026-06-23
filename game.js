@@ -758,51 +758,36 @@ function startGameFromSetup() {
 
 // Pick a question from GAME_QUESTIONS for this attraction
 function drawQuestionForAttraction(attraction) {
-  const cats =
-    typeof GAME_QUESTIONS !== "undefined" &&
-    GAME_QUESTIONS.categories
-      ? GAME_QUESTIONS.categories
-      : [];
+  const isShow = attraction?.type === "show";
 
-  if (!cats.length) {
-    return {
-      text: "No questions available.",
-      categoryId: null,
-      categoryName: null
-    };
+  const allCategories = GAME_QUESTIONS.categories;
+
+  let categories;
+  if (isShow) {
+    // Only use the show-specific category for show attractions
+    categories = allCategories.filter(cat => cat.id === 20);
+  } else {
+    // Use all other categories for rides/other attractions
+    categories = allCategories.filter(cat => cat.id !== 20);
   }
 
-  const catIndex = Math.floor(Math.random() * cats.length);
-  const cat = cats[catIndex];
-
-  if (!cat.questions || !cat.questions.length) {
-    return {
-      text: "No questions available in this category.",
-      categoryId: cat.id,
-      categoryName: cat.name
-    };
+  // Safety fallback if something is misconfigured
+  if (!categories.length) {
+    categories = allCategories;
   }
 
-  const qIndex = Math.floor(
-    Math.random() * cat.questions.length
-  );
-  const raw = cat.questions[qIndex];
+  const category =
+    categories[Math.floor(Math.random() * categories.length)];
+  const text =
+    category.questions[
+      Math.floor(Math.random() * category.questions.length)
+    ];
 
-  const attractionName = attraction?.name || "{{attraction}}";
-  const landName = attraction?.land || "{{land}}";
-  const parkName = attraction?.park || "{{park}}";
-
-  const text = raw
-    .replace(/{{attraction}}/g, attractionName)
-    .replace(/{{land}}/g, landName)
-    .replace(/{{park}}/g, parkName);
-
-  // Track which question index we used for this attraction/category
-  const key = `${attractionName}::${cat.id}`;
-  if (!gameState.questionUsage[key]) gameState.questionUsage[key] = [];
-  gameState.questionUsage[key].push(qIndex);
-
-  return { text, categoryId: cat.id, categoryName: cat.name };
+  return {
+    text,
+    categoryId: category.id,
+    categoryName: category.name
+  };
 }
 
 function renderAttractionOptions() {
