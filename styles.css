@@ -243,6 +243,14 @@ body {
 }
 
 /* ---------- Buttons ---------- */
+.wsd-btn-primary:disabled,
+.wsd-btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 .wsd-btn-primary,
 .wsd-btn-secondary,
 .wsd-btn-danger,
