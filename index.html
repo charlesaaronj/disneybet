@@ -702,11 +702,15 @@
   function dismiss() {
   if (isFirstVisit) {
     localStorage.setItem(FIRST_VISIT_KEY, "1");
-    // Trigger the hero spotlight once the splash is gone
+
     if (typeof initHeroSpotlightFirstVisit === "function") {
+      console.log("[splash] calling initHeroSpotlightFirstVisit");
       initHeroSpotlightFirstVisit();
+    } else {
+      console.log("[splash] initHeroSpotlightFirstVisit not found");
     }
   }
+
   splash.classList.add("wsd-splash-hide");
   setTimeout(function () { splash.style.display = "none"; }, 450);
 }
