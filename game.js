@@ -776,12 +776,23 @@ function drawQuestionForAttraction(attraction) {
     categories = allCategories;
   }
 
+  // Pick a random category from the filtered list
   const category =
     categories[Math.floor(Math.random() * categories.length)];
-  const text =
+
+  // Pick a random question template from that category
+  const template =
     category.questions[
       Math.floor(Math.random() * category.questions.length)
     ];
+
+  // Resolve placeholders like {{attraction}} and {{land}}
+  const attractionName = attraction?.name || "this attraction";
+  const landName = attraction?.land || "this land";
+
+  const text = template
+    .replace(/{{attraction}}/g, attractionName)
+    .replace(/{{land}}/g, landName);
 
   return {
     text,
