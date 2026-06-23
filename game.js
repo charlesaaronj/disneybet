@@ -404,6 +404,12 @@ function initHeroSpotlightAfterWelcome() {
     return;
   }
 
+  // Called once after first-time onboarding finishes (from splash)
+function initHeroSpotlightFirstVisit() {
+  console.log("[spotlight] first-visit init for setup-game");
+  showHeroSpotlightForScreen("setup-game");
+}
+
   modalEl.addEventListener(
     "hidden.bs.modal",
     () => {
@@ -2561,8 +2567,6 @@ function wireEvents() {
 document.addEventListener("DOMContentLoaded", () => {
   // One-time hero panel after welcome modal
   initHowToPlaySpotlight();
-  initHeroSpotlightAfterWelcome();
-
   loadState();
   ensureStateShape();
   initSetupScreen();
