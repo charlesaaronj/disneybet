@@ -82,24 +82,8 @@
         </div>
 
         <div class="wsd-actions-stack">
-          <select id="wsd-park-select">
-  <option value="">Select a park…</option>
-  <option value="mk">Magic Kingdom</option>
-  <option value="epcot">EPCOT</option>
-  <!-- etc -->
-</select>
-
-<button id="wsd-start-game-btn"
-        class="wsd-btn-primary"
-        disabled>
-  Start Game
-</button>
-
-<button id="wsd-restart-game-btn"
-        class="wsd-btn-secondary"
-        disabled>
-  Restart Game
-</button>
+          <button id="wsd-start-game" class="wsd-btn-primary" style="display:none">Start game</button>
+          <button id="wsd-reset-setup" class="wsd-btn-secondary" style="display:none">Restart game</button>
           </button>
         </div>
         <div id="wsd-setup-error"
@@ -609,7 +593,7 @@
                 class="btn-close btn-close-white"
                 data-bs-dismiss="modal"></button>
       </div>
-     <div class="modal-body" style="font-size:0.8rem;">
+     <div class="modal-body" style="font-size:0.7rem;">
   <p><strong>Who Said Diz?</strong> turns wait times into game time with a fast, funny guessing game for the whole family.</p>
   <hr/>
   <p><strong>How it works:</strong></p>
