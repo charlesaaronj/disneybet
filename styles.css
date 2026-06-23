@@ -683,7 +683,6 @@ body {
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.85rem;
-  background: var(--wsd-bg-modal-primary-grad);
   border: none;
   color: var(--wsd-text-invert);
 }
