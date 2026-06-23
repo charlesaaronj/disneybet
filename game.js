@@ -1665,3 +1665,17 @@ document.addEventListener("DOMContentLoaded",()=>{
     showScreen("setup-game");
   }
 });
+document.addEventListener('DOMContentLoaded', () => {
+  const parkSelect = document.getElementById('wsd-park-select');
+  const startBtn   = document.getElementById('wsd-start-game-btn');
+  const restartBtn = document.getElementById('wsd-restart-game-btn');
+
+  function updateButtons() {
+    const hasPark = parkSelect.value && parkSelect.value.trim() !== '';
+    startBtn.disabled   = !hasPark;
+    restartBtn.disabled = !hasPark;
+  }
+
+  updateButtons();
+  parkSelect.addEventListener('change', updateButtons);
+});
