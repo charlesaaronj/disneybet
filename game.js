@@ -324,11 +324,16 @@ function updatePlayerInputLock() {
   const addBtn = $("wsd-add-player");
   if (addBtn) addBtn.disabled = !selected;
 
-  // NEW: show/hide start and restart buttons
+  // Start / Restart: keep visible, just enable/disable
   const startBtn  = $("wsd-start-game");
   const resetBtn  = $("wsd-reset-setup");
-  if (startBtn) startBtn.style.display = selected ? "block" : "none";
-  if (resetBtn) resetBtn.style.display = selected ? "block" : "none";
+
+  if (startBtn) {
+    startBtn.disabled = !selected;
+  }
+  if (resetBtn) {
+    resetBtn.disabled = !selected;
+  }
 }
 function updateQuestionLock(){
   const attrSel=$("wsd-attraction-select");
@@ -1664,18 +1669,4 @@ document.addEventListener("DOMContentLoaded",()=>{
   }else{
     showScreen("setup-game");
   }
-});
-document.addEventListener('DOMContentLoaded', () => {
-  const parkSelect = document.getElementById('wsd-park-select');
-  const startBtn   = document.getElementById('wsd-start-game-btn');
-  const restartBtn = document.getElementById('wsd-restart-game-btn');
-
-  function updateButtons() {
-    const hasPark = parkSelect.value && parkSelect.value.trim() !== '';
-    startBtn.disabled   = !hasPark;
-    restartBtn.disabled = !hasPark;
-  }
-
-  updateButtons();
-  parkSelect.addEventListener('change', updateButtons);
 });
