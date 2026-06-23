@@ -471,7 +471,7 @@ if (name === "setup-game") {
   // Other screens behave as before
   showHeroSpotlightForScreen(name);
 }
-
+}
 // ---------- Setup screen + locks ----------
 
 // Lock player inputs and start/reset buttons until a park is chosen
