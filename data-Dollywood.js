@@ -17,7 +17,7 @@ const PARK_DOLLYWOOD = {
     { park: "Dollywood", land: "Wildwood Grove",   name: "Frogs & Fireflies",                type: "ride" },
     { park: "Dollywood", land: "Wildwood Grove",   name: "Treetop Tower",                    type: "ride" },
     { park: "Dollywood", land: "Jukebox Junction", name: "Lightning Rod",                    type: "ride" },
-    { park: "Dollywood", land: "Jukebox Junction", name: "PLay On",                           type: "show" },
+    { park: "Dollywood", land: "Jukebox Junction", name: "Play On",                           type: "show" },
     { park: "Dollywood", land: "Jukebox Junction", name: "Rocking Roadway",                  type: "ride" },
     { park: "Dollywood", land: "Craftsman's Valley", name: "Blazing Fury",                   type: "ride" },
     { park: "Dollywood", land: "Craftsman's Valley", name: "Eagle Show",                     type: "show" },
