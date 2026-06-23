@@ -50,8 +50,16 @@
     }
 
     .wsd-splash-logo {
-      width: 88px;
-      height: 88px;
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      margin-bottom: 0.25rem;
+    }
+    .wsd-splash-guide {
+      max-width: 100%;  /* never overflow the page/container */
+      height: auto;     /* keep aspect ratio */
+      display: block;   /* avoids inline gaps */
       border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
       margin-bottom: 0.25rem;
@@ -171,7 +179,7 @@
 
     <!-- Page 3: Spotlight guide (first visit only) -->
     <div class="wsd-splash-page">
-      <div class="wsd-splash-icon-big">💡</div>
+      m<img src="wsd_guide.png" alt="Who Said Diz?" class="wsd-splash-guide"/>
       <div class="wsd-splash-title">Follow the guide</div>
       <div class="wsd-splash-body">
         <p>At the top of every screen you'll see a <strong>step card</strong> that tells you exactly what to do and who should be holding the phone.</p>
