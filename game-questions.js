@@ -9,7 +9,8 @@ const GAME_QUESTIONS = {
         "You’re filling out your new name tag at {{attraction}}—what fake name are you putting on it?",
         "If you were the replacement for a character in {{attraction}}, who would it be?",
         "You’re a greeter at {{attraction}} - what is your go‑to line?",
-        "What cast memeber role on {{attraction}}would you least like to have?"
+        "What cast member role on {{attraction}} would you least like to have?",
+        "Starting with “Back when I worked {{attraction}}…”, what imaginary story do you tell?"
       ]
     },
     {
@@ -31,11 +32,12 @@ const GAME_QUESTIONS = {
       "name": "Mash-Ups & Crossovers",
       "description": "Blend {{attraction}} with other stories, parks, and formats.",
       "questions": [
-        "If {{attraction}} crossed over with any other IP, what wild mash‑up would you create?",
-        "If {{attraction}} crossed over with any other attraction, what wild mash‑up would you create?",
+        "If {{attraction}} crossed over with any other IP, what mash‑up would you create?",
+        "What character from another attraction in {{park}} would you bring to {{attraction}}?",
+        "If {{attraction}} crossed over with any other attraction, what mash‑up would you create?",
         "If you had to pick up {{attraction}} and moved it to another park, where would it fit best?",
-        "If {{attraction}} were a direct-to-streaming movie, what would it's title be?",
-        "If {{attraction}} were a direct-to-streaming song, what would it's title be?",
+        "If {{attraction}} were a direct-to-streaming movie, what would its title be?",
+        "If {{attraction}} were a song, what would its title be?",
         "If you could drop any other character into {{attraction}}, who joins the story?",
         "Where in {{attraction}} would you add the character YOU to the attraction?",
         "What other attraction do you rank exactly the same as this one?"
@@ -53,7 +55,6 @@ const GAME_QUESTIONS = {
         "Where would you add a brand new scene in {{attraction}}, and what would happen in it?",
         "What holiday overlay scene would you add to {{attraction}} for a seasonal version?",
         "Which scene in {{attraction}} deserves to be expanded into its own mini‑attraction?",
-        "Which scene in {{attraction}} deserves to be expanded into its own mini‑attraction?",
         "If budget didn’t matter at all, what wild upgrade would you add to {{attraction}}?"
       ]
     },
@@ -63,13 +64,13 @@ const GAME_QUESTIONS = {
       "description": "Turn {{attraction}} into shows, brands, and slogans.",
       "questions": [
         "If {{attraction}} were a roadside attraction, what would the big billboard outside say?",
-        "A producer wants to take {{attraction}} to Broadway—if it became a stage musical, what would its over‑the‑top title be?",
-        "The year is 1994 and your attraction becomes TV—if {{attraction}} were a 90s sitcom, what would its cheesy title be?",
-        "Merchandising has gone absolutely wild—what’s the most over‑the‑top souvenir you can imagine for {{attraction}}?",
-        "Marketing asks for a tiny tagline—what three words best describe the overall vibe of {{attraction}}?",
-        "You’re designing a motivational poster for the break room—what motivational quote could you write that sums up {{attraction}}?",
-        "Corporate sponsorship arrives in the funniest way—what fake company would be the funniest sponsor for {{attraction}}?",
-        "You’ve been told to work the sponsor into the script—what cheesy line would you add to the spiel to awkwardly mention that sponsor?"
+        "If {{attraction}} became a stage musical, what would its over‑the‑top title be?",
+        "If {{attraction}} were a 90s sitcom, what would its title be?",
+        "What’s the hottest souvenir you can imagine for {{attraction}}?",
+        "What three words best describe the overall vibe of {{attraction}}?",
+        "What quote could you write that sums up {{attraction}}?",
+        "What fake company would be the funniest sponsor for {{attraction}}?",
+        "What fake sponsor line would you add to {{attraction}}?"
       ]
     },
     {
@@ -77,12 +78,12 @@ const GAME_QUESTIONS = {
       "name": "Food & Flavor",
       "description": "Snacks, eateries, and the taste and smell of {{attraction}}.",
       "questions": [
-        "A tiny kiosk spot opens right beside the exit—if you built a themed eatery next to {{attraction}}, what would you serve?",
-        "You’re grabbing a bite between attraction times—what’s your ideal snack to eat right before or after riding {{attraction}}?",
-        "You’ve been given the tiniest snack cart imaginable—what would you serve at a snack stand based on {{attraction}}?",
-        "The park approves a full quick‑service concept—you’re designing a quick‑service spot beside {{attraction}}; what’s the signature dish?",
-        "An aromatics company wants a new signature scent—if {{attraction}} got its own fragrance, what would it smell like?",
-        "You’ve just stepped off and someone asks, “What does it smell like in there?”—describe the smell of {{attraction}} in three words or less."
+        "If you built a themed eatery next to {{attraction}}, what would you call it?",
+        "What’s your ideal snack to eat right before or after riding {{attraction}}?",
+        "What would you serve at a snack stand based on {{attraction}}?",
+        "You’re designing a quick‑service spot beside {{attraction}} - what’s the signature dish?",
+        "If {{attraction}} got its own fragrance, what would it be called?",
+        "Describe the smell of {{attraction}} in three words or less."
       ]
     },
     {
@@ -90,12 +91,11 @@ const GAME_QUESTIONS = {
       "name": "Memories & Feelings",
       "description": "Share personal stories and emotional reactions to {{attraction}}.",
       "questions": [
-        "You’re telling stories to friends who’ve never been—what’s the funniest or strangest real memory you have from {{attraction}}?",
-        "You’re flipping through your memories years from now—what moment from {{attraction}} do you think you’ll still remember in 20 years?",
-        "You’re stepping off still catching your breath—what’s the first single word that comes to mind when you step off {{attraction}}?",
-        "You’re chasing that classic Disney feeling—when does {{attraction}} hit pure “Disney magic” for you?",
-        "You’re so wrapped up you forget where you are—during {{attraction}}, when do you feel the most completely immersed?",
-        "The spell suddenly slips—during {{attraction}}, when does the illusion totally fall apart for you?"
+        "What’s the strongest real memory you have from your first time on {{attraction}}?",
+        "What moment from {{attraction}} do you think you’ll still remember in 20 years?",
+        "What’s the first single word that comes to mind when you step off {{attraction}}?",
+        "When do you feel the most completely immersed on {{attraction}}?",
+        "When does the illusion totally fall apart for you on {{attraction}}?"
       ]
     },
     {
@@ -103,12 +103,12 @@ const GAME_QUESTIONS = {
       "name": "Trivia & Hidden Details",
       "description": "Dig into facts, rumors, and Easter eggs around {{attraction}}.",
       "questions": [
-        "You’re playing tour guide in the queue—what tiny detail in {{attraction}} do you love pointing out to people?",
-        "You’ve watched attractionrs sail past without noticing something great—what little element in {{attraction}} do you think almost everyone misses?",
-        "You’re sharing “fun facts” with your group—what’s your favorite real trivia fact about {{attraction}}?",
-        "You’re writing a parody guidebook—what completely fake trivia fact about {{attraction}} do you wish were true?",
-        "You’re on a hidden‑details mission—what’s your favorite hidden Mickey in {{attraction}}, real or one you just made up?",
-        "You’re hiding secrets in plain sight—where would you hide a hidden Mickey inside {{attraction}}?"
+        "What detail in {{attraction}} do you love pointing out to people?",
+        "What little element in {{attraction}} do you think almost everyone misses?",
+        "What’s your favorite real trivia fact about {{attraction}}?",
+        "What completely fake trivia fact about {{attraction}} do you wish were true?",
+        "What’s your favorite hidden Mickey in {{attraction}}, real or one you just made up?",
+        "Where would you hide a hidden Mickey inside {{attraction}}?"
       ]
     },
     {
@@ -116,12 +116,12 @@ const GAME_QUESTIONS = {
       "name": "Music & Voice",
       "description": "Turn {{attraction}} into songs, bands, and performances.",
       "questions": [
-        "A songwriter is composing a track inspired by the attraction—if {{attraction}} were a song, what would its title be?",
-        "You walk away humming without thinking—what melody or musical moment from {{attraction}} gets stuck in your head all day?",
-        "You’re recasting the audio for a remaster—whose voice performance in {{attraction}} is the absolute best?",
-        "You’re putting together a themed concept band—what would you name a band that only sings about {{attraction}}?",
-        "A producer wants one big radio‑ready track—what would you call a pop single that’s inspired by {{attraction}}?",
-        "The script is written but the narrator is your call—who would you get to narrate {{attraction}}?"
+        "If {{attraction}} were a song, what would its title be?",
+        "What melody or musical moment from {{attraction}} gets stuck in your head all day?",
+        "Whose voice performance in {{attraction}} is the absolute best?",
+        "What would you name a band that only sings about {{attraction}}?",
+        "What would you call a pop single that’s inspired by {{attraction}}?",
+        "What celebrity would you get to narrate {{attraction}}?"
       ]
     },
     {
@@ -129,12 +129,12 @@ const GAME_QUESTIONS = {
       "name": "Characters & Casting",
       "description": "Recast, spotlight, or cut the characters of {{attraction}}.",
       "questions": [
-        "Imagine one character gets their name on the marquee—which character from {{attraction}} deserves their own spin‑off attraction or show?",
-        "Casting is rebalancing screen time—which underused character in {{attraction}} needs way more spotlight?",
-        "A tough cut has to be made—which existing character in {{attraction}} would you remove entirely?",
-        "You’re ranking the stars of the show—which animatronic in {{attraction}} is your favorite?",
-        "A new figure is being designed—what kind of animatronic would you add to {{attraction}}?",
-        "One performer is about to get a much bigger moment—which animatronic in {{attraction}} deserves an entire scene built around them?"
+        "Which character from {{attraction}} deserves their own spin‑off attraction?",
+        "Which underused character in {{attraction}} needs way more spotlight?",
+        "Which existing character in {{attraction}} would you remove entirely?",
+        "Which animatronic in {{attraction}} is your favorite?",
+        "What kind of animatronic would you add to {{attraction}}?",
+        "Which animatronic in {{attraction}} deserves an entire scene built around them?"
       ]
     },
     {
@@ -142,16 +142,16 @@ const GAME_QUESTIONS = {
       "name": "Queue & Preshow",
       "description": "Focus on the build‑up to {{attraction}}: line, preshow, and post‑show.",
       "questions": [
-        "You’re stuck in the preshow yet again—what annoys you the most about the preshow for {{attraction}}?",
-        "You’re replaying the “show before the show” in your head—what preshow moment from {{attraction}} sticks with you the most?",
-        "The setup is getting a total reboot—if you could completely swap out the preshow for {{attraction}}, what would happen instead?",
-        "The preshow needs more guest interaction—what simple audience participation bit would you add to the preshow for {{attraction}}?",
-        "You’ve stood in this line more times than you can count—what’s the best part of the queue for {{attraction}}?",
-        "You’re staring at a corner of the line wondering why it exists—what’s the most pointless or boring part of the queue for {{attraction}}?",
-        "Every time you enter the queue you look for one thing—what queue detail in {{attraction}} do you always look for every time?",
-        "You’re replaying the warm‑up in your mind—what is your all‑time favorite preshow moment for {{attraction}}?",
-        "The exit area is being redesigned from scratch—if you could completely swap out the post‑show for {{attraction}}, what would you put there instead?",
-        "The exit has turned into an exhibit gallery—if the post‑show for {{attraction}} became a mini museum, what’s the first artifact you’d display?"
+        "What do you like the most about the preshow for {{attraction}}?",
+         "What annoys you the most about the preshow for {{attraction}}?",
+        "What preshow moment from {{attraction}} sticks with you the most?",
+        "If you could completely swap out the preshow for {{attraction}}, what would happen instead?",
+        "What simple audience participation bit would you add to the preshow for {{attraction}}?",
+        "What’s the best part of the queue for {{attraction}}?",
+        "What’s the most pointless or boring part of the queue for {{attraction}}?",
+        "What queue detail in {{attraction}} do you always look for every time?",
+        "If you could completely swap out the post‑show for {{attraction}}, what would you put there instead?",
+        "If the post‑show for {{attraction}} became a mini museum, what’s the first {{land}} artifact you’d display?"
       ]
     },
     {
@@ -159,16 +159,16 @@ const GAME_QUESTIONS = {
       "name": "Scenes & Setpieces",
       "description": "Zoom in on best, worst, and most memorable moments in {{attraction}}.",
       "questions": [
-        "You only get to keep one moment—what’s the single best moment inside {{attraction}}?",
-        "A scene has to be reworked or removed—what’s the weakest scene in {{attraction}} that you’d call out?",
-        "You’re half‑watching the clock, waiting for “that part”—what’s the one moment in {{attraction}} you always look forward to?",
-        "You’re sketching layouts like an Imagineer—what’s the coolest setpiece inside {{attraction}}?",
-        "You’re deciding which sets to refurbish first—what’s the least impressive or most boring setpiece in {{attraction}}?",
-        "You scroll through fan comments and shrug—what moment in {{attraction}} do you think is the most overrated?",
-        "You’re defending a deep cut on a podcast—what moment in {{attraction}} do you think is the most underrated?",
-        "You attraction and catch yourself checking your watch—what part of {{attraction}} always drags and feels too long?",
-        "You wish the attraction would slow down for a beat—what part of {{attraction}} should hang just a little bit longer?",
-        "The attraction breaks down and you’re walked off mid‑scene—what’s the best part of {{attraction}} to get evacuated from and walk through?"
+        "What’s the single best moment inside {{attraction}}?",
+        "What’s the weakest scene in {{attraction}} that you’d call out?",
+        "What’s the one moment in {{attraction}} you always look forward to?",
+        "What’s the coolest setpiece inside {{attraction}}?",
+        "What’s the least impressive or most boring setpiece in {{attraction}}?",
+        "What {{attraction}} moment do you think is the most overrated?",
+        "What {{attraction}} moment do you think is the most underrated?",
+        "What part of {{attraction}} always drags and feels too long?",
+        "What part of {{attraction}} should hang just a little bit longer?",
+        "What’s the best part of {{attraction}} to get evacuated from?"
       ]
     },
     {
@@ -176,9 +176,9 @@ const GAME_QUESTIONS = {
       "name": "Tech & Effects",
       "description": "Talk about the illusions, effects, and show tech in {{attraction}}.",
       "questions": [
-        "Engineers ask which gag needs help most—which effect in {{attraction}} really needs an upgrade?",
-        "You’re bragging to a friend about the wow factor—which effect in {{attraction}} impresses you the most right now?",
-        "You spot a gag that just doesn’t sell the illusion—which effect in {{attraction}} looks the fakest to you?"
+        "Which effect in {{attraction}} really needs an upgrade?",
+        "Which effect in {{attraction}} impresses you the most?",
+        "Which effect in {{attraction}} looks the fakest to you?"
       ]
     },
     {
@@ -186,10 +186,11 @@ const GAME_QUESTIONS = {
       "name": "Comparisons & Rankings",
       "description": "Compare {{attraction}} to lines, lands, and other attractions.",
       "questions": [
-        "You’re ranking everything in {{land}} for a blog—how does {{attraction}} stack up against the other attractions there?",
-        "You’ve just stepped off another attraction and walked straight here—how does {{attraction}} compare to the last attraction you rode today?",
-        "You’re forced to rank your loyalties in {{land}}—where does {{attraction}} rank among the attractions there, and why?",
-        "You’re walking past and check the wait time sign—what’s the longest you would honestly wait in line for {{attraction}}?"
+        "How does {{attraction}} stack up against the other attractions in {{land}}?",
+        "How does {{attraction}} stack up against the other attractions in {{park}}?",
+        "How does {{attraction}} compare to the last attraction you rode in {{park}} today?",
+        "Where does {{attraction}} rank among the attractions in {{land}} and why?",
+        "What’s the longest you would wait in line for {{attraction}}?"
       ]
     },
     {
@@ -197,9 +198,8 @@ const GAME_QUESTIONS = {
       "name": "Story & Theme",
       "description": "Treat {{attraction}} like a story, poem, or fable.",
       "questions": [
-        "You’re turning the attraction into a storybook—if {{attraction}} were a fable, what quick moral would appear at the end?",
-        "You’ve been given one line to sum it all up—write a one‑line poem about {{attraction}}.",
-        "You’re telling tall tales in the cast break room—starting with “Back when I worked {{attraction}}…”, what imaginary story do you tell?"
+        "If {{attraction}} were a fable, what moral would appear at the end?",
+        "Write a one‑line poem about {{attraction}}."
       ]
     },
     {
@@ -207,8 +207,8 @@ const GAME_QUESTIONS = {
       "name": "Media & Moments",
       "description": "Capture {{attraction}} in clips, photos, and social posts.",
       "questions": [
-        "You only get ten seconds to film—what 10‑second moment from {{attraction}} would make the best viral clip?",
-        "You can snap exactly one photo inside—what single photo from {{attraction}} would perfectly capture its personality?"
+        "What 10‑second moment from {{attraction}} would make the best viral clip?",
+        "What single photo from {{attraction}} would you enter in a photo contest?"
       ]
     },
     {
@@ -216,8 +216,9 @@ const GAME_QUESTIONS = {
       "name": "Props & Chaos",
       "description": "Swap, steal, or joke about props inside {{attraction}}.",
       "questions": [
-        "A key prop from the preshow has mysteriously vanished—if someone stole it from {{attraction}}, what ridiculous thing would you replace it with?",
-        "A set piece disappears mid‑attraction and needs a stand‑in—if someone stole a prop from inside {{attraction}}, what silly replacement would you put in?"
+        "If someone stole a prop from {{attraction}}, what would you replace it with?",
+        "If someone stole a prop from {{attraction}}'s queue, what would you replace it with?",
+        "If someone stole a prop from {{attraction}}, what prop from another {{land}} would you put in its place?"
       ]
     },
     {
@@ -225,8 +226,8 @@ const GAME_QUESTIONS = {
       "name": "Legacy & Classic",
       "description": "Decide what should stay or go in {{attraction}}’s legacy.",
       "questions": [
-        "The preservation committee must protect one thing forever—what classic element in {{attraction}} should never, ever be changed?",
-        "That same committee agrees one thing can finally retire—what classic element in {{attraction}} do you think should finally go?"
+        "What classic element in {{attraction}} should never, ever be changed?",
+        "What classic element in {{attraction}} do you think should finally go?"
       ]
     },
     {
@@ -234,8 +235,7 @@ const GAME_QUESTIONS = {
       "name": "Meta & Location",
       "description": "Step outside the attraction and imagine new ways to experience {{attraction}}.",
       "questions": [
-        "You’re snuck in recording gear and a co‑host—what location on {{attraction}} would you most want to do a podcast from?",
-        "You’re walking past and check the wait time sign—what’s the longest you would honestly wait in line for {{attraction}}?"
+        "What location on {{attraction}} would you most want to do a podcast from?"
       ]
     },
      {
