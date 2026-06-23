@@ -258,8 +258,6 @@ const GAME_QUESTIONS = {
         "What celebrity would you get to narrate {{attraction}}?",
         "Which character from {{attraction}} deserves their own spin‑off attraction?",
         "Which underused character in {{attraction}} needs way more spotlight?",
-        "Which animatronic in {{attraction}} is your favorite?",
-        "Which animatronic in {{attraction}} deserves an entire scene built around them?",
         "What preshow moment from {{attraction}} sticks with you the most?",
         "What simple audience participation bit would you add to the preshow for {{attraction}}?",
         "What 10‑second moment from {{attraction}} would make the best viral clip?",
