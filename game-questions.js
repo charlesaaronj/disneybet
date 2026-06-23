@@ -243,30 +243,48 @@ const GAME_QUESTIONS = {
   "name": "Showtime & Performance",
   "description": "Questions that treat {{attraction}} like a live show or performance.",
   "questions": [
-    // Cast Member Roleplay
+    // Cast Member Roleplay / performer POV
     "You’ve just been hired at {{attraction}}—what would your dream cast member role be?",
     "You’re filling out your new name tag at {{attraction}}—what fake name are you putting on it?",
-    "Casting gets wild and opens a role just for you—if you joined {{attraction}} as a live character, who would you be?",
-    "You’re stationed as the front greeter with a mic—if you were greeting at {{attraction}}’s entrance, what would be your go‑to line?",
+    "If you were the replacement for a character in {{attraction}}, who would it be?",
+    "You’re a greeter at {{attraction}} - what is your go‑to line?",
+    "Starting with “Back when I worked {{attraction}}…”, what imaginary story do you tell?",
 
-    // Marketing & Branding (show formats)
-    "The year is 1994 and your attraction becomes TV—if {{attraction}} were a 90s sitcom, what would its cheesy title be?",
+    // Show format / medium
+    "If {{attraction}} became a stage musical, what would its over‑the‑top title be?",
+    "If {{attraction}} were a 90s sitcom, what would its title be?",
+    "If {{attraction}} were a song, what would its title be?",
+    "If {{attraction}} were a direct-to-streaming movie, what would its title be?",
 
-    // Music & Voice (performance‑focused)
-    "You walk away humming without thinking—what melody or musical moment from {{attraction}} gets stuck in your head all day?",
-    "You’re recasting the audio for a remaster—whose voice performance in {{attraction}} is the absolute best?",
-    "The script is written but the narrator is your call—who would you get to narrate {{attraction}}?",
+    // Music & Voice
+    "What melody or musical moment from {{attraction}} gets stuck in your head all day?",
+    "Whose voice performance in {{attraction}} is the absolute best?",
+    "What celebrity would you get to narrate {{attraction}}?",
 
-    // Characters & Casting (onstage emphasis)
-    "Imagine one character gets their name on the marquee—which character from {{attraction}} deserves their own spin‑off attraction or show?",
-    "Casting is rebalancing screen time—which underused character in {{attraction}} needs way more spotlight?",
-    "One performer is about to get a much bigger moment—which animatronic in {{attraction}} deserves an entire scene built around them?",
+    // Characters & Casting
+    "Which character from {{attraction}} deserves their own spin‑off attraction?",
+    "Which underused character in {{attraction}} needs way more spotlight?",
+    "Which animatronic in {{attraction}} is your favorite?",
+    "Which animatronic in {{attraction}} deserves an entire scene built around them?",
 
-    // Queue & Preshow / Media for show build‑up
-    "You’re replaying the “show before the show” in your head—what preshow moment from {{attraction}} sticks with you the most?",
-    "The preshow needs more guest interaction—what simple audience participation bit would you add to the preshow for {{attraction}}?",
-    "You only get ten seconds to film—what 10‑second moment from {{attraction}} would make the best viral clip?",
-    "You can snap exactly one photo inside—what single photo from {{attraction}} would perfectly capture its personality?"
+    // Queue, preshow, and “show before the show”
+    "What preshow moment from {{attraction}} sticks with you the most?",
+    "What simple audience participation bit would you add to the preshow for {{attraction}}?",
+
+    // Media moments / capturing the performance
+    "What 10‑second moment from {{attraction}} would make the best viral clip?",
+    "What single photo from {{attraction}} would you enter in a photo contest?",
+
+    // Story framing / big takeaway
+    "If {{attraction}} were a fable, what moral would appear at the end?",
+    "Write a one‑line poem about {{attraction}}.",
+
+    // Lasting “show” memory
+    "What moment from {{attraction}} do you think you’ll still remember in 20 years?",
+
+    // Marquee / tagline
+    "If {{attraction}} were a roadside attraction, what would the big billboard outside say?",
+    "What quote could you write that sums up {{attraction}}?"
   ]
     }
   ]
