@@ -313,6 +313,7 @@ function showScreen(name){
 function updatePlayerInputLock() {
   const parkSel = $("wsd-park-select");
   const selected = !!(parkSel && parkSel.value);
+
   const hint = $("wsd-park-hint");
   if (hint) hint.style.display = selected ? "none" : "block";
 
@@ -324,12 +325,13 @@ function updatePlayerInputLock() {
   const addBtn = $("wsd-add-player");
   if (addBtn) addBtn.disabled = !selected;
 
-  // NEW: show/hide start and restart buttons
-  const startBtn  = $("wsd-start-game");
-  const resetBtn  = $("wsd-reset-setup");
-  if (startBtn) startBtn.style.display = selected ? "block" : "none";
-  if (resetBtn) resetBtn.style.display = selected ? "block" : "none";
+  // NEW: disable/enable Start and Reset buttons instead of hiding them
+  const startBtn = $("wsd-start-game");
+  const resetBtn = $("wsd-reset-setup");
+  if (startBtn) startBtn.disabled = !selected;
+  if (resetBtn) resetBtn.disabled = !selected;
 }
+
 function updateQuestionLock(){
   const attrSel=$("wsd-attraction-select");
   const hasAttraction=!!(attrSel&&attrSel.value);
