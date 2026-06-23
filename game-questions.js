@@ -234,6 +234,37 @@ const GAME_QUESTIONS = {
         "You’re snuck in recording gear and a co‑host—what location on {{attraction}} would you most want to do a podcast from?",
         "You’re walking past and check the wait time sign—what’s the longest you would honestly wait in line for {{attraction}}?"
       ]
+    },
+     {
+      "id": 20,
+  "name": "Showtime & Performance",
+  "description": "Questions that treat {{attraction}} like a live show or performance.",
+  "questions": [
+    // Cast Member Roleplay
+    "You’ve just been hired at {{attraction}}—what would your dream cast member role be?",
+    "You’re filling out your new name tag at {{attraction}}—what fake name are you putting on it?",
+    "Casting gets wild and opens a role just for you—if you joined {{attraction}} as a live character, who would you be?",
+    "You’re stationed as the front greeter with a mic—if you were greeting at {{attraction}}’s entrance, what would be your go‑to line?",
+
+    // Marketing & Branding (show formats)
+    "The year is 1994 and your attraction becomes TV—if {{attraction}} were a 90s sitcom, what would its cheesy title be?",
+
+    // Music & Voice (performance‑focused)
+    "You walk away humming without thinking—what melody or musical moment from {{attraction}} gets stuck in your head all day?",
+    "You’re recasting the audio for a remaster—whose voice performance in {{attraction}} is the absolute best?",
+    "The script is written but the narrator is your call—who would you get to narrate {{attraction}}?",
+
+    // Characters & Casting (onstage emphasis)
+    "Imagine one character gets their name on the marquee—which character from {{attraction}} deserves their own spin‑off attraction or show?",
+    "Casting is rebalancing screen time—which underused character in {{attraction}} needs way more spotlight?",
+    "One performer is about to get a much bigger moment—which animatronic in {{attraction}} deserves an entire scene built around them?",
+
+    // Queue & Preshow / Media for show build‑up
+    "You’re replaying the “show before the show” in your head—what preshow moment from {{attraction}} sticks with you the most?",
+    "The preshow needs more guest interaction—what simple audience participation bit would you add to the preshow for {{attraction}}?",
+    "You only get ten seconds to film—what 10‑second moment from {{attraction}} would make the best viral clip?",
+    "You can snap exactly one photo inside—what single photo from {{attraction}} would perfectly capture its personality?"
+  ]
     }
   ]
 };
