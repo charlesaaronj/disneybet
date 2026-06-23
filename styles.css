@@ -690,12 +690,12 @@ body {
 
 /* Force all modal headers into the theme even with bg-* classes */
 .modal .modal-header {
-  background: var(--wsd-bg-modal-header-grad) !important;
-  color: var(--wsd-text-invert) !important;
+  background: var(--wsd-bg-modal-header-grad) 
+  color: var(--wsd-text-invert)
   border-bottom: none;
 }
 .modal .modal-header[class*="bg-"] {
-  background: var(--wsd-bg-modal-header-grad) !important;
+  background: var(--wsd-bg-modal-header-grad) 
 }
 
 #wsd-question-display {
