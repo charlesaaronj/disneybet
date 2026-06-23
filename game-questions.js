@@ -15,7 +15,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 2,
-      "name": "Wild What-Ifs",
+      "name": "What-Ifs",
       "description": "Break the rules inside {{attraction}} and imagine outrageous twists.",
       "questions": [
         "What outlandish activity would you love to do on {{attraction}}?",
@@ -109,6 +109,7 @@ const GAME_QUESTIONS = {
         "What completely fake trivia fact about {{attraction}} do you wish were true?",
         "What’s your favorite hidden Mickey in {{attraction}}, real or one you just made up?",
         "Where would you hide a hidden Mickey inside {{attraction}}?"
+        "What easter egg would you add to {{attraction}}?"
       ]
     },
     {
