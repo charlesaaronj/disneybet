@@ -456,12 +456,19 @@ function showScreen(name) {
   const navId = NAV_MAP[name];
   if (navId && $(navId)) $(navId).classList.add("wsd-nav-item-active");
 
-  // Suppress hero spotlight the first time setup-game is shown
-  if (name === "setup-game" && !firstSetupGameShown) {
+  // Hero spotlight per screen
+// For setup-game we rely on an explicit first-visit call, then one-time per screen
+if (name === "setup-game") {
+  if (!firstSetupGameShown) {
+    // First explicit spotlight comes from initHeroSpotlightFirstVisit (called by splash),
+    // so just flag that we've visited setup-game and don't fire another auto spotlight now.
     firstSetupGameShown = true;
-    return;
+  } else {
+    // Subsequent navigations to setup-game can still show the spotlight if needed
+    showHeroSpotlightForScreen(name);
   }
-
+} else {
+  // Other screens behave as before
   showHeroSpotlightForScreen(name);
 }
 
