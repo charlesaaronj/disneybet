@@ -404,23 +404,22 @@ function initHeroSpotlightAfterWelcome() {
     return;
   }
 
-// Called once from splash after first-time onboarding completes
-window.initHeroSpotlightFirstVisit = function () {
-  console.log("[spotlight] first-visit init for setup-game");
-  showHeroSpotlightForScreen("setup-game");
-};
-
   modalEl.addEventListener(
     "hidden.bs.modal",
     () => {
-      console.log(
-        "[spotlight] welcome modal closed -> spotlight setup-game"
-      );
+      console.log("[spotlight] welcome modal closed -> spotlight setup-game");
       showHeroSpotlightForScreen("setup-game");
     },
     { once: true }
   );
 }
+
+// Called once from splash after first-time onboarding completes
+window.initHeroSpotlightFirstVisit = function () {
+  console.log("[spotlight] first-visit init");
+  var screenName = (window.gameState && window.gameState.screen) || "setup-game";
+  showHeroSpotlightForScreen(screenName);
+};
 
 // ---------- Screen switching ----------
 
