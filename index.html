@@ -695,10 +695,16 @@
   }
 
   function dismiss() {
-    if (isFirstVisit) localStorage.setItem(FIRST_VISIT_KEY, "1");
-    splash.classList.add("wsd-splash-hide");
-    setTimeout(function () { splash.style.display = "none"; }, 450);
+  if (isFirstVisit) {
+    localStorage.setItem(FIRST_VISIT_KEY, "1");
+    // Trigger the hero spotlight once the splash is gone
+    if (typeof initHeroSpotlightFirstVisit === "function") {
+      initHeroSpotlightFirstVisit();
+    }
   }
+  splash.classList.add("wsd-splash-hide");
+  setTimeout(function () { splash.style.display = "none"; }, 450);
+}
 
   // ── Touch swipe ──
   var touchStartX = 0;
