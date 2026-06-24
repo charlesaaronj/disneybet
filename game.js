@@ -79,7 +79,7 @@ const FINAL_BONUS_POINTS = {
 const SCREEN_META = {
   "setup-game": {
     icon: "🎮",
-    title: "Setup game",
+    title: "Get started!",
     instruction:
       "Pick the park you're in, add 3+ players, and start the game."
   },
@@ -104,7 +104,7 @@ const SCREEN_META = {
     icon: "💰",
     title: "Guess & wager",
     instruction:
-      "Let everyone guess the author & how many points to wager. Add house points to up the stakes."
+      "All - guess who said diz & wager points. Add house points to "up" the stakes."
   },
   "reveal": {
     icon: "🔍",
