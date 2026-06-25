@@ -347,7 +347,7 @@ body {
 }
 .wsd-score-row:last-child { border-bottom: none; }
 .wsd-score-name  { font-weight: 700; color: var(--wsd-text-main); }
-.wsd-score-meta  { font-size: 0.75rem; color: var(--wsd-text-softer); }
+.wsd-score-meta  { font-size: 0.75rem; color: var(--wsd-text-softer); font-weight: 800; }
 .wsd-score-value { font-weight: 800; font-size: 1rem; color: var(--wsd-primary); }
 .wsd-chip {
   display: inline-flex;
