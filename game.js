@@ -721,6 +721,7 @@ function updateQuestionLock() {
 }
 
 function spotlightQuestionReveal() {
+  console.log("[spotlight] question reveal called");
   const qCard = $("wsd-question-display");
   const overlay = $("wsd-spotlight-overlay");
   if (!qCard || !overlay) {
@@ -739,15 +740,10 @@ function spotlightQuestionReveal() {
     qCard.classList.remove("wsd-hero-card-spotlight");
     overlay.style.display = "none";
     if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
-    document.removeEventListener("click", onDocClick, true);
   }
 
-  function onDocClick() {
-    clearSpotlight();
-  }
-
+  // Only clear when the user taps the dark backdrop
   if (backdrop) backdrop.addEventListener("click", clearSpotlight);
-  document.addEventListener("click", onDocClick, true);
 }
 
 // Question display helpers
