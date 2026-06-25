@@ -740,7 +740,7 @@ body {
   backdrop-filter: blur(2px);
   pointer-events: auto;
 }
-#wsd-question-display.wsd-hero-card-spotlight {
+#wsd-question-display {
   position: relative;      /* make it stackable */
   z-index: 50;             /* same as hero card, above overlay (40) */
   border-radius: 18px;
