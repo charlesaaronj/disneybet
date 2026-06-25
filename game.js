@@ -3,48 +3,6 @@
 // ===========================================================
 
 // ---------- Small DOM + utility helpers ----------
-const Logger = {
-  _enabled: true,
-  _styles: {
-    log:   'color: #8be9fd; font-weight: bold',
-    info:  'color: #50fa7b; font-weight: bold',
-    warn:  'color: #ffb86c; font-weight: bold',
-    error: 'color: #ff5555; font-weight: bold',
-    debug: 'color: #bd93f9; font-weight: bold',
-    game:  'color: #f1fa8c; font-weight: bold; font-size: 13px',
-  },
-
-  _log(level, label, ...args) {
-    if (!this._enabled) return;
-    const style = this._styles[level] || '';
-    const timestamp = new Date().toLocaleTimeString();
-    console.log(`%c[${label.toUpperCase()}] ${timestamp}`, style, ...args);
-  },
-
-  log:   (...args) => Logger._log('log',   'log',   ...args),
-  info:  (...args) => Logger._log('info',  'info',  ...args),
-  warn:  (...args) => Logger._log('warn',  'warn',  ...args),
-  error: (...args) => Logger._log('error', 'error', ...args),
-  debug: (...args) => Logger._log('debug', 'debug', ...args),
-
-  // Custom labeled log — great for game events
-  tag: (label, ...args) => Logger._log('game', label, ...args),
-
-  // Group logs under a collapsible header
-  group(label, fn) {
-    if (!Logger._enabled) return fn?.();
-    console.group(`%c▶ ${label}`, Logger._styles.game);
-    fn?.();
-    console.groupEnd();
-  },
-
-  // Toggle all logging on/off (e.g. disable in production)
-  enable:  () => { Logger._enabled = true; },
-  disable: () => { Logger._enabled = false; },
-};
-
-
-
 const $ = id => document.getElementById(id);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const medal = i => ["🥇 ", "🥈 ", "🥉 "][i] || "";
