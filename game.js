@@ -518,10 +518,13 @@ function updateQuestionLock() {
     });
 }
 
-function spotlightQuestionCard() {
+function spotlightQuestionReveal() {
   const qCard = $("wsd-question-display");
   const overlay = $("wsd-spotlight-overlay");
-  if (!qCard || !overlay) return;
+  if (!qCard || !overlay) {
+    console.log("[spotlight] missing question card or overlay");
+    return;
+  }
 
   qCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
@@ -530,18 +533,20 @@ function spotlightQuestionCard() {
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
 
   function clearSpotlight() {
+    console.log("[spotlight] clearing question spotlight");
     qCard.classList.remove("wsd-hero-card-spotlight");
     overlay.style.display = "none";
     if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
     document.removeEventListener("click", onDocClick, true);
   }
 
-  function onDocClick() { clearSpotlight(); }
+  function onDocClick() {
+    clearSpotlight();
+  }
 
   if (backdrop) backdrop.addEventListener("click", clearSpotlight);
   document.addEventListener("click", onDocClick, true);
 }
-
 
 // Question display helpers
 function flashQuestionDisplay() {
@@ -931,7 +936,7 @@ function onAttractionChange() {
 
   setQuestionDisplay(q);
   flashQuestionDisplay();
-  spotlightQuestionCard();
+  spotlightQuestionReveal();
 
   if (badge) {
     badge.textContent = categoryName || labelForType(type);
@@ -974,7 +979,7 @@ function onGenerateNewQuestion() {
 
   setQuestionDisplay(q);
   flashQuestionDisplay();
-spotlightQuestionCard();
+spotlightQuestionReveal();
 
   const badge = $("wsd-question-type-badge");
   if (badge) badge.textContent = categoryName || labelForType(type);
