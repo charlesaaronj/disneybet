@@ -928,7 +928,7 @@ function onAttractionChange() {
     question: q,
     questionType: type
   });
- //spotlightQuestionReveal();
+ spotlightQuestionReveal();
   setQuestionDisplay(q);
   //flashQuestionDisplay();
  
