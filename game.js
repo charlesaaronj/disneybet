@@ -1204,7 +1204,7 @@ function goToGuessWager() {
           ${p.name}
         </div>
         <div class="wsd-score-meta">
-          Current score: ${p.score}
+          Available points: ${p.score}
         </div>
       </div>`;
     row.appendChild(playerLabel);
