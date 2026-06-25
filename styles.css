@@ -753,7 +753,7 @@ body {
 
 #wsd-question-display.wsd-hero-card-spotlight {
   position: relative;      /* make it stackable */
-  z-index: 41;             /* same as hero card, above overlay (40) */
+  z-index: 50;             /* same as hero card, above overlay (40) */
   border-radius: 18px;
   box-shadow:
     0 0 0 4px rgba(255, 220, 120, 0.9),
