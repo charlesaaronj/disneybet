@@ -108,9 +108,9 @@ body {
 }
 .wsd-hero-title {
   font-family: 'Fredoka', sans-serif;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 900;
-  letter-spacing: 0em;
+  letter-spacing: 0.02em;
   color: var(--wsd-white-hero);
   text-shadow: 1px 1px 3px rgba(0,0,0,0.35);
 }
@@ -148,7 +148,6 @@ body {
 .wsd-hero-card {
   background: var(--wsd-card-bg);
   border-radius: 18px;
-  border: 1px solid var(--wsd-border-soft);
   box-shadow: var(--wsd-shadow-soft);
   padding: 0.9rem 1rem;
   display: flex;
