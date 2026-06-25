@@ -729,15 +729,8 @@ function spotlightQuestionReveal() {
     return;
   }
 
-  // Add spotlight class and show overlay
   qCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
-
-  // Force reflow so z-index and stacking apply immediately
-  void qCard.offsetWidth;
-
-  // Make sure it’s scrolled into view
-  qCard.scrollIntoView({ behavior: "smooth", block: "center" });
 
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
 
@@ -935,10 +928,10 @@ function onAttractionChange() {
     question: q,
     questionType: type
   });
-
+ spotlightQuestionReveal();
   setQuestionDisplay(q);
-  flashQuestionDisplay();
-  spotlightQuestionReveal();
+  //flashQuestionDisplay();
+ 
 
   if (badge) {
     badge.textContent = categoryName || labelForType(type);
@@ -978,10 +971,10 @@ function onGenerateNewQuestion() {
     question: q,
     questionType: type
   });
-
-  setQuestionDisplay(q);
-  flashQuestionDisplay();
 spotlightQuestionReveal();
+  setQuestionDisplay(q);
+ // flashQuestionDisplay();
+
 
   const badge = $("wsd-question-type-badge");
   if (badge) badge.textContent = categoryName || labelForType(type);
