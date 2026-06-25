@@ -729,8 +729,14 @@ function spotlightQuestionReveal() {
     return;
   }
 
+  // Add spotlight class and show overlay
   qCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
+
+  // Force reflow so z-index and stacking apply immediately
+  void qCard.offsetWidth;
+
+  // Make sure it’s scrolled into view
   qCard.scrollIntoView({ behavior: "smooth", block: "center" });
 
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
@@ -742,7 +748,6 @@ function spotlightQuestionReveal() {
     if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
   }
 
-  // Only clear when the user taps the dark backdrop
   if (backdrop) backdrop.addEventListener("click", clearSpotlight);
 }
 
