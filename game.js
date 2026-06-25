@@ -518,6 +518,31 @@ function updateQuestionLock() {
     });
 }
 
+function spotlightQuestionCard() {
+  const qCard = $("wsd-question-display");
+  const overlay = $("wsd-spotlight-overlay");
+  if (!qCard || !overlay) return;
+
+  qCard.classList.add("wsd-hero-card-spotlight");
+  overlay.style.display = "block";
+  qCard.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
+
+  function clearSpotlight() {
+    qCard.classList.remove("wsd-hero-card-spotlight");
+    overlay.style.display = "none";
+    if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
+    document.removeEventListener("click", onDocClick, true);
+  }
+
+  function onDocClick() { clearSpotlight(); }
+
+  if (backdrop) backdrop.addEventListener("click", clearSpotlight);
+  document.addEventListener("click", onDocClick, true);
+}
+
+
 // Question display helpers
 function flashQuestionDisplay() {
   const display = $("wsd-question-display");
@@ -906,6 +931,7 @@ function onAttractionChange() {
 
   setQuestionDisplay(q);
   flashQuestionDisplay();
+  spotlightQuestionCard();
 
   if (badge) {
     badge.textContent = categoryName || labelForType(type);
@@ -947,6 +973,8 @@ function onGenerateNewQuestion() {
   });
 
   setQuestionDisplay(q);
+  flashQuestionDisplay();
+spotlightQuestionCard();
 
   const badge = $("wsd-question-type-badge");
   if (badge) badge.textContent = categoryName || labelForType(type);
