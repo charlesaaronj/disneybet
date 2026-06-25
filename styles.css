@@ -719,6 +719,11 @@ body {
   display: none;
 }
 
+.wsd-avatar-img {
+  width: 32px;   /* adjust size as needed */
+  height: 32px;
+  display: block;
+}
 /* ---------- Hero spotlight overlay ---------- */
 
 .wsd-spotlight-overlay {
@@ -735,22 +740,6 @@ body {
   backdrop-filter: blur(2px);
   pointer-events: auto;
 }
-
-/* Highlight the existing hero card */
-.wsd-hero-card.wsd-hero-card-spotlight {
-  position: relative;
-  z-index: 41;
-  box-shadow: 0 0 0 4px rgba(255,255,255,0.9),
-              var(--wsd-shadow-hero-spot);
-  transform: scale(1.02);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-.wsd-avatar-img {
-  width: 32px;   /* adjust size as needed */
-  height: 32px;
-  display: block;
-}
-
 #wsd-question-display.wsd-hero-card-spotlight {
   position: relative;      /* make it stackable */
   z-index: 50;             /* same as hero card, above overlay (40) */
@@ -760,3 +749,14 @@ body {
     0 16px 40px rgba(0, 0, 0, 0.45);
   transform: scale(1.02);
 }
+
+/* Highlight the existing hero card */
+.wsd-hero-card.wsd-hero-card-spotlight {
+  position: relative;
+  z-index: 41;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.9),
+              var(--wsd-shadow-hero-spot);
+  transform: scale(1.02);
+}
+
+
