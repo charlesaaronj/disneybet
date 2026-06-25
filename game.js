@@ -505,84 +505,6 @@ function updatePlayerInputLock() {
   if (resetBtn) resetBtn.disabled = !selected;
 }
 
-function updateQuestionLock() {
-  const attrSel = $("wsd-attraction-select");
-  const hasAttraction = !!(attrSel && attrSel.value);
-  const hint = $("wsd-attraction-hint");
-  if (hint) hint.style.display = hasAttraction ? "none" : "block";
-
-  ["wsd-generate-question", "wsd-enter-custom-question", "wsd-to-answers"]
-    .forEach(id => {
-      const btn = $(id);
-      if (btn) btn.disabled = !hasAttraction;
-    });
-}
-
-function spotlightQuestionReveal() {
-  const qCard = $("wsd-question-display");
-  const overlay = $("wsd-spotlight-overlay");
-  if (!qCard || !overlay) {
-    console.log("[spotlight] missing question card or overlay");
-    return;
-  }
-
-  qCard.classList.add("wsd-hero-card-spotlight");
-  overlay.style.display = "block";
-  qCard.scrollIntoView({ behavior: "smooth", block: "center" });
-
-  const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
-
-  function clearSpotlight() {
-    console.log("[spotlight] clearing question spotlight");
-    qCard.classList.remove("wsd-hero-card-spotlight");
-    overlay.style.display = "none";
-    if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
-    document.removeEventListener("click", onDocClick, true);
-  }
-
-  function onDocClick() {
-    clearSpotlight();
-  }
-
-  if (backdrop) backdrop.addEventListener("click", clearSpotlight);
-  document.addEventListener("click", onDocClick, true);
-}
-
-// Question display helpers
-function flashQuestionDisplay() {
-  const display = $("wsd-question-display");
-  if (!display) return;
-  display.classList.remove("wsd-question-pop");
-  void display.offsetWidth;
-  display.classList.add("wsd-question-pop");
-}
-
-function setQuestionDisplay(text) {
-  const display = $("wsd-question-display");
-  const textarea = $("wsd-question-text");
-
-  if (display) {
-    display.style.display = text ? "block" : "none";
-    display.textContent = text || "";
-  }
-
-  if (textarea) {
-    textarea.value = text || "";
-    textarea.style.display = "none";
-  }
-}
-
-function showCustomTextarea() {
-  const display = $("wsd-question-display");
-  const textarea = $("wsd-question-text");
-  if (display) display.style.display = "none";
-  if (textarea) {
-    textarea.style.display = "block";
-    textarea.value = "";
-    textarea.readOnly = false;
-    textarea.focus();
-  }
-}
 
 // Populate parks, player inputs, and lock state
 function initSetupScreen() {
@@ -784,6 +706,85 @@ function startGameFromSetup() {
 }
 
 // ---------- Question setup ----------
+
+function updateQuestionLock() {
+  const attrSel = $("wsd-attraction-select");
+  const hasAttraction = !!(attrSel && attrSel.value);
+  const hint = $("wsd-attraction-hint");
+  if (hint) hint.style.display = hasAttraction ? "none" : "block";
+
+  ["wsd-generate-question", "wsd-enter-custom-question", "wsd-to-answers"]
+    .forEach(id => {
+      const btn = $(id);
+      if (btn) btn.disabled = !hasAttraction;
+    });
+}
+
+function spotlightQuestionReveal() {
+  const qCard = $("wsd-question-display");
+  const overlay = $("wsd-spotlight-overlay");
+  if (!qCard || !overlay) {
+    console.log("[spotlight] missing question card or overlay");
+    return;
+  }
+
+  qCard.classList.add("wsd-hero-card-spotlight");
+  overlay.style.display = "block";
+  qCard.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
+
+  function clearSpotlight() {
+    console.log("[spotlight] clearing question spotlight");
+    qCard.classList.remove("wsd-hero-card-spotlight");
+    overlay.style.display = "none";
+    if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
+    document.removeEventListener("click", onDocClick, true);
+  }
+
+  function onDocClick() {
+    clearSpotlight();
+  }
+
+  if (backdrop) backdrop.addEventListener("click", clearSpotlight);
+  document.addEventListener("click", onDocClick, true);
+}
+
+// Question display helpers
+function flashQuestionDisplay() {
+  const display = $("wsd-question-display");
+  if (!display) return;
+  display.classList.remove("wsd-question-pop");
+  void display.offsetWidth;
+  display.classList.add("wsd-question-pop");
+}
+
+function setQuestionDisplay(text) {
+  const display = $("wsd-question-display");
+  const textarea = $("wsd-question-text");
+
+  if (display) {
+    display.style.display = text ? "block" : "none";
+    display.textContent = text || "";
+  }
+
+  if (textarea) {
+    textarea.value = text || "";
+    textarea.style.display = "none";
+  }
+}
+
+function showCustomTextarea() {
+  const display = $("wsd-question-display");
+  const textarea = $("wsd-question-text");
+  if (display) display.style.display = "none";
+  if (textarea) {
+    textarea.style.display = "block";
+    textarea.value = "";
+    textarea.readOnly = false;
+    textarea.focus();
+  }
+}
 
 // Pick a question from GAME_QUESTIONS for this attraction
 function drawQuestionForAttraction(attraction) {
