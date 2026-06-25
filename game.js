@@ -1182,6 +1182,9 @@ function goToGuessWager() {
   // Randomize row order visually
   const playersShuffled = shuffle(gameState.players);
 
+  // Use roundNumber to decide whether Ghost should appear
+  const roundIndex = gameState.roundNumber || 1;
+
   playersShuffled.forEach(p => {
     const row = document.createElement("div");
     row.className = "mb-3 pb-2 border-bottom";
@@ -1216,6 +1219,7 @@ function goToGuessWager() {
     guessSel.className = "form-select wsd-form-select";
     guessSel.dataset.playerId = p.id;
 
+    // Player options
     gameState.players.forEach(p2 => {
       const opt = document.createElement("option");
       opt.value = String(p2.id);
@@ -1223,12 +1227,7 @@ function goToGuessWager() {
       guessSel.appendChild(opt);
     });
 
-    const ghostOpt = document.createElement("option");
-    ghostOpt.value = "ghost";
-    ghostOpt.textContent = "Ghost";
-    guessSel.appendChild(ghostOpt);
-
-     // Only add Ghost from round 2 onward
+    // Only add Ghost from round 2 onward
     if (roundIndex > 1) {
       const ghostOpt = document.createElement("option");
       ghostOpt.value = "ghost";
