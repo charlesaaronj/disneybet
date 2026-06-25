@@ -103,7 +103,7 @@ const SCREEN_META = {
     icon: "💰",
     title: "Guess & wager",
     instruction:
-      "All - guess who said diz & wager points. Add house points to "up" the stakes."
+      "All - guess who said diz & wager points. Add house points to increase the stakes."
   },
   "reveal": {
     icon: "🔍",
