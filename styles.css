@@ -707,7 +707,10 @@ body {
 .wsd-question-pop {
   animation: wsdQuestionFadeIn 0.35s ease-out 1;
 }
-
+/* Accent border for an actual question (not placeholder) */
+.wsd-question-live {
+  border-color: #ffcc33;
+}
 
 /* Optional: no arrow */
 #tutorial-tooltip.arrow-none::before {
