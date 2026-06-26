@@ -139,7 +139,7 @@ const GAME_QUESTIONS = {
         "Which existing character in {{attraction}} would you remove entirely?",
         "Which animatronic in {{attraction}} is your favorite?",
         "What kind of animatronic would you add to {{attraction}}?",
-        "Which animatronic in {{attraction}} deserves an entire scene built around them?"
+        "Which animatronic in {{attraction}} deserves an entire scene built around them?",
         "If {{attraction}} were a fable, what moral would appear at the end?",
         "Write a one‑line poem about {{attraction}}."
       ]
@@ -177,12 +177,14 @@ const GAME_QUESTIONS = {
       ]
     },
     {
-      "id": 14,
+      "id": 13,
       "name": "Comparisons & Rankings",
       "description": "Compare {{attraction}} to lines, lands, and other attractions.",
       "questions": [
         "How does {{attraction}} stack up against the other attractions in {{land}}?",
-        "How does {{attraction}} stack up against the other attractions in the park?",
+        "How does {{attraction}} stack up against the other attractions in {{park}}?",
+        "How does {{attraction}} stack up against attractions in other parks?",
+        "How does {{attraction}} stack up against a previous verion of the attraction?",
         "How does {{attraction}} compare to the last attraction you rode today?",
         "Where does {{attraction}} rank among the attractions in {{land}} and why?",
         "What's the longest you would wait in line for {{attraction}}?",
@@ -190,7 +192,7 @@ const GAME_QUESTIONS = {
       ]
     },
     {
-      "id": 18,
+      "id": 14,
       "name": "Legacy & Classic",
       "description": "Decide what should stay or go in {{attraction}}'s legacy.",
       "questions": [
@@ -203,7 +205,7 @@ const GAME_QUESTIONS = {
       ]
     },
      {
-      "id": 20,
+      "id": 15,
       "name": "Showtime & Performance",
       "description": "Questions that treat {{attraction}} like a live show or performance.",
       "questions": [
@@ -232,37 +234,14 @@ const GAME_QUESTIONS = {
         "What quote could you write that sums up {{attraction}}?"
       ]
     },
-    {
-       "id": 21,
-  "name": "Park-wide",
-  "description": "Step outside any single attraction and talk about {{park}} as a whole.",
+  {
+  "id": 16,
+  "name": "Park-wide Places & Vibes",
+  "description": "Zoom out and focus on the feel and locations of {{park}}.",
   "questions": [
     "What location in all of {{park}} would you most want to do a podcast from?",
-    "What's your absolute hottest take about {{park}}?",
-    "What single change to {{park}} do you think would make fans furious?",
-    "What classic element in {{park}} should never, ever be changed?",
-    "What classic element in {{park}} do you think should finally go?",
-    "What detail in {{park}} do you love pointing out to first-timers?",
     "What three words best describe the overall vibe of {{park}}?",
     "If {{park}} were a fable, what moral would appear at the end?",
-    "If any two attractions in {{park}} crossed over, what mash-up would you create?",
-    "What's the strongest memory you have from your very first visit to {{park}}?",
-    "If you could steal one attraction from any other park and bring it to {{park}}, what would it be?",
-    "What two attractions in {{park}} would you rank exactly the same, and why?",
-    "You're being chased by a villain from {{park}} — where do you hide?",
-    "A character has gone rogue in {{park}} — which attraction do you barricade yourself inside?",
-    "You have to survive a night locked inside {{park}} — what's your HQ?",
-    "Which {{park}} character would you least want to run into in a dark alley?",
-    "A character from {{land}} has declared you their nemesis — who is it and why?",
-    "You have to live inside one {{park}} land for a week — which do you pick and why?",
-    "If you had to eat only food from one {{land}} for a month, which land wins and why?",
-    "Which character in {{park}} would be the worst to get stuck next to on every ride?",
-    "Which {{park}} character would you most want as your tour guide for the day?",
-    "Which character from {{park}} do you think would be the most chaotic theme park guest?",
-    "What's the most underrated land in {{park}} and why?",
-    "What's the most overrated land in {{park}} and why?",
-    "If {{park}} added a brand new land tomorrow, what IP would you want it based on?",
-    "If you could rename {{park}}, what would you call it?",
     "What's the single best entrance moment anywhere in {{park}}?",
     "What's the most photogenic spot in all of {{park}}?",
     "What's the best smell anywhere in {{park}}?",
@@ -274,6 +253,43 @@ const GAME_QUESTIONS = {
     "What's the last thing you always do before leaving {{park}}?",
     "What moment in {{park}} made you feel like a kid again?"
   ]
-    },
+},
+    {
+  "id": 17,
+  "name": "Park-wide Characters & Chaos",
+  "description": "Let {{park}}'s characters and wild scenarios take over.",
+  "questions": [
+    "You're being chased by a villain from {{park}} — where do you hide?",
+    "A character has gone rogue in {{park}} — which attraction do you barricade yourself inside?",
+    "You have to survive a night locked inside {{park}} — what's your HQ?",
+    "Which {{park}} character would you least want to run into in a dark alley?",
+    "A character from {{land}} has declared you their nemesis — who is it and why?",
+    "Which character in {{park}} would be the worst to get stuck next to on every ride?",
+    "Which {{park}} character would you most want as your tour guide for the day?",
+    "Which character from {{park}} do you think would be the most chaotic theme park guest?"
+  ]
+},
+    {
+  "id": 18,
+  "name": "Park-wide Lands, Food & Opinions",
+  "description": "Pick lands, food, favorites, and strong takes about {{park}}.",
+  "questions": [
+    "What's your absolute hottest take about {{park}}?",
+    "What single change to {{park}} do you think would make fans furious?",
+    "What classic element in {{park}} should never, ever be changed?",
+    "What classic element in {{park}} do you think should finally go?",
+    "What detail in {{park}} do you love pointing out to first-timers?",
+    "If any two attractions in {{park}} crossed over, what mash-up would you create?",
+    "What's the strongest memory you have from your very first visit to {{park}}?",
+    "If you could steal one attraction from any other park and bring it to {{park}}, what would it be?",
+    "What two attractions in {{park}} would you rank exactly the same, and why?",
+    "You have to live inside one {{park}} land for a week — which do you pick and why?",
+    "If you had to eat only food from one {{land}} for a month, which land wins and why?",
+    "What's the most underrated land in {{park}} and why?",
+    "What's the most overrated land in {{park}} and why?",
+    "If {{park}} added a brand new land tomorrow, what IP would you want it based on?",
+    "If you could rename {{park}}, what would you call it?"
+  ]
+}
   ]
 };
