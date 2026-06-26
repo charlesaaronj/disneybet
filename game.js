@@ -721,29 +721,37 @@ function updateQuestionLock() {
 }
 
 function spotlightQuestionReveal() {
-  console.log("[spotlight] question reveal called");
-  const qCard = $("wsd-question-display");
-  const overlay = $("wsd-spotlight-overlay");
-  if (!qCard || !overlay) {
-    console.log("[spotlight] missing question card or overlay");
-    return;
-  }
+  const qCard   = document.getElementById('wsd-question-display');
+  const overlay = document.getElementById('wsd-spotlight-overlay');
+  if (!qCard || !overlay) return;
 
-  qCard.classList.add("wsd-hero-card-spotlight");
-  overlay.style.display = "block";
+  console.log('[spotlight] turning on question spotlight');
 
-  const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
+  // 1) Turn on overlay
+  overlay.style.display = 'block';
 
+  // 2) Add spotlight class so CSS applies position/z-index/border/shadow
+  qCard.classList.add('wsd-hero-card-spotlight');
+
+  // 3) Force a reflow: this is the DevTools "poke" done programmatically
+  void qCard.offsetHeight;   // reading layout forces the engine to recalc
+
+  // 4) Optional tiny transform nudge to guarantee repaint
+  qCard.style.transform = 'scale(1.0201)';
+  requestAnimationFrame(() => {
+    qCard.style.transform = 'scale(1.02)';
+  });
+
+  // 5) Close behavior exactly like hero spotlight
+  const backdrop = overlay.querySelector('.wsd-spotlight-backdrop');
   function clearSpotlight() {
-    console.log("[spotlight] clearing question spotlight");
-    qCard.classList.remove("wsd-hero-card-spotlight");
-    overlay.style.display = "none";
-    if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
+    console.log('[spotlight] clearing question spotlight');
+    qCard.classList.remove('wsd-hero-card-spotlight');
+    overlay.style.display = 'none';
+    if (backdrop) backdrop.removeEventListener('click', clearSpotlight);
   }
-
-  if (backdrop) backdrop.addEventListener("click", clearSpotlight);
+  if (backdrop) backdrop.addEventListener('click', clearSpotlight);
 }
-
 // Question display helpers
 function flashQuestionDisplay() {
   const display = $("wsd-question-display");
