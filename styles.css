@@ -180,38 +180,6 @@ body {
   margin-top: 0.15rem;
 }
 
-/* ---------- Screens ---------- */
-.wsd-screen {
-  display: none;
-  padding: 1.2rem 1.2rem 4.5rem;
-  animation: wsdFadeIn 0.3s ease both;
-  position: relative;   /* ← add this */
-  z-index: auto;          /* ← and this, so it sits above the overlay */
-}
-
-.wsd-screen-active {
-  display: block;
-}
-
-.wsd-card {
-  background: var(--wsd-card-bg);
-  border-radius: var(--wsd-card-radius);
-  border: 1px solid var(--wsd-border-soft);
-  box-shadow: var(--wsd-shadow-soft);
-  padding: 1.2rem 1.1rem 1.1rem;
-}
-.wsd-section-title {
-  font-family: 'Playfair Display', 'Fredoka', Georgia, serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.4rem;
-  color: var(--wsd-text-main);
-}
-.wsd-section-subtitle {
-  font-size: 0.85rem;
-  color: var(--wsd-text-softer);
-  margin-bottom: 0.9rem;
-}
 
 /* ---------- Forms ---------- */
 .wsd-form-label {
@@ -771,4 +739,36 @@ body {
   transform: scale(1.02);
 }
 
+/* ---------- Screens ---------- */
+.wsd-screen {
+  display: none;
+  padding: 1.2rem 1.2rem 4.5rem;
+  animation: wsdFadeIn 0.3s ease both;
+  position: relative;   /* ← add this */
+  z-index: auto;          /* ← and this, so it sits above the overlay */
+}
+
+.wsd-screen-active {
+  display: block;
+}
+
+.wsd-card {
+  background: var(--wsd-card-bg);
+  border-radius: var(--wsd-card-radius);
+  border: 1px solid var(--wsd-border-soft);
+  box-shadow: var(--wsd-shadow-soft);
+  padding: 1.2rem 1.1rem 1.1rem;
+}
+.wsd-section-title {
+  font-family: 'Playfair Display', 'Fredoka', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: var(--wsd-text-main);
+}
+.wsd-section-subtitle {
+  font-size: 0.85rem;
+  color: var(--wsd-text-softer);
+  margin-bottom: 0.9rem;
+}
 
