@@ -721,33 +721,58 @@ function updateQuestionLock() {
 }
 
 function spotlightQuestionReveal() {
-  console.log('[spotlight] question reveal (inline) called');
+  console.log('[spotlight] question reveal called');
 
   const inlineCard = document.getElementById('wsd-question-display');
-  if (!inlineCard) {
-    console.warn('[spotlight] missing inline question card');
+  const shell      = document.getElementById('wsd-question-spotlight-shell');
+  const shellText  = document.getElementById('wsd-question-spotlight-text');
+  const overlay    = document.getElementById('wsd-spotlight-overlay');
+
+  if (!inlineCard || !shell || !shellText || !overlay) {
+    console.warn('[spotlight] missing elements for question spotlight');
     return;
   }
 
-  inlineCard.classList.add('wsd-question-spotlight');
+  // Copy the question text from the inline card into the spotlight shell
+  shellText.textContent = inlineCard.innerText || inlineCard.textContent || '';
 
-  // Optional pop
-  inlineCard.classList.remove('wsd-question-pop');
-  void inlineCard.offsetWidth;
-  inlineCard.classList.add('wsd-question-pop');
+  // Make overlay and shell visible and ready to animate
+  shell.style.display = 'block';
+  overlay.style.display = 'block';
+  overlay.style.pointerEvents = 'auto';
 
-  // AUTO CLEAR after 1.8s
-  setTimeout(() => {
-    inlineCard.classList.remove('wsd-question-spotlight');
-    // Remove pop too if you want it to fully settle:
-    // inlineCard.classList.remove('wsd-question-pop');
-  }, 1800);
-}
-function clearQuestionSpotlight() {
-  const inlineCard = document.getElementById('wsd-question-display');
-  if (!inlineCard) return;
-  inlineCard.classList.remove('wsd-question-spotlight');
-  inlineCard.classList.remove('wsd-question-pop');
+  // Force reflow so transitions apply
+  void overlay.offsetWidth;
+  void shell.offsetWidth;
+
+  // Fade in overlay and glow the shell
+  overlay.style.opacity = '1';
+  shell.classList.add('wsd-hero-card-spotlight');
+
+  const backdrop = overlay.querySelector('.wsd-spotlight-backdrop');
+
+  function clearSpotlight() {
+    console.log('[spotlight] clear question spotlight');
+
+    // Fade out overlay
+    overlay.style.opacity = '0';
+    overlay.style.pointerEvents = 'none';
+    shell.classList.remove('wsd-hero-card-spotlight');
+
+    // After fade-out, hide elements
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      shell.style.display = 'none';
+    }, 350);
+
+    if (backdrop) backdrop.removeEventListener('click', clearSpotlight);
+  }
+
+  // Player tap on dark backdrop clears spotlight (no timeout)
+  if (backdrop) {
+    backdrop.removeEventListener('click', clearSpotlight);
+    backdrop.addEventListener('click', clearSpotlight);
+  }
 }
 // Question display helpers
 function flashQuestionDisplay() {
