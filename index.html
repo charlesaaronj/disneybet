@@ -138,6 +138,12 @@
     .wsd-splash-btn-next:active { background: rgba(255,255,255,0.3); }
   </style>
 </head>
+
+<!-- Spotlight overlay -->
+<div id="wsd-spotlight-overlay" class="wsd-spotlight-overlay" style="display:none;">
+  <div class="wsd-spotlight-backdrop"></div>
+</div>
+
 <body>
 
 <!-- ===== SPLASH / ONBOARDING ===== -->
@@ -648,15 +654,6 @@
   </div>
 </div>
 
-<!-- Spotlight overlay -->
-<div id="wsd-spotlight-overlay" class="wsd-spotlight-overlay" style="display:none;">
-  <div class="wsd-spotlight-backdrop"></div>
-</div>
-
-<div id="log-output"
-     style="font-family: monospace; font-size: 12px; padding: 8px;
-            background:#111; color:#0f0; max-height: 200px; overflow-y:auto;">
-</div>
 
 <script>
   const InlineLogger = {
