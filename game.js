@@ -786,6 +786,37 @@ function drawQuestionForAttraction(attraction) {
   const category =
     categories[Math.floor(Math.random() * categories.length)];
 
+    // Make sure we have usage tracking
+  gameState.questionUsage ||= {};
+  const usageMap = gameState.questionUsage;
+  const questionList = category.questions;
+
+  // Find the least-used questions in this category
+  let minUsage = Infinity;
+  const candidates = [];
+
+  questionList.forEach(template => {
+    const key = `${category.id}:${template}`;
+    const count = usageMap[key] || 0;
+
+    if (count < minUsage) {
+      minUsage = count;
+      candidates.length = 0; // reset candidate list
+      candidates.push(template);
+    } else if (count === minUsage) {
+      candidates.push(template);
+    }
+  });
+
+  // Pick randomly among the least-used questions
+  const template =
+    candidates[Math.floor(Math.random() * candidates.length)];
+
+  // Increment usage for the chosen question
+  const key = `${category.id}:${template}`;
+  usageMap[key] = (usageMap[key] || 0) + 1;
+  saveState();
+
   const template =
     category.questions[
       Math.floor(Math.random() * category.questions.length)
