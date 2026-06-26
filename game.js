@@ -1,6 +1,36 @@
 // ===========================================================
 //  Who Said Diz — game.js (refactored, commented, same behavior)
 // ===========================================================
+function initDebugPanel() {
+  const wrap = $("wsd-debug-wrap");
+  const openBtn = $("wsd-debug-open");
+  const closeBtn = $("wsd-debug-close");
+  const clearBtn = $("wsd-debug-clear");
+  const box = $("wsd-debug");
+
+  if (!wrap || !openBtn || !closeBtn || !clearBtn || !box) return;
+
+  openBtn.addEventListener("click", () => {
+    wrap.style.display = "block";
+    debugLog("Debug panel opened");
+  });
+
+  closeBtn.addEventListener("click", () => {
+    wrap.style.display = "none";
+  });
+
+  clearBtn.addEventListener("click", () => {
+    box.innerHTML = "";
+  });
+
+  window.onerror = function(message, source, line, col, error) {
+    debugLog(`ERROR: ${message} @ ${line}:${col}`);
+  };
+
+  window.onunhandledrejection = function(event) {
+    debugLog(`PROMISE ERROR: ${event.reason}`);
+  };
+}
 
 // ---------- Small DOM + utility helpers ----------
 const $ = id => document.getElementById(id);
@@ -2640,6 +2670,8 @@ function wireEvents() {
     showScreen("faq");
   });
 }
+initDebugPanel();
+debugLog("App boot starting");
 
 // ---------- Bootstrapping on DOM ready ----------
 
