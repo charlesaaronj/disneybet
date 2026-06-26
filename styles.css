@@ -701,7 +701,7 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.65);
-  z-index: 900;
+  z-index: 900;                 /* above any .wsd-screen (z-index:1) */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
@@ -748,11 +748,8 @@ body {
 
 /* ---------- Screens ---------- */
 .wsd-screen {
-  display: none;
-  padding: 1.2rem 1.2rem 4.5rem;
-  animation: wsdFadeIn 0.3s ease both;
-  position: relative;   /* ← add this */
-  z-index: auto;          /* ← and this, so it sits above the overlay */
+  position: relative;  /* it probably already is */
+  z-index: 1;          /* base layer for each screen */
 }
 
 .wsd-screen-active {
