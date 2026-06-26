@@ -701,7 +701,65 @@
      style="font-family: monospace; font-size: 12px; padding: 8px;
             background:#111; color:#0f0; max-height: 200px; overflow-y:auto;">
 </div>
+<div id="wsd-debug-wrap" style="
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  bottom: 70px;
+  z-index: 99999;
+  display: none;
+">
+  <div style="
+    background: rgba(0,0,0,0.92);
+    color: #00ff9d;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    overflow: hidden;
+    font-family: monospace;
+  ">
+    <div style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 12px;
+    ">
+      <strong>Debug Log</strong>
+      <div>
+        <button id="wsd-debug-clear" type="button" style="margin-right:6px;">Clear</button>
+        <button id="wsd-debug-close" type="button">Close</button>
+      </div>
+    </div>
 
+    <div id="wsd-debug" style="
+      max-height: 35vh;
+      overflow: auto;
+      padding: 10px;
+      font-size: 11px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-break: break-word;
+    "></div>
+  </div>
+</div>
+
+<button id="wsd-debug-open" type="button" style="
+  position: fixed;
+  right: 10px;
+  bottom: 70px;
+  z-index: 100000;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 12px;
+  background: #111;
+  color: #fff;
+  font-size: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+">
+  Debug
+</button>
 <script>
   const InlineLogger = {
     log(...args) {
@@ -890,63 +948,5 @@ window.renderCollectionsScreen = function () {
 };
 </script>
 
-<div id="wsd-debug-wrap" style="
-  position: fixed;
-  left: 8px;
-  right: 8px;
-  bottom: 70px;
-  z-index: 99999;
-  display: none;
-">
-  <div style="
-    background: rgba(0,0,0,0.92);
-    color: #00ff9d;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    overflow: hidden;
-    font-family: monospace;
-  ">
-    <div style="
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 10px;
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-      font-size: 12px;
-    ">
-      <strong>Debug Log</strong>
-      <div>
-        <button id="wsd-debug-clear" type="button" style="margin-right:6px;">Clear</button>
-        <button id="wsd-debug-close" type="button">Close</button>
-      </div>
-    </div>
 
-    <div id="wsd-debug" style="
-      max-height: 35vh;
-      overflow: auto;
-      padding: 10px;
-      font-size: 11px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-      word-break: break-word;
-    "></div>
-  </div>
-</div>
-
-<button id="wsd-debug-open" type="button" style="
-  position: fixed;
-  right: 10px;
-  bottom: 70px;
-  z-index: 100000;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 12px;
-  background: #111;
-  color: #fff;
-  font-size: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-">
-  Debug
-</button>
 
