@@ -1182,8 +1182,18 @@ function goToGuessWager() {
   if (ansEl) ansEl.textContent = `"${r.selectedAnswer.text}"`;
 
   const container = $("wsd-gw-players");
-  if (!container) return;
-  container.innerHTML = "";
+if (!container) return;
+
+// Remove any existing Ghost options in the guess-wager area
+Array.from(container.querySelectorAll("select")).forEach(sel => {
+  Array.from(sel.options).forEach(opt => {
+    if (opt.value === "ghost") {
+      sel.removeChild(opt);
+    }
+  });
+});
+
+container.innerHTML = "";
 
   // Randomize row order visually
   const playersShuffled = shuffle(gameState.players);
