@@ -64,7 +64,7 @@ const GAME_QUESTIONS = {
       "description": "Turn {{attraction}} into shows, brands, and slogans.",
       "questions": [
         "If {{attraction}} were a roadside attraction, what would the big billboard outside say?",
-        "If {{attraction}} became a stage musical, what would its over‑the‑top title be?",
+        "If {{attraction}} became a stage musical, what would its title be?",
         "If {{attraction}} were a 90s sitcom, what would its title be?",
         "What's the hottest souvenir you can imagine for {{attraction}}?",
         "What three words best describe the overall vibe of {{attraction}}?",
