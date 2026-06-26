@@ -709,7 +709,7 @@ body {
 
 /* Persistent accent border for an actual question */
 .wsd-question-live {
-  border-color: #ff0000 !important;   /* bright red for debugging */
+  border-color: var(--wsd-accent) !important;   /* bright red for debugging */ 
   border-width: 2px !important;
   border-style: solid !important;
 }
