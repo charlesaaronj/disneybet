@@ -694,27 +694,16 @@ body {
     border-color 0.35s ease;
   opacity: 1;
   border: 2px solid transparent;
-  border-radius: 8px; /* tweak to match your card style */
-}
-
-/* Optional background flash state */
-#wsd-question-display.wsd-question-flash {
-  background-color: var(--wsd-surface-question) !important;
+  border-radius: 8px;
 }
 
 /* Fade-in keyframes */
 @keyframes wsdQuestionFadeIn {
-  0% {
-    opacity: 0;
-    border-color: transparent;
-  }
-  100% {
-    opacity: 1;
-    border-color: var(--wsd-accent-question-border, #ffcc33);
-  }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-/* Class that triggers the fade + border accent */
+/* Class that triggers the fade */
 .wsd-question-pop {
   animation: wsdQuestionFadeIn 0.35s ease-out 1;
 }
