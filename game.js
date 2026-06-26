@@ -505,6 +505,54 @@ function updatePlayerInputLock() {
   if (resetBtn) resetBtn.disabled = !selected;
 }
 
+function updateQuestionLock() {
+  const attrSel = $("wsd-attraction-select");
+  const hasAttraction = !!(attrSel && attrSel.value);
+  const hint = $("wsd-attraction-hint");
+  if (hint) hint.style.display = hasAttraction ? "none" : "block";
+
+  ["wsd-generate-question", "wsd-enter-custom-question", "wsd-to-answers"]
+    .forEach(id => {
+      const btn = $(id);
+      if (btn) btn.disabled = !hasAttraction;
+    });
+}
+
+// Question display helpers
+function flashQuestionDisplay() {
+  const display = $("wsd-question-display");
+  if (!display) return;
+  display.classList.remove("wsd-question-pop");
+  void display.offsetWidth;
+  display.classList.add("wsd-question-pop");
+}
+
+function setQuestionDisplay(text) {
+  const display = $("wsd-question-display");
+  const textarea = $("wsd-question-text");
+
+  if (display) {
+    display.style.display = text ? "block" : "none";
+    display.textContent = text || "";
+  }
+
+  if (textarea) {
+    textarea.value = text || "";
+    textarea.style.display = "none";
+  }
+}
+
+function showCustomTextarea() {
+  const display = $("wsd-question-display");
+  const textarea = $("wsd-question-text");
+  if (display) display.style.display = "none";
+  if (textarea) {
+    textarea.style.display = "block";
+    textarea.value = "";
+    textarea.readOnly = false;
+    textarea.focus();
+  }
+}
 
 // Populate parks, player inputs, and lock state
 function initSetupScreen() {
@@ -707,89 +755,6 @@ function startGameFromSetup() {
 
 // ---------- Question setup ----------
 
-function updateQuestionLock() {
-  const attrSel = $("wsd-attraction-select");
-  const hasAttraction = !!(attrSel && attrSel.value);
-  const hint = $("wsd-attraction-hint");
-  if (hint) hint.style.display = hasAttraction ? "none" : "block";
-
-  ["wsd-generate-question", "wsd-enter-custom-question", "wsd-to-answers"]
-    .forEach(id => {
-      const btn = $(id);
-      if (btn) btn.disabled = !hasAttraction;
-    });
-}
-
-function spotlightQuestionReveal() {
-  console.log('[spotlight] question reveal (inline + dimmer) called');
-
-  const inlineCard = document.getElementById('wsd-question-display');
-  const dimmer     = document.getElementById('wsd-screen-dimmer');
-
-  if (!inlineCard || !dimmer) {
-    console.warn('[spotlight] missing elements for question spotlight');
-    return;
-  }
-
-  // Turn on dimmer + spotlight on same card
-  dimmer.style.display = 'block';
-  dimmer.style.pointerEvents = 'auto';
-
-  // Force reflow so transitions apply
-  void dimmer.offsetWidth;
-
-  dimmer.style.opacity = '1';
-  inlineCard.classList.add('wsd-question-spotlight');
-}
-  function clearQuestionSpotlight() {
-  const inlineCard = document.getElementById('wsd-question-display');
-  const dimmer     = document.getElementById('wsd-screen-dimmer');
-
-  if (inlineCard) inlineCard.classList.remove('wsd-question-spotlight');
-  if (dimmer) {
-    dimmer.style.opacity = '0';
-    dimmer.style.pointerEvents = 'none';
-    setTimeout(() => {
-      dimmer.style.display = 'none';
-    }, 350);
-  }
-}
-// Question display helpers
-function flashQuestionDisplay() {
-  const display = $("wsd-question-display");
-  if (!display) return;
-  display.classList.remove("wsd-question-pop");
-  void display.offsetWidth;
-  display.classList.add("wsd-question-pop");
-}
-
-function setQuestionDisplay(text) {
-  const display = $("wsd-question-display");
-  const textarea = $("wsd-question-text");
-
-  if (display) {
-    display.style.display = text ? "block" : "none";
-    display.textContent = text || "";
-  }
-
-  if (textarea) {
-    textarea.value = text || "";
-    textarea.style.display = "none";
-  }
-}
-
-function showCustomTextarea() {
-  const display = $("wsd-question-display");
-  const textarea = $("wsd-question-text");
-  if (display) display.style.display = "none";
-  if (textarea) {
-    textarea.style.display = "block";
-    textarea.value = "";
-    textarea.readOnly = false;
-    textarea.focus();
-  }
-}
-
 // Pick a question from GAME_QUESTIONS for this attraction
 function drawQuestionForAttraction(attraction) {
   const isShow = attraction?.type === "show";
@@ -938,10 +903,9 @@ function onAttractionChange() {
     question: q,
     questionType: type
   });
- spotlightQuestionReveal();
+
   setQuestionDisplay(q);
-  //flashQuestionDisplay();
- 
+  flashQuestionDisplay();
 
   if (badge) {
     badge.textContent = categoryName || labelForType(type);
@@ -981,10 +945,8 @@ function onGenerateNewQuestion() {
     question: q,
     questionType: type
   });
-spotlightQuestionReveal();
-  setQuestionDisplay(q);
- // flashQuestionDisplay();
 
+  setQuestionDisplay(q);
 
   const badge = $("wsd-question-type-badge");
   if (badge) badge.textContent = categoryName || labelForType(type);
@@ -1001,21 +963,22 @@ function onEnterCustomQuestion() {
   saveState();
 }
 
+// Move from question screen to answer entry screen
 function proceedToAnswers() {
-  const err = document.getElementById('wsd-setupq-error');
-  if (err) err.textContent = '';
+  const err = $("wsd-setupq-error");
+  if (err) err.textContent = "";
   if (!gameState) return;
 
-  const textarea = document.getElementById('wsd-question-text');
-  const display  = document.getElementById('wsd-question-display');
-  const isCustom = textarea && textarea.style.display !== 'none';
+  const textarea = $("wsd-question-text");
+  const display = $("wsd-question-display");
+  const isCustom = textarea && textarea.style.display !== "none";
 
   const q = isCustom
-    ? (textarea ? textarea.value.trim() : '')
-    : (display ? display.textContent.trim() : '');
+    ? (textarea ? textarea.value.trim() : "")
+    : (display ? display.textContent.trim() : "");
 
   if (!q) {
-    if (err) err.textContent = 'Please enter a question.';
+    if (err) err.textContent = "Please enter a question.";
     return;
   }
 
@@ -1027,18 +990,14 @@ function proceedToAnswers() {
 
   saveState();
 
-  const enterQ = document.getElementById('wsd-enter-question');
+  const enterQ = $("wsd-enter-question");
   if (enterQ) enterQ.textContent = q;
 
-  const ansInp = document.getElementById('wsd-answer-input');
-  if (ansInp) ansInp.value = '';
+  const ansInp = $("wsd-answer-input");
+  if (ansInp) ansInp.value = "";
 
   renderAnswerProgress();
-
-  // NEW: clear spotlight when leaving setup-question
-  clearQuestionSpotlight();
-
-  showScreen('enter-answers');
+  showScreen("enter-answers");
 }
 
 // ---------- Answers flow ----------
