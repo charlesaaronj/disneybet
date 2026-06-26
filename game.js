@@ -769,7 +769,7 @@ function drawQuestionForAttraction(attraction) {
   const allCategories = GAME_QUESTIONS.categories;
 
   let categories;
-    if (isShow) {
+  if (isShow) {
     // Shows can use showtime + park-wide
     categories = allCategories.filter(
       cat => cat.id === 20 || cat.id === 21
@@ -783,10 +783,11 @@ function drawQuestionForAttraction(attraction) {
     categories = allCategories;
   }
 
+  // Pick a random category from the eligible list
   const category =
     categories[Math.floor(Math.random() * categories.length)];
 
-    // Make sure we have usage tracking
+  // Make sure we have usage tracking
   gameState.questionUsage ||= {};
   const usageMap = gameState.questionUsage;
   const questionList = category.questions;
@@ -816,11 +817,6 @@ function drawQuestionForAttraction(attraction) {
   const key = `${category.id}:${template}`;
   usageMap[key] = (usageMap[key] || 0) + 1;
   saveState();
-
-  const template =
-    category.questions[
-      Math.floor(Math.random() * category.questions.length)
-    ];
 
   // Resolve placeholders like {{attraction}}, {{land}}, {{park}}
   const attractionName = attraction?.name || "this attraction";
