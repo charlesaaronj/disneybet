@@ -770,36 +770,32 @@ function drawQuestionForAttraction(attraction) {
 
   let categories;
   if (isShow) {
-    // Only use the show-specific category for show attractions
     categories = allCategories.filter(cat => cat.id === 20);
   } else {
-    // Use all other categories for rides/other attractions
     categories = allCategories.filter(cat => cat.id !== 20);
   }
 
-  // Safety fallback if something is misconfigured
   if (!categories.length) {
     categories = allCategories;
   }
 
-  // Pick a random category from the filtered list
   const category =
     categories[Math.floor(Math.random() * categories.length)];
 
-  // Pick a random question template from that category
   const template =
     category.questions[
       Math.floor(Math.random() * category.questions.length)
     ];
 
-  // Resolve placeholders like {{attraction}} and {{land}}
+  // Resolve placeholders like {{attraction}}, {{land}}, {{park}}
   const attractionName = attraction?.name || "this attraction";
   const landName = attraction?.land || "this land";
+  const parkNameFromState = gameState?.settings?.park || "this park";
 
   const text = template
     .replace(/{{attraction}}/g, attractionName)
     .replace(/{{land}}/g, landName)
-    .replace(/{{park}}/g, parkName);
+    .replace(/{{park}}/g, parkNameFromState);
 
   return {
     text,
