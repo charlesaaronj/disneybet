@@ -1179,23 +1179,17 @@ function goToGuessWager() {
   const ansEl = $("wsd-gw-answer");
 
   if (qEl) qEl.textContent = r.question;
-  if (ansEl) ansEl.textContent = `"${r.selectedAnswer.text}"`;
+  if (ansEl) ansEl.textContent = r.selectedAnswer.text;
 
   const container = $("wsd-gw-players");
-if (!container) return;
+  if (!container) return;
 
-// Remove any existing Ghost options in the guess-wager area
-Array.from(container.querySelectorAll("select")).forEach(sel => {
-  Array.from(sel.options).forEach(opt => {
-    if (opt.value === "ghost") {
-      sel.removeChild(opt);
-    }
-  });
-});
+  // Hard reset: remove ALL rows
+  container.innerHTML = "";
 
-container.innerHTML = "";
+  console.log("[goToGuessWager] roundNumber =", gameState.roundNumber);
 
-  // Randomize row order visually
+  // Build rows in a fresh container each time
   const playersShuffled = shuffle(gameState.players);
 
   playersShuffled.forEach(p => {
@@ -1205,24 +1199,14 @@ container.innerHTML = "";
     const playerLabel = document.createElement("div");
     playerLabel.className = "wsd-score-row mb-1";
     const dotColor = p.badgeColor || "#888888";
-
-    playerLabel.innerHTML = `
-      <div>
-        <div class="wsd-score-name">
-          <span class="wsd-player-dot" style="
-            display:inline-block;
-            width:8px;
-            height:8px;
-            border-radius:50%;
-            margin-right:6px;
-            background-color:${dotColor};
-          "></span>
-          ${p.name}
-        </div>
-        <div class="wsd-score-meta">
-          Available points: ${p.score}
-        </div>
-      </div>`;
+    playerLabel.innerHTML =
+      `<div>` +
+      `<div class="wsd-score-name">` +
+      `<span class="wsd-player-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background-color:${dotColor}"></span>` +
+      `<span>${p.name}</span>` +
+      `</div>` +
+      `<div class="wsd-score-meta">Available points: ${p.score}</div>` +
+      `</div>`;
     row.appendChild(playerLabel);
 
     const inner = document.createElement("div");
@@ -1232,6 +1216,7 @@ container.innerHTML = "";
     guessSel.className = "form-select wsd-form-select";
     guessSel.dataset.playerId = p.id;
 
+    // Player options only
     gameState.players.forEach(p2 => {
       const opt = document.createElement("option");
       opt.value = String(p2.id);
@@ -1239,24 +1224,17 @@ container.innerHTML = "";
       guessSel.appendChild(opt);
     });
 
-    const ghostOpt = document.createElement("option");
-    ghostOpt.value = "ghost";
-    ghostOpt.textContent = "Ghost";
-    guessSel.appendChild(ghostOpt);
-
-// Only add Ghost from round 2 onward
-console.log("[goToGuessWager] roundNumber =", gameState.roundNumber);
-
-// Use roundNumber to decide whether Ghost should appear
-  const roundIndex = gameState.roundNumber || 1;
-
- // Only add Ghost from round 2 onward
-    if (roundIndex > 1) {
+    // Only add Ghost from round 2 onward
+    if (gameState.roundNumber > 1) {
+      console.log("[goToGuessWager] adding Ghost option");
       const ghostOpt = document.createElement("option");
       ghostOpt.value = "ghost";
       ghostOpt.textContent = "Ghost";
       guessSel.appendChild(ghostOpt);
+    } else {
+      console.log("[goToGuessWager] NOT adding Ghost (round 1)");
     }
+
     const wagerInput = document.createElement("input");
     Object.assign(wagerInput, {
       type: "number",
