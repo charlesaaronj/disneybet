@@ -180,6 +180,35 @@ body {
   margin-top: 0.15rem;
 }
 
+/* ---------- Screens ---------- */
+.wsd-screen {
+  display: none;
+  padding: 1.2rem 1.2rem 4.5rem;
+  animation: wsdFadeIn 0.3s ease both;
+}
+.wsd-screen-active {
+  display: block;
+}
+
+.wsd-card {
+  background: var(--wsd-card-bg);
+  border-radius: var(--wsd-card-radius);
+  border: 1px solid var(--wsd-border-soft);
+  box-shadow: var(--wsd-shadow-soft);
+  padding: 1.2rem 1.1rem 1.1rem;
+}
+.wsd-section-title {
+  font-family: 'Playfair Display', 'Fredoka', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: var(--wsd-text-main);
+}
+.wsd-section-subtitle {
+  font-size: 0.85rem;
+  color: var(--wsd-text-softer);
+  margin-bottom: 0.9rem;
+}
 
 /* ---------- Forms ---------- */
 .wsd-form-label {
@@ -656,7 +685,7 @@ body {
   border: none;
   color: var(--wsd-text-invert);
 }
-/*
+
 #wsd-question-display {
   transition: background-color 0.25s ease;
 }
@@ -679,10 +708,10 @@ body {
   }
 }
 
- Class that triggers the animation
+/* Class that triggers the animation */
 .wsd-question-pop {
   animation: wsdQuestionPop 1.1s ease-in-out 2;
-}  */
+}
 
 
 /* Optional: no arrow */
@@ -690,44 +719,7 @@ body {
   display: none;
 }
 
-.wsd-avatar-img {
-  width: 32px;   /* adjust size as needed */
-  height: 32px;
-  display: block;
-}
-
-/* Full-screen dimmer */
-.wsd-screen-dimmer {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  z-index: 900;                 /* above any .wsd-screen (z-index:1) */
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
-}
-
-/* Question card base */
-.wsd-question-display {
-  position: relative;
-  z-index: 901;  /* higher than dimmer (900) */
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-}
-
-.wsd-question-display.wsd-question-spotlight {
-  transform: scale(1.04);
-  box-shadow: 0 0 32px rgba(255, 255, 255, 0.8),
-              0 0 48px rgba(0, 0, 0, 0.45);
-  background: rgba(255, 255, 255, 0.10);
-}
-
-/* Spotlight state on the SAME card */
-.wsd-question-display.wsd-question-spotlight {
-  transform: scale(1.04);
-  box-shadow: 0 0 32px rgba(255, 255, 255, 0.8),
-              0 0 48px rgba(0, 0, 0, 0.45);
-  background: rgba(255, 255, 255, 0.10);
-}
+/* ---------- Hero spotlight overlay ---------- */
 
 .wsd-spotlight-overlay {
   position: fixed;
@@ -751,35 +743,18 @@ body {
   box-shadow: 0 0 0 4px rgba(255,255,255,0.9),
               var(--wsd-shadow-hero-spot);
   transform: scale(1.02);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
-
-/* ---------- Screens ---------- */
-.wsd-screen {
-  position: relative;  /* it probably already is */
-  z-index: 1;          /* base layer for each screen */
-}
-
-.wsd-screen-active {
+.wsd-avatar-img {
+  width: 32px;   /* adjust size as needed */
+  height: 32px;
   display: block;
 }
 
-.wsd-card {
-  background: var(--wsd-card-bg);
-  border-radius: var(--wsd-card-radius);
-  border: 1px solid var(--wsd-border-soft);
-  box-shadow: var(--wsd-shadow-soft);
-  padding: 1.2rem 1.1rem 1.1rem;
+#wsd-question-display.wsd-hero-card-spotlight {
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 4px rgba(255, 220, 120, 0.9),
+    0 16px 40px rgba(0, 0, 0, 0.45);
+  transform: scale(1.02);
 }
-.wsd-section-title {
-  font-family: 'Playfair Display', 'Fredoka', Georgia, serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.4rem;
-  color: var(--wsd-text-main);
-}
-.wsd-section-subtitle {
-  font-size: 0.85rem;
-  color: var(--wsd-text-softer);
-  margin-bottom: 0.9rem;
-}
-
