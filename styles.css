@@ -703,13 +703,15 @@ body {
   100% { opacity: 1; }
 }
 
-/* Class that triggers the fade */
 .wsd-question-pop {
   animation: wsdQuestionFadeIn 0.35s ease-out 1;
 }
-/* Accent border for an actual question (not placeholder) */
+
+/* Persistent accent border for an actual question */
 .wsd-question-live {
-  border-color: #ffcc33;
+  border-color: #ff0000 !important;   /* bright red for debugging */
+  border-width: 2px !important;
+  border-style: solid !important;
 }
 
 /* Optional: no arrow */
