@@ -769,9 +769,13 @@ function drawQuestionForAttraction(attraction) {
   const allCategories = GAME_QUESTIONS.categories;
 
   let categories;
-  if (isShow) {
-    categories = allCategories.filter(cat => cat.id === 20);
+    if (isShow) {
+    // Shows can use showtime + park-wide
+    categories = allCategories.filter(
+      cat => cat.id === 20 || cat.id === 21
+    );
   } else {
+    // Non-shows: everything except the show-only bucket
     categories = allCategories.filter(cat => cat.id !== 20);
   }
 
