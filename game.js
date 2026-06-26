@@ -854,6 +854,8 @@ function startNewRoundCore() {
     if (el) fn(el);
   });
 
+  renderAttractionOptions();
+
   const display = $("wsd-question-display");
   if (display) {
     display.classList.remove("wsd-question-pop");
