@@ -532,21 +532,8 @@ function setQuestionDisplay(text) {
   const textarea = $("wsd-question-text");
 
   if (display) {
-    const isPrompt =
-      !text ||
-      text.trim() === "Select an attraction from the dropdown to get a question";
-
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
-
-    // Clear any previous state
-    display.classList.remove("wsd-question-display-prompt");
-    display.classList.remove("wsd-question-display-live");
-
-    // Apply different styling depending on text
-    display.classList.add(
-      isPrompt ? "wsd-question-display-prompt" : "wsd-question-display-live"
-    );
   }
 
   if (textarea) {
@@ -1195,9 +1182,6 @@ function goToGuessWager() {
   // Randomize row order visually
   const playersShuffled = shuffle(gameState.players);
 
-  // Use roundNumber to decide whether Ghost should appear
-  const roundIndex = gameState.roundNumber || 1;
-
   playersShuffled.forEach(p => {
     const row = document.createElement("div");
     row.className = "mb-3 pb-2 border-bottom";
@@ -1232,7 +1216,6 @@ function goToGuessWager() {
     guessSel.className = "form-select wsd-form-select";
     guessSel.dataset.playerId = p.id;
 
-    // Player options
     gameState.players.forEach(p2 => {
       const opt = document.createElement("option");
       opt.value = String(p2.id);
@@ -1240,7 +1223,12 @@ function goToGuessWager() {
       guessSel.appendChild(opt);
     });
 
-    // Only add Ghost from round 2 onward
+    const ghostOpt = document.createElement("option");
+    ghostOpt.value = "ghost";
+    ghostOpt.textContent = "Ghost";
+    guessSel.appendChild(ghostOpt);
+
+     // Only add Ghost from round 2 onward
     if (roundIndex > 1) {
       const ghostOpt = document.createElement("option");
       ghostOpt.value = "ghost";
