@@ -721,37 +721,33 @@ function updateQuestionLock() {
 }
 
 function spotlightQuestionReveal() {
-  console.log('[spotlight] question reveal called');
+  console.log('[spotlight] question reveal (inline) called');
 
   const inlineCard = document.getElementById('wsd-question-display');
-  const shell      = document.getElementById('wsd-question-spotlight-shell');
-  const shellText  = document.getElementById('wsd-question-spotlight-text');
-  const overlay    = document.getElementById('wsd-spotlight-overlay');
-
-  if (!inlineCard || !shell || !shellText || !overlay) {
-    console.warn('[spotlight] missing elements for question spotlight');
+  if (!inlineCard) {
+    console.warn('[spotlight] missing inline question card');
     return;
   }
 
-  // Copy visible question text from the inline card into the top-layer shell
-  shellText.textContent = inlineCard.innerText || inlineCard.textContent || '';
+  inlineCard.classList.add('wsd-question-spotlight');
 
-  // Turn on overlay + spotlight shell
-  overlay.style.display = 'block';
-  shell.style.display   = 'block';
-  shell.classList.add('wsd-hero-card-spotlight');
+  // Optional pop
+  inlineCard.classList.remove('wsd-question-pop');
+  void inlineCard.offsetWidth;
+  inlineCard.classList.add('wsd-question-pop');
 
-  const backdrop = overlay.querySelector('.wsd-spotlight-backdrop');
-
-  function clearSpotlight() {
-    console.log('[spotlight] clear question spotlight');
-    shell.classList.remove('wsd-hero-card-spotlight');
-    shell.style.display   = 'none';
-    overlay.style.display = 'none';
-    if (backdrop) backdrop.removeEventListener('click', clearSpotlight);
-  }
-
-  if (backdrop) backdrop.addEventListener('click', clearSpotlight);
+  // AUTO CLEAR after 1.8s
+  setTimeout(() => {
+    inlineCard.classList.remove('wsd-question-spotlight');
+    // Remove pop too if you want it to fully settle:
+    // inlineCard.classList.remove('wsd-question-pop');
+  }, 1800);
+}
+function clearQuestionSpotlight() {
+  const inlineCard = document.getElementById('wsd-question-display');
+  if (!inlineCard) return;
+  inlineCard.classList.remove('wsd-question-spotlight');
+  inlineCard.classList.remove('wsd-question-pop');
 }
 // Question display helpers
 function flashQuestionDisplay() {
