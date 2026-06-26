@@ -695,47 +695,31 @@ body {
   height: 32px;
   display: block;
 }
-/* ---------- Hero spotlight overlay ---------- */
 
-/*#wsd-question-display.wsd-hero-card-spotlight {
-  position: relative;      /* make it stackable */
-  z-index: 50;             /* same as hero card, above overlay (40) */
-  border-radius: 18px;
-  box-shadow:
-    0 0 0 4px rgba(255, 220, 120, 0.9),
-    0 16px 40px rgba(0, 0, 0, 0.45);
-  transform: scale(1.02);
-} */
+/* Full-screen dimmer */
+.wsd-screen-dimmer {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
 
-/* ---------- Hero spotlight overlay ---------- */
-
-/*#wsd-question-display.wsd-hero-card-spotlight {
-  position: relative;      /* make it stackable */
-  z-index: 50;             /* same as hero card, above overlay (40) */
-  border-radius: 18px;
-  box-shadow:
-    0 0 0 4px rgba(255, 220, 120, 0.9),
-    0 16px 40px rgba(0, 0, 0, 0.45);
-  transform: scale(1.02);
-} */
-
+/* Question card base */
 .wsd-question-display {
   position: relative;
-  z-index: 1;
-  transition: transform 0.30s ease, box-shadow 0.30s ease;
+  z-index: 901; /* above dimmer */
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
-/* BRIGHT spotlight on the same card */
+/* Spotlight state on the SAME card */
 .wsd-question-display.wsd-question-spotlight {
   transform: scale(1.04);
-  box-shadow: 0 0 32px rgba(255, 255, 255, 0.75),
-              0 0 48px rgba(0, 0, 0, 0.35);
-  background: rgba(255, 255, 255, 0.15); /* subtle glow, not dark */
-}
-
-/* IMPORTANT: remove/disable the dark full-screen pseudo-element */
-.wsd-question-display.wsd-question-spotlight::before {
-  content: none; /* or just delete this rule entirely */
+  box-shadow: 0 0 32px rgba(255, 255, 255, 0.8),
+              0 0 48px rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .wsd-spotlight-overlay {
@@ -751,15 +735,6 @@ body {
   background: var(--wsd-overlay-backdrop);
   backdrop-filter: blur(2px);
   pointer-events: auto;
-}
-#wsd-question-display.wsd-hero-card-spotlight {
-  position: relative;      /* make it stackable */
-  z-index: 50;             /* same as hero card, above overlay (40) */
-  border-radius: 18px;
-  box-shadow:
-    0 0 0 4px rgba(255, 220, 120, 0.9),
-    0 16px 40px rgba(0, 0, 0, 0.45);
-  transform: scale(1.02);
 }
 
 /* Highlight the existing hero card */
