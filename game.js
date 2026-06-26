@@ -1240,7 +1240,7 @@ function goToGuessWager() {
   ghostOpt.value = "ghost";
   ghostOpt.textContent = "Ghost";
   guessSel.appendChild(ghostOpt);
-
+  }
     const wagerInput = document.createElement("input");
     Object.assign(wagerInput, {
       type: "number",
