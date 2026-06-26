@@ -532,8 +532,21 @@ function setQuestionDisplay(text) {
   const textarea = $("wsd-question-text");
 
   if (display) {
+    const isPrompt =
+      !text ||
+      text.trim() === "Select an attraction from the dropdown to get a question";
+
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
+
+    // Clear any previous state
+    display.classList.remove("wsd-question-display-prompt");
+    display.classList.remove("wsd-question-display-live");
+
+    // Apply different styling depending on text
+    display.classList.add(
+      isPrompt ? "wsd-question-display-prompt" : "wsd-question-display-live"
+    );
   }
 
   if (textarea) {
