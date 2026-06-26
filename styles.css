@@ -710,8 +710,15 @@ body {
 /* Question card base */
 .wsd-question-display {
   position: relative;
-  z-index: 901; /* above dimmer */
+  z-index: 901;  /* higher than dimmer (900) */
   transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.wsd-question-display.wsd-question-spotlight {
+  transform: scale(1.04);
+  box-shadow: 0 0 32px rgba(255, 255, 255, 0.8),
+              0 0 48px rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.10);
 }
 
 /* Spotlight state on the SAME card */
