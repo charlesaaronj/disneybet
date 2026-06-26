@@ -287,6 +287,8 @@ function applyParkTheme(parkName) {
     ["#modal-no-correct .modal-header", "color", t ? "#fff" : ""],
     ["#modal-confirm-reset .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-confirm-reset .modal-header", "color", t ? "#fff" : ""],
+["#modal-first-visit .modal-header", "backgroundImage", t?.hero],
+["#modal-first-visit .modal-header", "color", t ? "#fff" : ""],
 
     // NEW: park-themed headers
     ["#modal-scoring .modal-header", "backgroundImage", t?.hero || ""],
@@ -463,21 +465,31 @@ function showScreen(name) {
   const navId = NAV_MAP[name];
   if (navId && $(navId)) $(navId).classList.add("wsd-nav-item-active");
 
-  // Hero spotlight per screen
-// For setup-game we rely on an explicit first-visit call, then one-time per screen
-if (name === "setup-game") {
-  if (!firstSetupGameShown) {
-    // First explicit spotlight comes from initHeroSpotlightFirstVisit (called by splash),
-    // so just flag that we've visited setup-game and don't fire another auto spotlight now.
-    firstSetupGameShown = true;
+  // Show/hide first-visit help only on setup-question and only for rounds 1-3
+  if (name === "setup-question") {
+    updateFirstVisitHint();
   } else {
-    // Subsequent navigations to setup-game can still show the spotlight if needed
+    const hint = $("wsd-first-visit-hint");
+    if (hint) hint.style.display = "none";
+  }
+
+  // Hero spotlight per screen
+  // For setup-game we rely on an explicit first-visit call, then one-time per screen
+  if (name === "setup-game") {
+    if (!firstSetupGameShown) {
+      // First explicit spotlight comes from initHeroSpotlightFirstVisit (called by splash),
+      // so just flag that we've visited setup-game and don't fire another auto spotlight now.
+      firstSetupGameShown = true;
+    } else {
+      // Subsequent navigations to setup-game can still show the spotlight if needed
+      showHeroSpotlightForScreen(name);
+    }
+  } else {
+    // Other screens behave as before
     showHeroSpotlightForScreen(name);
   }
-} else {
-  // Other screens behave as before
-  showHeroSpotlightForScreen(name);
 }
+
 }
 // ---------- Setup screen + locks ----------
 
@@ -519,6 +531,13 @@ function updateQuestionLock() {
 }
 
 // Question display helpers
+
+function updateFirstVisitHint() {
+  const el = id('wsd-first-visit-hint');
+  if (!el || !gameState) return;
+  el.style.display = gameState.roundNumber <= 3 ? 'block' : 'none';
+}
+
 function flashQuestionDisplay() {
   const display = $("wsd-question-display");
   if (!display) return;
@@ -903,6 +922,8 @@ function startNewRoundCore() {
   if (badge) badge.textContent = "Pending";
 
   updateQuestionLock();
+  updateFirstVisitHint();
+
 }
 
 // Handle attraction selection
