@@ -739,6 +739,17 @@ body {
   transform: scale(1.02);
 }
 
+/* Spotlighted question shell – same pattern as hero spotlight */
+#wsd-question-spotlight-shell.wsd-hero-card-spotlight {
+  position: relative;
+  z-index: 50;  /* above overlay (40) */
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 4px rgba(255, 220, 120, 0.9),
+    0 16px 40px rgba(0, 0, 0, 0.45);
+  transform: scale(1.02);
+}
+
 /* ---------- Screens ---------- */
 .wsd-screen {
   display: none;
