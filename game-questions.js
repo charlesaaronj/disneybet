@@ -10,7 +10,8 @@ const GAME_QUESTIONS = {
         "If you were the replacement for a character in {{attraction}}, who would it be?",
         "You're a greeter at {{attraction}} - what is your go‑to line?",
         "What cast member role on {{attraction}} would you least like to have?",
-        "Starting with \"Back when I worked {{attraction}}…\", what imaginary story do you tell?"
+        "Starting with \"Back when I worked {{attraction}}…\", what imaginary story do you tell?",
+        "What location on {{attraction}} would you most want to do a podcast from?"
       ]
     },
     {
@@ -55,7 +56,10 @@ const GAME_QUESTIONS = {
         "Where would you add a brand new scene in {{attraction}}, and what would happen in it?",
         "What holiday overlay scene would you add to {{attraction}} for a seasonal version?",
         "Which scene in {{attraction}} deserves to be expanded into its own mini‑attraction?",
-        "If budget didn't matter at all, what wild upgrade would you add to {{attraction}}?"
+        "If budget didn't matter at all, what wild upgrade would you add to {{attraction}}?",
+        "Which effect in {{attraction}} really needs an upgrade?",
+        "Which effect in {{attraction}} impresses you the most?",
+        "Which effect in {{attraction}} looks the fakest to you?"
       ]
     },
     {
@@ -127,7 +131,7 @@ const GAME_QUESTIONS = {
     },
     {
       "id": 10,
-      "name": "Characters & Casting",
+      "name": "Characters, Cast, Story",
       "description": "Recast, spotlight, or cut the characters of {{attraction}}.",
       "questions": [
         "Which character from {{attraction}} deserves their own spin‑off attraction?",
@@ -136,6 +140,8 @@ const GAME_QUESTIONS = {
         "Which animatronic in {{attraction}} is your favorite?",
         "What kind of animatronic would you add to {{attraction}}?",
         "Which animatronic in {{attraction}} deserves an entire scene built around them?"
+        "If {{attraction}} were a fable, what moral would appear at the end?",
+        "Write a one‑line poem about {{attraction}}."
       ]
     },
     {
@@ -144,8 +150,6 @@ const GAME_QUESTIONS = {
       "description": "Focus on the build‑up to {{attraction}}: line, preshow, and post‑show.",
       "questions": [
         "What do you like the most about the preshow for {{attraction}}?",
-        "What annoys you the most about the preshow for {{attraction}}?",
-        "What preshow moment from {{attraction}} sticks with you the most?",
         "If you could completely swap out the preshow for {{attraction}}, what would happen instead?",
         "What simple audience participation bit would you add to the preshow for {{attraction}}?",
         "What's the best part of the queue for {{attraction}}?",
@@ -173,16 +177,6 @@ const GAME_QUESTIONS = {
       ]
     },
     {
-      "id": 13,
-      "name": "Tech & Effects",
-      "description": "Talk about the illusions, effects, and show tech in {{attraction}}.",
-      "questions": [
-        "Which effect in {{attraction}} really needs an upgrade?",
-        "Which effect in {{attraction}} impresses you the most?",
-        "Which effect in {{attraction}} looks the fakest to you?"
-      ]
-    },
-    {
       "id": 14,
       "name": "Comparisons & Rankings",
       "description": "Compare {{attraction}} to lines, lands, and other attractions.",
@@ -191,35 +185,8 @@ const GAME_QUESTIONS = {
         "How does {{attraction}} stack up against the other attractions in the park?",
         "How does {{attraction}} compare to the last attraction you rode today?",
         "Where does {{attraction}} rank among the attractions in {{land}} and why?",
-        "What's the longest you would wait in line for {{attraction}}?"
-      ]
-    },
-    {
-      "id": 15,
-      "name": "Story & Theme",
-      "description": "Treat {{attraction}} like a story, poem, or fable.",
-      "questions": [
-        "If {{attraction}} were a fable, what moral would appear at the end?",
-        "Write a one‑line poem about {{attraction}}."
-      ]
-    },
-    {
-      "id": 16,
-      "name": "Media & Moments",
-      "description": "Capture {{attraction}} in clips, photos, and social posts.",
-      "questions": [
-        "What 10‑second moment from {{attraction}} would make the best viral clip?",
-        "What single photo from {{attraction}} would you enter in a photo contest?"
-      ]
-    },
-    {
-      "id": 17,
-      "name": "Props & Chaos",
-      "description": "Swap, steal, or joke about props inside {{attraction}}.",
-      "questions": [
-        "If someone stole a prop from {{attraction}}, what would you replace it with?",
-        "If someone stole a prop from {{attraction}}'s queue, what would you replace it with?",
-        "If someone stole a prop from {{attraction}}, what prop from another {{land}} would you put in its place?"
+        "What's the longest you would wait in line for {{attraction}}?",
+        "What's the shortest you have ever waited for {{attraction}}?"
       ]
     },
     {
@@ -228,15 +195,41 @@ const GAME_QUESTIONS = {
       "description": "Decide what should stay or go in {{attraction}}'s legacy.",
       "questions": [
         "What classic element in {{attraction}} should never, ever be changed?",
-        "What classic element in {{attraction}} do you think should finally go?"
+        "What classic element in {{attraction}} do you think should finally go?",
+         "What 10‑second moment from {{attraction}} would make the best viral clip?",
+        "What single photo from {{attraction}} would you enter in a photo contest?",
+          "If someone stole a prop from {{attraction}}, what would you replace it with?",
+        "If someone stole a prop from {{attraction}}, what prop from another {{land}} would you put in its place?"
       ]
     },
-    {
-      "id": 19,
-      "name": "Meta & Location",
-      "description": "Step outside the attraction and imagine new ways to experience {{attraction}}.",
+     {
+      "id": 20,
+      "name": "Showtime & Performance",
+      "description": "Questions that treat {{attraction}} like a live show or performance.",
       "questions": [
-        "What location on {{attraction}} would you most want to do a podcast from?"
+        "You've just been hired at {{attraction}}—what would your dream cast member role be?",
+        "You're filling out your new name tag at {{attraction}}—what fake name are you putting on it?",
+        "If you were the replacement for a character in {{attraction}}, who would it be?",
+        "You're a greeter at {{attraction}} - what is your go‑to line?",
+        "Starting with \"Back when I worked {{attraction}}…\", what imaginary story do you tell?",
+        "If {{attraction}} became a stage musical, what would its over‑the‑top title be?",
+        "If {{attraction}} were a 90s sitcom, what would its title be?",
+        "If {{attraction}} were a song, what would its title be?",
+        "If {{attraction}} were a direct-to-streaming movie, what would its title be?",
+        "What melody or musical moment from {{attraction}} gets stuck in your head all day?",
+        "Whose voice performance in {{attraction}} is the absolute best?",
+        "What celebrity would you get to narrate {{attraction}}?",
+        "Which character from {{attraction}} deserves their own spin‑off attraction?",
+        "Which underused character in {{attraction}} needs way more spotlight?",
+        "What preshow moment from {{attraction}} sticks with you the most?",
+        "What simple audience participation bit would you add to the preshow for {{attraction}}?",
+        "What 10‑second moment from {{attraction}} would make the best viral clip?",
+        "What single photo from {{attraction}} would you enter in a photo contest?",
+        "If {{attraction}} were a fable, what moral would appear at the end?",
+        "Write a one‑line poem about {{attraction}}.",
+        "What moment from {{attraction}} do you think you'll still remember in 20 years?",
+        "If {{attraction}} were a roadside attraction, what would the big billboard outside say?",
+        "What quote could you write that sums up {{attraction}}?"
       ]
     },
     {
@@ -281,14 +274,6 @@ const GAME_QUESTIONS = {
     "What's the last thing you always do before leaving {{park}}?",
     "What moment in {{park}} made you feel like a kid again?"
   ]
-    },
-       {
-      "id": 21,
-      "name": "Park-wide",
-      "description": "Step outside the attraction and imagine new ways to experience {{attraction}}.",
-      "questions": [
-        "What location in all of {{park}} would you most want to do a podcast from?"
-      ]
     },
   ]
 };
