@@ -33,7 +33,7 @@ const GAME_QUESTIONS = {
       "description": "Blend {{attraction}} with other stories, parks, and formats.",
       "questions": [
         "If {{attraction}} crossed over with any other IP, what mash‑up would you create?",
-        "What character from another attraction in {{park}} would you bring to {{attraction}}?",
+        "What character from another attraction in {{land}} would you bring to {{attraction}}?",
         "If {{attraction}} crossed over with any other attraction, what mash‑up would you create?",
         "If you had to pick up {{attraction}} and moved it to another park, where would it fit best?",
         "If {{attraction}} were a direct-to-streaming movie, what would its title be?",
@@ -188,8 +188,8 @@ const GAME_QUESTIONS = {
       "description": "Compare {{attraction}} to lines, lands, and other attractions.",
       "questions": [
         "How does {{attraction}} stack up against the other attractions in {{land}}?",
-        "How does {{attraction}} stack up against the other attractions in {{park}}?",
-        "How does {{attraction}} compare to the last attraction you rode in {{park}} today?",
+        "How does {{attraction}} stack up against the other attractions in the park?",
+        "How does {{attraction}} compare to the last attraction you rode today?",
         "Where does {{attraction}} rank among the attractions in {{land}} and why?",
         "What's the longest you would wait in line for {{attraction}}?"
       ]
