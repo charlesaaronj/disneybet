@@ -721,57 +721,37 @@ function updateQuestionLock() {
 }
 
 function spotlightQuestionReveal() {
-  console.log('[spotlight] question reveal called');
+  console.log('[spotlight] question reveal (inline + dimmer) called');
 
   const inlineCard = document.getElementById('wsd-question-display');
-  const shell      = document.getElementById('wsd-question-spotlight-shell');
-  const shellText  = document.getElementById('wsd-question-spotlight-text');
-  const overlay    = document.getElementById('wsd-spotlight-overlay');
+  const dimmer     = document.getElementById('wsd-screen-dimmer');
 
-  if (!inlineCard || !shell || !shellText || !overlay) {
+  if (!inlineCard || !dimmer) {
     console.warn('[spotlight] missing elements for question spotlight');
     return;
   }
 
-  // Copy the question text from the inline card into the spotlight shell
-  shellText.textContent = inlineCard.innerText || inlineCard.textContent || '';
-
-  // Make overlay and shell visible and ready to animate
-  shell.style.display = 'block';
-  overlay.style.display = 'block';
-  overlay.style.pointerEvents = 'auto';
+  // Turn on dimmer + spotlight on same card
+  dimmer.style.display = 'block';
+  dimmer.style.pointerEvents = 'auto';
 
   // Force reflow so transitions apply
-  void overlay.offsetWidth;
-  void shell.offsetWidth;
+  void dimmer.offsetWidth;
 
-  // Fade in overlay and glow the shell
-  overlay.style.opacity = '1';
-  shell.classList.add('wsd-hero-card-spotlight');
+  dimmer.style.opacity = '1';
+  inlineCard.classList.add('wsd-question-spotlight');
+}
+  function clearQuestionSpotlight() {
+  const inlineCard = document.getElementById('wsd-question-display');
+  const dimmer     = document.getElementById('wsd-screen-dimmer');
 
-  const backdrop = overlay.querySelector('.wsd-spotlight-backdrop');
-
-  function clearSpotlight() {
-    console.log('[spotlight] clear question spotlight');
-
-    // Fade out overlay
-    overlay.style.opacity = '0';
-    overlay.style.pointerEvents = 'none';
-    shell.classList.remove('wsd-hero-card-spotlight');
-
-    // After fade-out, hide elements
+  if (inlineCard) inlineCard.classList.remove('wsd-question-spotlight');
+  if (dimmer) {
+    dimmer.style.opacity = '0';
+    dimmer.style.pointerEvents = 'none';
     setTimeout(() => {
-      overlay.style.display = 'none';
-      shell.style.display = 'none';
+      dimmer.style.display = 'none';
     }, 350);
-
-    if (backdrop) backdrop.removeEventListener('click', clearSpotlight);
-  }
-
-  // Player tap on dark backdrop clears spotlight (no timeout)
-  if (backdrop) {
-    backdrop.removeEventListener('click', clearSpotlight);
-    backdrop.addEventListener('click', clearSpotlight);
   }
 }
 // Question display helpers
@@ -1021,22 +1001,21 @@ function onEnterCustomQuestion() {
   saveState();
 }
 
-// Move from question screen to answer entry screen
 function proceedToAnswers() {
-  const err = $("wsd-setupq-error");
-  if (err) err.textContent = "";
+  const err = document.getElementById('wsd-setupq-error');
+  if (err) err.textContent = '';
   if (!gameState) return;
 
-  const textarea = $("wsd-question-text");
-  const display = $("wsd-question-display");
-  const isCustom = textarea && textarea.style.display !== "none";
+  const textarea = document.getElementById('wsd-question-text');
+  const display  = document.getElementById('wsd-question-display');
+  const isCustom = textarea && textarea.style.display !== 'none';
 
   const q = isCustom
-    ? (textarea ? textarea.value.trim() : "")
-    : (display ? display.textContent.trim() : "");
+    ? (textarea ? textarea.value.trim() : '')
+    : (display ? display.textContent.trim() : '');
 
   if (!q) {
-    if (err) err.textContent = "Please enter a question.";
+    if (err) err.textContent = 'Please enter a question.';
     return;
   }
 
@@ -1048,14 +1027,18 @@ function proceedToAnswers() {
 
   saveState();
 
-  const enterQ = $("wsd-enter-question");
+  const enterQ = document.getElementById('wsd-enter-question');
   if (enterQ) enterQ.textContent = q;
 
-  const ansInp = $("wsd-answer-input");
-  if (ansInp) ansInp.value = "";
+  const ansInp = document.getElementById('wsd-answer-input');
+  if (ansInp) ansInp.value = '';
 
   renderAnswerProgress();
-  showScreen("enter-answers");
+
+  // NEW: clear spotlight when leaving setup-question
+  clearQuestionSpotlight();
+
+  showScreen('enter-answers');
 }
 
 // ---------- Answers flow ----------
