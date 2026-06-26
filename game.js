@@ -721,35 +721,36 @@ function updateQuestionLock() {
 }
 
 function spotlightQuestionReveal() {
-  const qCard   = document.getElementById('wsd-question-display');
-  const overlay = document.getElementById('wsd-spotlight-overlay');
-  if (!qCard || !overlay) return;
+  console.log('[spotlight] question reveal called');
 
-  console.log('[spotlight] turning on question spotlight');
+  const inlineCard = document.getElementById('wsd-question-display');
+  const shell      = document.getElementById('wsd-question-spotlight-shell');
+  const shellText  = document.getElementById('wsd-question-spotlight-text');
+  const overlay    = document.getElementById('wsd-spotlight-overlay');
 
-  // 1) Turn on overlay
+  if (!inlineCard || !shell || !shellText || !overlay) {
+    console.warn('[spotlight] missing elements for question spotlight');
+    return;
+  }
+
+  // Copy visible question text from the inline card into the top-layer shell
+  shellText.textContent = inlineCard.innerText || inlineCard.textContent || '';
+
+  // Turn on overlay + spotlight shell
   overlay.style.display = 'block';
+  shell.style.display   = 'block';
+  shell.classList.add('wsd-hero-card-spotlight');
 
-  // 2) Add spotlight class so CSS applies position/z-index/border/shadow
-  qCard.classList.add('wsd-hero-card-spotlight');
-
-  // 3) Force a reflow: this is the DevTools "poke" done programmatically
-  void qCard.offsetHeight;   // reading layout forces the engine to recalc
-
-  // 4) Optional tiny transform nudge to guarantee repaint
-  qCard.style.transform = 'scale(1.0201)';
-  requestAnimationFrame(() => {
-    qCard.style.transform = 'scale(1.02)';
-  });
-
-  // 5) Close behavior exactly like hero spotlight
   const backdrop = overlay.querySelector('.wsd-spotlight-backdrop');
+
   function clearSpotlight() {
-    console.log('[spotlight] clearing question spotlight');
-    qCard.classList.remove('wsd-hero-card-spotlight');
+    console.log('[spotlight] clear question spotlight');
+    shell.classList.remove('wsd-hero-card-spotlight');
+    shell.style.display   = 'none';
     overlay.style.display = 'none';
     if (backdrop) backdrop.removeEventListener('click', clearSpotlight);
   }
+
   if (backdrop) backdrop.addEventListener('click', clearSpotlight);
 }
 // Question display helpers
