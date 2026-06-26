@@ -891,6 +891,12 @@ function onAttractionChange() {
     return;
   }
 
+  // Once a real attraction is selected, remove the placeholder
+  if (attrSel) {
+    const firstOption = attrSel.querySelector('option[value=""]');
+    if (firstOption) firstOption.remove();
+  }
+
   const attraction = gameState.attractions[idx];
   gameState.currentRound.attraction = attraction;
 
