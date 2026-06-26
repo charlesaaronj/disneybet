@@ -186,7 +186,7 @@ body {
   padding: 1.2rem 1.2rem 4.5rem;
   animation: wsdFadeIn 0.3s ease both;
   position: relative;   /* ← add this */
-  z-index: 50;          /* ← and this, so it sits above the overlay */
+  z-index: auto;          /* ← and this, so it sits above the overlay */
 }
 
 .wsd-screen-active {
