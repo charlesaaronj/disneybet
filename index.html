@@ -307,19 +307,6 @@
           </select>
           <div class="wsd-text-small wsd-mt-1" id="wsd-attraction-meta"></div>
         </div>
-        
-        <div id="wsd-first-visit-hint" class="text-center mt-1" style="display:none;">
-  <a
-    href="#"
-    class="wsd-text-small"
-    data-bs-toggle="modal"
-    data-bs-target="#modal-first-visit"
-    style="text-decoration: underline;"
-  >
-    First visit to this park?
-  </a>
-</div>
-
         <div class="mb-3">
           <div class="d-flex justify-content-between align-items-center mb-1">
             <label class="wsd-form-label mb-0">Question</label>
@@ -625,24 +612,6 @@
   </div>
 </div>
 
-<!-- First time park explainer -->
-<div class="modal fade" id="modal-first-visit" tabindex="-1" aria-labelledby="modal-first-visit-label" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modal-first-visit-label">First visit to this park?</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p><strong>At your first attraction:</strong> Skip the game and use that time to pick the family prize for the day.</p>
-        <p><strong>Starting at attraction 2:</strong> While waiting in line, play using the last attraction your family experienced.</p>
-        <p class="mb-0">Keep doing that all day: queue for the next attraction, answer about the previous one.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-
 <!-- Scoring explainer -->
 <div class="modal fade" id="modal-scoring" tabindex="-1" aria-labelledby="modal-scoring-label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -701,65 +670,7 @@
      style="font-family: monospace; font-size: 12px; padding: 8px;
             background:#111; color:#0f0; max-height: 200px; overflow-y:auto;">
 </div>
-<div id="wsd-debug-wrap" style="
-  position: fixed;
-  left: 8px;
-  right: 8px;
-  bottom: 70px;
-  z-index: 99999;
-  display: none;
-">
-  <div style="
-    background: rgba(0,0,0,0.92);
-    color: #00ff9d;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    overflow: hidden;
-    font-family: monospace;
-  ">
-    <div style="
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 10px;
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-      font-size: 12px;
-    ">
-      <strong>Debug Log</strong>
-      <div>
-        <button id="wsd-debug-clear" type="button" style="margin-right:6px;">Clear</button>
-        <button id="wsd-debug-close" type="button">Close</button>
-      </div>
-    </div>
 
-    <div id="wsd-debug" style="
-      max-height: 35vh;
-      overflow: auto;
-      padding: 10px;
-      font-size: 11px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-      word-break: break-word;
-    "></div>
-  </div>
-</div>
-
-<button id="wsd-debug-open" type="button" style="
-  position: fixed;
-  right: 10px;
-  bottom: 70px;
-  z-index: 100000;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 12px;
-  background: #111;
-  color: #fff;
-  font-size: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-">
-  Debug
-</button>
 <script>
   const InlineLogger = {
     log(...args) {
@@ -947,6 +858,3 @@ window.renderCollectionsScreen = function () {
   container.innerHTML = html || '<div class="wsd-text-small">No progress yet.</div>';
 };
 </script>
-
-
-
