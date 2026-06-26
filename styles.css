@@ -697,7 +697,7 @@ body {
 }
 /* ---------- Hero spotlight overlay ---------- */
 
-#wsd-question-display.wsd-hero-card-spotlight {
+/*#wsd-question-display.wsd-hero-card-spotlight {
   position: relative;      /* make it stackable */
   z-index: 50;             /* same as hero card, above overlay (40) */
   border-radius: 18px;
@@ -705,7 +705,30 @@ body {
     0 0 0 4px rgba(255, 220, 120, 0.9),
     0 16px 40px rgba(0, 0, 0, 0.45);
   transform: scale(1.02);
+} */
+
+/* Base card */
+.wsd-question-display {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
+
+/* Spotlight state on the same card */
+.wsd-question-display.wsd-question-spotlight {
+  transform: scale(1.04);
+  box-shadow: 0 0 28px rgba(0, 0, 0, 0.35);
+}
+
+/* Optional dim backdrop using a pseudo-element, so no second card */
+.wsd-question-display.wsd-question-spotlight::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: -1; /* sits behind the card, but above page */
+}
+
 .wsd-spotlight-overlay {
   position: fixed;
   inset: 0;
