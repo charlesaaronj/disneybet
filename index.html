@@ -138,16 +138,12 @@
     .wsd-splash-btn-next:active { background: rgba(255,255,255,0.3); }
   </style>
 </head>
-
+<body>
+  <main>
 <!-- Spotlight overlay -->
 <div id="wsd-spotlight-overlay" class="wsd-spotlight-overlay" style="display:none;">
   <div class="wsd-spotlight-backdrop"></div>
 </div>
-
-<!-- Simple global dimmer for spotlight -->
-<div id="wsd-screen-dimmer" class="wsd-screen-dimmer" style="display:none;"></div>
-
-<body>
 
 <!-- ===== SPLASH / ONBOARDING ===== -->
 <div id="wsd-splash">
@@ -658,7 +654,11 @@
     </div>
   </div>
 </div>
-
+  
+  <!-- global dimmer overlay -->
+  <div id="wsd-screen-dimmer" class="wsd-screen-dimmer"></div>
+</body>
+</html>
 
 <script>
   const InlineLogger = {
