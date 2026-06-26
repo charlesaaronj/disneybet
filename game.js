@@ -938,7 +938,6 @@ function onAttractionChange() {
   });
  spotlightQuestionReveal();
   setQuestionDisplay(q);
-  setQuestionDisplay(q);
   //flashQuestionDisplay();
  
 
