@@ -798,7 +798,7 @@ function drawQuestionForAttraction(attraction) {
 
   const text = template
     .replace(/{{attraction}}/g, attractionName)
-    .replace(/{{land}}/g, landName);
+    .replace(/{{land}}/g, landName)
     .replace(/{{park}}/g, parkName);
 
   return {
