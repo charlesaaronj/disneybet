@@ -532,8 +532,15 @@ function setQuestionDisplay(text) {
   const textarea = $("wsd-question-text");
 
   if (display) {
+    const isPrompt =
+      !text ||
+      text.trim() === "Select an attraction from the dropdown to get a question.";
+
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
+
+    // Persistent border state: accent only for real questions
+    display.classList.toggle("wsd-question-live", !isPrompt);
   }
 
   if (textarea) {
