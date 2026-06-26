@@ -1234,13 +1234,13 @@ function goToGuessWager() {
     ghostOpt.textContent = "Ghost";
     guessSel.appendChild(ghostOpt);
 
-    // Only add Ghost from round 2 onward
-  if (gameState.roundNumber >= 2) {
+   // Only add Ghost if at least one round has completed
+if (gameState.history.length >= 1) {
   const ghostOpt = document.createElement("option");
   ghostOpt.value = "ghost";
   ghostOpt.textContent = "Ghost";
   guessSel.appendChild(ghostOpt);
-  }
+}
     const wagerInput = document.createElement("input");
     Object.assign(wagerInput, {
       type: "number",
