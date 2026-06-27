@@ -297,33 +297,40 @@
     </section>
 
     <!-- ===== SCREEN: SETUP_QUESTION ===== -->
-    <section id="screen-setup-question" class="wsd-screen">
-      <div class="wsd-card">
-        <div class="wsd-section-title">Choose attraction</div>
-        <div class="mb-3">
-          <label class="wsd-form-label" for="wsd-attraction-select">Attraction</label>
-          <select id="wsd-attraction-select" class="form-select wsd-form-select">
-            <option value="">Select an attraction</option>
-          </select>
-          <div class="wsd-text-small wsd-mt-1" id="wsd-attraction-meta"></div>
-        </div>
-        <div class="mb-3">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <label class="wsd-form-label mb-0">Question</label>
-            <span id="wsd-question-type-badge" class="wsd-badge-pill">&nbsp;</span>
-          </div>
-          <div id="wsd-question-display" class="wsd-question-display"></div>
-          <textarea id="wsd-question-text" class="form-control wsd-form-control" rows="4" style="display:none;"></textarea>
-        </div>
-        <div class="wsd-actions-stack">
-          <button id="wsd-to-answers" class="wsd-btn-primary" type="button">Answer Question</button>
-          <button id="wsd-generate-question" class="wsd-btn-secondary" type="button">Generate new question</button>
-          <button id="wsd-enter-custom-question" class="wsd-btn-secondary" type="button">Enter own question</button>
-          <button id="wsd-abandon-from-setupq" class="wsd-btn-tertiary" type="button">Abandon round</button>
-        </div>
-        <div id="wsd-setupq-error" class="wsd-text-small text-danger wsd-mt-3"></div>
+<section id="screen-setup-question" class="wsd-screen">
+  <div class="wsd-card">
+    <div class="wsd-section-title">Choose attraction</div>
+    <div class="mb-3">
+      <label class="wsd-form-label" for="wsd-attraction-select">Attraction</label>
+      <select id="wsd-attraction-select" class="form-select wsd-form-select">
+        <option value="">Select an attraction</option>
+      </select>
+      <div class="text-center mt-1">
+        <a href="#" style="font-size:0.82rem; color:#6c757d;"
+           data-bs-toggle="modal" data-bs-target="#modal-first-visit">
+          🏰 First visit to a park?
+        </a>
       </div>
-    </section>
+      <div class="wsd-text-small wsd-mt-1" id="wsd-attraction-meta"></div>
+    </div>
+    <div class="mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <label class="wsd-form-label mb-0">Question</label>
+        <span id="wsd-question-type-badge" class="wsd-badge-pill">&nbsp;</span>
+      </div>
+      <div id="wsd-question-display" class="wsd-question-display"></div>
+      <textarea id="wsd-question-text" class="form-control wsd-form-control" rows="4" style="display:none;"></textarea>
+    </div>
+    <div class="wsd-actions-stack">
+      <button id="wsd-to-answers" class="wsd-btn-primary" type="button">Answer Question</button>
+      <button id="wsd-generate-question" class="wsd-btn-secondary" type="button">Generate new question</button>
+      <button id="wsd-enter-custom-question" class="wsd-btn-secondary" type="button">Enter own question</button>
+      <button id="wsd-abandon-from-setupq" class="wsd-btn-tertiary" type="button">Abandon round</button>
+    </div>
+    <div id="wsd-setupq-error" class="wsd-text-small text-danger wsd-mt-3"></div>
+  </div>
+</section>
+
 
     <!-- ===== SCREEN: ENTER_ANSWERS ===== -->
     <section id="screen-enter-answers" class="wsd-screen">
@@ -636,6 +643,31 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="modal-first-visit" tabindex="-1" aria-labelledby="modal-first-visit-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-first-visit-label">🏰 First visit to this park?</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">
+          <strong>Round 1 — just play!</strong><br>
+          Pick any attraction you're queued for and answer naturally. Don't worry if you don't know it well yet.
+        </p>
+        <p>
+          <strong>Round 2 onwards — pick the last attraction.</strong><br>
+          While you're queuing for your current ride, select the <em>attraction you just came from</em>. You'll know that one well — you just experienced it!
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- Wager help -->
 <div class="modal fade" id="modal-wager-help" tabindex="-1" aria-labelledby="modal-wager-help-label" aria-hidden="true">
