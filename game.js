@@ -757,10 +757,11 @@ function startGameFromSetup() {
     startBtn.textContent = gameState ? "Resume game" : "Start game";
   }
 
-  renderAttractionOptions();
-  saveState();
-  showScreen("setup-question");
   startNewRoundCore();
+renderAttractionOptions();
+showScreen("setup-question");
+saveState();
+
 }
 
 // ---------- Question setup ----------
