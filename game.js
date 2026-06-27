@@ -537,7 +537,7 @@ function setQuestionDisplay(text) {
   if (display) {
     const isPrompt =
       !text ||
-      text.trim() === "Select an attraction from the dropdown to get a question.";
+      text.trim() === "Select the attraction you're queued for.";
 
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
