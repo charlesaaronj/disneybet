@@ -2826,9 +2826,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireEvents();
 
   const startBtn = $("wsd-start-game");
-  if (startBtn) {
-    startBtn.textContent = gameState ? "Resume game" : "Start game";
-  }
+  if (startBtn) startBtn.textContent = gameState ? "Resume game" : "Start game";
 
   if (gameState) {
     const parkName = gameState.settings?.park || "Not set";
@@ -2837,8 +2835,8 @@ document.addEventListener("DOMContentLoaded", () => {
     applyParkTheme(parkName);
 
     const scr = gameState.screen || "setup-game";
-    showScreen(scr);
-    restoreUIFromState();
+    restoreUIFromState();   // ← paint content FIRST
+    showScreen(scr);        // ← THEN show the screen
   } else {
     showScreen("setup-game");
   }
