@@ -2712,6 +2712,7 @@ function restoreUIFromState() {
   }
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
   initHowToPlaySpotlight();
   loadState();
@@ -2737,5 +2738,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showScreen("setup-game");
   }
 });
+
 
 
