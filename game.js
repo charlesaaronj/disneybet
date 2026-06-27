@@ -2596,24 +2596,164 @@ function wireEvents() {
 
   // Bottom nav
  // Bottom nav
+// Bottom nav
 wsd-nav-home?.addEventListener('click', () => {
   if (!gameState) {
     showScreen('setup-game');
     return;
   }
-  gameState.screen = 'setup-game';
-  restoreUIFromState();
+
+  const parkName = gameState.settings?.park || '';
+  const parkSel = id('wsd-park-select');
+  const container = id('wsd-player-inputs');
+  const parkLabel = id('wsd-park-label');
+  const startBtn = id('wsd-start-game');
+  const errEl = id('wsd-setup-error');
+
+  applyParkTheme(parkName || null);
+
+  if (parkLabel) parkLabel.textContent = parkName || 'Not set';
+
+  if (parkSel) {
+    parkSel.innerHTML = '<option value="">Select a park</option>';
+    Object.keys(PARKS).forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      parkSel.appendChild(opt);
+    });
+    if (parkName) parkSel.value = parkName;
+  }
+
+  if (container) {
+    container.innerHTML = '';
+    const players = gameState.players || [];
+    if (players.length) {
+      players.forEach(p => addPlayerInput(container, p.name));
+    } else {
+      for (let i = 0; i < 3; i++) addPlayerInput(container);
+    }
+  }
+
+  updatePlayerInputLock();
+  if (startBtn) startBtn.textContent = 'Resume game';
+  if (errEl) errEl.textContent = '';
+
   showScreen('setup-game');
 });
 
 wsd-nav-round?.addEventListener('click', () => {
   if (!gameState) return;
+
   const roundScreen = ROUNDSCREENS.includes(gameState.screen)
     ? gameState.screen
     : 'setup-question';
-  gameState.screen = roundScreen;
-  restoreUIFromState();
-  showScreen(roundScreen);
+
+  if (roundScreen === 'setup-question') {
+    renderAttractionOptions();
+
+    const attrSel = id('wsd-attraction-select');
+    const attraction = gameState.currentRound?.attraction || null;
+    const meta = id('wsd-attraction-meta');
+    const badge = id('wsd-question-type-badge');
+    const errEl = id('wsd-setupq-error');
+
+    if (attrSel && attraction && Array.isArray(gameState.attractions)) {
+      const idx = gameState.attractions.findIndex(a => a.name === attraction.name);
+      if (idx >= 0) attrSel.value = String(idx);
+    }
+
+    if (meta) {
+      meta.textContent = attraction
+        ? [attraction.park, attraction.land].filter(Boolean).join(' • ')
+        : '';
+    }
+
+    setQuestionDisplay(
+      gameState.currentRound?.question ||
+      'Select the attraction you’re in line for above.'
+    );
+
+    if (badge) {
+      badge.textContent = gameState.currentRound?.questionType || 'Pending';
+    }
+
+    if (errEl) errEl.textContent = '';
+    updateQuestionLock();
+    showScreen('setup-question');
+    return;
+  }
+
+  if (roundScreen === 'enter-answers') {
+    const q = id('wsd-enter-question');
+    const ansInp = id('wsd-answer-input');
+    const errEl = id('wsd-answers-error');
+
+    if (q) q.textContent = gameState.currentRound?.question || '';
+    if (ansInp) ansInp.value = '';
+    if (errEl) errEl.textContent = '';
+    renderAnswerProgress();
+    showScreen('enter-answers');
+    return;
+  }
+
+  if (roundScreen === 'select-answer') {
+    renderSelectAnswerScreen();
+    showScreen('select-answer');
+    return;
+  }
+
+  if (roundScreen === 'guess-wager') {
+    goToGuessWager();
+    return;
+  }
+
+  if (roundScreen === 'reveal') {
+    const r = gameState.currentRound;
+    const qEl = id('wsd-reveal-question');
+    const ansEl = id('wsd-reveal-answer-text');
+    const authWrap = id('wsd-reveal-author-wrap');
+    const authEl = id('wsd-reveal-author');
+    const resultsEl = id('wsd-reveal-results');
+    const nextWrap = id('wsd-reveal-next-wrap');
+    const countEl = id('wsd-reveal-countdown');
+    const confettiEl = id('wsd-confetti-wrap');
+
+    if (qEl) qEl.textContent = r?.question || '';
+    if (ansEl) ansEl.textContent = r?.selectedAnswer?.text || '';
+    if (countEl) countEl.textContent = '';
+    if (confettiEl) confettiEl.innerHTML = '';
+    if (authWrap) authWrap.style.display = 'block';
+
+    const isGhostAnswer = !!r?.selectedAnswer?.isGhost;
+    const author = isGhostAnswer
+      ? null
+      : gameState.players.find(p => p.id === r?.selectedAnswer?.playerId);
+
+    if (authEl) authEl.textContent = isGhostAnswer ? 'Ghost' : (author?.name || 'Unknown');
+
+    if (resultsEl) {
+      const lines = (r?.payouts || []).map(payout => {
+        const player = gameState.players.find(pl => pl.id === payout.playerId);
+        const delta = payout.delta || 0;
+        const sign = delta > 0 ? '+' : '';
+        return `
+          <div class="wsd-score-row mb-1">
+            <div class="wsd-score-name">${player ? player.name : 'Player'}</div>
+            <div class="wsd-score-meta">${sign}${delta}</div>
+          </div>
+        `;
+      }).join('');
+
+      resultsEl.innerHTML = lines || '<div class="wsd-text-small">No results available.</div>';
+    }
+
+    if (nextWrap) nextWrap.style.display = 'block';
+    showScreen('reveal');
+    return;
+  }
+
+  showScreen('setup-question');
 });
 
 
