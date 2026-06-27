@@ -2597,7 +2597,12 @@ function wireEvents() {
   // Bottom nav
  // Bottom nav
 wsd-nav-home?.addEventListener('click', () => {
-  if (!gameState) { showScreen('setup-game'); return; }
+  if (!gameState) {
+    showScreen('setup-game');
+    return;
+  }
+  gameState.screen = 'setup-game';
+  restoreUIFromState();
   showScreen('setup-game');
 });
 
@@ -2606,8 +2611,11 @@ wsd-nav-round?.addEventListener('click', () => {
   const roundScreen = ROUNDSCREENS.includes(gameState.screen)
     ? gameState.screen
     : 'setup-question';
+  gameState.screen = roundScreen;
+  restoreUIFromState();
   showScreen(roundScreen);
 });
+
 
   $("wsd-nav-scores")?.addEventListener(
     "click",
