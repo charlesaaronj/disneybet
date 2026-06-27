@@ -2646,30 +2646,50 @@ function wireEvents() {
 function restoreUIFromState() {
   if (!gameState) return;
 
-  applyParkTheme(gameState.settings?.park);
-
   const scr = gameState.screen || "setup-game";
+  const parkName = gameState.settings?.park || "";
+
+  applyParkTheme(parkName);
+
+  const parkLabel = $("wsd-park-label");
+  if (parkLabel) {
+    parkLabel.textContent = parkName || "Not set";
+  }
 
   if (scr === "setup-game") {
-    initSetupScreen();
-
     const parkSel = $("wsd-park-select");
-    if (parkSel && gameState.settings?.park) {
-      parkSel.value = gameState.settings.park;
+    const container = $("wsd-player-inputs");
+
+    if (parkSel) {
+      parkSel.innerHTML = '<option value="">Select a park</option>';
+      Object.keys(PARKS).forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        parkSel.appendChild(opt);
+      });
+      if (parkName) parkSel.value = parkName;
     }
 
-    const container = $("wsd-player-inputs");
     if (container) {
       container.innerHTML = "";
-      (gameState.players || []).forEach(p => addPlayerInput(container, p.name));
+      const players = gameState.players || [];
+      if (players.length) {
+        players.forEach(p => addPlayerInput(container, p.name));
+      } else {
+        for (let i = 0; i < 3; i++) addPlayerInput(container);
+      }
     }
 
     updatePlayerInputLock();
 
-    const parkLabel = $("wsd-park-label");
-    if (parkLabel) {
-      parkLabel.textContent = gameState.settings?.park || "Not set";
+    const startBtn = $("wsd-start-game");
+    if (startBtn) {
+      startBtn.textContent = "Resume game";
     }
+
+    const errEl = $("wsd-setup-error");
+    if (errEl) errEl.textContent = "";
 
     return;
   }
@@ -2677,25 +2697,18 @@ function restoreUIFromState() {
   if (scr === "setup-question") {
     renderAttractionOptions();
 
-    const parkLabel = $("wsd-park-label");
-    if (parkLabel) {
-      parkLabel.textContent = gameState.settings?.park || "Not set";
-    }
-
     const attrSel = $("wsd-attraction-select");
-    if (attrSel && gameState.currentRound?.attraction) {
-      const idx = gameState.attractions.findIndex(
-        a => a.name === gameState.currentRound.attraction.name
-      );
-      if (idx >= 0) {
-        attrSel.value = String(idx);
-      }
+    const attraction = gameState.currentRound?.attraction || null;
+
+    if (attrSel && attraction && Array.isArray(gameState.attractions)) {
+      const idx = gameState.attractions.findIndex(a => a.name === attraction.name);
+      if (idx >= 0) attrSel.value = String(idx);
     }
 
     const meta = $("wsd-attraction-meta");
     if (meta) {
-      meta.textContent = gameState.currentRound?.attraction
-        ? `${gameState.currentRound.attraction.park || ""} · ${gameState.currentRound.attraction.land || ""}`
+      meta.textContent = attraction
+        ? `${attraction.park || ""}${attraction.land ? " · " + attraction.land : ""}`
         : "";
     }
 
@@ -2708,15 +2721,23 @@ function restoreUIFromState() {
       badge.textContent = gameState.currentRound?.questionType || "Pending";
     }
 
+    const errEl = $("wsd-setupq-error");
+    if (errEl) errEl.textContent = "";
+
     updateQuestionLock();
     return;
   }
 
   if (scr === "enter-answers") {
     const q = $("wsd-enter-question");
-    if (q) {
-      q.textContent = gameState.currentRound?.question || "";
-    }
+    if (q) q.textContent = gameState.currentRound?.question || "";
+
+    const ansInp = $("wsd-answer-input");
+    if (ansInp) ansInp.value = "";
+
+    const errEl = $("wsd-answers-error");
+    if (errEl) errEl.textContent = "";
+
     renderAnswerProgress();
     return;
   }
@@ -2740,10 +2761,12 @@ function restoreUIFromState() {
     const resultsEl = $("wsd-reveal-results");
     const nextWrap = $("wsd-reveal-next-wrap");
     const countEl = $("wsd-reveal-countdown");
+    const confettiEl = $("wsd-confetti-wrap");
 
     if (qEl) qEl.textContent = r?.question || "";
     if (ansEl) ansEl.textContent = r?.selectedAnswer?.text || "";
     if (countEl) countEl.textContent = "";
+    if (confettiEl) confettiEl.innerHTML = "";
 
     if (authWrap) authWrap.style.display = "block";
 
@@ -2753,11 +2776,7 @@ function restoreUIFromState() {
       : gameState.players.find(p => p.id === r?.selectedAnswer?.playerId);
 
     if (authEl) {
-      authEl.textContent = isGhostAnswer
-        ? "👻 Ghost"
-        : author
-        ? author.name
-        : "Unknown";
+      authEl.textContent = isGhostAnswer ? "👻 Ghost" : (author ? author.name : "Unknown");
     }
 
     if (resultsEl) {
@@ -2773,7 +2792,8 @@ function restoreUIFromState() {
         `;
       }).join("");
 
-      resultsEl.innerHTML = lines || '<div class="wsd-text-small">No results available.</div>';
+      resultsEl.innerHTML =
+        lines || '<div class="wsd-text-small">No results available.</div>';
     }
 
     if (nextWrap) nextWrap.style.display = "block";
@@ -2795,7 +2815,6 @@ function restoreUIFromState() {
     return;
   }
 }
-
 
 
 document.addEventListener("DOMContentLoaded", () => {
