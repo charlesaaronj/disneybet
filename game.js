@@ -2652,15 +2652,52 @@ function restoreUIFromState() {
 
   if (scr === "setup-game") {
     initSetupScreen();
+
+    const parkSel = $("wsd-park-select");
+    if (parkSel && gameState.settings?.park) {
+      parkSel.value = gameState.settings.park;
+    }
+
+    const container = $("wsd-player-inputs");
+    if (container) {
+      container.innerHTML = "";
+      (gameState.players || []).forEach(p => addPlayerInput(container, p.name));
+    }
+
+    updatePlayerInputLock();
+
+    const parkLabel = $("wsd-park-label");
+    if (parkLabel) {
+      parkLabel.textContent = gameState.settings?.park || "Not set";
+    }
+
     return;
   }
 
   if (scr === "setup-question") {
     renderAttractionOptions();
-    updateQuestionLock();
 
     const parkLabel = $("wsd-park-label");
-    if (parkLabel) parkLabel.textContent = gameState.settings?.park || "Not set";
+    if (parkLabel) {
+      parkLabel.textContent = gameState.settings?.park || "Not set";
+    }
+
+    const attrSel = $("wsd-attraction-select");
+    if (attrSel && gameState.currentRound?.attraction) {
+      const idx = gameState.attractions.findIndex(
+        a => a.name === gameState.currentRound.attraction.name
+      );
+      if (idx >= 0) {
+        attrSel.value = String(idx);
+      }
+    }
+
+    const meta = $("wsd-attraction-meta");
+    if (meta) {
+      meta.textContent = gameState.currentRound?.attraction
+        ? `${gameState.currentRound.attraction.park || ""} · ${gameState.currentRound.attraction.land || ""}`
+        : "";
+    }
 
     setQuestionDisplay(
       gameState.currentRound?.question || "Select the attraction you're in line for above. 👆"
@@ -2670,12 +2707,16 @@ function restoreUIFromState() {
     if (badge) {
       badge.textContent = gameState.currentRound?.questionType || "Pending";
     }
+
+    updateQuestionLock();
     return;
   }
 
   if (scr === "enter-answers") {
     const q = $("wsd-enter-question");
-    if (q) q.textContent = gameState.currentRound?.question || "";
+    if (q) {
+      q.textContent = gameState.currentRound?.question || "";
+    }
     renderAnswerProgress();
     return;
   }
@@ -2691,8 +2732,51 @@ function restoreUIFromState() {
   }
 
   if (scr === "reveal") {
-    renderScoresScreen();
-    showScreen("scores");
+    const r = gameState.currentRound;
+    const qEl = $("wsd-reveal-question");
+    const ansEl = $("wsd-reveal-answer-text");
+    const authWrap = $("wsd-reveal-author-wrap");
+    const authEl = $("wsd-reveal-author");
+    const resultsEl = $("wsd-reveal-results");
+    const nextWrap = $("wsd-reveal-next-wrap");
+    const countEl = $("wsd-reveal-countdown");
+
+    if (qEl) qEl.textContent = r?.question || "";
+    if (ansEl) ansEl.textContent = r?.selectedAnswer?.text || "";
+    if (countEl) countEl.textContent = "";
+
+    if (authWrap) authWrap.style.display = "block";
+
+    const isGhostAnswer = !!r?.selectedAnswer?.isGhost;
+    const author = isGhostAnswer
+      ? null
+      : gameState.players.find(p => p.id === r?.selectedAnswer?.playerId);
+
+    if (authEl) {
+      authEl.textContent = isGhostAnswer
+        ? "👻 Ghost"
+        : author
+        ? author.name
+        : "Unknown";
+    }
+
+    if (resultsEl) {
+      const lines = (r?.payouts || []).map(payout => {
+        const player = gameState.players.find(pl => pl.id === payout.playerId);
+        const delta = payout.delta || 0;
+        const sign = delta > 0 ? "+" : "";
+        return `
+          <div class="wsd-score-row mb-1">
+            <div class="wsd-score-name">${player ? player.name : "Player"}</div>
+            <div class="wsd-score-meta">${sign}${delta}</div>
+          </div>
+        `;
+      }).join("");
+
+      resultsEl.innerHTML = lines || '<div class="wsd-text-small">No results available.</div>';
+    }
+
+    if (nextWrap) nextWrap.style.display = "block";
     return;
   }
 
@@ -2711,6 +2795,7 @@ function restoreUIFromState() {
     return;
   }
 }
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
