@@ -900,7 +900,7 @@ function startNewRoundCore() {
   }
 
   setQuestionDisplay(
-    "Select an attraction from the dropdown to get a question."
+    "Select the attraction you're in line for above 👆.."
   );
   const badge = $("wsd-question-type-badge");
   if (badge) badge.textContent = "Pending";
