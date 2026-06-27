@@ -537,7 +537,7 @@ function setQuestionDisplay(text) {
   if (display) {
     const isPrompt =
       !text ||
-      text.trim() === "Select the attraction you're in line for anove 👆.";
+      text.trim() === "Select the attraction you're in line for above. 👆";
 
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
