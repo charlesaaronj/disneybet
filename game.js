@@ -2643,20 +2643,79 @@ function wireEvents() {
 }
 
 // ---------- Bootstrapping on DOM ready ----------
+function restoreUIFromState() {
+  if (!gameState) return;
+
+  applyParkTheme(gameState.settings?.park);
+
+  const scr = gameState.screen || "setup-game";
+
+  if (scr === "setup-game") {
+    initSetupScreen();
+    return;
+  }
+
+  if (scr === "setup-question") {
+    renderAttractionOptions();
+    updateQuestionLock();
+
+    const parkLabel = $("wsd-park-label");
+    if (parkLabel) parkLabel.textContent = gameState.settings?.park || "Not set";
+
+    setQuestionDisplay(
+      gameState.currentRound?.question || "Select the attraction you're in line for above. 👆"
+    );
+
+    const badge = $("wsd-question-type-badge");
+    if (badge) {
+      badge.textContent = gameState.currentRound?.questionType || "Pending";
+    }
+    return;
+  }
+
+  if (scr === "enter-answers") {
+    const q = $("wsd-enter-question");
+    if (q) q.textContent = gameState.currentRound?.question || "";
+    renderAnswerProgress();
+    return;
+  }
+
+  if (scr === "select-answer") {
+    renderSelectAnswerScreen();
+    return;
+  }
+
+  if (scr === "guess-wager") {
+    goToGuessWager();
+    return;
+  }
+
+  if (scr === "reveal") {
+    renderScoresScreen();
+    showScreen("scores");
+    return;
+  }
+
+  if (scr === "scores") {
+    renderScoresScreen();
+    return;
+  }
+
+  if (scr === "history") {
+    renderHistoryScreen();
+    return;
+  }
+
+  if (scr === "game-end") {
+    renderFinalResults();
+    return;
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-  // One-time hero panel after welcome modal
   initHowToPlaySpotlight();
   loadState();
   ensureStateShape();
-  if (gameState) {
-  showScreen(gameState.screen || "setup-game");
-  restoreUIFromState();
-} else {
-  showScreen("setup-game");
-  initSetupScreen();
-}
-  
   initSetupScreen();
   wireEvents();
 
@@ -2670,26 +2729,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const parkLabel = $("wsd-park-label");
     if (parkLabel) parkLabel.textContent = parkName;
     applyParkTheme(parkName);
-    renderAttractionOptions();
 
     const scr = gameState.screen || "setup-game";
-    if (scr === "scores") renderScoresScreen();
-    if (scr === "history") renderHistoryScreen();
-    if (scr === "game-end") renderFinalResults();
     showScreen(scr);
+    restoreUIFromState();
   } else {
     showScreen("setup-game");
   }
 });
-function restoreUIFromState() {
-  if (!gameState) return;
-  applyParkTheme(gameState.settings?.park);
-  const screen = gameState.screen;
-  if (screen === 'setup-game') { initSetupScreen(); return; }
-  if (screen === 'setup-question') { renderAttractionOptions(); updateQuestionLock(); setQuestionDisplay(gameState.currentRound?.question || "Select the attraction you're in line for above. 👆"); return; }
-  if (screen === 'enter-answers') { const q = $('wsd-enter-question'); if (q) q.textContent = gameState.currentRound?.question || ''; renderAnswerProgress(); return; }
-  if (screen === 'select-answer') { renderSelectAnswerScreen(); return; }
-  if (screen === 'guess-wager') { goToGuessWager(); return; }
-  if (screen === 'reveal') { showScreen('scores'); renderScoresScreen(); return; }
-  if (screen === 'scores' || screen === 'game-end') { renderScoresScreen(); return; }
-}
+
+
