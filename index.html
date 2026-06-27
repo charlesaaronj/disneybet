@@ -296,23 +296,27 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: SETUP_QUESTION ===== -->
+   <!-- ===== SCREEN: SETUP_QUESTION ===== -->
 <section id="screen-setup-question" class="wsd-screen">
   <div class="wsd-card">
     <div class="wsd-section-title">Choose attraction</div>
     <div class="mb-3">
-      <label class="wsd-form-label" for="wsd-attraction-select">Attraction</label>
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <label class="wsd-form-label mb-0" for="wsd-attraction-select">Attraction</label>
+        <a href="#"
+           style="font-size:0.82rem; color:#6c757d; text-decoration:underline;"
+           data-bs-toggle="modal" data-bs-target="#modal-first-visit">
+          First visit to a park?
+        </a>
+      </div>
+
       <select id="wsd-attraction-select" class="form-select wsd-form-select">
         <option value="">Select an attraction</option>
       </select>
-      <div class="text-center mt-1">
-        <a href="#" style="font-size:0.82rem; color:#6c757d;"
-           data-bs-toggle="modal" data-bs-target="#modal-first-visit">
-          🏰 First visit to a park?
-        </a>
-      </div>
+
       <div class="wsd-text-small wsd-mt-1" id="wsd-attraction-meta"></div>
     </div>
+
     <div class="mb-3">
       <div class="d-flex justify-content-between align-items-center mb-1">
         <label class="wsd-form-label mb-0">Question</label>
@@ -321,6 +325,7 @@
       <div id="wsd-question-display" class="wsd-question-display"></div>
       <textarea id="wsd-question-text" class="form-control wsd-form-control" rows="4" style="display:none;"></textarea>
     </div>
+
     <div class="wsd-actions-stack">
       <button id="wsd-to-answers" class="wsd-btn-primary" type="button">Answer Question</button>
       <button id="wsd-generate-question" class="wsd-btn-secondary" type="button">Generate new question</button>
