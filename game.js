@@ -1212,7 +1212,17 @@ function goToGuessWager() {
   if (errEl) errEl.textContent = "";
 
   const hb = $("wsd-house-bonus");
-  if (hb) hb.value = "0";
+if (hb) hb.value = 0;
+
+//Show house bonus owner
+const ownerEl = $("wsd-house-bonus-owner");
+const chooser = getHouseBonusChooser();
+if (ownerEl) {
+  ownerEl.textContent = chooser
+    ? `${chooser.name} sets the house bonus this round.`
+    : "";
+}
+
 
   const r = gameState.currentRound;
   const qEl = $("wsd-gw-question");
@@ -1361,6 +1371,15 @@ function lockWagers() {
   runRevealAnimation();
   saveState();
 }
+//Set house bonus name
+function getHouseBonusChooser() {
+  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
+    return null;
+  }
+  const index = (Math.max(1, gameState.roundNumber) - 1) % gameState.players.length;
+  return gameState.players[index] || null;
+}
+
 
 // ---------- Scoring engine ----------
 
