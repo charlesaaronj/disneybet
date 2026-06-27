@@ -2595,28 +2595,20 @@ function wireEvents() {
   }
 
   // Bottom nav
-  $("wsd-nav-home")?.addEventListener(
-    "click",
-    () => {
-      if (!gameState) {
-        showScreen("setup-game");
-        return;
-      }
-      showScreen("setup-game");
-    }
-  );
-  $("wsd-nav-round")?.addEventListener(
-    "click",
-    () => {
-      if (!gameState) return;
-      const roundScreen = ROUND_SCREENS.includes(
-        gameState.screen
-      )
-        ? gameState.screen
-        : "setup-question";
-      showScreen(roundScreen);
-    }
-  );
+ // Bottom nav
+wsd-nav-home?.addEventListener('click', () => {
+  if (!gameState) { showScreen('setup-game'); return; }
+  showScreen('setup-game');
+});
+
+wsd-nav-round?.addEventListener('click', () => {
+  if (!gameState) return;
+  const roundScreen = ROUNDSCREENS.includes(gameState.screen)
+    ? gameState.screen
+    : 'setup-question';
+  showScreen(roundScreen);
+});
+
   $("wsd-nav-scores")?.addEventListener(
     "click",
     () => {
