@@ -2807,7 +2807,7 @@ function rebuildRoundScreenFromState() {
   renderAttractionOptions();
 
   const r = gameState.currentRound;
-  const scr = ROUNDSCREENS.includes(gameState.screen) ? gameState.screen : "setup-question";
+  const scr = ROUND_SCREENS.includes(gameState.screen) ? gameState.screen : "setup-question";
 
   if (!r) {
     showScreen("setup-question");
