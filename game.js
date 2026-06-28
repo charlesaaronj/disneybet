@@ -1258,7 +1258,7 @@ if (ownerEl) {
       `<div>` +
       `<div class="wsd-score-name">` +
       `<span class="wsd-player-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background-color:${dotColor}"></span>` +
-      `<span>${p.name}</span>` +
+      `<span>${p.name}'s guess</span>` +
       `</div>` +
       `<div class="wsd-score-meta">Available points: ${p.score}</div>` +
       `</div>`;
