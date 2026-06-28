@@ -1348,8 +1348,15 @@ function lockWagers() {
   if (isNaN(houseBonus) || houseBonus < 0) houseBonus = 0;
 
   // Clamp house bonus to a maximum of 10 points
-  if (houseBonus > 10) houseBonus = 10;
-  if (hbInput) hbInput.value = String(houseBonus);
+  if (houseBonus > 10) {
+  houseBonus = 10;
+  if (hbInput) hbInput.value = "10";
+  const err = $("wsd-gw-error");
+  if (err) err.textContent = "House bonus capped at 10 points.";
+  return;
+}
+if (hbInput) hbInput.value = String(houseBonus);
+
 
   const wagers = [];
   $$("#wsd-gw-players select").forEach(sel => {
