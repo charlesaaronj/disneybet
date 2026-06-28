@@ -1351,12 +1351,16 @@ function lockWagers() {
   if (houseBonus > 10) {
   houseBonus = 10;
   if (hbInput) hbInput.value = "10";
-  const err = $("wsd-gw-error");
-  if (err) err.textContent = "House bonus capped at 10 points.";
+  const err = $("wsd-house-bonus-error");
+  if (err) {
+    err.textContent = "House bonus capped at 10 points.";
+    err.style.display = "block";
+  }
   return;
 }
-if (hbInput) hbInput.value = String(houseBonus);
-
+// clear it on valid submit
+const err = $("wsd-house-bonus-error");
+if (err) { err.textContent = ""; err.style.display = "none"; }
 
   const wagers = [];
   $$("#wsd-gw-players select").forEach(sel => {
@@ -2513,6 +2517,16 @@ function wireEvents() {
     "click",
     lockWagers
   );
+  // House bonus inline validation
+$("wsd-house-bonus")?.addEventListener("input", () => {
+  const hbInput = $("wsd-house-bonus");
+  const err = $("wsd-house-bonus-error");
+  const val = parseInt(hbInput?.value, 10);
+  if (err) {
+    err.textContent = val > 10 ? "House bonus cannot exceed 10 points." : "";
+    err.style.display = val > 10 ? "block" : "none";
+  }
+});
   $("wsd-clear-wagers").addEventListener(
     "click",
     clearWagersUI
