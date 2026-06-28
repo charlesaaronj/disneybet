@@ -2643,6 +2643,58 @@ function wireEvents() {
   });
 }
 
+if (gameState) {
+  // Show resume modal instead of trying to restore screen state
+  const modalHtml = `
+    <div class="modal fade" id="modal-resume-game" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header wsd-hero">
+            <h5 class="modal-title" style="color:#fff;">Welcome back!</h5>
+          </div>
+          <div class="modal-body">
+            <p>You have a game in progress.</p>
+            <p><strong>Park:</strong> ${gameState.settings?.park || "Unknown"}</p>
+            <p><strong>Players:</strong> ${gameState.players?.map(p => p.name).join(", ")}</p>
+            <p><strong>Round:</strong> ${gameState.roundNumber || 0}</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline-secondary" id="resume-new-game">New Game</button>
+            <button class="btn wsd-btn-primary" id="resume-continue">Resume Game</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+  applyParkTheme(gameState.settings?.park);
+
+  const resumeModal = new bootstrap.Modal(document.getElementById("modal-resume-game"));
+  resumeModal.show();
+
+  document.getElementById("resume-continue").addEventListener("click", () => {
+    resumeModal.hide();
+    const scr = gameState.screen || "scores";
+    // Re-run the right render function for the saved screen
+    if (scr === "scores" || scr === "game-end") renderScoresScreen();
+    if (scr === "setup-question") { renderAttractionOptions(); updateQuestionLock(); }
+    if (scr === "enter-answers") renderAnswerProgress();
+    if (scr === "select-answer") renderSelectAnswerScreen();
+    if (scr === "guess-wager") goToGuessWager();
+    if (scr === "reveal") runRevealAnimation();
+    if (scr === "history") renderHistoryScreen();
+    showScreen(scr);
+  });
+
+  document.getElementById("resume-new-game").addEventListener("click", () => {
+    resumeModal.hide();
+    resetGame();
+  });
+
+} else {
+  showScreen("setup-game");
+}
+
 // ---------- Bootstrapping on DOM ready ----------
 function restoreUIFromState() {
   if (!gameState) return;
@@ -2917,18 +2969,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const startBtn = $("wsd-start-game");
   if (startBtn) startBtn.textContent = gameState ? "Resume game" : "Start game";
 
-  if (gameState) {
-    const parkName = gameState.settings?.park || "Not set";
-    const parkLabel = $("wsd-park-label");
-    if (parkLabel) parkLabel.textContent = parkName;
-    applyParkTheme(parkName);
-
-    const scr = gameState.screen || "setup-game";
-    restoreUIFromState();   // ← paint content FIRST
-    showScreen(scr);        // ← THEN show the screen
-  } else {
-    showScreen("setup-game");
-  }
+  
 });
 
 
