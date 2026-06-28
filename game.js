@@ -105,7 +105,7 @@ const SCREEN_META = {
     icon: "💰",
     title: "Guess & wager",
     instruction:
-      "All - guess who said diz & wager points. Add house points to increase the stakes."
+      "All - guess who said diz & wager points. Add house points to increase stakes."
   },
   "reveal": {
     icon: "🔍",
@@ -1101,7 +1101,7 @@ r.answerIndex = idx + 1;
       if (ansEl) {
         ansEl.classList.remove("wsd-anim-pop", "wsd-answer-highlight");
         void ansEl.offsetWidth;
-        ansEl.textContent = "Duplicate answers detected. Please abandon this round and start over.";
+        ansEl.textContent = "Oops — two players gave the same answer. Scrap this round and try again!";
         ansEl.classList.add("wsd-anim-pop");
       }
       if (toWagers) toWagers.style.display = "none";
