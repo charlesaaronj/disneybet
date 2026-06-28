@@ -1338,10 +1338,12 @@ function clearWagersUI() {
   if (hb) hb.value = "0";
 }
 
-// Lock wagers, compute scoring, and jump to reveal
 function lockWagers() {
-  const err = $("wsd-gw-error");
-  if (err) err.textContent = "";
+  const gwErr = $("wsd-gw-error");
+  if (gwErr) gwErr.textContent = "";
+
+  const hbErr = $("wsd-house-bonus-error");
+  if (hbErr) { hbErr.textContent = ""; hbErr.style.display = "none"; }
 
   const hbInput = $("wsd-house-bonus");
   let houseBonus = hbInput ? parseInt(hbInput.value, 10) : 0;
@@ -1349,18 +1351,14 @@ function lockWagers() {
 
   // Clamp house bonus to a maximum of 10 points
   if (houseBonus > 10) {
-  houseBonus = 10;
-  if (hbInput) hbInput.value = "10";
-  const err = $("wsd-house-bonus-error");
-  if (err) {
-    err.textContent = "House bonus capped at 10 points.";
-    err.style.display = "block";
+    houseBonus = 10;
+    if (hbInput) hbInput.value = "10";
+    if (hbErr) {
+      hbErr.textContent = "House bonus capped at 10 points.";
+      hbErr.style.display = "block";
+    }
+    return;
   }
-  return;
-}
-// clear it on valid submit
-const err = $("wsd-house-bonus-error");
-if (err) { err.textContent = ""; err.style.display = "none"; }
 
   const wagers = [];
   $$("#wsd-gw-players select").forEach(sel => {
