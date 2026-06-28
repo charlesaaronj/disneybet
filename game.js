@@ -497,19 +497,14 @@ function updatePlayerInputLock() {
     parkSel.disabled = hasStarted;
   }
 
-  sel("#wsd-player-inputs input").forEach((inp) => {
+  document.querySelectorAll("#wsd-player-inputs input").forEach((inp) => {
     if (!selected) {
       inp.disabled = true;
       inp.placeholder = "Select a park first";
       return;
     }
 
-    if (hasStarted && inp.value.trim()) {
-      inp.disabled = true;
-    } else {
-      inp.disabled = false;
-    }
-
+    inp.disabled = hasStarted && !!inp.value.trim();
     inp.placeholder = "Player name";
   });
 
@@ -521,7 +516,6 @@ function updatePlayerInputLock() {
   if (startBtn) startBtn.disabled = !selected;
   if (resetBtn) resetBtn.disabled = !selected;
 }
-
 function updateQuestionLock() {
   const attrSel = $("wsd-attraction-select");
   const hasAttraction = !!(attrSel && attrSel.value);
