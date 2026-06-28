@@ -2658,36 +2658,32 @@ function restoreUIFromState() {
   }
 
   if (scr === "setup-game") {
-    const parkSel = $("wsd-park-select");
-    const container = $("wsd-player-inputs");
+  initSetupScreen();
 
-    if (parkSel) {
-      parkSel.innerHTML = '<option value="">Select a park</option>';
-      Object.keys(PARKS).forEach(name => {
-        const opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name;
-        parkSel.appendChild(opt);
-      });
-      if (parkName) parkSel.value = parkName;
-    }
+  const parkSel = $("wsd-park-select");
+  const container = $("wsd-player-inputs");
 
-    if (container) {
-      container.innerHTML = "";
-      const players = gameState.players || [];
-      if (players.length) {
-        players.forEach(p => addPlayerInput(container, p.name));
-      } else {
-        for (let i = 0; i < 3; i++) addPlayerInput(container);
-      }
-    }
+  if (parkName && parkSel) parkSel.value = parkName;
 
-    updatePlayerInputLock();
+  if (container) {
+    container.innerHTML = "";
+    const players = gameState.players || [];
+    if (players.length) {
+      players.forEach(p => addPlayerInput(container, p.name));
+    } else {
+      for (let i = 0; i < 3; i++) addPlayerInput(container);
+    }
+  }
 
-    const startBtn = $("wsd-start-game");
-    if (startBtn) {
-      startBtn.textContent = "Resume game";
-    }
+  updatePlayerInputLock();
+
+  const startBtn = $("wsd-start-game");
+  if (startBtn) startBtn.textContent = "Resume game";
+
+  const errEl = $("wsd-setup-error");
+  if (errEl) errEl.textContent = "";
+  return;
+}
 
     const errEl = $("wsd-setup-error");
     if (errEl) errEl.textContent = "";
