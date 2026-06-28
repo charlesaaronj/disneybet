@@ -2673,25 +2673,3 @@ document.addEventListener("DOMContentLoaded", () => {
     showScreen("setup-game");
   }
 });
-
-// Separate DOMContentLoaded for disabling start / restart
-// buttons until a park is selected. This works alongside
-// updatePlayerInputLock / park theme handling.
-document.addEventListener("DOMContentLoaded", () => {
-  const parkSelect = $("wsd-park-select");
-  const startBtn = $("wsd-start-game-btn");
-  const restartBtn = $("wsd-restart-game-btn");
-
-  if (!parkSelect || !startBtn || !restartBtn) return;
-
-  function updateButtons() {
-    const hasPark =
-      parkSelect.value &&
-      parkSelect.value.trim() !== "";
-    startBtn.disabled = !hasPark;
-    restartBtn.disabled = !hasPark;
-  }
-
-  updateButtons();
-  parkSelect.addEventListener("change", updateButtons);
-});
