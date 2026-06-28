@@ -2423,7 +2423,6 @@ function renderFinalResults() {
   });
 }
 
-// Abandon current round, either back to scores or to setup-question
 function abandonRound() {
   if (gameState) {
     gameState.roundNumber = Math.max(
@@ -2433,15 +2432,9 @@ function abandonRound() {
   }
 
   startNewRoundCore();
-
-  if (gameState && gameState.history.length) {
-    renderScoresScreen();
-    showScreen("scores");
-  } else {
-    showScreen("setup-question");
-    startNewRoundCore();
-  }
+  showScreen("setup-question");
 }
+
 
 // ---------- Wire events & bootstrap ----------
 
