@@ -2599,18 +2599,9 @@ function wireEvents() {
   rebuildSetupScreenFromState();
   showScreen("setup-game");
 });
-  $("wsd-nav-round")?.addEventListener(
-    "click",
-    () => {
-      if (!gameState) return;
-      const roundScreen = ROUND_SCREENS.includes(
-        gameState.screen
-      )
-        ? gameState.screen
-        : "setup-question";
-      showScreen(roundScreen);
-    }
-  );
+  $("wsd-nav-round")?.addEventListener("click", () => {
+  rebuildRoundScreenFromState();
+});
   $("wsd-nav-scores")?.addEventListener(
     "click",
     () => {
@@ -2786,6 +2777,126 @@ function rebuildSetupScreenFromState() {
 
   applyParkTheme(parkName || null);
   updatePlayerInputLock();
+}
+function rebuildRoundScreenFromState() {
+  if (!gameState) {
+    showScreen("setup-game");
+    return;
+  }
+
+  const parkName = gameState.settings?.park || "";
+  const parkLabel = $("wsd-park-label");
+  if (parkLabel) parkLabel.textContent = parkName || "Not set";
+  applyParkTheme(parkName);
+  renderAttractionOptions();
+
+  const r = gameState.currentRound;
+  const scr = ROUNDSCREENS.includes(gameState.screen) ? gameState.screen : "setup-question";
+
+  if (!r) {
+    showScreen("setup-question");
+    return;
+  }
+
+  if (scr === "setup-question") {
+    const attrSel = $("wsd-attraction-select");
+    const meta = $("wsd-attraction-meta");
+    const badge = $("wsd-question-type-badge");
+
+    if (attrSel && r.attraction) {
+      const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
+      if (idx >= 0) attrSel.value = String(idx);
+    }
+
+    if (meta) {
+      meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
+    }
+
+    setQuestionDisplay(r.question || "Select the attraction you're in line for above.");
+    if (badge) badge.textContent = r.questionType === "custom" ? "Custom question" : (r.question ? "Question" : "Pending");
+    updateQuestionLock();
+    showScreen("setup-question");
+    return;
+  }
+
+  if (scr === "enter-answers") {
+    const enterQ = $("wsd-enter-question");
+    const ansInp = $("wsd-answer-input");
+    if (enterQ) enterQ.textContent = r.question || "";
+    if (ansInp) ansInp.value = "";
+    renderAnswerProgress();
+    showScreen("enter-answers");
+    return;
+  }
+
+  if (scr === "select-answer") {
+    renderSelectAnswerScreen();
+    showScreen("select-answer");
+    return;
+  }
+
+  if (scr === "guess-wager") {
+    goToGuessWager();
+    return;
+  }
+
+  if (scr === "reveal") {
+    showScreen("reveal");
+
+    const isGhost = !!r.selectedAnswer?.isGhost;
+    const author = isGhost ? null : gameState.players.find(p => p.id === r.selectedAnswer?.playerId);
+
+    const qEl = $("wsd-reveal-question");
+    const ansEl = $("wsd-reveal-answer-text");
+    const authWrap = $("wsd-reveal-author-wrap");
+    const authEl = $("wsd-reveal-author");
+    const resultsEl = $("wsd-reveal-results");
+    const nextWrap = $("wsd-reveal-next-wrap");
+    const countEl = $("wsd-reveal-countdown");
+
+    if (qEl) qEl.textContent = r.question || "";
+    if (ansEl) ansEl.textContent = r.selectedAnswer?.text || "";
+    if (countEl) countEl.textContent = "";
+    if (authEl) authEl.textContent = isGhost ? "Ghost" : (author?.name || "Unknown");
+    if (authWrap) authWrap.style.display = "block";
+    if (nextWrap) nextWrap.style.display = "block";
+
+    if (resultsEl) {
+      resultsEl.innerHTML = "";
+      (r.payouts || []).forEach((payout) => {
+        const p = gameState.players.find(pl => pl.id === payout.playerId);
+        const wager = (r.wagers || []).find(w => w.playerId === payout.playerId);
+
+        let guessName = "";
+        if (wager) {
+          if (wager.guessedAuthorId === "ghost") {
+            guessName = "Ghost";
+          } else {
+            const guessedPlayer = gameState.players.find(pl => pl.id === parseInt(wager.guessedAuthorId, 10));
+            guessName = guessedPlayer ? guessedPlayer.name : "";
+          }
+        }
+
+        const ok = (r.correctGuessers || []).includes(payout.playerId);
+        const dStr = payout.delta > 0 ? `+${payout.delta}` : String(payout.delta);
+
+        const row = document.createElement("div");
+        row.className = "wsd-result-row";
+        row.innerHTML = `
+          <div>
+            <div class="wsd-score-name">${ok ? "✅ " : ""}${p ? p.name : "?"}</div>
+            <div class="wsd-score-meta">Guess: ${guessName} • Wager: ${wager ? wager.amount : 0}</div>
+          </div>
+          <div class="wsd-score-value ${payout.delta >= 0 ? "text-success" : "text-danger"}">${dStr}</div>
+        `;
+        resultsEl.appendChild(row);
+      });
+    }
+
+    return;
+  }
+
+  showScreen("setup-question");
 }
 // ---------- Bootstrapping on DOM ready ----------
 
