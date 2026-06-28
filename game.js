@@ -1168,7 +1168,7 @@ function saveAnswerForCurrentPlayer(skip) {
   renderAnswerProgress();
   saveState();
 }
-
+}
 
 // ---------- Random answer selection (with ghost pool) ----------
 
