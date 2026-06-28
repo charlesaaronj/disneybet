@@ -2824,22 +2824,28 @@ document.addEventListener("DOMContentLoaded", () => {
   ensureStateShape();
   wireEvents();
 
-  const startBtn = $("wsd-start-game");
-  if (startBtn) startBtn.textContent = gameState ? "Resume game" : "Start game";
-
   if (gameState) {
     const parkName = gameState.settings?.park || "Not set";
     const parkLabel = $("wsd-park-label");
     if (parkLabel) parkLabel.textContent = parkName;
     applyParkTheme(parkName);
+
+    const startBtn = $("wsd-start-game");
+    if (startBtn) startBtn.textContent = "Resume game";
+
     const scr = gameState.screen || "setup-game";
     restoreUIFromState();
     showScreen(scr);
   } else {
     initSetupScreen();
+
+    const startBtn = $("wsd-start-game");
+    if (startBtn) startBtn.textContent = "Start game";
+
     showScreen("setup-game");
   }
 });
+
 
 
 
