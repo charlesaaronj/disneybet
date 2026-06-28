@@ -1276,13 +1276,13 @@ if (ownerEl) {
 
     const wagerInput = document.createElement("input");
     Object.assign(wagerInput, {
-      type: "number",
-      min: 0,
-      max: p.score,
-      value: Math.min(1, p.score),
-      inputMode: "numeric",
-      pattern: "[0-9]*"
-    });
+  type: "number",
+  min: 1,
+  max: p.score,
+  value: Math.min(1, p.score),
+  inputMode: "numeric",
+  pattern: "[0-9]*"
+});
     wagerInput.className = "form-control wsd-form-control";
     wagerInput.style.maxWidth = "90px";
     wagerInput.dataset.playerId = p.id;
@@ -1338,26 +1338,11 @@ function lockWagers() {
     const wInp = document.querySelector(
       `#wsd-gw-players input[data-player-id="${pid}"]`
     );
-    let amount = wInp ? parseInt(wInp.value, 10) : 0;
-    if (isNaN(amount) || amount < 0) amount = 0;
-
-    const player = gameState.players.find(pl => pl.id === pid);
-    if (player && amount > player.score) amount = player.score;
-
-    wagers.push({
-      playerId: pid,
-      guessedAuthorId: sel.value,
-      amount
-    });
-  });
-
-  if (wagers.filter(w => w.amount > 0).length < 2) {
-    if (err) {
-      err.textContent =
-        "At least two players must wager more than 0.";
-    }
-    return;
-  }
+    let amount = wInp ? (parseInt(wInp.value, 10) || 1) : 1;
+    if (isNaN(amount) || amount < 1) amount = 1;
+    if (player) amount = Math.min(amount, player.score);
+    // Remove the "at least two players" check entirely — it's no longer needed
+    // since every player is forced to wager at least 1
 
   Object.assign(gameState.currentRound, {
     houseBonusAmount: houseBonus,
