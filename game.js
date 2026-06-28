@@ -1119,24 +1119,62 @@ function saveAnswerForCurrentPlayer(skip) {
   r.answerIndex = idx + 1;
 
   if (r.answerIndex >= order.length) {
-    // Everyone passed or answered
-    if (!r.answers.length) {
-      if (err) {
-        err.textContent =
-          "No answers were entered. Abandon or go back.";
-      }
-      return;
-    }
-    saveState();
-    showPickOverlay(() => {
-      pickRandomAnswer();
-      renderSelectAnswerScreen();
-      showScreen("select-answer");
-    });
-  } else {
-    renderAnswerProgress();
-    saveState();
+  // Everyone passed or answered
+  if (!r.answers.length) {
+    if (err) err.textContent = "No answers were entered. Abandon or go back.";
+    return;
   }
+
+  const normalized = r.answers
+    .map(a => (a.text || "").trim().toLowerCase())
+    .filter(Boolean);
+
+  const hasDuplicateAnswers = normalized.length !== new Set(normalized).size;
+
+  saveState();
+  
+  const normalized = r.answers
+  .map(a => (a.text || "").trim().toLowerCase())
+  .filter(Boolean);
+
+const hasDuplicateAnswers = normalized.length !== new Set(normalized).size;
+
+ showPickOverlay(() => {
+  const labelEl = document.querySelector('#screen-select-answer .wsd-form-label');
+  const qEl = $("wsd-select-question");
+  const ansEl = $("wsd-selected-answer");
+  const toWagers = $("wsd-to-wagers");
+  const selectAgain = $("wsd-select-again");
+
+  if (qEl) qEl.textContent = r.question || "";
+
+  if (hasDuplicateAnswers) {
+    if (labelEl) labelEl.textContent = "Round issue";
+    if (ansEl) {
+      ansEl.classList.remove("wsd-anim-pop", "wsd-answer-highlight");
+      void ansEl.offsetWidth;
+      ansEl.textContent = "Duplicate answers detected. Please abandon this round and start over.";
+      ansEl.classList.add("wsd-anim-pop");
+    }
+    if (toWagers) toWagers.style.display = "none";
+    if (selectAgain) selectAgain.style.display = "none";
+    showScreen("select-answer");
+    return;
+  }
+
+  pickRandomAnswer();
+  renderSelectAnswerScreen();
+
+  if (labelEl) labelEl.textContent = "A player said";
+  if (toWagers) toWagers.style.display = "";
+  if (selectAgain) selectAgain.style.display = "";
+
+  showScreen("select-answer");
+});
+} else {
+  renderAnswerProgress();
+  saveState();
+}
 }
 
 // ---------- Random answer selection (with ghost pool) ----------
