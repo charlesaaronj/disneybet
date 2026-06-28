@@ -203,6 +203,7 @@ if (typeof PARK_DOLLYWOOD !== "undefined")
   PARKS[PARK_DOLLYWOOD.name] = PARK_DOLLYWOOD;
 
 let gameState = null;
+let answerSaveLocked = false;
 
 // ---------- Persistence & shape helpers ----------
 
@@ -1027,6 +1028,7 @@ function renderAnswerProgress() {
 
 // Save the current player’s answer, or “skip” if requested
 function saveAnswerForCurrentPlayer(skip) {
+  if (answerSaveLocked) return;
   const r = gameState.currentRound;
   const idx = r.answerIndex || 0;
   const order =
@@ -1048,16 +1050,28 @@ function saveAnswerForCurrentPlayer(skip) {
     return;
   }
 
-  if (!skip) {
-    r.answers.push({ playerId: player.id, text });
-  }
+if (!skip) r.answers.push({ playerId: player.id, text });
 
-  if (ansInp) {
+if (ansInp) {
+  const saveBtn = $("wsd-save-answer");
+  const skipBtn = $("wsd-skip-player");
+
+  answerSaveLocked = true;
+  if (saveBtn) saveBtn.disabled = true;
+  if (skipBtn) skipBtn.disabled = true;
+
   ansInp.value = "";
-  ansInp.blur();
-  ansInp.focus();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (saveBtn) saveBtn.disabled = false;
+      if (skipBtn) skipBtn.disabled = false;
+      answerSaveLocked = false;
+    });
+  });
 }
-  r.answerIndex = idx + 1;
+
+r.answerIndex = idx + 1;
 
   if (r.answerIndex >= order.length) {
   if (!r.answers.length) {
