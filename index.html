@@ -708,30 +708,29 @@
   </div>
 </div>
 
+  <div class="modal fade" id="modal-resume-game" tabindex="-1" aria-labelledby="modal-resume-game-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-resume-game-title">Resume game?</h5>
+      </div>
+      <div class="modal-body">
+        We found a saved game. Would you like to resume where you left off or start over?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="wsd-start-over-btn">Start over</button>
+        <button type="button" class="btn btn-primary" id="wsd-resume-game-btn">Resume game</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Spotlight overlay -->
 <div id="wsd-spotlight-overlay" class="wsd-spotlight-overlay" style="display:none;">
   <div class="wsd-spotlight-backdrop"></div>
 </div>
 
-<div id="log-output"
-     style="font-family: monospace; font-size: 12px; padding: 8px;
-            background:#111; color:#0f0; max-height: 200px; overflow-y:auto;">
-</div>
 
-<script>
-  const InlineLogger = {
-    log(...args) {
-      const el = document.getElementById('log-output');
-      if (!el) return;
-      const time = new Date().toLocaleTimeString();
-      const line = document.createElement('div');
-      line.textContent = `[${time}] ` + args.map(a =>
-        typeof a === 'object' ? JSON.stringify(a) : String(a)
-      ).join(' ');
-      el.prepend(line);
-    }
-  };
-</script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
