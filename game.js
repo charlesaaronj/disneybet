@@ -2,7 +2,7 @@
 //  Who Said Diz — game.js (refactored, commented, same behavior)
 // ===========================================================
 
-const APP_VERSION = "1.0";
+const APP_VERSION = "1.1";
 
 // ---------- Small DOM + utility helpers ----------
 const $ = id => document.getElementById(id);
