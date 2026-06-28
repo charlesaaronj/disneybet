@@ -1315,16 +1315,18 @@ function lockWagers() {
   if (gwErr) gwErr.textContent = "";
 
   const hbErr = $("wsd-house-bonus-error");
-  if (hbErr) { hbErr.textContent = ""; hbErr.style.display = "none"; }
+  if (hbErr) {
+    hbErr.textContent = "";
+    hbErr.style.display = "none";
+  }
 
   const hbInput = $("wsd-house-bonus");
   let houseBonus = hbInput ? parseInt(hbInput.value, 10) : 0;
   if (isNaN(houseBonus) || houseBonus < 0) houseBonus = 0;
 
-  // Clamp house bonus to a maximum of 10 points
   if (houseBonus > 10) {
     houseBonus = 10;
-    if (hbInput) hbInput.value = "10";
+    if (hbInput) hbInput.value = 10;
     if (hbErr) {
       hbErr.textContent = "House bonus capped at 10 points.";
       hbErr.style.display = "block";
@@ -1338,11 +1340,19 @@ function lockWagers() {
     const wInp = document.querySelector(
       `#wsd-gw-players input[data-player-id="${pid}"]`
     );
+
     let amount = wInp ? (parseInt(wInp.value, 10) || 1) : 1;
     if (isNaN(amount) || amount < 1) amount = 1;
+
+    const player = gameState.players.find(pl => pl.id === pid);
     if (player) amount = Math.min(amount, player.score);
-    // Remove the "at least two players" check entirely — it's no longer needed
-    // since every player is forced to wager at least 1
+
+    wagers.push({
+      playerId: pid,
+      guessedAuthorId: sel.value,
+      amount
+    });
+  });
 
   Object.assign(gameState.currentRound, {
     houseBonusAmount: houseBonus,
