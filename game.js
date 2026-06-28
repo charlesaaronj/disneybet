@@ -2642,10 +2642,129 @@ function wireEvents() {
   });
 }
 
+function showResumeModal() {
+  const modalEl = $("modal-resume-game");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    new bootstrap.Modal(modalEl, {
+      backdrop: "static",
+      keyboard: false
+    }).show();
+  }
+}
+
+function rebuildCurrentScreen() {
+  if (!gameState) return;
+
+  const parkName = gameState.settings?.park || "Not set";
+  const parkLabel = $("wsd-park-label");
+  if (parkLabel) parkLabel.textContent = parkName;
+  applyParkTheme(gameState.settings?.park || null);
+
+  const scr = gameState.screen || "setup-game";
+
+  if (scr === "setup-game") rebuildSetupGameScreen();
+  if (scr === "setup-question") rebuildSetupQuestionScreen();
+  if (scr === "enter-answers") rebuildEnterAnswersScreen();
+  if (scr === "select-answer") renderSelectAnswerScreen();
+  if (scr === "guess-wager") goToGuessWager();
+  if (scr === "reveal") rebuildRevealScreen();
+  if (scr === "scores") renderScoresScreen();
+  if (scr === "history") renderHistoryScreen();
+  if (scr === "game-end") renderFinalResults();
+
+  showScreen(scr);
+}
+function rebuildSetupGameScreen() {
+  initSetupScreen();
+
+  const parkSel = $("wsd-park-select");
+  const container = $("wsd-player-inputs");
+  if (!parkSel || !container) return;
+
+  parkSel.value = gameState?.settings?.park || "";
+  container.innerHTML = "";
+
+  (gameState.players || []).forEach(p => addPlayerInput(container, p.name));
+
+  while (container.querySelectorAll("input").length < 3) {
+    addPlayerInput(container);
+  }
+
+  updatePlayerInputLock();
+}
+function rebuildSetupQuestionScreen() {
+  renderAttractionOptions();
+
+  const r = gameState?.currentRound;
+  if (!r) return;
+
+  const attrSel = $("wsd-attraction-select");
+  const meta = $("wsd-attraction-meta");
+  const badge = $("wsd-question-type-badge");
+
+  if (attrSel && r.attraction) {
+    const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
+    if (idx >= 0) attrSel.value = String(idx);
+  }
+
+  if (meta) {
+    meta.textContent = r.attraction
+      ? `${r.attraction.park} • ${r.attraction.land}`
+      : "";
+  }
+
+  setQuestionDisplay(r.question || "Select the attraction you're in line for above. 👆");
+
+  if (badge) {
+    badge.textContent =
+      r.questionType === "custom" ? "Custom question" :
+      r.question ? "Question" : "Pending";
+  }
+
+  updateQuestionLock();
+}
+function rebuildEnterAnswersScreen() {
+  const r = gameState?.currentRound;
+  if (!r) return;
+
+  const enterQ = $("wsd-enter-question");
+  if (enterQ) enterQ.textContent = r.question || "";
+
+  renderAnswerProgress();
+}
+function rebuildRevealScreen() {
+  const r = gameState?.currentRound;
+  if (!r?.selectedAnswer) return;
+
+  const isGhost = !!r.selectedAnswer.isGhost;
+  const author = isGhost
+    ? null
+    : gameState.players.find(p => p.id === r.selectedAnswer.playerId);
+
+  const qEl = $("wsd-reveal-question");
+  const ansEl = $("wsd-reveal-answer-text");
+  const authWrap = $("wsd-reveal-author-wrap");
+  const authEl = $("wsd-reveal-author");
+
+  if (qEl) qEl.textContent = r.question || "";
+  if (ansEl) ansEl.textContent = r.selectedAnswer.text || "";
+  if (authEl) authEl.textContent = isGhost ? "Ghost" : (author?.name || "Unknown");
+  if (authWrap) authWrap.style.display = "block";
+}
+$("wsd-resume-game-btn")?.addEventListener("click", () => {
+  const modalEl = $("modal-resume-game");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    bootstrap.Modal.getInstance(modalEl)?.hide();
+  }
+  rebuildCurrentScreen();
+});
+
+$("wsd-start-over-btn")?.addEventListener("click", () => {
+  resetGame();
+});
 // ---------- Bootstrapping on DOM ready ----------
 
 document.addEventListener("DOMContentLoaded", () => {
-  // One-time hero panel after welcome modal
   initHowToPlaySpotlight();
   loadState();
   ensureStateShape();
@@ -2662,13 +2781,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const parkLabel = $("wsd-park-label");
     if (parkLabel) parkLabel.textContent = parkName;
     applyParkTheme(parkName);
-    renderAttractionOptions();
 
-    const scr = gameState.screen || "setup-game";
-    if (scr === "scores") renderScoresScreen();
-    if (scr === "history") renderHistoryScreen();
-    if (scr === "game-end") renderFinalResults();
-    showScreen(scr);
+    showResumeModal();
   } else {
     showScreen("setup-game");
   }
