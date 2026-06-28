@@ -1111,7 +1111,11 @@ function saveAnswerForCurrentPlayer(skip) {
     r.answers.push({ playerId: player.id, text });
   }
 
-  if (ansInp) ansInp.value = "";
+  if (ansInp) {
+  ansInp.value = "";
+  ansInp.blur();
+  ansInp.focus();
+}
   r.answerIndex = idx + 1;
 
   if (r.answerIndex >= order.length) {
