@@ -2595,16 +2595,10 @@ function wireEvents() {
   }
 
   // Bottom nav
-  $("wsd-nav-home")?.addEventListener(
-    "click",
-    () => {
-      if (!gameState) {
-        showScreen("setup-game");
-        return;
-      }
-      showScreen("setup-game");
-    }
-  );
+  $("wsd-nav-home")?.addEventListener("click", () => {
+  rebuildSetupScreenFromState();
+  showScreen("setup-game");
+});
   $("wsd-nav-round")?.addEventListener(
     "click",
     () => {
@@ -2763,6 +2757,36 @@ $("wsd-resume-game-btn")?.addEventListener("click", () => {
 $("wsd-start-over-btn")?.addEventListener("click", () => {
   resetGame();
 });
+
+function rebuildSetupScreenFromState() {
+  initSetupScreen();
+
+  if (!gameState) return;
+
+  const parkSel = $("wsd-park-select");
+  const parkLabel = $("wsd-park-label");
+  const container = $("wsd-player-inputs");
+
+  const parkName = gameState.settings?.park || "";
+
+  if (parkSel) parkSel.value = parkName;
+  if (parkLabel) parkLabel.textContent = parkName || "Not set";
+
+  if (container) {
+    container.innerHTML = "";
+
+    (gameState.players || []).forEach((p) => {
+      addPlayerInput(container, p.name);
+    });
+
+    while (container.querySelectorAll("input").length < 3) {
+      addPlayerInput(container);
+    }
+  }
+
+  applyParkTheme(parkName || null);
+  updatePlayerInputLock();
+}
 // ---------- Bootstrapping on DOM ready ----------
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -2782,7 +2806,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const parkLabel = $("wsd-park-label");
     if (parkLabel) parkLabel.textContent = parkName;
     applyParkTheme(parkName);
-
+    rebuildSetupScreenFromState();
     showResumeModal();
   } else {
     showScreen("setup-game");
