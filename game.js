@@ -168,10 +168,6 @@ const PARK_THEMES = {
   }
 };
 
-// Spotlight localStorage key
-const SPOTLIGHT_KEY = "wsd_hero_panel_spotlight_shown";
-let firstSetupGameShown = false;
-
 // ---------- Global game state ----------
 
 const NAV_MAP = {
@@ -316,50 +312,6 @@ function applyParkTheme(parkName) {
   }
 }
 // ---------- Hero spotlight helpers ----------
-
-function showHeroPanelSpotlightOnce() {
-  try {
-    if (localStorage.getItem(SPOTLIGHT_KEY) === "1") return;
-  } catch (e) {
-    // If localStorage fails, just show once per session
-  }
-
-  const heroCard = document.querySelector(".wsd-hero-card");
-  const overlay = $("wsd-spotlight-overlay");
-  const okBtn = $("wsd-spotlight-ok");
-  if (!heroCard || !overlay || !okBtn) return;
-
-  heroCard.classList.add("wsd-hero-card-spotlight");
-  overlay.style.display = "block";
-
-  const tooltip = document.querySelector(".wsd-spotlight-tooltip");
-  if (heroCard && tooltip) {
-    const rect = heroCard.getBoundingClientRect();
-    const offset = 16;
-    tooltip.style.top = `${rect.bottom + offset}px`;
-  }
-
-  okBtn.onclick = () => {
-    heroCard.classList.remove("wsd-hero-card-spotlight");
-    overlay.style.display = "none";
-    try {
-      localStorage.setItem(SPOTLIGHT_KEY, "1");
-    } catch (e) {}
-  };
-}
-
-function initHowToPlaySpotlight() {
-  const modalEl = $("modal-welcome");
-  if (!modalEl || typeof bootstrap === "undefined") return;
-
-  modalEl.addEventListener(
-    "hidden.bs.modal",
-    () => {
-      showHeroPanelSpotlightOnce();
-    },
-    { once: true }
-  );
-}
 
 // Spotlight per screen (after welcome)
 function showHeroSpotlightForScreen(screenName) {
@@ -2955,7 +2907,6 @@ function rebuildRoundScreenFromState() {
 // ---------- Bootstrapping on DOM ready ----------
 
 document.addEventListener("DOMContentLoaded", () => {
-  initHowToPlaySpotlight();
   loadState();
   ensureStateShape();
   initSetupScreen();
