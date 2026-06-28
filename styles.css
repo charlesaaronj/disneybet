@@ -535,6 +535,7 @@ body {
 
 /* Utility */
 .wsd-text-small { font-size: 0.8rem; color: var(--wsd-text-softer); }
+.wsd-text-small-white { font-size: 0.8rem; color: #fff !important; }
 .wsd-mt-1 { margin-top: 0.25rem; }
 .wsd-mt-2 { margin-top: 0.5rem; }
 .wsd-mt-3 { margin-top: 0.75rem; }
