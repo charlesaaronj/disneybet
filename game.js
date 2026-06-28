@@ -485,19 +485,32 @@ if (name === "setup-game") {
 }
 // ---------- Setup screen + locks ----------
 
-// Lock player inputs and start/reset buttons until a park is chosen
 function updatePlayerInputLock() {
   const parkSel = $("wsd-park-select");
   const selected = !!(parkSel && parkSel.value);
+  const hasStarted = !!gameState;
 
   const hint = $("wsd-park-hint");
   if (hint) hint.style.display = selected ? "none" : "block";
 
-  $$("#wsd-player-inputs input").forEach(inp => {
-    inp.disabled = !selected;
-    inp.placeholder = selected
-      ? "Player name"
-      : "Select a park first";
+  if (parkSel) {
+    parkSel.disabled = hasStarted;
+  }
+
+  sel("#wsd-player-inputs input").forEach((inp) => {
+    if (!selected) {
+      inp.disabled = true;
+      inp.placeholder = "Select a park first";
+      return;
+    }
+
+    if (hasStarted && inp.value.trim()) {
+      inp.disabled = true;
+    } else {
+      inp.disabled = false;
+    }
+
+    inp.placeholder = "Player name";
   });
 
   const addBtn = $("wsd-add-player");
@@ -760,6 +773,7 @@ function startGameFromSetup() {
 
   renderAttractionOptions();
   saveState();
+  updatePlayerInputLock();
   showScreen("setup-question");
   startNewRoundCore();
 }
