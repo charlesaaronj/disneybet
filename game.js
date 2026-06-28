@@ -1850,7 +1850,7 @@ function runRevealAnimation() {
               ${ok ? "✅ " : ""}${p ? p.name : "?"}
             </div>
             <div class="wsd-score-meta">
-              Wager: ${wagerStr} · Author: ${authorStr} · House: ${houseStr} = ${totalStr}
+              Wager: ${wagerStr} · Author: ${authorStr} · House: ${houseStr}
             </div>
           </div>
           <div class="wsd-score-value ${
