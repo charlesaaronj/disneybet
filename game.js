@@ -2,6 +2,8 @@
 //  Who Said Diz — game.js (refactored, commented, same behavior)
 // ===========================================================
 
+const APP_VERSION = "1.0";
+
 // ---------- Small DOM + utility helpers ----------
 const $ = id => document.getElementById(id);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -2974,6 +2976,10 @@ document.addEventListener("DOMContentLoaded", () => {
   loadState();
   ensureStateShape();
   initSetupScreen();
+  
+  const verEl = $("wsd-version");
+if (verEl) verEl.textContent = `v${APP_VERSION}`;
+
   wireEvents();
 
   const startBtn = $("wsd-start-game");
