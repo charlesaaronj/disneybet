@@ -293,8 +293,6 @@ function applyParkTheme(parkName) {
     ['#modal-first-visit .modal-header', 'color',           t ? '#fff' : ''],
     ["#modal-resume-game .modal-header", "backgroundImage", t?.hero],
     ["#modal-resume-game .modal-header", "color", t ? "#fff" : ""],
-
-    // NEW: park-themed headers
     ["#modal-scoring .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-scoring .modal-header", "color", t ? "#fff" : ""],
     ["#modal-bonuses .modal-header", "backgroundImage", t?.hero || ""],
@@ -365,14 +363,12 @@ function initHowToPlaySpotlight() {
 
 // Spotlight per screen (after welcome)
 function showHeroSpotlightForScreen(screenName) {
-  console.log("[spotlight] called for screen:", screenName);
   if (!screenName) return;
 
   const storageKey = `wsd_hero_spotlight_${screenName}`;
 
   try {
     if (localStorage.getItem(storageKey) === "1") {
-      console.log("[spotlight] already shown for", screenName);
       return;
     }
   } catch (e) {}
@@ -380,11 +376,8 @@ function showHeroSpotlightForScreen(screenName) {
   const heroCard = document.querySelector(".wsd-hero-card");
   const overlay = $("wsd-spotlight-overlay");
   if (!heroCard || !overlay) {
-    console.log("[spotlight] missing heroCard or overlay");
     return;
   }
-
-  console.log("[spotlight] showing spotlight for", screenName);
   heroCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
   heroCard.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -392,7 +385,6 @@ function showHeroSpotlightForScreen(screenName) {
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
 
   function clearSpotlight() {
-    console.log("[spotlight] clearing spotlight for", screenName);
     heroCard.classList.remove("wsd-hero-card-spotlight");
     overlay.style.display = "none";
     try {
@@ -414,14 +406,12 @@ function showHeroSpotlightForScreen(screenName) {
 function initHeroSpotlightAfterWelcome() {
   const modalEl = $("modal-welcome");
   if (!modalEl || typeof bootstrap === "undefined") {
-    console.log("[spotlight] no modal-welcome or bootstrap");
     return;
   }
 
   modalEl.addEventListener(
     "hidden.bs.modal",
     () => {
-      console.log("[spotlight] welcome modal closed -> spotlight setup-game");
       showHeroSpotlightForScreen("setup-game");
     },
     { once: true }
@@ -430,7 +420,6 @@ function initHeroSpotlightAfterWelcome() {
 
 // Called once from splash after first-time onboarding completes
 window.initHeroSpotlightFirstVisit = function () {
-  console.log("[spotlight] first-visit init");
   var screenName = (window.gameState && window.gameState.screen) || "setup-game";
   showHeroSpotlightForScreen(screenName);
 };
@@ -439,9 +428,7 @@ window.initHeroSpotlightFirstVisit = function () {
 
 const ALL_SCREENS = Object.keys(SCREEN_META);
 
-// Main screen router (final version; earlier stub removed)
 function showScreen(name) {
-  console.log("[showScreen] showing", name);
 
   ALL_SCREENS.forEach(key => {
     const el = $(`screen-${key}`);
@@ -1291,8 +1278,6 @@ if (ownerEl) {
   // Hard reset: remove ALL rows
   container.innerHTML = "";
 
-  console.log("[goToGuessWager] roundNumber =", gameState.roundNumber);
-
   // Build rows in a fresh container each time
   const playersShuffled = shuffle(gameState.players);
 
@@ -1330,13 +1315,11 @@ if (ownerEl) {
 
     // Only add Ghost from round 2 onward
     if (gameState.roundNumber > 1) {
-      console.log("[goToGuessWager] adding Ghost option");
       const ghostOpt = document.createElement("option");
       ghostOpt.value = "ghost";
       ghostOpt.textContent = "Ghost";
       guessSel.appendChild(ghostOpt);
     } else {
-      console.log("[goToGuessWager] NOT adding Ghost (round 1)");
     }
 
     const wagerInput = document.createElement("input");
