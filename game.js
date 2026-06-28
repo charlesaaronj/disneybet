@@ -2749,8 +2749,97 @@ function restoreUIFromState() {
   }
 
   if (scr === "guess-wager") {
-    goToGuessWager();
-    return;
+  const errEl = $("wsd-gw-error");
+  if (errEl) errEl.textContent = "";
+
+  const hb = $("wsd-house-bonus");
+  if (hb) hb.value = gameState.currentRound?.houseBonusAmount ?? 0;
+
+  const ownerEl = $("wsd-house-bonus-owner");
+  const chooser = getHouseBonusChooser();
+  if (ownerEl) {
+    ownerEl.textContent = chooser
+      ? `${chooser.name} sets the house bonus this round.`
+      : "";
+  }
+
+  const r = gameState.currentRound;
+  const qEl = $("wsd-gw-question");
+  const ansEl = $("wsd-gw-answer");
+  if (qEl) qEl.textContent = r?.question || "";
+  if (ansEl) ansEl.textContent = r?.selectedAnswer?.text || "";
+
+  const container = $("wsd-gw-players");
+  if (container) {
+    container.innerHTML = "";
+
+    gameState.players.forEach(p => {
+      const row = document.createElement("div");
+      row.className = "mb-3 pb-2 border-bottom";
+
+      const playerLabel = document.createElement("div");
+      playerLabel.className = "wsd-score-row mb-1";
+      const dotColor = p.badgeColor || "#888888";
+      playerLabel.innerHTML = `
+        <div>
+          <div class="wsd-score-name">
+            <span class="wsd-player-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background-color:${dotColor};"></span>
+            <span>${p.name}</span>
+          </div>
+          <div class="wsd-score-meta">Available points: ${p.score}</div>
+        </div>
+      `;
+
+      const inner = document.createElement("div");
+      inner.className = "d-flex gap-1";
+
+      const guessSel = document.createElement("select");
+      guessSel.className = "form-select wsd-form-select";
+      guessSel.dataset.playerId = p.id;
+
+      gameState.players.forEach(p2 => {
+        const opt = document.createElement("option");
+        opt.value = String(p2.id);
+        opt.textContent = p2.name;
+        guessSel.appendChild(opt);
+      });
+
+      if (gameState.roundNumber > 1) {
+        const ghostOpt = document.createElement("option");
+        ghostOpt.value = "ghost";
+        ghostOpt.textContent = "Ghost";
+        guessSel.appendChild(ghostOpt);
+      }
+
+      const existingWager = r?.wagers?.find(w => w.playerId === p.id);
+
+      const wagerInput = document.createElement("input");
+      Object.assign(wagerInput, {
+        type: "number",
+        min: 0,
+        max: p.score,
+        value: existingWager ? existingWager.amount : Math.min(1, p.score),
+        inputMode: "numeric",
+        pattern: "[0-9]*"
+      });
+      wagerInput.className = "form-control wsd-form-control";
+      wagerInput.style.maxWidth = "90px";
+      wagerInput.dataset.playerId = p.id;
+
+      if (existingWager) {
+        guessSel.value = String(existingWager.guessedAuthorId);
+      }
+
+      inner.append(guessSel, wagerInput);
+      row.appendChild(playerLabel);
+      row.appendChild(inner);
+      container.appendChild(row);
+    });
+  }
+
+  return;
+}
+
   }
 
   if (scr === "reveal") {
