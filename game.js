@@ -850,7 +850,14 @@ function drawQuestionForAttraction(attraction) {
 function renderAttractionOptions() {
   const sel = $("wsd-attraction-select");
   if (!sel || !gameState) return;
-  sel.innerHTML = '<option value="">Select an attraction</option>';
+  sel.innerHTML = "";
+
+  // only add placeholder if no attraction chosen yet
+  const hasAttraction = !!gameState.currentRound?.attraction;
+  if (!hasAttraction) {
+    sel.innerHTML = `<option value="">Select an attraction</option>`;
+  }
+
   gameState.attractions.forEach((a, i) => {
     const opt = document.createElement("option");
     opt.value = String(i);
@@ -858,6 +865,7 @@ function renderAttractionOptions() {
     sel.appendChild(opt);
   });
 }
+
 
 // Initialize a fresh round state
 function startNewRoundCore() {
@@ -2812,9 +2820,15 @@ function rebuildRoundScreenFromState() {
     const badge = $("wsd-question-type-badge");
 
     if (attrSel && r.attraction) {
-      const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
-      if (idx >= 0) attrSel.value = String(idx);
-    }
+  const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
+  if (idx >= 0) {
+    attrSel.value = String(idx);
+    // remove the placeholder "Select an attraction" option
+    const placeholder = attrSel.querySelector('option[value=""]');
+    if (placeholder) placeholder.remove();
+  }
+}
+
 
     if (meta) {
       meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
