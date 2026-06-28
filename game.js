@@ -1287,6 +1287,13 @@ if (ownerEl) {
     wagerInput.style.maxWidth = "90px";
     wagerInput.dataset.playerId = p.id;
 
+    wagerInput.addEventListener("blur", () => {
+  let val = parseInt(wagerInput.value, 10);
+  if (isNaN(val) || val < 1) val = 1;
+  if (val > p.score) val = p.score;
+  wagerInput.value = val;
+});
+
     inner.append(guessSel, wagerInput);
     row.appendChild(inner);
     container.appendChild(row);
