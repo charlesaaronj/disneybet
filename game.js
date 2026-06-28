@@ -1800,49 +1800,62 @@ function runRevealAnimation() {
           w => w.playerId === payout.playerId
         );
 
-        let guessName = "";
-        if (wager) {
-          if (wager.guessedAuthorId === "ghost") {
-            guessName = "👻 Ghost";
-          } else {
-            const guessedPlayer = gameState.players.find(
-              pl =>
-                pl.id ===
-                parseInt(wager.guessedAuthorId, 10)
-            );
-            if (guessedPlayer) {
-              guessName = guessedPlayer.name;
-            }
-          }
-        }
-
+        // We no longer show guess on this screen, so we skip guessName.
         const ok = r.correctGuessers.includes(
           payout.playerId
         );
-        const dStr =
-          payout.delta >= 0
-            ? `+${payout.delta}`
-            : String(payout.delta);
 
         const row = document.createElement("div");
         row.className = "wsd-result-row";
         row.style.animationDelay = `${i * 0.07}s`;
+
+        // --- New math breakdown: Wager + Author + House = Total ---
+        const wagerAmount = wager
+          ? (parseInt(wager.amount, 10) || 0)
+          : 0;
+
+        let authorPart = 0;
+        if (
+          !r.selectedAnswer?.isGhost &&
+          r.selectedAnswer &&
+          p &&
+          p.id === r.selectedAnswer.playerId
+        ) {
+          authorPart = r.authorBonus || 0;
+        }
+
+        let housePart = 0;
+        if (Array.isArray(r.houseBonusRecipients)) {
+          const hbEntry = r.houseBonusRecipients.find(
+            hb => hb.playerId === payout.playerId
+          );
+          if (hbEntry) housePart = hbEntry.extra || 0;
+        }
+
+        const total = payout.delta;
+
+        const wagerStr = wagerAmount
+          ? ok
+            ? `+${wagerAmount}`
+            : `-${wagerAmount}`
+          : "0";
+        const authorStr = authorPart ? `+${authorPart}` : "+0";
+        const houseStr = housePart ? `+${housePart}` : "+0";
+        const totalStr =
+          total >= 0 ? `+${total}` : String(total);
+
         row.innerHTML = `
           <div>
             <div class="wsd-score-name">
               ${ok ? "✅ " : ""}${p ? p.name : "?"}
             </div>
             <div class="wsd-score-meta">
-              Guess: ${guessName || "—"} · Wager: ${
-          wager ? wager.amount : 0
-        }
+              Wager: ${wagerStr} · Author: ${authorStr} · House: ${houseStr} = ${totalStr}
             </div>
           </div>
           <div class="wsd-score-value ${
-            payout.delta >= 0
-              ? "text-success"
-              : "text-danger"
-          }">${dStr}</div>`;
+            total >= 0 ? "text-success" : "text-danger"
+          }">${totalStr}</div>`;
 
         if (resultsEl) resultsEl.appendChild(row);
       }, i * 120);
