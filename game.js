@@ -2819,27 +2819,26 @@ function restoreUIFromState() {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  initHowToPlaySpotlight();
-  loadState();
-  ensureStateShape();
-  initSetupScreen();
-  wireEvents();
+  initHowToPlaySpotlight();
+  loadState();
+  ensureStateShape();
+  wireEvents();
 
-  const startBtn = $("wsd-start-game");
-  if (startBtn) startBtn.textContent = gameState ? "Resume game" : "Start game";
+  const startBtn = $("wsd-start-game");
+  if (startBtn) startBtn.textContent = gameState ? "Resume game" : "Start game";
 
-  if (gameState) {
-    const parkName = gameState.settings?.park || "Not set";
-    const parkLabel = $("wsd-park-label");
-    if (parkLabel) parkLabel.textContent = parkName;
-    applyParkTheme(parkName);
-
-    const scr = gameState.screen || "setup-game";
-    restoreUIFromState();   // ← paint content FIRST
-    showScreen(scr);        // ← THEN show the screen
-  } else {
-    showScreen("setup-game");
-  }
+  if (gameState) {
+    const parkName = gameState.settings?.park || "Not set";
+    const parkLabel = $("wsd-park-label");
+    if (parkLabel) parkLabel.textContent = parkName;
+    applyParkTheme(parkName);
+    const scr = gameState.screen || "setup-game";
+    restoreUIFromState();
+    showScreen(scr);
+  } else {
+    initSetupScreen();
+    showScreen("setup-game");
+  }
 });
 
 
