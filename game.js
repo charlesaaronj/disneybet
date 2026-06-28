@@ -287,9 +287,10 @@ function applyParkTheme(parkName) {
     ["#modal-no-correct .modal-header", "color", t ? "#fff" : ""],
     ["#modal-confirm-reset .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-confirm-reset .modal-header", "color", t ? "#fff" : ""],
-
-['#modal-first-visit .modal-header', 'backgroundImage', t?.hero],
-['#modal-first-visit .modal-header', 'color',           t ? '#fff' : ''],
+    ['#modal-first-visit .modal-header', 'backgroundImage', t?.hero],
+    ['#modal-first-visit .modal-header', 'color',           t ? '#fff' : ''],
+    ["#modal-resume-game .modal-header", "backgroundImage", t?.hero],
+    ["#modal-resume-game .modal-header", "color", t ? "#fff" : ""]
 
     // NEW: park-themed headers
     ["#modal-scoring .modal-header", "backgroundImage", t?.hero || ""],
