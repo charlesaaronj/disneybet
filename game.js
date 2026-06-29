@@ -1790,8 +1790,6 @@ function runRevealAnimation() {
     }
 
     // Summary text lines in the modal
-    // Summary text lines in the modal
-const authorLineSummary = $("wsd-no-correct-author-line");
 const authorLineSummary = $("wsd-no-correct-author-line");
 if (authorLineSummary) {
   const winnerNames = r.correctGuessers.length
