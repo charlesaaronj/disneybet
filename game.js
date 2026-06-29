@@ -1833,32 +1833,6 @@ if (authorLineSummary) {
     `${line1}<br>${line2}<br>${line3}`;
 }
 
-    const houseLineText = $("wsd-house-bonus-line");
-    if (houseLineText) {
-      if (r.houseBonusApplied && r.houseBonusResolved > 0) {
-        const names = r.houseBonusRecipients
-          .map(hr => {
-            const p = gameState.players.find(
-              pl => pl.id === hr.playerId
-            );
-            return p
-              ? `${p.name} (+${hr.extra})`
-              : `Player ${hr.playerId} (+${hr.extra})`;
-          })
-          .join(", ");
-        houseLineText.textContent =
-          `🎟️ House bonus: ${r.houseBonusResolved} ` +
-          `rounded up and split among ${names}.`;
-      } else if (r.houseBonusAmount > 0) {
-        houseLineText.textContent =
-          `🎟️ House bonus: ${
-            r.houseBonusReason || "Not applied."
-          }`;
-      } else {
-        houseLineText.textContent = "";
-      }
-    }
-
     // Bootstrap modal: Round summary
     try {
       const modalEl = $("modal-no-correct");
