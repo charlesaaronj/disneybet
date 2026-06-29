@@ -2009,7 +2009,7 @@ if (authorLineSummary) {
               ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
             </div>
             <div class="wsd-score-meta">
-              Wager: ${wagerStr} · Pot: ${potStr} · House: ${houseStr}
+              Wager: ${wagerStr} · Hunny Pot: ${potStr} · House: ${houseStr}
             </div>
           </div>
           <div class="wsd-score-value ${
