@@ -1648,6 +1648,8 @@ function applyRoundResults(authorId) {
 
 // ---------- Reveal animation & round summary modal ----------
 
+// ---------- Reveal animation & round summary modal ----------
+
 function runRevealAnimation() {
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
@@ -1709,22 +1711,54 @@ function runRevealAnimation() {
     // Summary text lines in the modal
     const authorLineSummary = $("wsd-no-correct-author-line");
     if (authorLineSummary) {
-      if (r.wrongGuessCount > 0 && !isGhostAnswer) {
-        const b = r.authorBonus || 0;
-        const w = r.wrongGuessCount;
-        authorLineSummary.textContent =
-          `⭐ Author bonus: ${
-            author ? author.name : "The author"
-          } earned ${b} point${b !== 1 ? "s" : ""} ` +
-          `from ${w} wrong guess${w !== 1 ? "es" : ""}.`;
+      // We now use this as a general round summary line.
+      const potTotal = (r.pot || 0) + (r.houseBonusResolved || 0);
+      const winnerNames = r.correctGuessers.length
+        ? r.correctGuessers
+            .map(
+              pid =>
+                gameState.players.find(
+                  p => p.id === pid
+                )?.name
+            )
+            .filter(Boolean)
+            .join(", ")
+        : null;
+
+      if (isGhostAnswer) {
+        if (winnerNames) {
+          authorLineSummary.textContent =
+            `🎉 Winners: ${winnerNames} correctly guessed Ghost and shared the pot.`;
+        } else {
+          authorLineSummary.textContent =
+            "😱 Nobody guessed Ghost this round. The house wins the pot.";
+        }
+      } else if (r.correctGuessers.length > 0) {
+        if (winnerNames && potTotal > 0) {
+          authorLineSummary.textContent =
+            `🎉 Author guessed correctly by ${winnerNames}. They shared ${potTotal} points from the pot and house.`;
+        } else if (winnerNames) {
+          authorLineSummary.textContent =
+            `🎉 Winners: ${winnerNames} guessed the author correctly.`;
+        } else {
+          authorLineSummary.textContent =
+            "🤔 No winners recorded this round.";
+        }
       } else {
-        authorLineSummary.textContent = "";
+        const name = author ? author.name : "The author";
+        if (potTotal > 0) {
+          authorLineSummary.textContent =
+            `🎯 Author not guessed — ${name} wins the pot and house points (${potTotal} total).`;
+        } else {
+          authorLineSummary.textContent =
+            `🎯 Author not guessed — ${name} wins this round.`;
+        }
       }
     }
 
     const houseLineText = $("wsd-house-bonus-line");
     if (houseLineText) {
-      if (r.houseBonusApplied) {
+      if (r.houseBonusApplied && r.houseBonusResolved > 0) {
         const names = r.houseBonusRecipients
           .map(hr => {
             const p = gameState.players.find(
@@ -1759,56 +1793,12 @@ function runRevealAnimation() {
         const houseLine = $("wsd-house-bonus-line");
 
         if (authorLine) {
-          const winnerNames = r.correctGuessers.length
-            ? r.correctGuessers
-                .map(
-                  pid =>
-                    gameState.players.find(
-                      p => p.id === pid
-                    )?.name
-                )
-                .filter(Boolean)
-                .join(", ")
-            : null;
-
-          if (isGhostAnswer) {
-            authorLine.textContent = winnerNames
-              ? `🎉 Winners: ${winnerNames} correctly guessed Ghost.`
-              : "😱 Nobody guessed Ghost this round.";
-          } else {
-            authorLine.textContent = winnerNames
-              ? `🎉 Winners: ${winnerNames} got it right this round.`
-              : `🤔 Nobody guessed ${
-                  author ? author.name : "the author"
-                } this round.`;
-          }
+          // authorLine already set above; no extra author-bonus wording now.
         }
 
-        // Optional extra line describing author bonus
+        // Remove any old author bonus line if present
         let bonusLine = $("wsd-author-bonus-line");
         if (bonusLine) bonusLine.remove();
-
-        if (r.authorBonus > 0 && !isGhostAnswer) {
-          const b = r.authorBonus;
-          const w = r.wrongGuessCount;
-          bonusLine = document.createElement("p");
-          bonusLine.id = "wsd-author-bonus-line";
-          bonusLine.className =
-            (houseLine ? houseLine.className : "") +
-            " wsd-text-small";
-          bonusLine.textContent =
-            `⭐ Author bonus: ${
-              author ? author.name : "The author"
-            } earned ${b} point${b !== 1 ? "s" : ""} ` +
-            `from ${w} wrong guess${w !== 1 ? "es" : ""}.`;
-          const authorLineEl = $("wsd-no-correct-author-line");
-          if (authorLineEl) {
-            authorLineEl.insertAdjacentElement(
-              "afterend",
-              bonusLine
-            );
-          }
-        }
 
         setTimeout(
           () => new bootstrap.Modal(modalEl).show(),
@@ -1818,6 +1808,11 @@ function runRevealAnimation() {
     } catch (e) {}
 
     // Animate individual payout rows
+    const authorWonRound =
+      !isGhostAnswer &&
+      r.correctGuessers.length === 0 &&
+      !!author;
+
     r.payouts.forEach((payout, i) => {
       setTimeout(() => {
         const p = gameState.players.find(
@@ -1827,7 +1822,6 @@ function runRevealAnimation() {
           w => w.playerId === payout.playerId
         );
 
-        // We no longer show guess on this screen, so we skip guessName.
         const ok = r.correctGuessers.includes(
           payout.playerId
         );
@@ -1836,21 +1830,11 @@ function runRevealAnimation() {
         row.className = "wsd-result-row";
         row.style.animationDelay = `${i * 0.07}s`;
 
-        // --- New math breakdown: Wager + Author + House = Total ---
         const wagerAmount = wager
           ? (parseInt(wager.amount, 10) || 0)
           : 0;
 
-        let authorPart = 0;
-        if (
-          !r.selectedAnswer?.isGhost &&
-          r.selectedAnswer &&
-          p &&
-          p.id === r.selectedAnswer.playerId
-        ) {
-          authorPart = r.authorBonus || 0;
-        }
-
+        // House bonus share for this player (if any)
         let housePart = 0;
         if (Array.isArray(r.houseBonusRecipients)) {
           const hbEntry = r.houseBonusRecipients.find(
@@ -1866,18 +1850,25 @@ function runRevealAnimation() {
             ? `+${wagerAmount}`
             : `-${wagerAmount}`
           : "0";
-        const authorStr = authorPart ? `+${authorPart}` : "+0";
         const houseStr = housePart ? `+${housePart}` : "+0";
         const totalStr =
           total >= 0 ? `+${total}` : String(total);
 
+        const isAuthor =
+          !isGhostAnswer &&
+          author &&
+          p &&
+          p.id === author.id;
+        const winnerBadge =
+          authorWonRound && isAuthor ? " 👑" : "";
+
         row.innerHTML = `
           <div>
             <div class="wsd-score-name">
-              ${ok ? "✅ " : ""}${p ? p.name : "?"}
+              ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
             </div>
             <div class="wsd-score-meta">
-              Wager: ${wagerStr} · Author: ${authorStr} · House: ${houseStr}
+              Wager: ${wagerStr} · House: ${houseStr} = ${totalStr}
             </div>
           </div>
           <div class="wsd-score-value ${
