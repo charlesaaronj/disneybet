@@ -1399,6 +1399,10 @@ function getHouseBonusChooser() {
 
 // Compute payouts with pot: author wins if nobody guesses them,
 // house wins for Ghost when nobody guesses Ghost.
+// Compute payouts with full-pot model:
+// - All wagers go into the pot.
+// - Winners (author alone, or correct guessers) split pot and house.
+// - House wins for Ghost when nobody guesses Ghost.
 function computeRevealAndScoring() {
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
@@ -1409,13 +1413,15 @@ function computeRevealAndScoring() {
   const payouts = [];
   let pot = 0;
 
-  // First pass: basic +wager / -wager and build pot
+  // First pass: collect wagers, build pot, and set wagerPart = -amount
+  // (everyone puts their wager into the pot).
+  const wagerMap = new Map(); // playerId -> amount
+
   gameState.players.forEach(p => {
     const we = r.wagers.find(w => w.playerId === p.id);
-    let delta = 0;
+    let wagerPart = 0;
 
     if (we) {
-      const rawGuess = we.guessedAuthorId;
       const amount = Math.max(
         0,
         parseInt(we.amount, 10) || 0
@@ -1424,37 +1430,28 @@ function computeRevealAndScoring() {
       p.stats.totalRisked += amount;
 
       if (amount > 0) {
-        if (isGhostAnswer) {
-          // Ghost round: only "ghost" guess is correct
-          if (rawGuess === "ghost") {
-            // correct ghost guess
-            delta += amount;
-          } else {
-            // wrong guess feeds the house pot
-            delta -= amount;
-            pot += amount;
-          }
-        } else {
-          // Real author round
-          const guessedId = parseInt(rawGuess, 10);
-          if (guessedId === authorId) {
-            // correct author guess
-            delta += amount;
-          } else {
-            // wrong guess feeds the author pot
-            delta -= amount;
-            pot += amount;
-          }
-        }
+        wagerPart = -amount;
+        pot += amount;
+        wagerMap.set(p.id, amount);
       }
     }
 
-    payouts.push({ playerId: p.id, delta });
+    payouts.push({
+      playerId: p.id,
+      // we'll store components explicitly
+      wagerPart,
+      potPart: 0,
+      housePart: 0,
+      delta: 0 // filled later
+    });
   });
 
-  // Determine correct guessers (for reveal / history)
+  // Determine winners
+  let winners = [];
+
   if (isGhostAnswer) {
-    r.correctGuessers = r.wagers
+    // Winners are players who guessed "ghost"
+    winners = r.wagers
       .filter(w => {
         const amount = Math.max(
           0,
@@ -1464,7 +1461,8 @@ function computeRevealAndScoring() {
       })
       .map(w => w.playerId);
   } else {
-    r.correctGuessers = r.wagers
+    // Winners are players who guessed the author
+    winners = r.wagers
       .filter(w => {
         const amount = Math.max(
           0,
@@ -1478,11 +1476,13 @@ function computeRevealAndScoring() {
       .map(w => w.playerId);
   }
 
+  r.correctGuessers = winners.slice();
+
   // No more per-wrong-guess author bonus
   r.wrongGuessCount = 0;
   r.authorBonus = 0;
 
-  // House bonus distribution (unchanged)
+  // House bonus amount
   const hb = Math.max(
     0,
     parseInt(r.houseBonusAmount, 10) || 0
@@ -1495,57 +1495,129 @@ function computeRevealAndScoring() {
     houseBonusReason: ""
   });
 
-  if (hb > 0) {
-    const cc = r.correctGuessers.length;
-    if (cc === 0) {
-      r.houseBonusReason =
-        "No house bonus: No correct guesses.";
-    } else if (hb % cc !== 0) {
-      r.houseBonusReason =
-        "No house bonus: it could not be split evenly among correct guessers.";
-    } else {
-      const share = hb / cc;
-      r.correctGuessers.forEach(pid => {
-        const pt = payouts.find(p => p.playerId === pid);
-        if (pt) {
-          pt.delta += share;
-          r.houseBonusRecipients.push({
-            playerId: pid,
-            extra: share
-          });
-        }
-      });
+  // Helper to split an integer amount among winners, rounding up
+  function splitRounded(amount, winnerIds) {
+    const result = new Map(); // playerId -> share
+    if (!amount || !winnerIds.length) return result;
 
-      Object.assign(r, {
-        houseBonusResolved: hb,
-        houseBonusApplied: true,
-        houseBonusReason: "✅ House bonus applied evenly."
-      });
-    }
+    const n = winnerIds.length;
+    const base = Math.floor(amount / n);
+    let remainder = amount % n;
+
+    winnerIds.forEach(pid => {
+      let share = base;
+      if (remainder > 0) {
+        share += 1;
+        remainder -= 1;
+      }
+      result.set(pid, share);
+    });
+
+    return result;
   }
 
-  // Apply pot for author / house
+  // Decide who wins the pot
   if (isGhostAnswer) {
-    // Ghost round, house wins if nobody guesses Ghost
-    const anyGhostGuesser =
-      r.correctGuessers.length > 0;
-    if (!anyGhostGuesser) {
-      // pot simply vanishes to the house; no extra payout
-      // (payouts already include -wager for wrong guesses)
+    if (winners.length === 0) {
+      // Ghost round, nobody guessed Ghost: house wins pot.
+      r.houseBonusReason =
+        "House wins: nobody guessed Ghost.";
+    } else {
+      // Winners share the pot
+      const potShares = splitRounded(pot, winners);
+      potShares.forEach((share, pid) => {
+        const pt = payouts.find(p => p.playerId === pid);
+        if (pt) pt.potPart += share;
+      });
+
+      // House bonus: split among same winners, if any
+      if (hb > 0) {
+        const hbShares = splitRounded(hb, winners);
+        hbShares.forEach((share, pid) => {
+          const pt = payouts.find(p => p.playerId === pid);
+          if (pt) {
+            pt.housePart += share;
+            r.houseBonusRecipients.push({
+              playerId: pid,
+              extra: share
+            });
+          }
+        });
+        Object.assign(r, {
+          houseBonusResolved: hb,
+          houseBonusApplied: true,
+          houseBonusReason:
+            "✅ House bonus rounded up and split among Ghost guessers."
+        });
+      }
     }
   } else {
-    // Real-author round: author wins pot if nobody guesses them
-    const anyCorrectGuesser =
-      r.correctGuessers.length > 0;
-    if (!anyCorrectGuesser && pot > 0 && authorId != null) {
-      const authorPayout = payouts.find(
-        pt => pt.playerId === authorId
-      );
-      if (authorPayout) {
-        authorPayout.delta += pot;
+    // Real-author round
+    if (winners.length === 0) {
+      // Author is the sole winner
+      if (authorId != null && pot > 0) {
+        const authorPayout = payouts.find(
+          pt => pt.playerId === authorId
+        );
+        if (authorPayout) {
+          authorPayout.potPart += pot;
+        }
+      }
+
+      // House bonus: all to author if any
+      if (hb > 0 && authorId != null) {
+        const authorPayout = payouts.find(
+          pt => pt.playerId === authorId
+        );
+        if (authorPayout) {
+          authorPayout.housePart += hb;
+          r.houseBonusRecipients.push({
+            playerId: authorId,
+            extra: hb
+          });
+        }
+        Object.assign(r, {
+          houseBonusResolved: hb,
+          houseBonusApplied: true,
+          houseBonusReason:
+            "✅ House bonus awarded to the author (nobody guessed them)."
+        });
+      }
+    } else {
+      // Correct guessers share pot
+      const potShares = splitRounded(pot, winners);
+      potShares.forEach((share, pid) => {
+        const pt = payouts.find(p => p.playerId === pid);
+        if (pt) pt.potPart += share;
+      });
+
+      // House bonus: split among winners
+      if (hb > 0) {
+        const hbShares = splitRounded(hb, winners);
+        hbShares.forEach((share, pid) => {
+          const pt = payouts.find(p => p.playerId === pid);
+          if (pt) {
+            pt.housePart += share;
+            r.houseBonusRecipients.push({
+              playerId: pid,
+              extra: share
+            });
+          }
+        });
+        Object.assign(r, {
+          houseBonusResolved: hb,
+          houseBonusApplied: true,
+          houseBonusReason:
+            "✅ House bonus rounded up and split among winners."
+        });
       }
     }
   }
+
+  // Finalize deltas and store on round
+  payouts.forEach(pt => {
+    pt.delta = pt.wagerPart + pt.potPart + pt.housePart;
+  });
 
   r.payouts = payouts;
   r.pot = pot;
@@ -1708,7 +1780,6 @@ function runRevealAnimation() {
     // Summary text lines in the modal
     const authorLineSummary = $("wsd-no-correct-author-line");
     if (authorLineSummary) {
-      // General round summary line.
       const potTotal = (r.pot || 0) + (r.houseBonusResolved || 0);
       const winnerNames = r.correctGuessers.length
         ? r.correctGuessers
@@ -1725,7 +1796,7 @@ function runRevealAnimation() {
       if (isGhostAnswer) {
         if (winnerNames) {
           authorLineSummary.textContent =
-            `🎉 Winners: ${winnerNames} correctly guessed Ghost and shared the pot.`;
+            `🎉 Winners: ${winnerNames} correctly guessed Ghost and shared the pot (rounded up as needed).`;
         } else {
           authorLineSummary.textContent =
             "😱 Nobody guessed Ghost this round. The house wins the pot.";
@@ -1733,7 +1804,7 @@ function runRevealAnimation() {
       } else if (r.correctGuessers.length > 0) {
         if (winnerNames && potTotal > 0) {
           authorLineSummary.textContent =
-            `🎉 Author guessed correctly by ${winnerNames}. They shared ${potTotal} points from the pot and house.`;
+            `🎉 Author guessed correctly by ${winnerNames}. They shared ${potTotal} points from the pot and house (rounded up as needed).`;
         } else if (winnerNames) {
           authorLineSummary.textContent =
             `🎉 Winners: ${winnerNames} guessed the author correctly.`;
@@ -1768,7 +1839,7 @@ function runRevealAnimation() {
           .join(", ");
         houseLineText.textContent =
           `🎟️ House bonus: ${r.houseBonusResolved} ` +
-          `split evenly between ${names}.`;
+          `rounded up and split among ${names}.`;
       } else if (r.houseBonusAmount > 0) {
         houseLineText.textContent =
           `🎟️ House bonus: ${
@@ -1786,9 +1857,6 @@ function runRevealAnimation() {
         const titleEl = modalEl.querySelector(".modal-title");
         if (titleEl) titleEl.textContent = "📝 Round summary";
 
-        // authorLine already set above; no extra author-bonus wording now.
-
-        // Remove any old author bonus line if present
         let bonusLine = $("wsd-author-bonus-line");
         if (bonusLine) bonusLine.remove();
 
@@ -1810,10 +1878,6 @@ function runRevealAnimation() {
         const p = gameState.players.find(
           pl => pl.id === payout.playerId
         );
-        const wager = r.wagers.find(
-          w => w.playerId === payout.playerId
-        );
-
         const ok = r.correctGuessers.includes(
           payout.playerId
         );
@@ -1822,28 +1886,17 @@ function runRevealAnimation() {
         row.className = "wsd-result-row";
         row.style.animationDelay = `${i * 0.07}s`;
 
-        // Base wager amount
-        const wagerAmount = wager
-          ? (parseInt(wager.amount, 10) || 0)
-          : 0;
+        const wagerPart = payout.wagerPart || 0;
+        const potPart = payout.potPart || 0;
+        const housePart = payout.housePart || 0;
+        const total = payout.delta || 0;
 
-        // House bonus share for this player (if any)
-        let housePart = 0;
-        if (Array.isArray(r.houseBonusRecipients)) {
-          const hbEntry = r.houseBonusRecipients.find(
-            hb => hb.playerId === payout.playerId
-          );
-          if (hbEntry) housePart = hbEntry.extra || 0;
-        }
-
-        const total = payout.delta;
-
-        // For display:
-        const wagerPart = total - housePart; // logical “wager+pot” piece
-        const potPart = r.pot || 0;          // same pot total for everyone (explained in text)
-        const wagerStr = wagerPart >= 0 ? `+${wagerPart}` : String(wagerPart);
-        const potStr = potPart ? `+${potPart}` : "+0";
-        const houseStr = housePart ? `+${housePart}` : "+0";
+        const wagerStr =
+          wagerPart >= 0 ? `+${wagerPart}` : String(wagerPart);
+        const potStr =
+          potPart >= 0 ? `+${potPart}` : String(potPart);
+        const houseStr =
+          housePart >= 0 ? `+${housePart}` : String(housePart);
         const totalStr =
           total >= 0 ? `+${total}` : String(total);
 
@@ -1877,6 +1930,7 @@ function runRevealAnimation() {
     }, r.payouts.length * 120 + 300);
   }, 2100);
 }
+
 // Simple confetti spawn for reveal/final screens
 function spawnConfetti(container) {
   if (!container) return;
