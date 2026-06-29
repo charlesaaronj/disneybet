@@ -1830,48 +1830,71 @@ function runRevealAnimation() {
     }
 
     // Summary text lines in the modal
-const authorLineSummary = $("wsd-no-correct-author-line");
-if (authorLineSummary) {
-  const winnerNames = r.correctGuessers.length
-    ? r.correctGuessers
-        .map(pid => gameState.players.find(p => p.id === pid)?.name)
-        .filter(Boolean)
-        .join(", ")
-    : null;
+    const authorLineSummary = $("wsd-no-correct-author-line");
+    if (authorLineSummary) {
+      const winnerNames = r.correctGuessers.length
+        ? r.correctGuessers
+            .map(
+              pid =>
+                gameState.players.find(p => p.id === pid)
+                  ?.name
+            )
+            .filter(Boolean)
+            .join(", ")
+        : null;
 
-  const authorWonRound =
-    !isGhostAnswer && r.correctGuessers.length === 0 && !!author;
+      const authorWonRound =
+        !isGhostAnswer &&
+        r.correctGuessers.length === 0 &&
+        !!author;
 
-  // Line 1: win outcome
-  let line1 = "";
-  if (isGhostAnswer) {
-    line1 = winnerNames
-      ? `🎉 ${winnerNames} correctly guessed Ghost.`
-      : "😱 Nobody guessed Ghost — the house wins the pot.";
-  } else if (authorWonRound) {
-    const name = author ? author.name : "The author";
-    line1 = `🎯 Nobody guessed the author — ${name} wins the pot.`;
-  } else {
-    line1 = winnerNames
-      ? `🎉 ${winnerNames} guessed the author correctly.`
-      : "🤔 No winners recorded this round.";
-  }
+      // Detect "author guessed themselves and no one else hit"
+      const authorSelfOnly =
+        !isGhostAnswer &&
+        !!author &&
+        r.correctGuessers.length === 0 &&
+        r.wagers.some(
+          w =>
+            w.playerId === author.id &&
+            parseInt(w.guessedAuthorId, 10) === author.id
+        );
 
-  // Line 2: pot payout
-  const potPaidOut = r.pot || 0;
-  const line2 = potPaidOut > 0
-    ? `🪙 Pot paid out: ${potPaidOut} points`
-    : `🪙 Pot paid out: 0 points`;
+      // Line 1: win outcome
+      let line1 = "";
+      if (isGhostAnswer) {
+        line1 = winnerNames
+          ? `🎉 ${winnerNames} correctly guessed Ghost.`
+          : "😱 Nobody guessed Ghost — the house wins the pot.";
+      } else if (authorSelfOnly) {
+        // Solo self-guess: nobody wins pot or house
+        line1 =
+          "🤔 The author guessed themselves — no one wins the pot this round.";
+      } else if (authorWonRound) {
+        const name = author ? author.name : "The author";
+        line1 = `🎯 Nobody guessed the author — ${name} wins the pot.`;
+      } else {
+        line1 = winnerNames
+          ? `🎉 ${winnerNames} guessed the author correctly.`
+          : "🤔 No winners recorded this round.";
+      }
 
-  // Line 3: house bonus payout
-  const housePaidOut = r.houseBonusResolved || 0;
-  const line3 = housePaidOut > 0
-    ? `🏠 House bonus paid out: ${housePaidOut} points`
-    : `🏠 House bonus: none this round`;
+      // Line 2: pot payout
+      const potPaidOut = r.pot || 0;
+      const line2 =
+        potPaidOut > 0
+          ? `🪙 Pot paid out: ${potPaidOut} points`
+          : `🪙 Pot paid out: 0 points`;
 
-  authorLineSummary.innerHTML =
-    `${line1}<br>${line2}<br>${line3}`;
-}
+      // Line 3: house bonus payout
+      const housePaidOut = r.houseBonusResolved || 0;
+      const line3 =
+        housePaidOut > 0
+          ? `🏠 House bonus paid out: ${housePaidOut} points`
+          : `🏠 House bonus: none this round`;
+
+      authorLineSummary.innerHTML =
+        `${line1}<br>${line2}<br>${line3}`;
+    }
 
     // Bootstrap modal: Round summary
     try {
@@ -1891,10 +1914,20 @@ if (authorLineSummary) {
     } catch (e) {}
 
     // Animate individual payout rows
-    const authorWonRound =
+    const authorWonRoundRowFlag =
       !isGhostAnswer &&
       r.correctGuessers.length === 0 &&
-      !!author;
+      !!author &&
+      !(
+        !isGhostAnswer &&
+        !!author &&
+        r.correctGuessers.length === 0 &&
+        r.wagers.some(
+          w =>
+            w.playerId === author.id &&
+            parseInt(w.guessedAuthorId, 10) === author.id
+        )
+      );
 
     r.payouts.forEach((payout, i) => {
       setTimeout(() => {
@@ -1929,7 +1962,7 @@ if (authorLineSummary) {
           p &&
           p.id === author.id;
         const winnerBadge =
-          authorWonRound && isAuthor ? " 👑" : "";
+          authorWonRoundRowFlag && isAuthor ? " 👑" : "";
 
         row.innerHTML = `
           <div>
@@ -1953,7 +1986,6 @@ if (authorLineSummary) {
     }, r.payouts.length * 120 + 300);
   }, 2100);
 }
-
 // Simple confetti spawn for reveal/final screens
 function spawnConfetti(container) {
   if (!container) return;
