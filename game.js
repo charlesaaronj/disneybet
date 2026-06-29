@@ -1469,6 +1469,18 @@ function computeRevealAndScoring() {
       .map(w => w.playerId);
   }
 
+  // Special case: if the only "winner" is the author guessing themselves,
+  // treat it as if nobody guessed the author at all.
+  if (!isGhostAnswer && authorId != null) {
+    const uniqueWinners = Array.from(new Set(winners));
+    if (
+      uniqueWinners.length === 1 &&
+      uniqueWinners[0] === authorId
+    ) {
+      winners = [];
+    }
+  }
+
   r.correctGuessers = winners.slice();
 
   // No more author bonus / wrongGuessCount
@@ -1549,8 +1561,22 @@ function computeRevealAndScoring() {
     }
   } else {
     // Real-author round
-    if (winners.length === 0) {
-      // Author is the sole winner: they get full pot and full house (no need to round)
+    const n = winners.length;
+
+    // Detect "author guessed themselves and no one else hit"
+    const authorSelfOnly =
+      !isGhostAnswer &&
+      authorId != null &&
+      n === 0 &&
+      r.wagers.some(
+        w =>
+          w.playerId === authorId &&
+          parseInt(w.guessedAuthorId, 10) === authorId
+      );
+
+    if (n === 0 && !authorSelfOnly) {
+      // Case 1: No winners, and the author did NOT guess themselves.
+      // -> Author gets full pot and full house.
       r.pot = pot;
 
       if (authorId != null && pot > 0) {
@@ -1581,15 +1607,29 @@ function computeRevealAndScoring() {
             "✅ House bonus awarded to the author (nobody guessed them)."
         });
       }
+    } else if (n === 0 && authorSelfOnly) {
+      // Case 2: Only the author guessed the author (self-guess).
+      // -> Nobody gets pot or house this round.
+      r.pot = pot;
+      // Leave potPart and housePart as 0 for everyone.
+      if (hb > 0) {
+        Object.assign(r, {
+          houseBonusResolved: 0,
+          houseBonusApplied: false,
+          houseBonusReason:
+            "House bonus not applied: only the author guessed themselves."
+        });
+      }
     } else {
-      const n = winners.length;
+      // Case 3: At least one non-author winner; share pot and house.
+      const winnerCount = n;
 
       // Pot: round up and split evenly among winners
       const resolvedPot = resolveAmountForWinners(
         pot,
-        n
+        winnerCount
       );
-      const potShare = resolvedPot / n;
+      const potShare = resolvedPot / winnerCount;
 
       winners.forEach(pid => {
         const pt = payouts.find(p => p.playerId === pid);
@@ -1600,9 +1640,9 @@ function computeRevealAndScoring() {
       if (hb > 0) {
         const resolvedHouse = resolveAmountForWinners(
           hb,
-          n
+          winnerCount
         );
-        const houseShare = resolvedHouse / n;
+        const houseShare = resolvedHouse / winnerCount;
 
         winners.forEach(pid => {
           const pt = payouts.find(p => p.playerId === pid);
