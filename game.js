@@ -1792,50 +1792,47 @@ function runRevealAnimation() {
     // Summary text lines in the modal
     // Summary text lines in the modal
 const authorLineSummary = $("wsd-no-correct-author-line");
+const authorLineSummary = $("wsd-no-correct-author-line");
 if (authorLineSummary) {
-  const totalBonusPool =
-    (r.pot || 0) + (r.houseBonusResolved || 0);
   const winnerNames = r.correctGuessers.length
     ? r.correctGuessers
-        .map(
-          pid =>
-            gameState.players.find(
-              p => p.id === pid
-            )?.name
-        )
+        .map(pid => gameState.players.find(p => p.id === pid)?.name)
         .filter(Boolean)
         .join(", ")
     : null;
 
+  const authorWonRound =
+    !isGhostAnswer && r.correctGuessers.length === 0 && !!author;
+
+  // Line 1: win outcome
+  let line1 = "";
   if (isGhostAnswer) {
-    if (winnerNames) {
-      authorLineSummary.textContent =
-        `🎉 Winners: ${winnerNames} correctly guessed Ghost and shared ${totalBonusPool} points from the pot and house (rounded up as needed).`;
-    } else {
-      authorLineSummary.textContent =
-        "😱 Nobody guessed Ghost this round. The house wins the pot and house points.";
-    }
-  } else if (r.correctGuessers.length > 0) {
-    if (winnerNames && totalBonusPool > 0) {
-      authorLineSummary.textContent =
-        `🎉 Author guessed correctly by ${winnerNames}. They shared ${totalBonusPool} points from the pot and house (rounded up as needed).`;
-    } else if (winnerNames) {
-      authorLineSummary.textContent =
-        `🎉 Winners: ${winnerNames} guessed the author correctly.`;
-    } else {
-      authorLineSummary.textContent =
-        "🤔 No winners recorded this round.";
-    }
-  } else {
+    line1 = winnerNames
+      ? `🎉 ${winnerNames} correctly guessed Ghost.`
+      : "😱 Nobody guessed Ghost — the house wins the pot.";
+  } else if (authorWonRound) {
     const name = author ? author.name : "The author";
-    if (totalBonusPool > 0) {
-      authorLineSummary.textContent =
-        `🎯 Author not guessed — ${name} wins ${totalBonusPool} points from the pot and house (rounded up as needed).`;
-    } else {
-      authorLineSummary.textContent =
-        `🎯 Author not guessed — ${name} wins this round.`;
-    }
+    line1 = `🎯 Nobody guessed the author — ${name} wins the pot.`;
+  } else {
+    line1 = winnerNames
+      ? `🎉 ${winnerNames} guessed the author correctly.`
+      : "🤔 No winners recorded this round.";
   }
+
+  // Line 2: pot payout
+  const potPaidOut = r.pot || 0;
+  const line2 = potPaidOut > 0
+    ? `🪙 Pot paid out: ${potPaidOut} points`
+    : `🪙 Pot paid out: 0 points`;
+
+  // Line 3: house bonus payout
+  const housePaidOut = r.houseBonusResolved || 0;
+  const line3 = housePaidOut > 0
+    ? `🏠 House bonus paid out: ${housePaidOut} points`
+    : `🏠 House bonus: none this round`;
+
+  authorLineSummary.innerHTML =
+    `${line1}<br>${line2}<br>${line3}`;
 }
 
     const houseLineText = $("wsd-house-bonus-line");
