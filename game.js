@@ -1856,7 +1856,7 @@ if (authorLineSummary) {
     r.correctGuessers.length === 0 &&
     !!author;
 
-  // NEW: simple flag – did the author bet on themselves?
+  // Did the author bet on themselves?
   const authorChoseSelf =
     !isGhostAnswer &&
     !!author &&
@@ -1866,8 +1866,7 @@ if (authorLineSummary) {
         parseInt(w.guessedAuthorId, 10) === author.id
     );
 
-  // We still keep authorSelfOnly if you need it elsewhere,
-  // but it no longer controls the message visibility.
+  // Solo self-guess: author chose self and no one else was correct
   const authorSelfOnly =
     authorChoseSelf && r.correctGuessers.length === 0;
 
@@ -1876,14 +1875,13 @@ if (authorLineSummary) {
   if (isGhostAnswer) {
     line1 = winnerNames
       ? `🎉 ${winnerNames} correctly guessed Ghost.`
-      : "😱 Nobody guessed Ghost — the house wins the pot.";
+      : "😱 Nobody guessed Ghost — the house wins the Hunny pot.";
   } else if (authorSelfOnly) {
-    // Solo self-guess: nobody wins pot or house
     line1 =
-      "🤔 The author guessed themselves — no one wins the pot this round.";
+      "🤔 The author guessed themselves — no one wins the Hunny pot this round.";
   } else if (authorWonRound) {
     const name = author ? author.name : "The author";
-    line1 = `🎯 Nobody guessed the author — ${name} wins the pot.`;
+    line1 = `🎯 Nobody guessed the author — ${name} wins the Hunny pot.`;
   } else {
     // Normal winner case: only non-author winners are listed
     line1 = winnerNames
@@ -1891,15 +1889,15 @@ if (authorLineSummary) {
       : "🤔 No winners recorded this round.";
   }
 
-  // Line 2: pot payout (actual distributed pot)
+  // Line 2: Hunny pot payout (actual distributed pot)
   const potPaidOut = (r.payouts || []).reduce(
     (sum, pt) => sum + Math.max(0, pt.potPart || 0),
     0
   );
   const line2 =
     potPaidOut > 0
-      ? `🪙 Pot paid out: ${potPaidOut} points`
-      : `🪙 Pot paid out: 0 points`;
+      ? `🍯 Hunny pot paid out: ${potPaidOut} points`
+      : `🍯 Hunny pot paid out: 0 points`;
 
   // Line 3: house bonus payout
   const housePaidOut = r.houseBonusResolved || 0;
@@ -1908,15 +1906,32 @@ if (authorLineSummary) {
       ? `🏠 House bonus paid out: ${housePaidOut} points`
       : `🏠 House bonus: none this round`;
 
-  // UPDATED: Line 4 – explanation whenever author chose themselves
+  // Line 4: explanation whenever author chose themselves
   const line4 = authorChoseSelf
-    ? "ℹ️ The author was not included in the payout because they chose themselves."
+    ? `ℹ️ ${author ? author.name : "The author"} guessed themselves and was excluded from the payout.`
     : "";
 
-  authorLineSummary.innerHTML =
-    line4
-      ? `${line1}<br>${line2}<br>${line3}<br>${line4}`
-      : `${line1}<br>${line2}<br>${line3}`;
+  const parts = [];
+
+  parts.push(
+    `<p class="wsd-round-line">${line1}</p>`
+  );
+
+  parts.push(
+    `<p class="wsd-round-line">${line2}</p>`
+  );
+
+  parts.push(
+    `<p class="wsd-round-line">${line3}</p>`
+  );
+
+  if (line4) {
+    parts.push(
+      `<p class="wsd-round-line wsd-round-line-note">${line4}</p>`
+    );
+  }
+
+  authorLineSummary.innerHTML = parts.join("");
 }
 
     // Bootstrap modal: Round summary
