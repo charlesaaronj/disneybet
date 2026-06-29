@@ -1647,9 +1647,6 @@ function applyRoundResults(authorId) {
 }
 
 // ---------- Reveal animation & round summary modal ----------
-
-// ---------- Reveal animation & round summary modal ----------
-
 function runRevealAnimation() {
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
@@ -1711,7 +1708,7 @@ function runRevealAnimation() {
     // Summary text lines in the modal
     const authorLineSummary = $("wsd-no-correct-author-line");
     if (authorLineSummary) {
-      // We now use this as a general round summary line.
+      // General round summary line.
       const potTotal = (r.pot || 0) + (r.houseBonusResolved || 0);
       const winnerNames = r.correctGuessers.length
         ? r.correctGuessers
@@ -1789,12 +1786,7 @@ function runRevealAnimation() {
         const titleEl = modalEl.querySelector(".modal-title");
         if (titleEl) titleEl.textContent = "📝 Round summary";
 
-        const authorLine = $("wsd-no-correct-author-line");
-        const houseLine = $("wsd-house-bonus-line");
-
-        if (authorLine) {
-          // authorLine already set above; no extra author-bonus wording now.
-        }
+        // authorLine already set above; no extra author-bonus wording now.
 
         // Remove any old author bonus line if present
         let bonusLine = $("wsd-author-bonus-line");
@@ -1830,6 +1822,7 @@ function runRevealAnimation() {
         row.className = "wsd-result-row";
         row.style.animationDelay = `${i * 0.07}s`;
 
+        // Base wager amount
         const wagerAmount = wager
           ? (parseInt(wager.amount, 10) || 0)
           : 0;
@@ -1845,11 +1838,11 @@ function runRevealAnimation() {
 
         const total = payout.delta;
 
-        const wagerStr = wagerAmount
-          ? ok
-            ? `+${wagerAmount}`
-            : `-${wagerAmount}`
-          : "0";
+        // For display:
+        const wagerPart = total - housePart; // logical “wager+pot” piece
+        const potPart = r.pot || 0;          // same pot total for everyone (explained in text)
+        const wagerStr = wagerPart >= 0 ? `+${wagerPart}` : String(wagerPart);
+        const potStr = potPart ? `+${potPart}` : "+0";
         const houseStr = housePart ? `+${housePart}` : "+0";
         const totalStr =
           total >= 0 ? `+${total}` : String(total);
@@ -1868,7 +1861,7 @@ function runRevealAnimation() {
               ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
             </div>
             <div class="wsd-score-meta">
-              Wager: ${wagerStr} · House: ${houseStr} = ${totalStr}
+              Wager: ${wagerStr} · Pot: ${potStr} · House: ${houseStr} = ${totalStr}
             </div>
           </div>
           <div class="wsd-score-value ${
@@ -1884,7 +1877,6 @@ function runRevealAnimation() {
     }, r.payouts.length * 120 + 300);
   }, 2100);
 }
-
 // Simple confetti spawn for reveal/final screens
 function spawnConfetti(container) {
   if (!container) return;
