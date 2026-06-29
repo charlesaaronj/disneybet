@@ -1397,7 +1397,8 @@ function getHouseBonusChooser() {
 
 // ---------- Scoring engine ----------
 
-// Compute payouts, correct guessers, and house bonus
+// Compute payouts with pot: author wins if nobody guesses them,
+// house wins for Ghost when nobody guesses Ghost.
 function computeRevealAndScoring() {
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
@@ -1406,8 +1407,9 @@ function computeRevealAndScoring() {
     : r.selectedAnswer.playerId;
 
   const payouts = [];
-  let wrong = 0;
+  let pot = 0;
 
+  // First pass: basic +wager / -wager and build pot
   gameState.players.forEach(p => {
     const we = r.wagers.find(w => w.playerId === p.id);
     let delta = 0;
@@ -1423,20 +1425,25 @@ function computeRevealAndScoring() {
 
       if (amount > 0) {
         if (isGhostAnswer) {
-          // Only "ghost" guess is correct
+          // Ghost round: only "ghost" guess is correct
           if (rawGuess === "ghost") {
+            // correct ghost guess
             delta += amount;
           } else {
+            // wrong guess feeds the house pot
             delta -= amount;
-            wrong++;
+            pot += amount;
           }
         } else {
+          // Real author round
           const guessedId = parseInt(rawGuess, 10);
           if (guessedId === authorId) {
+            // correct author guess
             delta += amount;
           } else {
+            // wrong guess feeds the author pot
             delta -= amount;
-            wrong++;
+            pot += amount;
           }
         }
       }
@@ -1445,39 +1452,37 @@ function computeRevealAndScoring() {
     payouts.push({ playerId: p.id, delta });
   });
 
-  r.wrongGuessCount = wrong;
-  r.authorBonus = isGhostAnswer ? 0 : wrong;
-
-  // Award author bonus: +1 per wrong guess
-  if (!isGhostAnswer && wrong > 0) {
-    const ap = payouts.find(pt => pt.playerId === authorId);
-    if (ap) ap.delta += wrong;
+  // Determine correct guessers (for reveal / history)
+  if (isGhostAnswer) {
+    r.correctGuessers = r.wagers
+      .filter(w => {
+        const amount = Math.max(
+          0,
+          parseInt(w.amount, 10) || 0
+        );
+        return amount > 0 && w.guessedAuthorId === "ghost";
+      })
+      .map(w => w.playerId);
+  } else {
+    r.correctGuessers = r.wagers
+      .filter(w => {
+        const amount = Math.max(
+          0,
+          parseInt(w.amount, 10) || 0
+        );
+        return (
+          amount > 0 &&
+          parseInt(w.guessedAuthorId, 10) === authorId
+        );
+      })
+      .map(w => w.playerId);
   }
 
-  r.correctGuessers = isGhostAnswer
-    ? r.wagers
-        .filter(
-          w =>
-            Math.max(
-              0,
-              parseInt(w.amount, 10) || 0
-            ) > 0 && w.guessedAuthorId === "ghost"
-        )
-        .map(w => w.playerId)
-    : r.wagers
-        .filter(w => {
-          const amount = Math.max(
-            0,
-            parseInt(w.amount, 10) || 0
-          );
-          return (
-            amount > 0 &&
-            parseInt(w.guessedAuthorId, 10) === authorId
-          );
-        })
-        .map(w => w.playerId);
+  // No more per-wrong-guess author bonus
+  r.wrongGuessCount = 0;
+  r.authorBonus = 0;
 
-  // House bonus distribution
+  // House bonus distribution (unchanged)
   const hb = Math.max(
     0,
     parseInt(r.houseBonusAmount, 10) || 0
@@ -1519,12 +1524,34 @@ function computeRevealAndScoring() {
     }
   }
 
+  // Apply pot for author / house
+  if (isGhostAnswer) {
+    // Ghost round, house wins if nobody guesses Ghost
+    const anyGhostGuesser =
+      r.correctGuessers.length > 0;
+    if (!anyGhostGuesser) {
+      // pot simply vanishes to the house; no extra payout
+      // (payouts already include -wager for wrong guesses)
+    }
+  } else {
+    // Real-author round: author wins pot if nobody guesses them
+    const anyCorrectGuesser =
+      r.correctGuessers.length > 0;
+    if (!anyCorrectGuesser && pot > 0 && authorId != null) {
+      const authorPayout = payouts.find(
+        pt => pt.playerId === authorId
+      );
+      if (authorPayout) {
+        authorPayout.delta += pot;
+      }
+    }
+  }
+
   r.payouts = payouts;
-  r.pot = 0;
+  r.pot = pot;
 
   applyRoundResults(authorId);
 }
-
 // Apply scoring to players, update collections, ghost pool, and history
 function applyRoundResults(authorId) {
   const r = gameState.currentRound;
