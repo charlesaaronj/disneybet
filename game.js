@@ -1837,6 +1837,7 @@ function runRevealAnimation() {
     }
 
     // Summary text lines in the modal
+
 // Summary text lines in the modal
 const authorLineSummary = $("wsd-no-correct-author-line");
 if (authorLineSummary) {
@@ -1855,16 +1856,20 @@ if (authorLineSummary) {
     r.correctGuessers.length === 0 &&
     !!author;
 
-  // Detect "author guessed themselves and no one else hit"
-  const authorSelfOnly =
+  // NEW: simple flag – did the author bet on themselves?
+  const authorChoseSelf =
     !isGhostAnswer &&
     !!author &&
-    r.correctGuessers.length === 0 &&
     r.wagers.some(
       w =>
         w.playerId === author.id &&
         parseInt(w.guessedAuthorId, 10) === author.id
     );
+
+  // We still keep authorSelfOnly if you need it elsewhere,
+  // but it no longer controls the message visibility.
+  const authorSelfOnly =
+    authorChoseSelf && r.correctGuessers.length === 0;
 
   // Line 1: win outcome
   let line1 = "";
@@ -1903,8 +1908,8 @@ if (authorLineSummary) {
       ? `🏠 House bonus paid out: ${housePaidOut} points`
       : `🏠 House bonus: none this round`;
 
-  // NEW: Line 4 – explanation when author self-guessed
-  const line4 = authorSelfOnly
+  // UPDATED: Line 4 – explanation whenever author chose themselves
+  const line4 = authorChoseSelf
     ? "ℹ️ The author was not included in the payout because they chose themselves."
     : "";
 
