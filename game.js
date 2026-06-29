@@ -1790,51 +1790,53 @@ function runRevealAnimation() {
     }
 
     // Summary text lines in the modal
-    const authorLineSummary = $("wsd-no-correct-author-line");
-    if (authorLineSummary) {
-      const potTotal = (r.pot || 0) + (r.houseBonusResolved || 0);
-      const winnerNames = r.correctGuessers.length
-        ? r.correctGuessers
-            .map(
-              pid =>
-                gameState.players.find(
-                  p => p.id === pid
-                )?.name
-            )
-            .filter(Boolean)
-            .join(", ")
-        : null;
+    // Summary text lines in the modal
+const authorLineSummary = $("wsd-no-correct-author-line");
+if (authorLineSummary) {
+  const totalBonusPool =
+    (r.pot || 0) + (r.houseBonusResolved || 0);
+  const winnerNames = r.correctGuessers.length
+    ? r.correctGuessers
+        .map(
+          pid =>
+            gameState.players.find(
+              p => p.id === pid
+            )?.name
+        )
+        .filter(Boolean)
+        .join(", ")
+    : null;
 
-      if (isGhostAnswer) {
-        if (winnerNames) {
-          authorLineSummary.textContent =
-            `🎉 Winners: ${winnerNames} correctly guessed Ghost and shared the pot (rounded up as needed).`;
-        } else {
-          authorLineSummary.textContent =
-            "😱 Nobody guessed Ghost this round. The house wins the pot.";
-        }
-      } else if (r.correctGuessers.length > 0) {
-        if (winnerNames && potTotal > 0) {
-          authorLineSummary.textContent =
-            `🎉 Author guessed correctly by ${winnerNames}. They shared ${potTotal} points from the pot and house (rounded up as needed).`;
-        } else if (winnerNames) {
-          authorLineSummary.textContent =
-            `🎉 Winners: ${winnerNames} guessed the author correctly.`;
-        } else {
-          authorLineSummary.textContent =
-            "🤔 No winners recorded this round.";
-        }
-      } else {
-        const name = author ? author.name : "The author";
-        if (potTotal > 0) {
-          authorLineSummary.textContent =
-            `🎯 Author not guessed — ${name} wins the pot and house points (${potTotal} total).`;
-        } else {
-          authorLineSummary.textContent =
-            `🎯 Author not guessed — ${name} wins this round.`;
-        }
-      }
+  if (isGhostAnswer) {
+    if (winnerNames) {
+      authorLineSummary.textContent =
+        `🎉 Winners: ${winnerNames} correctly guessed Ghost and shared ${totalBonusPool} points from the pot and house (rounded up as needed).`;
+    } else {
+      authorLineSummary.textContent =
+        "😱 Nobody guessed Ghost this round. The house wins the pot and house points.";
     }
+  } else if (r.correctGuessers.length > 0) {
+    if (winnerNames && totalBonusPool > 0) {
+      authorLineSummary.textContent =
+        `🎉 Author guessed correctly by ${winnerNames}. They shared ${totalBonusPool} points from the pot and house (rounded up as needed).`;
+    } else if (winnerNames) {
+      authorLineSummary.textContent =
+        `🎉 Winners: ${winnerNames} guessed the author correctly.`;
+    } else {
+      authorLineSummary.textContent =
+        "🤔 No winners recorded this round.";
+    }
+  } else {
+    const name = author ? author.name : "The author";
+    if (totalBonusPool > 0) {
+      authorLineSummary.textContent =
+        `🎯 Author not guessed — ${name} wins ${totalBonusPool} points from the pot and house (rounded up as needed).`;
+    } else {
+      authorLineSummary.textContent =
+        `🎯 Author not guessed — ${name} wins this round.`;
+    }
+  }
+}
 
     const houseLineText = $("wsd-house-bonus-line");
     if (houseLineText) {
