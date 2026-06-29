@@ -754,3 +754,15 @@ body {
   height: 32px;
   display: block;
 }
+.wsd-round-line {
+  margin: 0 0 6px 0;   /* space below each line */
+}
+
+.wsd-round-line:last-child {
+  margin-bottom: 0;
+}
+
+.wsd-round-line-note {
+  margin-top: 10px;    /* extra gap before the ℹ️ note */
+}
+
