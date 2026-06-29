@@ -1469,15 +1469,20 @@ function computeRevealAndScoring() {
       .map(w => w.playerId);
   }
 
-  // Special case: if the only "winner" is the author guessing themselves,
-  // treat it as if nobody guessed the author at all.
+  // Special cases for real-author rounds
   if (!isGhostAnswer && authorId != null) {
     const uniqueWinners = Array.from(new Set(winners));
+
+    // Case A: only the author guessed themselves -> no winners at all.
     if (
       uniqueWinners.length === 1 &&
       uniqueWinners[0] === authorId
     ) {
       winners = [];
+    } else {
+      // Case B: author AND others guessed the author -> remove the author;
+      // only non-author players can win pot/house.
+      winners = winners.filter(pid => pid !== authorId);
     }
   }
 
@@ -1676,6 +1681,7 @@ function computeRevealAndScoring() {
 
   applyRoundResults(authorId);
 }
+
 // Apply scoring to players, update collections, ghost pool, and history
 function applyRoundResults(authorId) {
   const r = gameState.currentRound;
