@@ -1771,6 +1771,7 @@ function applyRoundResults(authorId) {
 }
 
 // ---------- Reveal animation & round summary modal ----------
+// ---------- Reveal animation & round summary modal ----------
 function runRevealAnimation() {
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
@@ -1878,14 +1879,17 @@ function runRevealAnimation() {
           : "🤔 No winners recorded this round.";
       }
 
-      // Line 2: pot payout
-      const potPaidOut = r.pot || 0;
+      // Line 2: pot payout (sum of actual potPart given out, not r.pot)
+      const potPaidOut = (r.payouts || []).reduce(
+        (sum, pt) => sum + Math.max(0, pt.potPart || 0),
+        0
+      );
       const line2 =
         potPaidOut > 0
           ? `🪙 Pot paid out: ${potPaidOut} points`
           : `🪙 Pot paid out: 0 points`;
 
-      // Line 3: house bonus payout
+      // Line 3: house bonus payout (uses houseBonusResolved)
       const housePaidOut = r.houseBonusResolved || 0;
       const line3 =
         housePaidOut > 0
@@ -1914,20 +1918,21 @@ function runRevealAnimation() {
     } catch (e) {}
 
     // Animate individual payout rows
+    const authorSelfOnlyRows =
+      !isGhostAnswer &&
+      !!author &&
+      r.correctGuessers.length === 0 &&
+      r.wagers.some(
+        w =>
+          w.playerId === author.id &&
+          parseInt(w.guessedAuthorId, 10) === author.id
+      );
+
     const authorWonRoundRowFlag =
       !isGhostAnswer &&
       r.correctGuessers.length === 0 &&
       !!author &&
-      !(
-        !isGhostAnswer &&
-        !!author &&
-        r.correctGuessers.length === 0 &&
-        r.wagers.some(
-          w =>
-            w.playerId === author.id &&
-            parseInt(w.guessedAuthorId, 10) === author.id
-        )
-      );
+      !authorSelfOnlyRows;
 
     r.payouts.forEach((payout, i) => {
       setTimeout(() => {
@@ -1986,6 +1991,7 @@ function runRevealAnimation() {
     }, r.payouts.length * 120 + 300);
   }, 2100);
 }
+
 // Simple confetti spawn for reveal/final screens
 function spawnConfetti(container) {
   if (!container) return;
