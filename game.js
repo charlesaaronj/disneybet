@@ -1121,6 +1121,16 @@ r.answerIndex = idx + 1;
   });
 } else {
   renderAnswerProgress();
+  
+  const nextInput = $("wsd-answer-input");
+    if (nextInput) {
+      nextInput.classList.add("wsd-anim-answer-refresh");
+      void nextInput.offsetWidth; // force reflow so animation starts
+      setTimeout(() => {
+        nextInput.classList.remove("wsd-anim-answer-refresh");
+      }, 200);
+    }
+
   saveState();
 }
 }
