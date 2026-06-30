@@ -201,7 +201,7 @@ const GAME_QUESTIONS = {
          "What 10‑second moment from {{attraction}} would make the best viral clip?",
         "What single photo from {{attraction}} would you enter in a photo contest?",
           "If someone stole a prop from {{attraction}}, what would you replace it with?",
-        "If someone stole a prop from {{attraction}}, what prop from another {{land}} would you put in its place?"
+        "If someone stole a prop from {{attraction}}, what prop from {{land}} would you put in its place?"
       ]
     },
      {
