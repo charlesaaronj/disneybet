@@ -877,58 +877,29 @@ function onAttractionChange() {
   }
 
   const attraction = gameState.attractions[idx];
-gameState.currentRound.attraction = attraction;
+  gameState.currentRound.attraction = attraction;
 
-if (meta) meta.textContent = `${attraction.park} · ${attraction.land}`;
+  if (meta) {
+    meta.textContent = `${attraction.park} • ${attraction.land}`;
+  }
 
-const { text: q, categoryId, categoryName } = drawQuestion(attraction);
-Object.assign(gameState.currentRound, {
-  question: q,
-  questionType: "category",
-  categoryId,
-  categoryName
-});
+  const { q, type, categoryName } = drawQuestion(attraction);
+  Object.assign(gameState.currentRound, {
+    question: q,
+    questionType: type
+  });
 
-// Roll Hunny Pot Hot Round bonus for this round
-const playerCount = gameState.players.length;
-const minBonus = playerCount;          // minimal # of players
-const maxBonus = playerCount * 2;      // up to double that
-const isHotRound = Math.random() < 0.33; // ~33% chance; tweak as you like
-let hunnyHotBonus = 0;
+  setQuestionDisplay(q);
+  flashQuestionDisplay();
 
-if (isHotRound) {
-  hunnyHotBonus =
-    Math.floor(Math.random() * (maxBonus - minBonus + 1)) + minBonus;
+  if (badge) {
+    badge.textContent = categoryName || labelForType(type);
+  }
+
+  saveState();
+  updateQuestionLock();
 }
 
-gameState.currentRound.hunnyHotBonus = hunnyHotBonus;
-
-// Show modal if this is a hot round
-if (hunnyHotBonus > 0) {
-  const modalEl = $("modal-hunny-hot");
-  const bodyEl = $("modal-hunny-hot-body");
-  const titleEl = $("modal-hunny-hot-title");
-  if (bodyEl) {
-    bodyEl.textContent =
-      `🔥 It's a Hunny Pot Hot Round! ` +
-      `${hunnyHotBonus} extra points will be added to the Hunny pot this round.`;
-  }
-  if (titleEl) {
-    titleEl.textContent = "Hunny Pot Hot Round!";
-  }
-  if (modalEl && typeof bootstrap !== "undefined") {
-    new bootstrap.Modal(modalEl).show();
-  }
-}
-
-setQuestionDisplay(q);
-flashQuestionDisplay();
-
-if (badge) badge.textContent = categoryName || labelForType("category");
-
-saveState();
-updateQuestionLock();
-}
 
 // Wraps drawQuestionForAttraction for current round
 function drawQuestion(attraction) {
@@ -979,10 +950,16 @@ function onEnterCustomQuestion() {
 }
 
 // Move from question screen to answer entry screen
+// Move from question screen to answer entry screen
 function proceedToAnswers() {
   const err = $("wsd-setupq-error");
   if (err) err.textContent = "";
+
   if (!gameState) return;
+  if (!gameState.currentRound?.attraction) {
+    if (err) err.textContent = "Select an attraction first.";
+    return;
+  }
 
   const textarea = $("wsd-question-text");
   const display = $("wsd-question-display");
@@ -1003,7 +980,43 @@ function proceedToAnswers() {
     answerIndex: 0
   });
 
-  saveState();
+  // Roll Hunny Pot Hot Round bonus for this round
+  const playerCount = gameState.players.length;
+  const minBonus = playerCount;          // minimal # of players
+  const maxBonus = playerCount * 2;      // up to double that
+  const isHotRound = playerCount > 0 && Math.random() < 0.33; // tweak %
+  let hunnyHotBonus = 0;
+
+  if (isHotRound) {
+    hunnyHotBonus =
+      Math.floor(Math.random() * (maxBonus - minBonus + 1)) + minBonus;
+  }
+
+  gameState.currentRound.hunnyHotBonus = hunnyHotBonus;
+
+  // Show modal if this is a hot round
+  if (hunnyHotBonus > 0) {
+    const modalEl = $("modal-hunny-hot");
+    const bodyEl = $("modal-hunny-hot-body");
+    const titleEl = $("modal-hunny-hot-title");
+
+    if (bodyEl) {
+      bodyEl.textContent =
+        `🔥 It's a Hunny Pot Hot Round! ` +
+        `${hunnyHotBonus} extra points will be added to the Hunny pot this round.`;
+    }
+    if (titleEl) {
+      titleEl.textContent = "Hunny Pot Hot Round!";
+    }
+
+    try {
+      if (modalEl && typeof bootstrap !== "undefined") {
+        new bootstrap.Modal(modalEl).show();
+      }
+    } catch (e) {
+      console.error("Hunny Hot modal error", e);
+    }
+  }
 
   const enterQ = $("wsd-enter-question");
   if (enterQ) enterQ.textContent = q;
