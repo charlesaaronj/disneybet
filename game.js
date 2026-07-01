@@ -951,6 +951,7 @@ function onEnterCustomQuestion() {
 
 // Move from question screen to answer entry screen
 // Move from question screen to answer entry screen
+// Move from question screen to answer entry screen
 function proceedToAnswers() {
   const err = $("wsd-setupq-error");
   if (err) err.textContent = "";
@@ -984,12 +985,23 @@ function proceedToAnswers() {
   const playerCount = gameState.players.length;
   const minBonus = playerCount;          // minimal # of players
   const maxBonus = playerCount * 2;      // up to double that
-  const isHotRound = playerCount > 0 && Math.random() < 0.33; // tweak %
+
+  // Only allow hot rounds from round 2 onward
+  const roundNumber = gameState.roundNumber || 1;
+  const canBeHot =
+    playerCount > 0 && roundNumber > 1;
+
+  // Decrease frequency: e.g. ~20% of eligible rounds
+  const isHotRound =
+    canBeHot && Math.random() < 0.20;
+
   let hunnyHotBonus = 0;
 
   if (isHotRound) {
     hunnyHotBonus =
-      Math.floor(Math.random() * (maxBonus - minBonus + 1)) + minBonus;
+      Math.floor(
+        Math.random() * (maxBonus - minBonus + 1)
+      ) + minBonus;
   }
 
   gameState.currentRound.hunnyHotBonus = hunnyHotBonus;
@@ -1027,7 +1039,6 @@ function proceedToAnswers() {
   renderAnswerProgress();
   showScreen("enter-answers");
 }
-
 // ---------- Answers flow ----------
 
 // Update the “Player X of Y” indicator and current player label
@@ -1412,7 +1423,6 @@ function getHouseBonusChooser() {
   return gameState.players[index] || null;
 }
 
-
 // Compute payouts with full-pot model:
 // - All wagers go into the pot.
 // - Winners (author alone, or correct guessers) split the pot,
@@ -1449,11 +1459,11 @@ function computeRevealAndScoring() {
       potPart: 0,
       delta: 0
     });
-  // Add Hunny Pot Hot Round bonus (if any)
+  });
+
+  // Add Hunny Pot Hot Round bonus (if any) ONCE
   const bonus = Math.max(0, r.hunnyHotBonus || 0);
   pot += bonus;
-    
-  });
 
   // Determine winners (correct guessers)
   let winners = [];
