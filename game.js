@@ -250,13 +250,12 @@ function ensureStateShape() {
   if (!gameState.currentRound) return;
   const r = gameState.currentRound;
 
-  ["correctGuessers", "payouts", "houseBonusRecipients", "collectionsThisRound"]
-    .forEach(k => {
-      r[k] ||= [];
-    });
+  // Round arrays we still care about, without house bonus
+  ["correctGuessers", "payouts", "collectionsThisRound"].forEach(k => {
+    r[k] ||= [];
+  });
 
-  if (typeof r.houseBonusApplied !== "boolean") r.houseBonusApplied = false;
-  r.houseBonusReason ||= "";
+  // No houseBonusApplied / houseBonusReason anymore
 }
 
 // Convenience lookup
@@ -814,30 +813,25 @@ function startNewRoundCore() {
   if (!gameState) return;
 
   gameState.roundNumber += 1;
-  gameState.currentRound = {
-    attraction: null,
-    question: "",
-    questionType: "",
-    answers: [],
-    selectedAnswer: null,
-    answerIndex: 0,
-    houseBonusAmount: 0,
-    wagers: [],
-    pot: 0,
-    correctGuessers: [],
-    payouts: [],
-    scoreBefore: {},
-    scoreAfter: {},
-    collectionsThisRound: [],
-    wrongGuessCount: 0,
-    authorBonus: 0,
-    houseBonusResolved: 0,
-    houseBonusRecipients: [],
-    houseBonusApplied: false,
-    houseBonusReason: "",
-    answerOrder: shuffle(gameState.players.map(p => p.id)),
-    usedGhost: false
-  };
+ gameState.currentRound = {
+  attraction: null,
+  question: "",
+  questionType: "",
+  answers: [],
+  selectedAnswer: null,
+  answerIndex: 0,
+  wagers: [],
+  pot: 0,
+  correctGuessers: [],
+  payouts: [],
+  scoreBefore: {},
+  scoreAfter: {},
+  collectionsThisRound: [],
+  wrongGuessCount: 0,
+  authorBonus: 0,
+  answerOrder: shuffle(gameState.players.map(p => p.id)),
+  usedGhost: false
+};
 
   saveState();
 
@@ -1228,19 +1222,6 @@ function goToGuessWager() {
   const errEl = $("wsd-gw-error");
   if (errEl) errEl.textContent = "";
 
-  const hb = $("wsd-house-bonus");
-if (hb) hb.value = 0;
-
-//Show house bonus owner
-const ownerEl = $("wsd-house-bonus-owner");
-const chooser = getHouseBonusChooser();
-if (ownerEl) {
-  ownerEl.textContent = chooser
-    ? `${chooser.name} sets the house bonus this round.`
-    : "";
-}
-
-
   const r = gameState.currentRound;
   const qEl = $("wsd-gw-question");
   const ansEl = $("wsd-gw-answer");
@@ -1295,28 +1276,27 @@ if (ownerEl) {
       ghostOpt.value = "ghost";
       ghostOpt.textContent = "Ghost";
       guessSel.appendChild(ghostOpt);
-    } else {
     }
 
     const wagerInput = document.createElement("input");
     Object.assign(wagerInput, {
-  type: "number",
-  min: 1,
-  max: p.score,
-  value: Math.min(1, p.score),
-  inputMode: "numeric",
-  pattern: "[0-9]*"
-});
+      type: "number",
+      min: 1,
+      max: p.score,
+      value: Math.min(1, p.score),
+      inputMode: "numeric",
+      pattern: "[0-9]*"
+    });
     wagerInput.className = "form-control wsd-form-control";
     wagerInput.style.maxWidth = "90px";
     wagerInput.dataset.playerId = p.id;
 
     wagerInput.addEventListener("blur", () => {
-  let val = parseInt(wagerInput.value, 10);
-  if (isNaN(val) || val < 1) val = 1;
-  if (val > p.score) val = p.score;
-  wagerInput.value = val;
-});
+      let val = parseInt(wagerInput.value, 10);
+      if (isNaN(val) || val < 1) val = 1;
+      if (val > p.score) val = p.score;
+      wagerInput.value = val;
+    });
 
     inner.append(guessSel, wagerInput);
     row.appendChild(inner);
@@ -1386,7 +1366,6 @@ function lockWagers() {
   });
 
   Object.assign(gameState.currentRound, {
-    houseBonusAmount: houseBonus,
     wagers
   });
 
@@ -1409,15 +1388,13 @@ function getHouseBonusChooser() {
 
 // Compute payouts with full-pot model:
 // - All wagers go into the pot.
-// - Winners (author alone, or correct guessers) split pot and house,
-//   with pot and house rounded up so they split evenly.
-// - House wins for Ghost when nobody guesses Ghost.
+// - Winners (author alone, or correct guessers) split the pot,
+//   with the pot rounded up so it splits evenly.
+// - For Ghost, only correct Ghost guessers share the pot.
 function computeRevealAndScoring() {
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
-  const authorId = isGhostAnswer
-    ? null
-    : r.selectedAnswer.playerId;
+  const authorId = isGhostAnswer ? null : r.selectedAnswer.playerId;
 
   const payouts = [];
   let pot = 0;
@@ -1429,10 +1406,7 @@ function computeRevealAndScoring() {
     let wagerPart = 0;
 
     if (we) {
-      const amount = Math.max(
-        0,
-        parseInt(we.amount, 10) || 0
-      );
+      const amount = Math.max(0, parseInt(we.amount, 10) || 0);
       ensurePlayerStats(p);
       p.stats.totalRisked += amount;
 
@@ -1446,7 +1420,6 @@ function computeRevealAndScoring() {
       playerId: p.id,
       wagerPart,
       potPart: 0,
-      housePart: 0,
       delta: 0
     });
   });
@@ -1457,20 +1430,14 @@ function computeRevealAndScoring() {
   if (isGhostAnswer) {
     winners = r.wagers
       .filter(w => {
-        const amount = Math.max(
-          0,
-          parseInt(w.amount, 10) || 0
-        );
+        const amount = Math.max(0, parseInt(w.amount, 10) || 0);
         return amount > 0 && w.guessedAuthorId === "ghost";
       })
       .map(w => w.playerId);
   } else {
     winners = r.wagers
       .filter(w => {
-        const amount = Math.max(
-          0,
-          parseInt(w.amount, 10) || 0
-        );
+        const amount = Math.max(0, parseInt(w.amount, 10) || 0);
         return (
           amount > 0 &&
           parseInt(w.guessedAuthorId, 10) === authorId
@@ -1484,14 +1451,11 @@ function computeRevealAndScoring() {
     const uniqueWinners = Array.from(new Set(winners));
 
     // Case A: only the author guessed themselves -> no winners at all.
-    if (
-      uniqueWinners.length === 1 &&
-      uniqueWinners[0] === authorId
-    ) {
+    if (uniqueWinners.length === 1 && uniqueWinners[0] === authorId) {
       winners = [];
     } else {
       // Case B: author AND others guessed the author -> remove the author;
-      // only non-author players can win pot/house.
+      // only non-author players can win the pot.
       winners = winners.filter(pid => pid !== authorId);
     }
   }
@@ -1502,19 +1466,83 @@ function computeRevealAndScoring() {
   r.wrongGuessCount = 0;
   r.authorBonus = 0;
 
-  // House bonus amount
-  const hb = Math.max(
-    0,
-    parseInt(r.houseBonusAmount, 10) || 0
-  );
+  // Helper: round amount up so it splits evenly among n winners
+  function resolveAmountForWinners(amount, winnerCount) {
+    if (!amount || winnerCount === 0) return 0;
+    const remainder = amount % winnerCount;
+    if (remainder === 0) return amount;
+    return amount + (winnerCount - remainder);
+  }
 
-  Object.assign(r, {
-    houseBonusResolved: 0,
-    houseBonusRecipients: [],
-    houseBonusApplied: false,
-    houseBonusReason: ""
+  if (isGhostAnswer) {
+    // Ghost round
+    if (winners.length === 0) {
+      // Nobody guessed Ghost: pot stays as-is, no payouts.
+      r.pot = pot;
+    } else {
+      const n = winners.length;
+      const resolvedPot = resolveAmountForWinners(pot, n);
+      const potShare = resolvedPot / n;
+
+      winners.forEach(pid => {
+        const pt = payouts.find(p => p.playerId === pid);
+        if (pt) pt.potPart = potShare;
+      });
+
+      r.pot = resolvedPot;
+    }
+  } else {
+    // Real-author round
+    const n = winners.length;
+
+    // Detect author guessed themselves and no one else hit
+    const authorSelfOnly =
+      !isGhostAnswer &&
+      authorId != null &&
+      n === 0 &&
+      r.wagers.some(
+        w =>
+          w.playerId === authorId &&
+          parseInt(w.guessedAuthorId, 10) === authorId
+      );
+
+    if (n === 0 && !authorSelfOnly) {
+      // Case 1: No winners, and the author did NOT guess themselves.
+      // Author gets full pot.
+      r.pot = pot;
+      if (authorId != null) {
+        const authorPayout = payouts.find(pt => pt.playerId === authorId);
+        if (authorPayout) authorPayout.potPart = pot;
+      }
+    } else if (n === 0 && authorSelfOnly) {
+      // Case 2: Only the author guessed the author (self-guess).
+      // Nobody gets pot this round.
+      r.pot = pot;
+      // Leave potPart as 0 for everyone.
+    } else {
+      // Case 3: At least one non-author winner shares the pot.
+      const winnerCount = n;
+      const resolvedPot = resolveAmountForWinners(pot, winnerCount);
+      const potShare = resolvedPot / winnerCount;
+
+      winners.forEach(pid => {
+        const pt = payouts.find(p => p.playerId === pid);
+        if (pt) pt.potPart = potShare;
+      });
+
+      r.pot = resolvedPot;
+    }
+  }
+
+  // Finalize deltas (no housePart anymore)
+  payouts.forEach(pt => {
+    pt.delta = pt.wagerPart + pt.potPart;
   });
 
+  r.payouts = payouts;
+
+  applyRoundResults(authorId);
+}
   // Helper: round amount up so it splits evenly among n winners
   function resolveAmountForWinners(amount, winnerCount) {
     if (!amount || winnerCount <= 0) return 0;
@@ -1742,6 +1770,7 @@ function applyRoundResults(authorId) {
     });
   }
 
+  // History: no house bonus fields anymore
   gameState.history.push({
     roundNumber: gameState.roundNumber,
     park: gameState.settings.park,
@@ -1758,13 +1787,8 @@ function applyRoundResults(authorId) {
     manualAdjustments: [],
     scoreBefore,
     scoreAfter,
-    houseBonusResolved: r.houseBonusResolved,
-    houseBonusRecipients: r.houseBonusRecipients,
-    houseBonusApplied: r.houseBonusApplied,
-    houseBonusReason: r.houseBonusReason,
     authorBonus: r.authorBonus,
     wrongGuessCount: r.wrongGuessCount,
-    houseBonusAmount: r.houseBonusAmount,
     isGhostAnswer: !!r.selectedAnswer.isGhost
   });
 
@@ -1786,7 +1810,6 @@ function applyRoundResults(authorId) {
   } catch (e) {}
 }
 
-// ---------- Reveal animation & round summary modal ----------
 // ---------- Reveal animation & round summary modal ----------
 function runRevealAnimation() {
   const r = gameState.currentRound;
@@ -1847,102 +1870,88 @@ function runRevealAnimation() {
     }
 
     // Summary text lines in the modal
+    const authorLineSummary = $("wsd-no-correct-author-line");
+    if (authorLineSummary) {
+      const winnerNames = r.correctGuessers.length
+        ? r.correctGuessers
+            .map(
+              pid =>
+                gameState.players.find(p => p.id === pid)?.name
+            )
+            .filter(Boolean)
+            .join(", ")
+        : null;
 
-// Summary text lines in the modal
-const authorLineSummary = $("wsd-no-correct-author-line");
-if (authorLineSummary) {
-  const winnerNames = r.correctGuessers.length
-    ? r.correctGuessers
-        .map(
-          pid =>
-            gameState.players.find(p => p.id === pid)?.name
-        )
-        .filter(Boolean)
-        .join(", ")
-    : null;
+      const authorWonRound =
+        !isGhostAnswer &&
+        r.correctGuessers.length === 0 &&
+        !!author;
 
-  const authorWonRound =
-    !isGhostAnswer &&
-    r.correctGuessers.length === 0 &&
-    !!author;
+      // Did the author bet on themselves?
+      const authorChoseSelf =
+        !isGhostAnswer &&
+        !!author &&
+        r.wagers.some(
+          w =>
+            w.playerId === author.id &&
+            parseInt(w.guessedAuthorId, 10) === author.id
+        );
 
-  // Did the author bet on themselves?
-  const authorChoseSelf =
-    !isGhostAnswer &&
-    !!author &&
-    r.wagers.some(
-      w =>
-        w.playerId === author.id &&
-        parseInt(w.guessedAuthorId, 10) === author.id
-    );
+      // Solo self-guess: author chose self and no one else was correct
+      const authorSelfOnly =
+        authorChoseSelf && r.correctGuessers.length === 0;
 
-  // Solo self-guess: author chose self and no one else was correct
-  const authorSelfOnly =
-    authorChoseSelf && r.correctGuessers.length === 0;
+      // Line 1: win outcome
+      let line1 = "";
+      if (isGhostAnswer) {
+        line1 = winnerNames
+          ? `🎉 ${winnerNames} correctly guessed Ghost.`
+          : "😱 Nobody guessed Ghost — the house wins the Hunny pot.";
+      } else if (authorSelfOnly) {
+        line1 =
+          "🤔 The author guessed themselves — no one wins the Hunny pot this round.";
+      } else if (authorWonRound) {
+        const name = author ? author.name : "The author";
+        line1 = `🎯 Nobody guessed the author — ${name} wins the Hunny pot.`;
+      } else {
+        // Normal winner case: only non-author winners are listed
+        line1 = winnerNames
+          ? `🎉 ${winnerNames} guessed the author correctly.`
+          : "🤔 No winners recorded this round.";
+      }
 
-  // Line 1: win outcome
-  let line1 = "";
-  if (isGhostAnswer) {
-    line1 = winnerNames
-      ? `🎉 ${winnerNames} correctly guessed Ghost.`
-      : "😱 Nobody guessed Ghost — the house wins the Hunny pot.";
-  } else if (authorSelfOnly) {
-    line1 =
-      "🤔 The author guessed themselves — no one wins the Hunny pot this round.";
-  } else if (authorWonRound) {
-    const name = author ? author.name : "The author";
-    line1 = `🎯 Nobody guessed the author — ${name} wins the Hunny pot.`;
-  } else {
-    // Normal winner case: only non-author winners are listed
-    line1 = winnerNames
-      ? `🎉 ${winnerNames} guessed the author correctly.`
-      : "🤔 No winners recorded this round.";
-  }
+      // Line 2: Hunny pot payout (actual distributed pot)
+      const potPaidOut = (r.payouts || []).reduce(
+        (sum, pt) => sum + Math.max(0, pt.potPart || 0),
+        0
+      );
+      const line2 =
+        potPaidOut > 0
+          ? `🍯 Hunny pot paid out: ${potPaidOut} points`
+          : `🍯 Hunny pot paid out: 0 points`;
 
-  // Line 2: Hunny pot payout (actual distributed pot)
-  const potPaidOut = (r.payouts || []).reduce(
-    (sum, pt) => sum + Math.max(0, pt.potPart || 0),
-    0
-  );
-  const line2 =
-    potPaidOut > 0
-      ? `🍯 Hunny pot paid out: ${potPaidOut} points`
-      : `🍯 Hunny pot paid out: 0 points`;
+      // Line 3: removed (no house bonus anymore)
 
-  // Line 3: house bonus payout
-  const housePaidOut = r.houseBonusResolved || 0;
-  const line3 =
-    housePaidOut > 0
-      ? `🏠 House bonus paid out: ${housePaidOut} points`
-      : `🏠 House bonus: none this round`;
+      // Line 4: explanation whenever author chose themselves
+      const line4 = authorChoseSelf
+        ? `ℹ️ ${author ? author.name : "The author"} guessed themselves and was excluded from the payout.`
+        : "";
 
-  // Line 4: explanation whenever author chose themselves
-  const line4 = authorChoseSelf
-    ? `ℹ️ ${author ? author.name : "The author"} guessed themselves and was excluded from the payout.`
-    : "";
+      const parts = [];
+      parts.push(
+        `<p class="wsd-round-line">${line1}</p>`
+      );
+      parts.push(
+        `<p class="wsd-round-line">${line2}</p>`
+      );
+      if (line4) {
+        parts.push(
+          `<p class="wsd-round-line wsd-round-line-note">${line4}</p>`
+        );
+      }
 
-  const parts = [];
-
-  parts.push(
-    `<p class="wsd-round-line">${line1}</p>`
-  );
-
-  parts.push(
-    `<p class="wsd-round-line">${line2}</p>`
-  );
-
-  parts.push(
-    `<p class="wsd-round-line">${line3}</p>`
-  );
-
-  if (line4) {
-    parts.push(
-      `<p class="wsd-round-line wsd-round-line-note">${line4}</p>`
-    );
-  }
-
-  authorLineSummary.innerHTML = parts.join("");
-}
+      authorLineSummary.innerHTML = parts.join("");
+    }
 
     // Bootstrap modal: Round summary
     try {
@@ -1993,15 +2002,12 @@ if (authorLineSummary) {
 
         const wagerPart = payout.wagerPart || 0;
         const potPart = payout.potPart || 0;
-        const housePart = payout.housePart || 0;
         const total = payout.delta || 0;
 
         const wagerStr =
           wagerPart >= 0 ? `+${wagerPart}` : String(wagerPart);
         const potStr =
           potPart >= 0 ? `+${potPart}` : String(potPart);
-        const houseStr =
-          housePart >= 0 ? `+${housePart}` : String(housePart);
         const totalStr =
           total >= 0 ? `+${total}` : String(total);
 
@@ -2019,7 +2025,7 @@ if (authorLineSummary) {
               ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
             </div>
             <div class="wsd-score-meta">
-              Wager: ${wagerStr} · Hunny Pot: ${potStr} · House: ${houseStr}
+              Wager: ${wagerStr} · Hunny Pot: ${potStr}
             </div>
           </div>
           <div class="wsd-score-value ${
@@ -2382,27 +2388,7 @@ function renderHistoryScreen() {
       html += `<div class="wsd-text-small">Author bonus: +${h.authorBonus}</div>`;
     }
 
-    if (
-      h.houseBonusAmount > 0 ||
-      h.houseBonusResolved > 0 ||
-      h.houseBonusReason
-    ) {
-      const names = (h.houseBonusRecipients || [])
-        .map(hr => {
-          const pl = gameState.players.find(
-            x => x.id === hr.playerId
-          );
-          return pl
-            ? `${pl.name} (+${hr.extra})`
-            : `Player ${hr.playerId} (+${hr.extra})`;
-        })
-        .join(", ");
-      html += `<div class="wsd-text-small">House bonus: ${
-        h.houseBonusApplied
-          ? `+${h.houseBonusResolved} split evenly: ${names}`
-          : h.houseBonusReason || "Not applied"
-      }</div>`;
-    }
+    // House bonus block removed
 
     (h.manualAdjustments || []).forEach(adj => {
       if (adj.type === "invertScores") {
@@ -2423,7 +2409,6 @@ function renderHistoryScreen() {
     c.appendChild(wrap);
   });
 }
-
 // Compute final bonuses once then show game-end screen
 function computeFinalBonusesAndShow() {
   if (gameState.finalBonusesApplied) {
@@ -2678,16 +2663,6 @@ function wireEvents() {
     "click",
     lockWagers
   );
-  // House bonus inline validation
-$("wsd-house-bonus")?.addEventListener("input", () => {
-  const hbInput = $("wsd-house-bonus");
-  const err = $("wsd-house-bonus-error");
-  const val = parseInt(hbInput?.value, 10);
-  if (err) {
-    err.textContent = val > 10 ? "House bonus cannot exceed 10 points." : "";
-    err.style.display = val > 10 ? "block" : "none";
-  }
-});
   $("wsd-clear-wagers").addEventListener(
     "click",
     clearWagersUI
