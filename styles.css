@@ -563,8 +563,7 @@ body {
 }
 
 #wsd-no-correct-author-line,
-#wsd-author-bonus-line,
-#wsd-house-bonus-line {
+#wsd-author-bonus-line {
   margin-top: 0;
   margin-bottom: 4px;
 }
