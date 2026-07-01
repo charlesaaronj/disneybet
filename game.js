@@ -254,8 +254,7 @@ function ensureStateShape() {
   ["correctGuessers", "payouts", "collectionsThisRound"].forEach(k => {
     r[k] ||= [];
   });
-
-  // No houseBonusApplied / houseBonusReason anymore
+if (typeof r.hunnyHotBonus !== "number") r.hunnyHotBonus = 0;
 }
 
 // Convenience lookup
@@ -806,6 +805,7 @@ function startNewRoundCore() {
   answerIndex: 0,
   wagers: [],
   pot: 0,
+  hunnyHotBonus: 0,
   correctGuessers: [],
   payouts: [],
   scoreBefore: {},
@@ -875,27 +875,57 @@ function onAttractionChange() {
   }
 
   const attraction = gameState.attractions[idx];
-  gameState.currentRound.attraction = attraction;
+gameState.currentRound.attraction = attraction;
 
-  if (meta) {
-    meta.textContent = `${attraction.park} • ${attraction.land}`;
+if (meta) meta.textContent = `${attraction.park} · ${attraction.land}`;
+
+const { text: q, categoryId, categoryName } = drawQuestion(attraction);
+Object.assign(gameState.currentRound, {
+  question: q,
+  questionType: "category",
+  categoryId,
+  categoryName
+});
+
+// Roll Hunny Pot Hot Round bonus for this round
+const playerCount = gameState.players.length;
+const minBonus = playerCount;          // minimal # of players
+const maxBonus = playerCount * 2;      // up to double that
+const isHotRound = Math.random() < 0.33; // ~33% chance; tweak as you like
+let hunnyHotBonus = 0;
+
+if (isHotRound) {
+  hunnyHotBonus =
+    Math.floor(Math.random() * (maxBonus - minBonus + 1)) + minBonus;
+}
+
+gameState.currentRound.hunnyHotBonus = hunnyHotBonus;
+
+// Show modal if this is a hot round
+if (hunnyHotBonus > 0) {
+  const modalEl = $("modal-hunny-hot");
+  const bodyEl = $("modal-hunny-hot-body");
+  const titleEl = $("modal-hunny-hot-title");
+  if (bodyEl) {
+    bodyEl.textContent =
+      `🔥 It's a Hunny Pot Hot Round! ` +
+      `${hunnyHotBonus} extra points will be added to the Hunny pot this round.`;
   }
-
-  const { q, type, categoryName } = drawQuestion(attraction);
-  Object.assign(gameState.currentRound, {
-    question: q,
-    questionType: type
-  });
-
-  setQuestionDisplay(q);
-  flashQuestionDisplay();
-
-  if (badge) {
-    badge.textContent = categoryName || labelForType(type);
+  if (titleEl) {
+    titleEl.textContent = "Hunny Pot Hot Round!";
   }
+  if (modalEl && typeof bootstrap !== "undefined") {
+    new bootstrap.Modal(modalEl).show();
+  }
+}
 
-  saveState();
-  updateQuestionLock();
+setQuestionDisplay(q);
+flashQuestionDisplay();
+
+if (badge) badge.textContent = categoryName || labelForType("category");
+
+saveState();
+updateQuestionLock();
 }
 
 // Wraps drawQuestionForAttraction for current round
@@ -1404,6 +1434,10 @@ function computeRevealAndScoring() {
       potPart: 0,
       delta: 0
     });
+  // Add Hunny Pot Hot Round bonus (if any)
+  const bonus = Math.max(0, r.hunnyHotBonus || 0);
+  pot += bonus;
+    
   });
 
   // Determine winners (correct guessers)
@@ -1595,6 +1629,7 @@ function applyRoundResults(authorId) {
     scoreAfter,
     authorBonus: r.authorBonus,
     wrongGuessCount: r.wrongGuessCount,
+    hunnyHotBonus: r.hunnyHotBonus || 0,
     isGhostAnswer: !!r.selectedAnswer.isGhost
   });
 
@@ -2194,7 +2229,10 @@ function renderHistoryScreen() {
       html += `<div class="wsd-text-small">Author bonus: +${h.authorBonus}</div>`;
     }
 
-    // House bonus block removed
+   // Hunny Pot Hot Round bonus line (if present)
+    if (h.hunnyHotBonus && h.hunnyHotBonus > 0) {
+      html += `<div class="wsd-text-small">Hunny Pot Hot Round bonus: +${h.hunnyHotBonus} points</div>`;
+    }
 
     (h.manualAdjustments || []).forEach(adj => {
       if (adj.type === "invertScores") {
@@ -2287,6 +2325,7 @@ function computeFinalBonusesAndShow() {
   saveState();
   renderFinalResults();
 }
+
 
 // Show final ranking with medals and bonus breakdown
 function renderFinalResults() {
