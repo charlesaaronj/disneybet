@@ -381,48 +381,32 @@ window.initHeroSpotlightFirstVisit = function () {
 const ALL_SCREENS = Object.keys(SCREEN_META);
 
 function showScreen(name) {
-
+  // Toggle active screen
   ALL_SCREENS.forEach(key => {
-    const el = $(`screen-${key}`);
-    if (el) el.classList.toggle("wsd-screen-active", key === name);
+    const el = document.getElementById(`screen-${key}`);
+    if (el) {
+      el.classList.toggle("wsd-screen-active", key === name);
+    }
   });
 
+  // Persist current screen in gameState
   if (gameState) {
     gameState.screen = name;
     saveState();
   }
 
+  // Update step icon, title, and instruction
   const m = SCREEN_META[name] || SCREEN_META["setup-game"];
-  [
-    ["wsd-step-icon", m.icon],
-    ["wsd-step-title", m.title],
-    ["wsd-step-instruction", m.instruction]
-  ].forEach(([id, val]) => {
+  ["wsd-step-icon", "wsd-step-title", "wsd-step-instruction"].forEach(id => {
     const el = $(id);
-    if (el) el.textContent = val;
+    if (!el) return;
+    if (id === "wsd-step-icon") el.textContent = m.icon;
+    if (id === "wsd-step-title") el.textContent = m.title;
+    if (id === "wsd-step-instruction") el.textContent = m.instruction;
   });
 
-  $$(".wsd-nav-item").forEach(b =>
-    b.classList.remove("wsd-nav-item-active")
-  );
-  const navId = NAV_MAP[name];
-  if (navId && $(navId)) $(navId).classList.add("wsd-nav-item-active");
-
-  // Hero spotlight per screen
-// For setup-game we rely on an explicit first-visit call, then one-time per screen
-if (name === "setup-game") {
-  if (!firstSetupGameShown) {
-    // First explicit spotlight comes from initHeroSpotlightFirstVisit (called by splash),
-    // so just flag that we've visited setup-game and don't fire another auto spotlight now.
-    firstSetupGameShown = true;
-  } else {
-    // Subsequent navigations to setup-game can still show the spotlight if needed
-    showHeroSpotlightForScreen(name);
-  }
-} else {
-  // Other screens behave as before
+  // Hero spotlight per screen (no firstSetupGameShown flag anymore)
   showHeroSpotlightForScreen(name);
-}
 }
 // ---------- Setup screen + locks ----------
 
