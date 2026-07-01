@@ -1776,7 +1776,7 @@ function runRevealAnimation() {
           "🤔 The author guessed themselves — no one wins the Hunny pot this round.";
       } else if (authorWonRound) {
         const name = author ? author.name : "The author";
-        line1 = `🎯 Nobody guessed the author — ${name} wins the Hunny pot.`;
+        line1 = `🎯 Author not guessed — ${name} wins the Hunny pot.`;
       } else {
         // Normal winner case: only non-author winners are listed
         line1 = winnerNames
@@ -1798,7 +1798,7 @@ function runRevealAnimation() {
 
       // Line 4: explanation whenever author chose themselves
       const line4 = authorChoseSelf
-        ? `ℹ️ ${author ? author.name : "The author"} guessed themselves and was excluded from the payout.`
+        ? `ℹ️ ${author ? author.name : "The author"} guessed themselves so no payout.`
         : "";
 
       const parts = [];
