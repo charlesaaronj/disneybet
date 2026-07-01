@@ -993,7 +993,7 @@ function proceedToAnswers() {
 
   // Decrease frequency: e.g. ~20% of eligible rounds
   const isHotRound =
-    canBeHot && Math.random() < 0.20;
+    canBeHot && Math.random() < 0.15;
 
   let hunnyHotBonus = 0;
 
