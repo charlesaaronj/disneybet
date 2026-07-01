@@ -950,8 +950,6 @@ function onEnterCustomQuestion() {
 }
 
 // Move from question screen to answer entry screen
-// Move from question screen to answer entry screen
-// Move from question screen to answer entry screen
 function proceedToAnswers() {
   const err = $("wsd-setupq-error");
   if (err) err.textContent = "";
@@ -993,7 +991,7 @@ function proceedToAnswers() {
 
   // Decrease frequency: e.g. ~20% of eligible rounds
   const isHotRound =
-    canBeHot && Math.random() < 0.15;
+    canBeHot && Math.random() < 0.10;
 
   let hunnyHotBonus = 0;
 
