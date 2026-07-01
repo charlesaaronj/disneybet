@@ -290,6 +290,8 @@ function applyParkTheme(parkName) {
     ["#modal-resume-game .modal-header", "color", t ? "#fff" : ""],
     ["#modal-scoring .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-scoring .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-hunny-hot .modal-header", "backgroundImage", t?.hero],
+    ["#modal-hunny-hot .modal-header", "color", t ? "#fff" : ""],
     ["#modal-bonuses .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-bonuses .modal-header", "color", t ? "#fff" : ""],
     ["#modal-wager-help .modal-header", "backgroundImage", t?.hero || ""],
