@@ -268,14 +268,29 @@ body {
   background: var(--wsd-btn-primary-bg);
   color: var(--wsd-text-invert);
   cursor: pointer;
-  min-height: 40px;
+  min-height: 48px;
   transition: transform 0.1s, filter 0.1s;
   letter-spacing: 0.03em;
-  max-width: 50%
 }
 .wsd-btn-primary:active { transform: scale(0.97); }
 .wsd-btn-primary:hover  { filter: brightness(1.06); }
 
+.wsd-btn-primary-modal {
+  display: block;
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--wsd-btn-primary-bg);
+  color: var(--wsd-text-invert);
+  cursor: pointer;
+  min-height: 40px;
+  transition: transform 0.1s, filter 0.1s;
+  letter-spacing: 0.03em;
+  max-width: 50%;
+}
 .wsd-btn-secondary {
   display: block;
   width: 100%;
