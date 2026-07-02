@@ -13,7 +13,7 @@ const PLAYER_BADGE_COLORS = [
   "#FFB3BA", "#FFDFBA", "#E0BBFF", "#E5E5A6",
   "#BAFFC9", "#BAE1FF", "#FFD1DC", "#C5E1A5"
 ];
- 
+
 function debugLog(msg) {
   try { console.log(msg); } catch (e) {}
   const box = $("wsd-debug");
@@ -991,7 +991,7 @@ function proceedToAnswers() {
 
   // Decrease frequency: e.g. ~20% of eligible rounds
   const isHotRound =
-    canBeHot && Math.random() < 0.15;
+    canBeHot && Math.random() < 0.10;
 
   let hunnyHotBonus = 0;
 
@@ -2944,45 +2944,6 @@ function rebuildRoundScreenFromState() {
   }
 
   showScreen("setup-question");
-}
-// Donate Modal
-function handleStartRoundClick() {
-  if (!gameState) {
-    // No game yet, just start as usual
-    startNewRoundCore();
-    showScreen('setup-question');
-    return;
-  }
-
-  const roundsPlayed = gameState.roundNumber; // after finishing N, this is N
-
-  // Show modal every 5 rounds (5, 10, 15, ...)
-  if (roundsPlayed > 0 && roundsPlayed % 5 === 0) {
-    const modalEl = document.getElementById('modal-support');
-    if (modalEl && typeof bootstrap !== 'undefined') {
-      new bootstrap.Modal(modalEl).show();
-    }
-  } else {
-    startNewRoundCore();
-    showScreen('setup-question');
-  }
-}
-
-const startRoundBtn = document.getElementById('wsd-start-round');
-if (startRoundBtn) {
-  startRoundBtn.addEventListener('click', handleStartRoundClick);
-}
-//keep playing
-const keepPlayingSupport = document.getElementById('wsd-support-keep-playing');
-if (keepPlayingSupport) {
-  keepPlayingSupport.addEventListener('click', () => {
-    const modalEl = document.getElementById('modal-support');
-    if (modalEl && typeof bootstrap !== 'undefined') {
-      bootstrap.Modal.getInstance(modalEl)?.hide();
-    }
-    startNewRoundCore();
-    showScreen('setup-question');
-  });
 }
 // ---------- Bootstrapping on DOM ready ----------
 
