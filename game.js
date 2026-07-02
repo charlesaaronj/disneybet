@@ -2243,7 +2243,7 @@ function renderHistoryScreen() {
       const deltaStr = `${
         pt.delta >= 0 ? "+" : ""
       }${pt.delta}`;
-      html += `<div class="wsd-text-small">${
+      html += `<div class="wsd-text-small mt-1">${
         pl ? pl.name : "?"
       } ${ok ? "✅" : "❌"} (${deltaStr} pts)</div>`;
     });
