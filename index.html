@@ -452,7 +452,7 @@
     <!-- ===== SCREEN: SCORES ===== -->
     <section id="screen-scores" class="wsd-screen">
       <div class="wsd-card">
- <div id="wsd-round-indicator" class="wsd-section-title">Scores after round 0</div>
+        <div class="wsd-section-title">Scores</div>
         <div id="wsd-scores-list" class="mb-3"></div>
         <hr class="wsd-divider"/>
         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -482,14 +482,29 @@
           <div id="wsd-manual-adjustments"></div>
         </div>
         <hr class="wsd-divider"/>
-        <div class="wsd-text-small text-center"><a href="https://www.buymeacoffee.com/Whosaiddiz" target="_blank" rel="noopener noreferrer"class="wsd-btn-tertiary">
-  Support Who Said Diz</a></div>
         <div class="wsd-actions-stack wsd-mt-3">
           <button id="wsd-start-round" class="wsd-btn-primary" type="button" style="margin-top:1.25rem;">Start new round</button>
-          <button id="wsd-end-game" class="wsd-btn-secondary" type="button">End game</button>
-          <button id="wsd-restart-game" class="wsd-btn-secondary" type="button">Restart game</button>
           <button id="wsd-invert-scores" class="wsd-btn-secondary" type="button">Invert scores</button>
+          <button id="wsd-view-history" class="wsd-btn-secondary" type="button">View round history</button>
+          <button id="wsd-end-game" class="wsd-btn-secondary" type="button">End game</button>
+          <button id="wsd-restart-game" class="wsd-btn-tertiary" type="button">Restart game</button>
         </div>
+        <div id="wsd-scores-list"></div>
+
+<div class="wsd-text-small mt-3 text-center">
+  <script type="text/javascript"
+          src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+          data-name="bmc-button"
+          data-slug="Whosaiddiz"
+          data-color="#5b5b5b"
+          data-emoji=""
+          data-font="Cookie"
+          data-text="Buy me a coffee"
+          data-outline-color="#000000"
+          data-font-color="#ffffff"
+          data-coffee-color="#FFDD00">
+  </script>
+</div>
       </div>
     </section>
 
@@ -782,7 +797,7 @@
   </div>
 </div>
 
- <div class="modal fade" id="modal-resume-game" tabindex="-1" aria-labelledby="modal-resume-game-title" aria-hidden="true">
+  <div class="modal fade" id="modal-resume-game" tabindex="-1" aria-labelledby="modal-resume-game-title" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -822,6 +837,43 @@
   </div>
 </div>
 
+  <div class="modal fade" id="modal-support" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Enjoying Who Said Dizt?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-3">
+          If this game is making your queue more fun, consider buying me a coffee.
+        </p>
+
+        <!-- Buy Me a Coffee button inside modal -->
+        <script type="text/javascript"
+                src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+                data-name="bmc-button"
+                data-slug="Whosaiddiz"
+                data-color="#5b5b5b"
+                data-emoji=""
+                data-font="Cookie"
+                data-text="Buy me a coffee"
+                data-outline-color="#000000"
+                data-font-color="#ffffff"
+                data-coffee-color="#FFDD00">
+        </script>
+      </div>
+      <div class="modal-footer">
+       <button id="wsd-support-keep-playing"
+        type="button"
+        class="btn btn-secondary" style="max-width:150px;">
+  Keep playing
+</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Spotlight overlay -->
 <div id="wsd-spotlight-overlay" class="wsd-spotlight-overlay" style="display:none;">
@@ -1002,4 +1054,3 @@ window.renderCollectionsScreen = function () {
   container.innerHTML = html || '<div class="wsd-text-small">No progress yet.</div>';
 };
 </script>
-
