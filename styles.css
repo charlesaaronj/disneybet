@@ -665,7 +665,7 @@ body {
   padding: 8px 16px 14px;
   background: var(--wsd-surface-modal);
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 8px;
 }
 
