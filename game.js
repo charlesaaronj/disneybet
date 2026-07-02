@@ -288,6 +288,8 @@ function applyParkTheme(parkName) {
     ['#modal-first-visit .modal-header', 'color',           t ? '#fff' : ''],
     ["#modal-resume-game .modal-header", "backgroundImage", t?.hero],
     ["#modal-resume-game .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-support .modal-header", "backgroundImage", t?.hero],
+    ["#modal-support .modal-header", "color", t ? "#fff" : ""],
     ["#modal-scoring .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-scoring .modal-header", "color", t ? "#fff" : ""],
     ["#modal-hunny-hot .modal-header", "backgroundImage", t?.hero],
