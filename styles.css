@@ -268,7 +268,7 @@ body {
   background: var(--wsd-btn-primary-bg);
   color: var(--wsd-text-invert);
   cursor: pointer;
-  min-height: 52px;
+  min-height: 40px;
   transition: transform 0.1s, filter 0.1s;
   letter-spacing: 0.03em;
   max-width: 50%
