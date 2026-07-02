@@ -2225,7 +2225,7 @@ function renderHistoryScreen() {
       <div class="wsd-text-small mt-1">Answer: &ldquo;${
         h.selectedAnswerText
       }&rdquo;</div>
-      <div class="wsd-text-smal mt-1l">
+      <div class="wsd-text-small mt-1">
         Author:${
           isGhost
             ? "👻 Ghost"
