@@ -271,6 +271,7 @@ body {
   min-height: 52px;
   transition: transform 0.1s, filter 0.1s;
   letter-spacing: 0.03em;
+  max-width: 50%
 }
 .wsd-btn-primary:active { transform: scale(0.97); }
 .wsd-btn-primary:hover  { filter: brightness(1.06); }
