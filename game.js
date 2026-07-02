@@ -2221,11 +2221,11 @@ function renderHistoryScreen() {
     if (h.attraction)
       html += ` · <em>${h.attraction}</em>`;
     html += `</div>
-      <div class="wsd-text-small mt-1">Q: ${h.question}</div>
-      <div class="wsd-text-small mt-1">Answer: &ldquo;${
+      <div class="wsd-text-small">Q: ${h.question}</div>
+      <div class="wsd-text-small">Answer: &ldquo;${
         h.selectedAnswerText
       }&rdquo;</div>
-      <div class="wsd-text-small mt-1">
+      <div class="wsd-text-small">
         Author:${
           isGhost
             ? "👻 Ghost"
@@ -2669,30 +2669,14 @@ function wireEvents() {
   });
 }
 
-let resumeModalInstance = null;
-
 function showResumeModal() {
   const modalEl = $("modal-resume-game");
-  if (!modalEl || typeof bootstrap === "undefined") return;
-
-  if (!resumeModalInstance) {
-    resumeModalInstance = new bootstrap.Modal(modalEl, {
+  if (modalEl && typeof bootstrap !== "undefined") {
+    new bootstrap.Modal(modalEl, {
       backdrop: "static",
       keyboard: false
-    });
-
-    modalEl.addEventListener("hide.bs.modal", () => {
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-    });
-
-    modalEl.addEventListener("hidden.bs.modal", () => {
-      $("wsd-start-game")?.focus();
-    });
+    }).show();
   }
-
-  resumeModalInstance.show();
 }
 
 function rebuildCurrentScreen() {
