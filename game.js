@@ -1993,6 +1993,13 @@ function renderScoresScreen() {
     </a>`;
   list.appendChild(footer);
 
+  // Show current round number
+  const roundIndicator = document.getElementById('wsd-round-indicator');
+  if (roundIndicator) {
+    const currentRound = gameState.roundNumber || 0;
+    roundIndicator.textContent = `Round ${currentRound}`;
+  }
+
   renderBonusProgress();
   renderManualAdjustmentsUI();
   maybeRenderCollectionsScreen();
