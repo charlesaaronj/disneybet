@@ -2555,13 +2555,6 @@ function wireEvents() {
       showScreen("scores");
     }
   );
-  $("wsd-start-round").addEventListener(
-    "click",
-    () => {
-      startNewRoundCore();
-      showScreen("setup-question");
-    }
-  );
   $("wsd-view-history").addEventListener(
     "click",
     () => {
