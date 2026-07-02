@@ -13,7 +13,7 @@ const PLAYER_BADGE_COLORS = [
   "#FFB3BA", "#FFDFBA", "#E0BBFF", "#E5E5A6",
   "#BAFFC9", "#BAE1FF", "#FFD1DC", "#C5E1A5"
 ];
-
+ 
 function debugLog(msg) {
   try { console.log(msg); } catch (e) {}
   const box = $("wsd-debug");
@@ -1992,6 +1992,27 @@ function renderScoresScreen() {
       How does scoring work?
     </a>`;
   list.appendChild(footer);
+
+    // --- Buy Me a Coffee button ---
+  const donateWrap = document.getElementById('wsd-donate-wrap');
+  if (donateWrap && !donateWrap.dataset.bmcLoaded) {
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js';
+    script.dataset.name = 'bmc-button';
+    script.dataset.slug = 'Whosaiddiz';
+    script.dataset.color = '#BD5FFF';
+    script.dataset.emoji = '';
+    script.dataset.font = 'Cookie';
+    script.dataset.text = 'Buy me a coffee';
+    script.dataset.outlineColor = '#000000';
+    script.dataset.fontColor = '#ffffff';
+    script.dataset.coffeeColor = '#FFDD00';
+
+    donateWrap.appendChild(script);
+    donateWrap.dataset.bmcLoaded = '1';
+  }
+
 
   renderBonusProgress();
   renderManualAdjustmentsUI();
