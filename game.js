@@ -1999,7 +1999,7 @@ function renderScoresScreen() {
   const roundIndicator = document.getElementById('wsd-round-indicator');
   if (roundIndicator) {
     const currentRound = gameState.roundNumber || 0;
-    roundIndicator.textContent = `Round ${currentRound}`;
+    roundIndicator.textContent = `Scores after round ${currentRound}`;
   }
 
   renderBonusProgress();
