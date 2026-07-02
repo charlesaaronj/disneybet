@@ -2859,7 +2859,7 @@ function rebuildRoundScreenFromState() {
       meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
     }
 
-    setQuestionDisplay(r.question || "Select the attraction you're in line for above.");
+    setQuestionDisplay(r.question || "Select the attraction you're in line for above. 👆");
     if (badge) badge.textContent = r.questionType === "custom" ? "Custom question" : (r.question ? "Question" : "Pending");
     updateQuestionLock();
     showScreen("setup-question");
