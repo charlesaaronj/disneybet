@@ -288,8 +288,6 @@ function applyParkTheme(parkName) {
     ['#modal-first-visit .modal-header', 'color',           t ? '#fff' : ''],
     ["#modal-resume-game .modal-header", "backgroundImage", t?.hero],
     ["#modal-resume-game .modal-header", "color", t ? "#fff" : ""],
-    ["#modal-support .modal-header", "backgroundImage", t?.hero],
-    ["#modal-support .modal-header", "color", t ? "#fff" : ""],
     ["#modal-scoring .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-scoring .modal-header", "color", t ? "#fff" : ""],
     ["#modal-hunny-hot .modal-header", "backgroundImage", t?.hero],
@@ -1995,13 +1993,6 @@ function renderScoresScreen() {
     </a>`;
   list.appendChild(footer);
 
-  // Show current round number
-  const roundIndicator = document.getElementById('wsd-round-indicator');
-  if (roundIndicator) {
-    const currentRound = gameState.roundNumber || 0;
-    roundIndicator.textContent = `Scores after round ${currentRound}`;
-  }
-
   renderBonusProgress();
   renderManualAdjustmentsUI();
   maybeRenderCollectionsScreen();
@@ -2557,6 +2548,13 @@ function wireEvents() {
       showScreen("scores");
     }
   );
+  $("wsd-start-round").addEventListener(
+    "click",
+    () => {
+      startNewRoundCore();
+      showScreen("setup-question");
+    }
+  );
   $("wsd-view-history").addEventListener(
     "click",
     () => {
@@ -2564,13 +2562,7 @@ function wireEvents() {
       showScreen("history");
     }
   );
-$("wsd-start-round").addEventListener(
-    "click",
-    () => {
-      startNewRoundCore();
-      showScreen("setup-question");
-    }
-  );
+
   // End game / restart
   $("wsd-end-game").addEventListener("click", () => {
     confirmThenReset(
