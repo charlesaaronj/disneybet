@@ -2221,11 +2221,11 @@ function renderHistoryScreen() {
     if (h.attraction)
       html += ` · <em>${h.attraction}</em>`;
     html += `</div>
-      <div class="wsd-text-small">Q: ${h.question}</div>
-      <div class="wsd-text-small">Answer: &ldquo;${
+      <div class="wsd-text-small mt-1">Q: ${h.question}</div>
+      <div class="wsd-text-small mt-1">Answer: &ldquo;${
         h.selectedAnswerText
       }&rdquo;</div>
-      <div class="wsd-text-small">
+      <div class="wsd-text-smal mt-1l">
         Author:${
           isGhost
             ? "👻 Ghost"
