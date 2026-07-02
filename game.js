@@ -2564,7 +2564,13 @@ function wireEvents() {
       showScreen("history");
     }
   );
-
+$("wsd-start-round").addEventListener(
+    "click",
+    () => {
+      startNewRoundCore();
+      showScreen("setup-question");
+    }
+  );
   // End game / restart
   $("wsd-end-game").addEventListener("click", () => {
     confirmThenReset(
