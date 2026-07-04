@@ -586,21 +586,18 @@ function startGameFromSetup() {
     .filter(Boolean);
 
   if (names.length < 3) {
-    if (errEl) errEl.textContent =
-      "Please enter at least three player names.";
+    if (errEl) errEl.textContent = "Please enter at least three player names.";
     return;
   }
 
   const uniqueNames = new Set(names.map(n => n.toLowerCase()));
   if (uniqueNames.size !== names.length) {
-    if (errEl) errEl.textContent =
-      "Each player must have a unique name.";
+    if (errEl) errEl.textContent = "Each player must have a unique name.";
     return;
   }
 
   const parkData = PARKS[parkName];
 
-  // First-time game creation
   if (!gameState) {
     const players = names.map((name, id) => ({
       id,
@@ -632,27 +629,24 @@ function startGameFromSetup() {
       },
       players,
       lands: [
-        ...new Set(
-          parkData.attractions.map(a => a.land).filter(Boolean)
-        )
+        ...new Set(parkData.attractions.map(a => a.land).filter(Boolean))
       ],
       attractions: parkData.attractions,
-      questionUsage: {}, // track questions per attraction/category
+      questionUsage: {},
       ghostPool: [],
       currentRound: null,
       history: [],
       finalBonusesApplied: false
     };
+
+    assignSecretLandMissions();
   } else {
-    // Existing game: update park + players
     const parkAttrs = parkData.attractions;
     Object.assign(gameState.settings, { park: parkName });
     Object.assign(gameState, {
       attractions: parkAttrs,
       lands: [
-        ...new Set(
-          parkAttrs.map(a => a.land).filter(Boolean)
-        )
+        ...new Set(parkAttrs.map(a => a.land).filter(Boolean))
       ]
     });
     gameState.questionUsage ||= {};
@@ -666,14 +660,15 @@ function startGameFromSetup() {
         old.name = name;
         return old;
       }
+
       const newId = existingPlayers.length
         ? Math.max(...existingPlayers.map(p => p.id)) + 1
         : index;
+
       return {
         id: newId,
         name,
-        score:
-          gameState.settings?.startingPoints ?? START_POINTS,
+        score: gameState.settings?.startingPoints ?? START_POINTS,
         wins: 0,
         collected: [],
         bonusTotal: 0,
@@ -683,9 +678,7 @@ function startGameFromSetup() {
           uniqueLands: []
         },
         badgeColor:
-          PLAYER_BADGE_COLORS[
-            index % PLAYER_BADGE_COLORS.length
-          ] || "#999999"
+          PLAYER_BADGE_COLORS[index % PLAYER_BADGE_COLORS.length] || "#999999"
       };
     });
   }
@@ -702,88 +695,15 @@ function startGameFromSetup() {
 
   const startBtn = $("wsd-start-game");
   if (startBtn) {
-    startBtn.textContent = gameState ? "Resume game" : "Start game";
+    startBtn.textContent = "Resume game";
   }
+
   renderAttractionOptions();
   saveState();
   updatePlayerInputLock();
   showScreen("setup-question");
   startNewRoundCore();
-
-  // First-time game creation, assign secret land mission
-if (!gameState) {
-  const players = names.map((name, index) => ({
-    id: index + 1,
-    name,
-    score: STARTPOINTS,
-    wins: 0,
-    collected: [],
-    bonusTotal: 0,
-    stats: {
-      correctGuesses: 0,
-      totalRisked: 0,
-      uniqueLands: []
-    },
-    badgeColor: null
-  }));
-
-  const palette = shuffle(PLAYERBADGECOLORS.slice());
-  players.forEach((p) => {
-    p.badgeColor = palette.shift() || "#999999";
-  });
-
-  gameState = {
-    screen: "setup-question",
-    roundNumber: 0,
-    settings: {
-      park: parkName,
-      startingPoints: STARTPOINTS,
-      minPoints: MINPOINTS
-    },
-    players,
-    lands: new Set(parkData.attractions.map(a => a.land).filter(Boolean)),
-    attractions: parkData.attractions,
-    questionUsage: {},
-    ghostPool: [],
-    currentRound: null,
-    history: [],
-    finalBonusesApplied: false
-  };
-
-  // NEW: assign secret missions once per game
-  assignSecretLandMissions();
-
-} else {
-  // Existing game update (leave missions alone)
-  const parkAttrs = parkData.attractions;
-  Object.assign(gameState.settings, { park: parkName });
-  Object.assign(gameState, {
-    attractions: parkAttrs,
-    lands: new Set(parkAttrs.map(a => a.land).filter(Boolean))
-  });
-}
-
-}
-
-// ----- Secret land mission pass-the-phone -----
-
-let secretMissionIndex = 0;
-
-function showSecretMissionModal() {
-  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
-    return;
-  }
-
-  secretMissionIndex = 0;
-  updateSecretMissionSlide();
-
-  const modalEl = document.getElementById("modal-secret-missions");
-  if (modalEl && typeof bootstrap !== "undefined") {
-    new bootstrap.Modal(modalEl, {
-      backdrop: "static",
-      keyboard: false
-    }).show();
-  }
+  showSecretMissionModal();
 }
 
 function updateSecretMissionSlide() {
