@@ -394,6 +394,7 @@ function showScreen(name) {
   if (gameState) {
     gameState.screen = name;
     saveState();
+    updateTopHeroMeta();
   }
 
   // Update step icon, title, and instruction
@@ -905,7 +906,6 @@ function onAttractionChange() {
 
   saveState();
   updateQuestionLock();
-  updateTopHeroMeta();
 }
 
 
