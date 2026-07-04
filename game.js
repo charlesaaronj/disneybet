@@ -1704,20 +1704,173 @@ function applyRoundResults(authorId) {
   } catch (e) {}
 }
 
-// ---------- Reveal animation & round summary modal ----------
-function runRevealAnimation() {
-  const r = gameState.currentRound;
-  const isGhostAnswer = !!r.selectedAnswer.isGhost;
+function getRevealContext(r) {
+  const isGhostAnswer = !!r.selectedAnswer?.isGhost;
   const author = isGhostAnswer
     ? null
     : gameState.players.find(
-        p => p.id === r.selectedAnswer.playerId
+        p => p.id === r.selectedAnswer?.playerId
       );
+
+  const correctGuessers = r.correctGuessers || [];
+  const wagers = r.wagers || [];
+  const payouts = r.payouts || [];
+
+  const authorChoseSelf =
+    !isGhostAnswer &&
+    !!author &&
+    wagers.some(
+      w =>
+        w.playerId === author.id &&
+        parseInt(w.guessedAuthorId, 10) === author.id
+    );
+
+  const authorSelfOnly =
+    !isGhostAnswer &&
+    !!author &&
+    correctGuessers.length === 0 &&
+    authorChoseSelf;
+
+  const authorWonRound =
+    !isGhostAnswer &&
+    !!author &&
+    correctGuessers.length === 0 &&
+    !authorSelfOnly;
+
+  const winnerNames = correctGuessers.length
+    ? correctGuessers
+        .map(pid => gameState.players.find(p => p.id === pid)?.name)
+        .filter(Boolean)
+        .join(", ")
+    : "";
+
+  const potPaidOut = payouts.reduce(
+    (sum, pt) => sum + Math.max(0, pt.potPart || 0),
+    0
+  );
+
+  return {
+    isGhostAnswer,
+    author,
+    correctGuessers,
+    wagers,
+    payouts,
+    authorChoseSelf,
+    authorSelfOnly,
+    authorWonRound,
+    winnerNames,
+    potPaidOut
+  };
+}
+
+function buildRevealSummaryLines(r) {
+  const ctx = getRevealContext(r);
+
+  let line1 = "";
+  if (ctx.isGhostAnswer) {
+    line1 = ctx.winnerNames
+      ? `🎉 ${ctx.winnerNames} correctly guessed Ghost.`
+      : "😱 Nobody guessed Ghost — the house wins the Hunny pot.";
+  } else if (ctx.authorSelfOnly) {
+    line1 =
+      "🤔 The author guessed themselves — no one wins the Hunny pot this round.";
+  } else if (ctx.authorWonRound) {
+    const name = ctx.author ? ctx.author.name : "The author";
+    line1 = `🎯 Author not guessed — ${name} wins the Hunny pot.`;
+  } else {
+    line1 = ctx.winnerNames
+      ? `🎉 ${ctx.winnerNames} guessed the author correctly.`
+      : "🤔 No winners recorded this round.";
+  }
+
+  const line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
+
+  const line3 = ctx.authorChoseSelf
+    ? `ℹ️ ${ctx.author ? ctx.author.name : "The author"} guessed themselves so no payout.`
+    : "";
+
+  return [line1, line2, line3].filter(Boolean);
+}
+
+function renderRevealSummary(r) {
+  const authorLineSummary = $("wsd-no-correct-author-line");
+  if (!authorLineSummary) return;
+
+  const lines = buildRevealSummaryLines(r);
+  authorLineSummary.innerHTML = lines
+    .map(line => `<p class="wsd-round-line">${line}</p>`)
+    .join("");
+}
+
+function buildRevealRowHTML(r, payout) {
+  const ctx = getRevealContext(r);
+  const p = gameState.players.find(pl => pl.id === payout.playerId);
+  const ok = ctx.correctGuessers.includes(payout.playerId);
+
+  const spent = Math.abs(payout.wagerPart || 0);
+  const earned = Math.max(0, payout.potPart || 0);
+  const net = payout.delta || 0;
+  const netStr = net >= 0 ? `+${net}` : String(net);
+
+  const isAuthorRow =
+    !ctx.isGhostAnswer &&
+    ctx.author &&
+    p &&
+    p.id === ctx.author.id;
+
+  const winnerBadge =
+    ctx.authorWonRound && isAuthorRow ? " 👑" : "";
+
+  return `
+    <div>
+      <div class="wsd-score-name">
+        ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
+      </div>
+      <div class="wsd-score-meta">
+        Spent: ${spent} · 🍯 ${earned}
+      </div>
+    </div>
+    <div class="wsd-score-value ${
+      net >= 0 ? "text-success" : "text-danger"
+    }">${netStr}</div>
+  `;
+}
+
+function renderRevealRows(r, options = {}) {
+  const resultsEl = $("wsd-reveal-results");
+  if (!resultsEl) return;
+
+  const { animate = false } = options;
+  resultsEl.innerHTML = "";
+
+  (r.payouts || []).forEach((payout, i) => {
+    const renderRow = () => {
+      const row = document.createElement("div");
+      row.className = "wsd-result-row";
+
+      if (animate) {
+        row.style.animationDelay = `${i * 0.07}s`;
+      }
+
+      row.innerHTML = buildRevealRowHTML(r, payout);
+      resultsEl.appendChild(row);
+    };
+
+    if (animate) {
+      setTimeout(renderRow, i * 120);
+    } else {
+      renderRow();
+    }
+  });
+}
+
+function runRevealAnimation() {
+  const r = gameState.currentRound;
+  const ctx = getRevealContext(r);
 
   const countEl = $("wsd-reveal-countdown");
   const authWrap = $("wsd-reveal-author-wrap");
   const authEl = $("wsd-reveal-author");
-  const resultsEl = $("wsd-reveal-results");
   const nextWrap = $("wsd-reveal-next-wrap");
   const confettiEl = $("wsd-confetti-wrap");
   const qEl = $("wsd-reveal-question");
@@ -1726,11 +1879,12 @@ function runRevealAnimation() {
   if (qEl) qEl.textContent = r.question;
   if (ansEl) ansEl.textContent = r.selectedAnswer.text;
   if (authWrap) authWrap.style.display = "none";
-  if (resultsEl) resultsEl.innerHTML = "";
   if (nextWrap) nextWrap.style.display = "none";
   if (confettiEl) confettiEl.innerHTML = "";
+  renderRevealRows(r, { animate: false });
+  const resultsEl = $("wsd-reveal-results");
+  if (resultsEl) resultsEl.innerHTML = "";
 
-  // Countdown: 3, 2, 1
   [3, 2, 1].forEach((n, i) => {
     setTimeout(() => {
       if (!countEl) return;
@@ -1745,10 +1899,10 @@ function runRevealAnimation() {
     if (countEl) countEl.textContent = "";
 
     if (authEl) {
-      authEl.textContent = isGhostAnswer
+      authEl.textContent = ctx.isGhostAnswer
         ? "👻 Ghost"
-        : author
-        ? author.name
+        : ctx.author
+        ? ctx.author.name
         : "Unknown";
     }
 
@@ -1759,178 +1913,31 @@ function runRevealAnimation() {
       authWrap.classList.add("wsd-anim-pop");
     }
 
-    if (!isGhostAnswer && r.correctGuessers.length > 0) {
+    if (!ctx.isGhostAnswer && ctx.correctGuessers.length > 0) {
       spawnConfetti(confettiEl);
     }
 
-    // Summary text lines in the modal
-    const authorLineSummary = $("wsd-no-correct-author-line");
-    if (authorLineSummary) {
-      const winnerNames = r.correctGuessers.length
-        ? r.correctGuessers
-            .map(
-              pid =>
-                gameState.players.find(p => p.id === pid)?.name
-            )
-            .filter(Boolean)
-            .join(", ")
-        : null;
+    renderRevealSummary(r);
+    renderRevealRows(r, { animate: true });
 
-      const authorWonRound =
-        !isGhostAnswer &&
-        r.correctGuessers.length === 0 &&
-        !!author;
-
-      // Did the author bet on themselves?
-      const authorChoseSelf =
-        !isGhostAnswer &&
-        !!author &&
-        r.wagers.some(
-          w =>
-            w.playerId === author.id &&
-            parseInt(w.guessedAuthorId, 10) === author.id
-        );
-
-      // Solo self-guess: author chose self and no one else was correct
-      const authorSelfOnly =
-        authorChoseSelf && r.correctGuessers.length === 0;
-
-      // Line 1: win outcome
-      let line1 = "";
-      if (isGhostAnswer) {
-        line1 = winnerNames
-          ? `🎉 ${winnerNames} correctly guessed Ghost.`
-          : "😱 Nobody guessed Ghost — the house wins the Hunny pot.";
-      } else if (authorSelfOnly) {
-        line1 =
-          "🤔 The author guessed themselves — no one wins the Hunny pot this round.";
-      } else if (authorWonRound) {
-        const name = author ? author.name : "The author";
-        line1 = `🎯 Author not guessed — ${name} wins the Hunny pot.`;
-      } else {
-        // Normal winner case: only non-author winners are listed
-        line1 = winnerNames
-          ? `🎉 ${winnerNames} guessed the author correctly.`
-          : "🤔 No winners recorded this round.";
-      }
-
-      // Line 2: Hunny pot payout (actual distributed pot)
-      const potPaidOut = (r.payouts || []).reduce(
-        (sum, pt) => sum + Math.max(0, pt.potPart || 0),
-        0
-      );
-      const line2 =
-        potPaidOut > 0
-          ? `🍯 Hunny pot paid out: ${potPaidOut} points`
-          : `🍯 Hunny pot paid out: 0 points`;
-
-      // Line 3: removed (no house bonus anymore)
-
-      // Line 4: explanation whenever author chose themselves
-      const line4 = authorChoseSelf
-        ? `ℹ️ ${author ? author.name : "The author"} guessed themselves so no payout.`
-        : "";
-
-      const parts = [];
-      parts.push(
-        `<p class="wsd-round-line">${line1}</p>`
-      );
-      parts.push(
-        `<p class="wsd-round-line">${line2}</p>`
-      );
-      if (line4) {
-        parts.push(
-          `<p class="wsd-round-line">${line4}</p>`
-        );
-      }
-
-      authorLineSummary.innerHTML = parts.join("");
-    }
-
-    // Bootstrap modal: Round summary
     try {
       const modalEl = $("modal-no-correct");
       if (modalEl && typeof bootstrap !== "undefined") {
         const titleEl = modalEl.querySelector(".modal-title");
         if (titleEl) titleEl.textContent = "📝 Round summary";
 
-        let bonusLine = $("wsd-author-bonus-line");
+        const bonusLine = $("wsd-author-bonus-line");
         if (bonusLine) bonusLine.remove();
 
-        setTimeout(
-          () => new bootstrap.Modal(modalEl).show(),
-          400
-        );
+        setTimeout(() => new bootstrap.Modal(modalEl).show(), 400);
       }
     } catch (e) {}
 
-    // Animate individual payout rows
-    const authorSelfOnlyRows =
-      !isGhostAnswer &&
-      !!author &&
-      r.correctGuessers.length === 0 &&
-      r.wagers.some(
-        w =>
-          w.playerId === author.id &&
-          parseInt(w.guessedAuthorId, 10) === author.id
-      );
-
-    const authorWonRoundRowFlag =
-      !isGhostAnswer &&
-      r.correctGuessers.length === 0 &&
-      !!author &&
-      !authorSelfOnlyRows;
-
-        r.payouts.forEach((payout, i) => {
-      setTimeout(() => {
-        const p = gameState.players.find(
-          pl => pl.id === payout.playerId
-        );
-        const ok = r.correctGuessers.includes(
-          payout.playerId
-        );
-
-        const row = document.createElement("div");
-        row.className = "wsd-result-row";
-        row.style.animationDelay = `${i * 0.07}s`;
-
-        const spent = Math.abs(payout.wagerPart || 0);
-        const earned = Math.max(0, payout.potPart || 0);
-        const net = payout.delta || 0;
-
-        const netStr = net >= 0 ? `+${net}` : String(net);
-
-        const isAuthor =
-          !isGhostAnswer &&
-          author &&
-          p &&
-          p.id === author.id;
-        const winnerBadge =
-          authorWonRoundRowFlag && isAuthor ? " 👑" : "";
-
-        row.innerHTML = `
-          <div>
-            <div class="wsd-score-name">
-              ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
-            </div>
-            <div class="wsd-score-meta">
-              Spent: ${spent} · Earned: ${earned}
-            </div>
-          </div>
-          <div class="wsd-score-value ${
-            net >= 0 ? "text-success" : "text-danger"
-          }">${netStr}</div>`;
-
-        if (resultsEl) resultsEl.appendChild(row);
-      }, i * 120);
-    });
-
     setTimeout(() => {
       if (nextWrap) nextWrap.style.display = "block";
-    }, r.payouts.length * 120 + 300);
+    }, (r.payouts || []).length * 120 + 300);
   }, 2100);
 }
-
 // Simple confetti spawn for reveal/final screens
 function spawnConfetti(container) {
   if (!container) return;
@@ -2912,85 +2919,33 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  if (scr === "reveal") {
+    if (scr === "reveal") {
     showScreen("reveal");
 
-    const isGhost = !!r.selectedAnswer?.isGhost;
-    const author = isGhost ? null : gameState.players.find(p => p.id === r.selectedAnswer?.playerId);
+    const ctx = getRevealContext(r);
 
     const qEl = $("wsd-reveal-question");
     const ansEl = $("wsd-reveal-answer-text");
     const authWrap = $("wsd-reveal-author-wrap");
     const authEl = $("wsd-reveal-author");
-    const resultsEl = $("wsd-reveal-results");
     const nextWrap = $("wsd-reveal-next-wrap");
     const countEl = $("wsd-reveal-countdown");
+    const confettiEl = $("wsd-confetti-wrap");
 
     if (qEl) qEl.textContent = r.question || "";
     if (ansEl) ansEl.textContent = r.selectedAnswer?.text || "";
     if (countEl) countEl.textContent = "";
-    if (authEl) authEl.textContent = isGhost ? "Ghost" : (author?.name || "Unknown");
+    if (authEl) {
+      authEl.textContent = ctx.isGhostAnswer
+        ? "👻 Ghost"
+        : (ctx.author?.name || "Unknown");
+    }
     if (authWrap) authWrap.style.display = "block";
     if (nextWrap) nextWrap.style.display = "block";
+    if (confettiEl) confettiEl.innerHTML = "";
 
-        if (resultsEl) {
-      resultsEl.innerHTML = "";
-
-      const authorSelfOnlyRows =
-        !isGhost &&
-        !!author &&
-        (r.correctGuessers || []).length === 0 &&
-        (r.wagers || []).some(
-          w =>
-            w.playerId === author.id &&
-            parseInt(w.guessedAuthorId, 10) === author.id
-        );
-
-      const authorWonRoundRowFlag =
-        !isGhost &&
-        (r.correctGuessers || []).length === 0 &&
-        !!author &&
-        !authorSelfOnlyRows;
-
-      (r.payouts || []).forEach((payout) => {
-        const p = gameState.players.find(
-          pl => pl.id === payout.playerId
-        );
-        const ok = (r.correctGuessers || []).includes(
-          payout.playerId
-        );
-
-        const spent = Math.abs(payout.wagerPart || 0);
-        const earned = Math.max(0, payout.potPart || 0);
-        const net = payout.delta || 0;
-        const netStr = net >= 0 ? `+${net}` : String(net);
-
-        const isAuthorRow =
-          !isGhost &&
-          author &&
-          p &&
-          p.id === author.id;
-        const winnerBadge =
-          authorWonRoundRowFlag && isAuthorRow ? " 👑" : "";
-
-        const row = document.createElement("div");
-        row.className = "wsd-result-row";
-        row.innerHTML = `
-          <div>
-            <div class="wsd-score-name">
-              ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
-            </div>
-            <div class="wsd-score-meta">
-              Spent: ${spent} · 🍯 ${earned}
-            </div>
-          </div>
-          <div class="wsd-score-value ${
-            net >= 0 ? "text-success" : "text-danger"
-          }">${netStr}</div>
-        `;
-        resultsEl.appendChild(row);
-      });
-    }
+    renderRevealSummary(r);
+    renderRevealRows(r, { animate: false });
 
     return;
   }
