@@ -762,20 +762,30 @@ function assignSecretLandMissions() {
 let secretMissionIndex = 0;
 
 function showSecretMissionModal() {
-  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
-    return;
-  }
+  if (!gameState?.players?.length) return;
 
   secretMissionIndex = 0;
   updateSecretMissionSlide();
 
-  const modalEl = $("modal-secret-missions");
-  if (modalEl && typeof bootstrap !== "undefined") {
-    new bootstrap.Modal(modalEl, {
-      backdrop: "static",
-      keyboard: false
-    }).show();
-  }
+  const modalEl = document.getElementById("modal-secret-missions");
+  if (!modalEl || typeof bootstrap === "undefined") return;
+
+  modalEl.addEventListener(
+    "hidden.bs.modal",
+    () => {
+      document.body.classList.remove("modal-open");
+      document.body.style.removeProperty("padding-right");
+      document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+    },
+    { once: true }
+  );
+
+  new bootstrap.Modal(modalEl, {
+    backdrop: "static",
+    keyboard: false
+  }).show();
+}
+
 }
 
 function updateSecretMissionSlide() {
