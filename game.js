@@ -105,12 +105,12 @@ const SCREEN_META = {
     icon: "💰",
     title: "Guess & wager",
     instruction:
-      "All - guess who said diz & wager points. Add house points to increase stakes."
+      "All - guess "Who Said Diz" & wager points."
   },
   "reveal": {
     icon: "🔍",
     title: "Reveal",
-    instruction: "Find out who said diz!"
+    instruction: "Find out "Who Said Diz" and the points gained or lost."
   },
   "scores": {
     icon: "📊",
