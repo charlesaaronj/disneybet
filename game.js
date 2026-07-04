@@ -2933,33 +2933,60 @@ function rebuildRoundScreenFromState() {
     if (authWrap) authWrap.style.display = "block";
     if (nextWrap) nextWrap.style.display = "block";
 
-    if (resultsEl) {
+        if (resultsEl) {
       resultsEl.innerHTML = "";
+
+      const authorSelfOnlyRows =
+        !isGhost &&
+        !!author &&
+        (r.correctGuessers || []).length === 0 &&
+        (r.wagers || []).some(
+          w =>
+            w.playerId === author.id &&
+            parseInt(w.guessedAuthorId, 10) === author.id
+        );
+
+      const authorWonRoundRowFlag =
+        !isGhost &&
+        (r.correctGuessers || []).length === 0 &&
+        !!author &&
+        !authorSelfOnlyRows;
+
       (r.payouts || []).forEach((payout) => {
-        const p = gameState.players.find(pl => pl.id === payout.playerId);
-        const wager = (r.wagers || []).find(w => w.playerId === payout.playerId);
+        const p = gameState.players.find(
+          pl => pl.id === payout.playerId
+        );
+        const ok = (r.correctGuessers || []).includes(
+          payout.playerId
+        );
 
-        let guessName = "";
-        if (wager) {
-          if (wager.guessedAuthorId === "ghost") {
-            guessName = "Ghost";
-          } else {
-            const guessedPlayer = gameState.players.find(pl => pl.id === parseInt(wager.guessedAuthorId, 10));
-            guessName = guessedPlayer ? guessedPlayer.name : "";
-          }
-        }
+        const spent = Math.abs(payout.wagerPart || 0);
+        const earned = Math.max(0, payout.potPart || 0);
+        const net = payout.delta || 0;
+        const netStr = net >= 0 ? `+${net}` : String(net);
 
-        const ok = (r.correctGuessers || []).includes(payout.playerId);
-        const dStr = payout.delta > 0 ? `+${payout.delta}` : String(payout.delta);
+        const isAuthorRow =
+          !isGhost &&
+          author &&
+          p &&
+          p.id === author.id;
+        const winnerBadge =
+          authorWonRoundRowFlag && isAuthorRow ? " 👑" : "";
 
         const row = document.createElement("div");
         row.className = "wsd-result-row";
         row.innerHTML = `
           <div>
-            <div class="wsd-score-name">${ok ? "✅ " : ""}${p ? p.name : "?"}</div>
-            <div class="wsd-score-meta">Guess: ${guessName} • Wager: ${wager ? wager.amount : 0}</div>
+            <div class="wsd-score-name">
+              ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
+            </div>
+            <div class="wsd-score-meta">
+              Spent: ${spent} · 🍯 ${earned}
+            </div>
           </div>
-          <div class="wsd-score-value ${payout.delta >= 0 ? "text-success" : "text-danger"}">${dStr}</div>
+          <div class="wsd-score-value ${
+            net >= 0 ? "text-success" : "text-danger"
+          }">${netStr}</div>
         `;
         resultsEl.appendChild(row);
       });
