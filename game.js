@@ -756,6 +756,65 @@ function assignSecretLandMissions() {
 
   saveState();
 }
+
+// ----- Secret land mission pass-the-phone -----
+
+let secretMissionIndex = 0;
+
+function showSecretMissionModal() {
+  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
+    return;
+  }
+
+  secretMissionIndex = 0;
+  updateSecretMissionSlide();
+
+  const modalEl = $("modal-secret-missions");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    new bootstrap.Modal(modalEl, {
+      backdrop: "static",
+      keyboard: false
+    }).show();
+  }
+}
+
+function updateSecretMissionSlide() {
+  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
+    return;
+  }
+
+  const p = gameState.players[secretMissionIndex];
+  if (!p) {
+    const modalEl = $("modal-secret-missions");
+    if (modalEl && typeof bootstrap !== "undefined") {
+      bootstrap.Modal.getInstance(modalEl)?.hide();
+    }
+    return;
+  }
+
+  const nameEl = $("wsd-secret-player-name");
+  const missionEl = $("wsd-secret-mission-text");
+  const btnEl = $("wsd-secret-next-btn");
+
+  if (nameEl) nameEl.textContent = p.name;
+  if (missionEl) {
+    missionEl.textContent = p.secretLand
+      ? `Your secret mission: win an attraction in ${p.secretLand}.`
+      : "Your secret mission has not been assigned yet.";
+  }
+
+  if (btnEl) {
+    btnEl.textContent =
+      secretMissionIndex >= gameState.players.length - 1
+        ? "Start game"
+        : "Next player";
+  }
+}
+
+function nextSecretMissionPlayer() {
+  secretMissionIndex += 1;
+  updateSecretMissionSlide();
+}
 // ---------- Question setup ----------
 
 // Pick a question from GAME_QUESTIONS for this attraction
