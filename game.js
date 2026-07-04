@@ -765,6 +765,59 @@ if (!gameState) {
 
 }
 
+// ----- Secret land mission pass-the-phone -----
+
+let secretMissionIndex = 0;
+
+function showSecretMissionModal() {
+  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
+    return;
+  }
+
+  secretMissionIndex = 0;
+  updateSecretMissionSlide();
+
+  const modalEl = document.getElementById("modal-secret-missions");
+  if (modalEl && typeof bootstrap !== "undefined") {
+    new bootstrap.Modal(modalEl, {
+      backdrop: "static",
+      keyboard: false
+    }).show();
+  }
+}
+
+function updateSecretMissionSlide() {
+  if (!gameState) return;
+
+  const players = gameState.players;
+  if (secretMissionIndex >= players.length) {
+    // all players have seen their mission; close modal
+    const modalEl = document.getElementById("modal-secret-missions");
+    if (modalEl && typeof bootstrap !== "undefined") {
+      const inst = bootstrap.Modal.getInstance(modalEl);
+      inst && inst.hide();
+    }
+    return;
+  }
+
+  const p = players[secretMissionIndex];
+  const labelEl = document.getElementById("wsd-secret-player-label");
+  const textEl = document.getElementById("wsd-secret-mission-text");
+
+  if (labelEl) {
+    labelEl.textContent = `${p.name}, this is your secret mission.`;
+  }
+  if (textEl) {
+    const land = p.secretLand || "a land of your choice";
+    textEl.textContent = `Win an attraction in ${land}. If you do, you earn a secret bonus at the end of the game.`;
+  }
+}
+
+function nextSecretMissionPlayer() {
+  secretMissionIndex += 1;
+  updateSecretMissionSlide();
+}
+
 // -------Assign Secret Land-----------
 function assignSecretLandMissions() {
   if (!gameState || !Array.isArray(gameState.lands) || !gameState.lands.length) {
@@ -2403,6 +2456,9 @@ function computeFinalBonusesAndShow() {
   const players = gameState.players;
   players.forEach(ensurePlayerStats);
 
+   // NEW: secret land missions bonus
+  applySecretLandBonuses();
+
   const maxLand = Math.max(
     0,
     ...players.map(getPlayerUniqueLandCount)
@@ -2540,6 +2596,34 @@ function abandonRound() {
   showScreen("setup-question");
 }
 
+function applySecretLandBonuses() {
+  if (!gameState || !Array.isArray(gameState.players)) return;
+
+  gameState.players.forEach((p) => {
+    ensurePlayerStats(p);
+
+    if (!p.secretLand) {
+      p.secretLandCompleted = false;
+      return;
+    }
+
+    const completed = gameState.history.some(
+      (h) => h.winnerId === p.id && h.land === p.secretLand
+    );
+
+    p.secretLandCompleted = completed;
+    if (completed) {
+      p.score += 3;
+      p.bonusTotal = (p.bonusTotal || 0) + 3;
+
+      // If you want to track breakdown:
+      if (!p.finalBonusBreakdown) {
+        p.finalBonusBreakdown = {};
+      }
+      p.finalBonusBreakdown.secretLand = 3;
+    }
+  });
+}
 
 // ---------- Wire events & bootstrap ----------
 
@@ -2583,6 +2667,22 @@ function wireEvents() {
       updatePlayerInputLock();
     }
   );
+
+    // Secret missions modal "Next player" button
+  const secretNextBtn = document.getElementById("wsd-secret-next-btn");
+  if (secretNextBtn) {
+    secretNextBtn.addEventListener("click", nextSecretMissionPlayer);
+  }
+
+  // Option: trigger missions after starting game
+  const startBtn = document.getElementById("wsd-start-game");
+  if (startBtn) {
+    startBtn.addEventListener("click", () => {
+      startGameFromSetup();
+      // After game is created, show secret missions before first attraction
+      showSecretMissionModal();
+    });
+  }
 
   // Question flow
   $("wsd-attraction-select").addEventListener(
