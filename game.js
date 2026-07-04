@@ -786,7 +786,6 @@ function showSecretMissionModal() {
   }).show();
 }
 
-}
 
 function updateSecretMissionSlide() {
   if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
