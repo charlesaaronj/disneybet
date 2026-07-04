@@ -704,15 +704,85 @@ function startGameFromSetup() {
   if (startBtn) {
     startBtn.textContent = gameState ? "Resume game" : "Start game";
   }
-
   renderAttractionOptions();
   saveState();
   updatePlayerInputLock();
   showScreen("setup-question");
   startNewRoundCore();
 
+  // First-time game creation, assign secret land mission
+if (!gameState) {
+  const players = names.map((name, index) => ({
+    id: index + 1,
+    name,
+    score: STARTPOINTS,
+    wins: 0,
+    collected: [],
+    bonusTotal: 0,
+    stats: {
+      correctGuesses: 0,
+      totalRisked: 0,
+      uniqueLands: []
+    },
+    badgeColor: null
+  }));
+
+  const palette = shuffle(PLAYERBADGECOLORS.slice());
+  players.forEach((p) => {
+    p.badgeColor = palette.shift() || "#999999";
+  });
+
+  gameState = {
+    screen: "setup-question",
+    roundNumber: 0,
+    settings: {
+      park: parkName,
+      startingPoints: STARTPOINTS,
+      minPoints: MINPOINTS
+    },
+    players,
+    lands: new Set(parkData.attractions.map(a => a.land).filter(Boolean)),
+    attractions: parkData.attractions,
+    questionUsage: {},
+    ghostPool: [],
+    currentRound: null,
+    history: [],
+    finalBonusesApplied: false
+  };
+
+  // NEW: assign secret missions once per game
+  assignSecretLandMissions();
+
+} else {
+  // Existing game update (leave missions alone)
+  const parkAttrs = parkData.attractions;
+  Object.assign(gameState.settings, { park: parkName });
+  Object.assign(gameState, {
+    attractions: parkAttrs,
+    lands: new Set(parkAttrs.map(a => a.land).filter(Boolean))
+  });
 }
 
+}
+
+// -------Assign Secret Land-----------
+function assignSecretLandMissions() {
+  if (!gameState || !Array.isArray(gameState.lands) || !gameState.lands.length) {
+    return;
+  }
+
+  const lands = Array.from(gameState.lands); // Set → array
+
+  gameState.players.forEach((p) => {
+    // pick a random land
+    const secretLand = lands[Math.floor(Math.random() * lands.length)];
+    p.secretLand = secretLand;
+    p.secretLandCompleted = false;
+    ensurePlayerStats(p);
+  });
+
+  saveState();
+}
 // ---------- Question setup ----------
 
 // Pick a question from GAME_QUESTIONS for this attraction
