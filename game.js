@@ -1851,7 +1851,7 @@ function runRevealAnimation() {
       !!author &&
       !authorSelfOnlyRows;
 
-    r.payouts.forEach((payout, i) => {
+        r.payouts.forEach((payout, i) => {
       setTimeout(() => {
         const p = gameState.players.find(
           pl => pl.id === payout.playerId
@@ -1864,16 +1864,11 @@ function runRevealAnimation() {
         row.className = "wsd-result-row";
         row.style.animationDelay = `${i * 0.07}s`;
 
-        const wagerPart = payout.wagerPart || 0;
-        const potPart = payout.potPart || 0;
-        const total = payout.delta || 0;
+        const spent = Math.abs(payout.wagerPart || 0);
+        const earned = Math.max(0, payout.potPart || 0);
+        const net = payout.delta || 0;
 
-        const wagerStr =
-          wagerPart >= 0 ? `+${wagerPart}` : String(wagerPart);
-        const potStr =
-          potPart >= 0 ? `+${potPart}` : String(potPart);
-        const totalStr =
-          total >= 0 ? `+${total}` : String(total);
+        const netStr = net >= 0 ? `+${net}` : String(net);
 
         const isAuthor =
           !isGhostAnswer &&
@@ -1889,12 +1884,12 @@ function runRevealAnimation() {
               ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
             </div>
             <div class="wsd-score-meta">
-              Wager: ${wagerStr} · Hunny Pot: ${potStr}
+              Spent: ${spent} · Earned: ${earned}
             </div>
           </div>
           <div class="wsd-score-value ${
-            total >= 0 ? "text-success" : "text-danger"
-          }">${totalStr}</div>`;
+            net >= 0 ? "text-success" : "text-danger"
+          }">${netStr}</div>`;
 
         if (resultsEl) resultsEl.appendChild(row);
       }, i * 120);
