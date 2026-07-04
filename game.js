@@ -408,8 +408,6 @@ function showScreen(name) {
 
   // Hero spotlight per screen (no firstSetupGameShown flag anymore)
   showHeroSpotlightForScreen(name);
-
-  updateTopHeroMeta();
 }
 // ---------- Setup screen + locks ----------
 
@@ -907,6 +905,7 @@ function onAttractionChange() {
 
   saveState();
   updateQuestionLock();
+  updateTopHeroMeta();
 }
 
 
