@@ -564,7 +564,7 @@ function updateTopHeroMeta() {
 
   const roundIndicator = $("wsd-round-indicator");
   if (roundIndicator) {
-    roundIndicator.textContent = `Round ${(gameState?.roundNumber ?? 0) + 1}`;
+    roundIndicator.textContent = `Round ${(gameState?.roundNumber ?? 0)}`;
   }
 }
 
@@ -710,6 +710,7 @@ function startGameFromSetup() {
   updatePlayerInputLock();
   showScreen("setup-question");
   startNewRoundCore();
+
 }
 
 // ---------- Question setup ----------
