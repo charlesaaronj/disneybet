@@ -564,7 +564,7 @@ function updateTopHeroMeta() {
 
   const roundIndicator = $("wsd-round-indicator");
   if (roundIndicator) {
-    roundIndicator.textContent = `Round ${gameState?.roundNumber ?? 1}`;
+    roundIndicator.textContent = `Round ${(gameState?.roundNumber ?? 0) + 1}`;
   }
 }
 
