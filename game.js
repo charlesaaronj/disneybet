@@ -681,6 +681,10 @@ function startGameFromSetup() {
 
   applyParkTheme(parkName);
 
+  const roundIndicator = $("wsd-round-indicator");
+if (roundIndicator) {
+  roundIndicator.textContent = `Round ${gameState?.roundNumber ?? 0}`;
+}
   const summary = $("wsd-player-summary");
   if (summary && gameState?.players) {
     summary.textContent = `${gameState.players.length} players`;
