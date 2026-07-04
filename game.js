@@ -1434,36 +1434,34 @@ function computeRevealAndScoring() {
   const payouts = [];
   let pot = 0;
 
-  // First pass: collect wagers, build pot, and set wagerPart = -amount
-  // (everyone puts their wager into the pot).
   gameState.players.forEach(p => {
     const we = r.wagers.find(w => w.playerId === p.id);
     let wagerPart = 0;
+    let wagerAmount = 0;
 
     if (we) {
-      const amount = Math.max(0, parseInt(we.amount, 10) || 0);
+      wagerAmount = Math.max(0, parseInt(we.amount, 10) || 0);
       ensurePlayerStats(p);
-      p.stats.totalRisked += amount;
+      p.stats.totalRisked += wagerAmount;
 
-      if (amount > 0) {
-        wagerPart = -amount;
-        pot += amount;
+      if (wagerAmount > 0) {
+        wagerPart = -wagerAmount;
+        pot += wagerAmount;
       }
     }
 
     payouts.push({
       playerId: p.id,
+      wagerAmount,
       wagerPart,
       potPart: 0,
       delta: 0
     });
   });
 
-  // Add Hunny Pot Hot Round bonus (if any) ONCE
   const bonus = Math.max(0, r.hunnyHotBonus || 0);
   pot += bonus;
 
-  // Determine winners (correct guessers)
   let winners = [];
 
   if (isGhostAnswer) {
@@ -1477,35 +1475,26 @@ function computeRevealAndScoring() {
     winners = r.wagers
       .filter(w => {
         const amount = Math.max(0, parseInt(w.amount, 10) || 0);
-        return (
-          amount > 0 &&
-          parseInt(w.guessedAuthorId, 10) === authorId
-        );
+        return amount > 0 && parseInt(w.guessedAuthorId, 10) === authorId;
       })
       .map(w => w.playerId);
   }
 
-  // Special cases for real-author rounds
   if (!isGhostAnswer && authorId != null) {
     const uniqueWinners = Array.from(new Set(winners));
 
-    // Case A: only the author guessed themselves -> no winners at all.
     if (uniqueWinners.length === 1 && uniqueWinners[0] === authorId) {
       winners = [];
     } else {
-      // Case B: author AND others guessed the author -> remove the author;
-      // only non-author players can win the pot.
       winners = winners.filter(pid => pid !== authorId);
     }
   }
 
+  winners = Array.from(new Set(winners));
   r.correctGuessers = winners.slice();
-
-  // No more author bonus / wrongGuessCount
   r.wrongGuessCount = 0;
   r.authorBonus = 0;
 
-  // Helper: round amount up so it splits evenly among n winners
   function resolveAmountForWinners(amount, winnerCount) {
     if (!amount || winnerCount === 0) return 0;
     const remainder = amount % winnerCount;
@@ -1513,30 +1502,75 @@ function computeRevealAndScoring() {
     return amount + (winnerCount - remainder);
   }
 
+  function distributeWeightedPot(winnerIds, totalPot) {
+    if (!winnerIds.length || totalPot <= 0) return;
+
+    const winnerEntries = winnerIds
+      .map(pid => {
+        const pt = payouts.find(p => p.playerId === pid);
+        return {
+          playerId: pid,
+          wagerAmount: pt ? Math.max(0, pt.wagerAmount || 0) : 0,
+          rawShare: 0,
+          wholeShare: 0,
+          remainder: 0
+        };
+      })
+      .filter(entry => entry.wagerAmount > 0);
+
+    if (!winnerEntries.length) return;
+
+    const totalWinnerWeight = winnerEntries.reduce(
+      (sum, entry) => sum + entry.wagerAmount,
+      0
+    );
+
+    if (totalWinnerWeight <= 0) return;
+
+    winnerEntries.forEach(entry => {
+      entry.rawShare =
+        (entry.wagerAmount / totalWinnerWeight) * totalPot;
+      entry.wholeShare = Math.floor(entry.rawShare);
+      entry.remainder = entry.rawShare - entry.wholeShare;
+    });
+
+    let assigned = winnerEntries.reduce(
+      (sum, entry) => sum + entry.wholeShare,
+      0
+    );
+    let leftovers = totalPot - assigned;
+
+    winnerEntries.sort((a, b) => {
+      if (b.remainder !== a.remainder) {
+        return b.remainder - a.remainder;
+      }
+      return b.wagerAmount - a.wagerAmount;
+    });
+
+    for (let i = 0; i < winnerEntries.length && leftovers > 0; i++) {
+      winnerEntries[i].wholeShare += 1;
+      leftovers -= 1;
+      if (i === winnerEntries.length - 1 && leftovers > 0) i = -1;
+    }
+
+    winnerEntries.forEach(entry => {
+      const pt = payouts.find(p => p.playerId === entry.playerId);
+      if (pt) pt.potPart = entry.wholeShare;
+    });
+  }
+
   if (isGhostAnswer) {
-    // Ghost round
     if (winners.length === 0) {
-      // Nobody guessed Ghost: pot stays as-is, no payouts.
       r.pot = pot;
     } else {
-      const n = winners.length;
-      const resolvedPot = resolveAmountForWinners(pot, n);
-      const potShare = resolvedPot / n;
-
-      winners.forEach(pid => {
-        const pt = payouts.find(p => p.playerId === pid);
-        if (pt) pt.potPart = potShare;
-      });
-
+      const resolvedPot = resolveAmountForWinners(pot, winners.length);
+      distributeWeightedPot(winners, resolvedPot);
       r.pot = resolvedPot;
     }
   } else {
-    // Real-author round
     const n = winners.length;
 
-    // Detect author guessed themselves and no one else hit
     const authorSelfOnly =
-      !isGhostAnswer &&
       authorId != null &&
       n === 0 &&
       r.wagers.some(
@@ -1546,34 +1580,20 @@ function computeRevealAndScoring() {
       );
 
     if (n === 0 && !authorSelfOnly) {
-      // Case 1: No winners, and the author did NOT guess themselves.
-      // Author gets full pot.
       r.pot = pot;
       if (authorId != null) {
         const authorPayout = payouts.find(pt => pt.playerId === authorId);
         if (authorPayout) authorPayout.potPart = pot;
       }
     } else if (n === 0 && authorSelfOnly) {
-      // Case 2: Only the author guessed the author (self-guess).
-      // Nobody gets pot this round.
       r.pot = pot;
-      // Leave potPart as 0 for everyone.
     } else {
-      // Case 3: At least one non-author winner shares the pot.
-      const winnerCount = n;
-      const resolvedPot = resolveAmountForWinners(pot, winnerCount);
-      const potShare = resolvedPot / winnerCount;
-
-      winners.forEach(pid => {
-        const pt = payouts.find(p => p.playerId === pid);
-        if (pt) pt.potPart = potShare;
-      });
-
+      const resolvedPot = resolveAmountForWinners(pot, winners.length);
+      distributeWeightedPot(winners, resolvedPot);
       r.pot = resolvedPot;
     }
   }
 
-  // Finalize deltas (no housePart anymore)
   payouts.forEach(pt => {
     pt.delta = pt.wagerPart + pt.potPart;
   });
@@ -1810,7 +1830,7 @@ function runRevealAnimation() {
       );
       if (line4) {
         parts.push(
-          `<p class="wsd-round-line wsd-round-line-note">${line4}</p>`
+          `<p class="wsd-round-line">${line4}</p>`
         );
       }
 
