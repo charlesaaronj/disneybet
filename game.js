@@ -244,23 +244,23 @@ function ensureStateShape() {
     if (!Array.isArray(p.collected)) p.collected = [];
     if (typeof p.wins !== "number") p.wins = 0;
     if (typeof p.bonusTotal !== "number") p.bonusTotal = 0;
+
+    // NEW: secret mission defaults
+    if (typeof p.secretLand !== "string") p.secretLand = null;
+    if (typeof p.secretLandCompleted !== "boolean") p.secretLandCompleted = false;
+
     ensurePlayerStats(p);
   });
 
   if (!gameState.currentRound) return;
   const r = gameState.currentRound;
 
-  // Round arrays we still care about, without house bonus
   ["correctGuessers", "payouts", "collectionsThisRound"].forEach(k => {
     r[k] ||= [];
   });
-if (typeof r.hunnyHotBonus !== "number") r.hunnyHotBonus = 0;
+
+  if (typeof r.hunnyHotBonus !== "number") r.hunnyHotBonus = 0;
 }
-
-// Convenience lookup
-const getAttractionByName = name =>
-  gameState.attractions.find(a => a.name === name);
-
 // Count unique lands collected by a player
 function getPlayerUniqueLandCount(player) {
   const s = new Set();
