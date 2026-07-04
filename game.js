@@ -555,6 +555,19 @@ function addPlayerInput(container, name = "") {
   container.appendChild(wrap);
 }
 
+function updateTopHeroMeta() {
+  const parkLabel = $("wsd-park-label");
+  if (parkLabel) {
+    const parkName = gameState?.settings?.park || "";
+    parkLabel.textContent = parkName || "Not set";
+  }
+
+  const roundIndicator = $("wsd-round-indicator");
+  if (roundIndicator) {
+    roundIndicator.textContent = `Round ${gameState?.roundNumber ?? 0}`;
+  }
+}
+
 // Validate setup and either create or update gameState
 function startGameFromSetup() {
   const errEl = $("wsd-setup-error");
@@ -682,13 +695,6 @@ function startGameFromSetup() {
 
   applyParkTheme(parkName);
 
-  
-function updateTopHeroMeta() {
-  const roundIndicator = $("wsd-round-indicator");
-if (roundIndicator) {
-  roundIndicator.textContent = `Round ${gameState?.roundNumber ?? 0}`;
-}
-}
   const summary = $("wsd-player-summary");
   if (summary && gameState?.players) {
     summary.textContent = `${gameState.players.length} players`;
