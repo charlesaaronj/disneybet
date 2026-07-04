@@ -706,33 +706,6 @@ function startGameFromSetup() {
   showSecretMissionModal();
 }
 
-function updateSecretMissionSlide() {
-  if (!gameState) return;
-
-  const players = gameState.players;
-  if (secretMissionIndex >= players.length) {
-    // all players have seen their mission; close modal
-    const modalEl = document.getElementById("modal-secret-missions");
-    if (modalEl && typeof bootstrap !== "undefined") {
-      const inst = bootstrap.Modal.getInstance(modalEl);
-      inst && inst.hide();
-    }
-    return;
-  }
-
-  const p = players[secretMissionIndex];
-  const labelEl = document.getElementById("wsd-secret-player-label");
-  const textEl = document.getElementById("wsd-secret-mission-text");
-
-  if (labelEl) {
-    labelEl.textContent = `${p.name}, this is your secret mission.`;
-  }
-  if (textEl) {
-    const land = p.secretLand || "a land of your choice";
-    textEl.textContent = `Win an attraction in ${land}. If you do, you earn a secret bonus at the end of the game.`;
-  }
-}
-
 function nextSecretMissionPlayer() {
   secretMissionIndex += 1;
   updateSecretMissionSlide();
@@ -788,27 +761,22 @@ function showSecretMissionModal() {
 
 
 function updateSecretMissionSlide() {
-  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
-    return;
-  }
+  if (!gameState || !gameState.players || !gameState.players.length) return;
 
   const p = gameState.players[secretMissionIndex];
-  if (!p) {
-    const modalEl = $("modal-secret-missions");
-    if (modalEl && typeof bootstrap !== "undefined") {
-      bootstrap.Modal.getInstance(modalEl)?.hide();
-    }
-    return;
+  if (!p) return;
+
+  const nameEl = document.getElementById("wsd-secret-player-name");
+  const missionEl = document.getElementById("wsd-secret-mission-text");
+  const btnEl = document.getElementById("wsd-secret-next-btn");
+
+  if (nameEl) {
+    nameEl.textContent = p.name;
   }
 
-  const nameEl = $("wsd-secret-player-name");
-  const missionEl = $("wsd-secret-mission-text");
-  const btnEl = $("wsd-secret-next-btn");
-
-  if (nameEl) nameEl.textContent = p.name;
   if (missionEl) {
     missionEl.textContent = p.secretLand
-      ? `Your secret mission: win an attraction in ${p.secretLand}.`
+      ? "Your secret mission: win an attraction in " + p.secretLand + "."
       : "Your secret mission has not been assigned yet.";
   }
 
@@ -819,6 +787,7 @@ function updateSecretMissionSlide() {
         : "Next player";
   }
 }
+
 
 function nextSecretMissionPlayer() {
   secretMissionIndex += 1;
