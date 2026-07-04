@@ -1423,6 +1423,8 @@ function getHouseBonusChooser() {
 
 // Compute payouts with full-pot model:
 // - All wagers go into the pot.
+// - The Hunny Pot also gets +1 point per player every round.
+// - Hot Round bonus is added on top when active.
 // - Winners (author alone, or correct guessers) split the pot,
 //   with the pot rounded up so it splits evenly.
 // - For Ghost, only correct Ghost guessers share the pot.
@@ -1459,8 +1461,16 @@ function computeRevealAndScoring() {
     });
   });
 
-  const bonus = Math.max(0, r.hunnyHotBonus || 0);
-  pot += bonus;
+  // Base Hunny Pot: +1 point per player every round
+  const baseHunnyPot = gameState.players.length;
+  pot += baseHunnyPot;
+
+  // Keep Hot Round bonus the same; add it on top
+  const hotBonus = Math.max(0, r.hunnyHotBonus || 0);
+  pot += hotBonus;
+
+  // Store for summary/history display
+  r.baseHunnyPot = baseHunnyPot;
 
   let winners = [];
 
