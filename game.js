@@ -1,5 +1,5 @@
 // ===========================================================
-//  Who Said Diz — game.js (refactored, commented, same behavior)
+//   Who Said Diz — game.js (refactored, commented, same behavior)
 // ===========================================================
 
 const APP_VERSION = "1.5";
