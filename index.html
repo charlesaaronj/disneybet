@@ -840,27 +840,36 @@
 </div>
 
  <!-- Secret mission pass-the-phone -->
-<div class="modal fade" id="modal-secret-missions" tabindex="-1" aria-hidden="true">
+<div class="modal fade wsd-modal" id="modal-secret-missions" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius:20px;overflow:hidden;">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold">Secret Missions</h5>
+    <div class="modal-content wsd-modal-content">
+      <div class="modal-header wsd-modal-header">
+        <h5 class="modal-title wsd-modal-title">Secret Missions</h5>
+        <button
+          type="button"
+          class="btn-close wsd-modal-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
 
-      <div class="modal-body" style="font-size:0.9rem;">
+      <div class="modal-body wsd-modal-body">
         <p class="wsd-text-small mb-2" id="wsd-secret-player-label"></p>
         <p class="wsd-text-small mb-3" id="wsd-secret-mission-text"></p>
-        <p class="wsd-text-small mb-1" id="wsd-secret-helper-text" style="opacity:0.7;">
+        <p
+          class="wsd-text-small mb-1"
+          id="wsd-secret-helper-text"
+          style="opacity: 0.7;"
+        >
           Pass the phone to the next player when you tap the button below.
         </p>
       </div>
 
-      <div class="modal-footer border-0 d-flex justify-content-between">
+      <div class="modal-footer wsd-modal-footer">
         <button
           type="button"
-          class="wsd-btn-secondary"
+          class="btn btn-light wsd-btn-secondary"
           id="wsd-secret-skip-btn"
-          style="width:auto;"
         >
           Skip missions
         </button>
@@ -869,7 +878,6 @@
           type="button"
           class="wsd-btn-primary-modal"
           id="wsd-secret-next-btn"
-          style="width:auto;"
         >
           Next player
         </button>
