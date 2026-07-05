@@ -716,60 +716,44 @@ function startGameFromSetup() {
 // Pick a question from GAME_QUESTIONS for this attraction
 function drawQuestionForAttraction(attraction) {
   const isShow = attraction?.type === "show";
-
   const allCategories = GAME_QUESTIONS.categories;
 
   let categories;
   if (isShow) {
-    // Shows can use showtime + park-wide
-    categories = allCategories.filter(
-      cat => cat.id === 20 || cat.id === 21
-    );
+    categories = allCategories.filter(cat => cat.id === 15);
   } else {
-    // Non-shows: everything except the show-only bucket
-    categories = allCategories.filter(cat => cat.id !== 20);
+    categories = allCategories.filter(cat => cat.id !== 15);
   }
 
-  if (!categories.length) {
-    categories = allCategories;
-  }
+  if (!categories.length) categories = allCategories;
 
-  // Pick a random category from the eligible list
-  const category =
-    categories[Math.floor(Math.random() * categories.length)];
+  const category = categories[Math.floor(Math.random() * categories.length)];
 
-  // Make sure we have usage tracking
   gameState.questionUsage ||= {};
   const usageMap = gameState.questionUsage;
   const questionList = category.questions;
 
-  // Find the least-used questions in this category
   let minUsage = Infinity;
   const candidates = [];
 
   questionList.forEach(template => {
-    const key = `${category.id}:${template}`;
+    const key = `${category.id}::${template}`;
     const count = usageMap[key] || 0;
 
     if (count < minUsage) {
       minUsage = count;
-      candidates.length = 0; // reset candidate list
+      candidates.length = 0;
       candidates.push(template);
     } else if (count === minUsage) {
       candidates.push(template);
     }
   });
 
-  // Pick randomly among the least-used questions
-  const template =
-    candidates[Math.floor(Math.random() * candidates.length)];
-
-  // Increment usage for the chosen question
-  const key = `${category.id}:${template}`;
+  const template = candidates[Math.floor(Math.random() * candidates.length)];
+  const key = `${category.id}::${template}`;
   usageMap[key] = (usageMap[key] || 0) + 1;
   saveState();
 
-  // Resolve placeholders like {{attraction}}, {{land}}, {{park}}
   const attractionName = attraction?.name || "this attraction";
   const landName = attraction?.land || "this land";
   const parkNameFromState = gameState?.settings?.park || "this park";
@@ -780,11 +764,14 @@ function drawQuestionForAttraction(attraction) {
     .replace(/{{park}}/g, parkNameFromState);
 
   return {
-    text,
-    categoryId: category.id,
-    categoryName: category.name
-  };
+  text,
+  type: isShow ? "show" : "general",
+  categoryId: category.id,
+  categoryName: category.name
+};
+
 }
+
 
 function renderAttractionOptions() {
   const sel = $("wsd-attraction-select");
