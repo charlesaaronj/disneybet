@@ -797,8 +797,11 @@ function renderAttractionOptions() {
 function startNewRoundCore() {
   if (!gameState) return;
 
+if (!gameState.currentRound) {
+  gameState.roundNumber = Math.max(1, gameState.roundNumber || 1);
+} else {
   gameState.roundNumber += 1;
- gameState.currentRound = {
+} gameState.currentRound = {
   attraction: null,
   question: "",
   questionType: "",
