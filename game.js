@@ -989,34 +989,28 @@ function proceedToAnswers() {
   }
 
   const roundNumber = gameState.roundNumber || 1;
-const canHaveGhost = roundNumber > 1;
-const isGhostRound = canHaveGhost && Math.random() < 0.2;
+  const canHaveGhost = roundNumber > 1;
+  const isGhostRound = canHaveGhost && Math.random() < 0.2;
 
-const ghostPlayerId = isGhostRound
-  ? gameState.players[Math.floor(Math.random() * gameState.players.length)].id
-  : null;
+  const ghostPlayerId = isGhostRound
+    ? gameState.players[Math.floor(Math.random() * gameState.players.length)].id
+    : null;
 
-Object.assign(gameState.currentRound, {
-  question: q,
-  answers: [],
-  answerIndex: 0,
-  ghostRound: isGhostRound,
-  ghostPlayerId,
-  ghostBonusAwardedTo: null
-});
+  Object.assign(gameState.currentRound, {
+    question: q,
+    answers: [],
+    answerIndex: 0,
+    ghostRound: isGhostRound,
+    ghostPlayerId,
+    ghostBonusAwardedTo: null
+  });
 
-  // Roll Hunny Pot Hot Round bonus for this round
   const playerCount = gameState.players.length;
-  const minBonus = playerCount;          // minimal # of players
-  const maxBonus = playerCount * 2;      // up to double that
+  const minBonus = playerCount;
+  const maxBonus = playerCount * 2;
 
-  // Only allow hot rounds from round 2 onward
-  const canBeHot =
-    playerCount > 0 && roundNumber > 1;
-
-  // Decrease frequency: e.g. ~20% of eligible rounds
-  const isHotRound =
-    canBeHot && Math.random() < 0.15;
+  const canBeHot = playerCount > 0 && roundNumber > 1;
+  const isHotRound = canBeHot && Math.random() < 0.15;
 
   let hunnyHotBonus = 0;
 
@@ -1029,7 +1023,6 @@ Object.assign(gameState.currentRound, {
 
   gameState.currentRound.hunnyHotBonus = hunnyHotBonus;
 
-  // Show modal if this is a hot round
   if (hunnyHotBonus > 0) {
     const modalEl = $("modal-hunny-hot");
     const bodyEl = $("modal-hunny-hot-body");
@@ -1059,9 +1052,10 @@ Object.assign(gameState.currentRound, {
   const ansInp = $("wsd-answer-input");
   if (ansInp) ansInp.value = "";
 
-  const ghostInp = id("wsd-ghost-answer-input");
+  const ghostInp = $("wsd-ghost-answer-input");
   if (ghostInp) ghostInp.value = "";
 
+  saveState();
   renderAnswerProgress();
   showScreen("enter-answers");
 }
