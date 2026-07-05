@@ -1,5 +1,5 @@
 // ===========================================================
-//  Who Said Diz — game.js (refactored, commented, same behavior)
+//   Who Said Diz — game.js (refactored, commented, same behavior)
 // ===========================================================
 
 const APP_VERSION = "1.5";
@@ -241,40 +241,34 @@ function ensureStateShape() {
   gameState.questionUsage ||= {};
 
   gameState.players.forEach(p => {
-  if (!Array.isArray(p.collected)) p.collected = [];
-  if (typeof p.wins !== "number") p.wins = 0;
-  if (typeof p.bonusTotal !== "number") p.bonusTotal = 0;
-  // Secret mission defaults
-  if (typeof p.secretLand !== "string") p.secretLand = "";
-  if (typeof p.secretLandCompleted !== "boolean") p.secretLandCompleted = false;
-
-  ensurePlayerStats(p);
-});
+    if (!Array.isArray(p.collected)) p.collected = [];
+    if (typeof p.wins !== "number") p.wins = 0;
+    if (typeof p.bonusTotal !== "number") p.bonusTotal = 0;
+    ensurePlayerStats(p);
+  });
 
   if (!gameState.currentRound) return;
   const r = gameState.currentRound;
 
+  // Round arrays we still care about, without house bonus
   ["correctGuessers", "payouts", "collectionsThisRound"].forEach(k => {
     r[k] ||= [];
   });
-
-  if (typeof r.hunnyHotBonus !== "number") r.hunnyHotBonus = 0;
+if (typeof r.hunnyHotBonus !== "number") r.hunnyHotBonus = 0;
 }
+
+// Convenience lookup
+const getAttractionByName = name =>
+  gameState.attractions.find(a => a.name === name);
+
 // Count unique lands collected by a player
 function getPlayerUniqueLandCount(player) {
-  if (!gameState || !Array.isArray(gameState.attractions)) return 0;
-  if (!player || !Array.isArray(player.collected)) return 0;
-
-  const lands = new Set();
-
+  const s = new Set();
   player.collected.forEach(name => {
-    const attraction = gameState.attractions.find(a => a.name === name);
-    if (attraction && attraction.land) {
-      lands.add(attraction.land);
-    }
+    const a = getAttractionByName(name);
+    if (a?.land) s.add(a.land);
   });
-
-  return lands.size;
+  return s.size;
 }
 
 // ---------- Theme application ----------
@@ -294,8 +288,6 @@ function applyParkTheme(parkName) {
     ['#modal-first-visit .modal-header', 'color',           t ? '#fff' : ''],
     ["#modal-resume-game .modal-header", "backgroundImage", t?.hero],
     ["#modal-resume-game .modal-header", "color", t ? "#fff" : ""],
-    ["#modal-secret-missions .modal-header", "backgroundImage", t?.hero],
-    ["#modal-secret-missions .modal-header", "color", t ? "#fff" : ""],
     ["#modal-scoring .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-scoring .modal-header", "color", t ? "#fff" : ""],
     ["#modal-hunny-hot .modal-header", "backgroundImage", t?.hero],
@@ -594,35 +586,36 @@ function startGameFromSetup() {
     .filter(Boolean);
 
   if (names.length < 3) {
-    if (errEl) errEl.textContent = "Please enter at least three player names.";
+    if (errEl) errEl.textContent =
+      "Please enter at least three player names.";
     return;
   }
 
   const uniqueNames = new Set(names.map(n => n.toLowerCase()));
   if (uniqueNames.size !== names.length) {
-    if (errEl) errEl.textContent = "Each player must have a unique name.";
+    if (errEl) errEl.textContent =
+      "Each player must have a unique name.";
     return;
   }
 
   const parkData = PARKS[parkName];
 
+  // First-time game creation
   if (!gameState) {
     const players = names.map((name, id) => ({
-  id,
-  name,
-  score: START_POINTS,
-  wins: 0,
-  collected: [],
-  bonusTotal: 0,
-  secretMission: "",
-  secretMissionEarned: false,
-  stats: {
-    correctGuesses: 0,
-    totalRisked: 0,
-    uniqueLands: []
-  },
-  badgeColor: null
-}));
+      id,
+      name,
+      score: START_POINTS,
+      wins: 0,
+      collected: [],
+      bonusTotal: 0,
+      stats: {
+        correctGuesses: 0,
+        totalRisked: 0,
+        uniqueLands: []
+      },
+      badgeColor: null
+    }));
 
     const palette = shuffle(PLAYER_BADGE_COLORS.slice());
     players.forEach(p => {
@@ -639,24 +632,27 @@ function startGameFromSetup() {
       },
       players,
       lands: [
-        ...new Set(parkData.attractions.map(a => a.land).filter(Boolean))
+        ...new Set(
+          parkData.attractions.map(a => a.land).filter(Boolean)
+        )
       ],
       attractions: parkData.attractions,
-      questionUsage: {},
+      questionUsage: {}, // track questions per attraction/category
       ghostPool: [],
       currentRound: null,
       history: [],
       finalBonusesApplied: false
     };
-
-    assignSecretLandMissions();
   } else {
+    // Existing game: update park + players
     const parkAttrs = parkData.attractions;
     Object.assign(gameState.settings, { park: parkName });
     Object.assign(gameState, {
       attractions: parkAttrs,
       lands: [
-        ...new Set(parkAttrs.map(a => a.land).filter(Boolean))
+        ...new Set(
+          parkAttrs.map(a => a.land).filter(Boolean)
+        )
       ]
     });
     gameState.questionUsage ||= {};
@@ -670,27 +666,27 @@ function startGameFromSetup() {
         old.name = name;
         return old;
       }
-
       const newId = existingPlayers.length
         ? Math.max(...existingPlayers.map(p => p.id)) + 1
         : index;
-
       return {
-  id: newId,
-  name,
-  score: gameState.settings?.startingPoints ?? START_POINTS,
-  wins: 0,
-  collected: [],
-  bonusTotal: 0,
-  secretMission: "",
-  secretMissionEarned: false,
-  stats: {
-    correctGuesses: 0,
-    totalRisked: 0,
-    uniqueLands: []
-  },
-  badgeColor: PLAYER_BADGE_COLORS[index % PLAYER_BADGE_COLORS.length] || "#999999"
-};
+        id: newId,
+        name,
+        score:
+          gameState.settings?.startingPoints ?? START_POINTS,
+        wins: 0,
+        collected: [],
+        bonusTotal: 0,
+        stats: {
+          correctGuesses: 0,
+          totalRisked: 0,
+          uniqueLands: []
+        },
+        badgeColor:
+          PLAYER_BADGE_COLORS[
+            index % PLAYER_BADGE_COLORS.length
+          ] || "#999999"
+      };
     });
   }
 
@@ -706,178 +702,17 @@ function startGameFromSetup() {
 
   const startBtn = $("wsd-start-game");
   if (startBtn) {
-    startBtn.textContent = "Resume game";
-  }
-assignSecretLandMissions();
-renderAttractionOptions();
-saveState();
-updatePlayerInputLock();
-showSecretMissionModal();
-}
-let secretMissionIndex = 0;
-let secretMissionPhase = "pass"; // "pass" | "reveal"
-
-function assignSecretLandMissions() {
-  if (!gameState || !Array.isArray(gameState.players) || !Array.isArray(gameState.lands) || !gameState.lands.length) {
-    return;
+    startBtn.textContent = gameState ? "Resume game" : "Start game";
   }
 
-  const lands = Array.from(gameState.lands);
-
-  gameState.players.forEach((p) => {
-    const secretLand = lands[Math.floor(Math.random() * lands.length)];
-    p.secretLand = secretLand;
-    p.secretLandCompleted = false;
-    ensurePlayerStats(p);
-  });
-
+  renderAttractionOptions();
   saveState();
-}
-
-function updateSecretMissionSlide() {
-  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) return;
-
-  const p = gameState.players[secretMissionIndex];
-  if (!p) return;
-
-  const labelEl = document.getElementById("wsd-secret-player-label");
-  const missionEl = document.getElementById("wsd-secret-mission-text");
-  const helperEl = document.getElementById("wsd-secret-helper-text");
-  const btnEl = document.getElementById("wsd-secret-next-btn");
-
-  if (secretMissionPhase === "pass") {
-    if (labelEl) {
-      labelEl.innerHTML = `Pass the phone to <strong>${p.name}</strong>`;
-    }
-
-    if (missionEl) {
-      missionEl.innerHTML = `${p.name}, <strong>tap below</strong> when you're ready to see your secret land.`;
-    }
-
-    if (helperEl) {
-      helperEl.style.display = "block";
-      helperEl.innerHTML = "Make sure no one else is looking.";
-    }
-
-    if (btnEl) {
-      btnEl.textContent = "Reveal secret land";
-    }
-
-    return;
-  }
-
-  if (labelEl) {
-    labelEl.textContent = `${p.name}, your secret land is:`;
-  }
-
-  if (missionEl) {
-    missionEl.textContent = p.secretLand || "Unknown";
-  }
-
-  if (helperEl) {
-    helperEl.style.display = "block";
-    helperEl.textContent =
-      secretMissionIndex >= gameState.players.length - 1
-        ? "When you're done, tap below to begin the first round."
-        : "Memorize it, then pass the phone to the next player.";
-  }
-
-  if (btnEl) {
-    btnEl.textContent =
-      secretMissionIndex >= gameState.players.length - 1
-        ? "Start game"
-        : "Next player";
-  }
-}
-
-function showSecretMissionModal() {
-  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) return;
-
-  secretMissionIndex = 0;
-  secretMissionPhase = "pass";
-  updateSecretMissionSlide();
-
-  const modalEl = document.getElementById("modal-secret-missions");
-  if (!modalEl || typeof bootstrap === "undefined") return;
-
-  const modal =
-    bootstrap.Modal.getInstance(modalEl) ||
-    new bootstrap.Modal(modalEl, {
-      backdrop: "static",
-      keyboard: false
-    });
-
-  modal.show();
-}
-
-function nextSecretMissionPlayer() {
-  if (!gameState || !Array.isArray(gameState.players)) return;
-
-  if (secretMissionPhase === "pass") {
-    secretMissionPhase = "reveal";
-    updateSecretMissionSlide();
-    return;
-  }
-
-  const isLastPlayer = secretMissionIndex >= gameState.players.length - 1;
-
-  if (!isLastPlayer) {
-    secretMissionIndex += 1;
-    secretMissionPhase = "pass";
-    updateSecretMissionSlide();
-    return;
-  }
-
-  const modalEl = document.getElementById("modal-secret-missions");
-
-  if (modalEl && typeof bootstrap !== "undefined") {
-    bootstrap.Modal.getInstance(modalEl)?.hide();
-  }
-
-  startNewRoundCore();
+  updatePlayerInputLock();
   showScreen("setup-question");
-}
-
-function skipSecretMissions() {
-  const modalEl = document.getElementById("modal-secret-missions");
-
-  if (modalEl && typeof bootstrap !== "undefined") {
-    bootstrap.Modal.getInstance(modalEl)?.hide();
-  }
-
   startNewRoundCore();
-  showScreen("setup-question");
+
 }
-function renderSecretMissionProgress() {
-  const el = document.getElementById("wsd-secret-progress");
-  if (!el || !gameState || !Array.isArray(gameState.players)) return;
 
-  let html = "";
-
-  gameState.players.forEach((p) => {
-    const done = !!p.secretLandCompleted;
-    const icon = done ? "✅" : "❌";
-    const missionText = p.secretLand
-      ? `Collect ${p.secretLand}`
-      : "No secret mission assigned yet.";
-
-    html += `
-      <div style="padding:12px 0; border-bottom:1px solid rgba(0,0,0,0.07);">
-        <div class="wsd-score-row">
-          <div>
-            <div class="wsd-score-name">${p.name}</div>
-            <div class="wsd-score-meta" style="margin-top:4px;">${missionText}</div>
-          </div>
-          <div class="wsd-score-value" style="font-size:1.1rem;">
-            ${icon}
-          </div>
-        </div>
-      </div>
-    `;
-  });
-
-  el.innerHTML = html || `<div class="wsd-text-small">No secret missions yet.</div>`;
-}
 // ---------- Question setup ----------
 
 // Pick a question from GAME_QUESTIONS for this attraction
@@ -2206,9 +2041,8 @@ function renderScoresScreen() {
   list.appendChild(footer);
 
   renderBonusProgress();
-renderSecretMissionProgress();
-renderManualAdjustmentsUI();
-maybeRenderCollectionsScreen();
+  renderManualAdjustmentsUI();
+  maybeRenderCollectionsScreen();
 }
 
 // Show progress toward final bonus categories
@@ -2499,9 +2333,6 @@ function computeFinalBonusesAndShow() {
   const players = gameState.players;
   players.forEach(ensurePlayerStats);
 
-   // NEW: secret land missions bonus
-  applySecretLandBonuses();
-
   const maxLand = Math.max(
     0,
     ...players.map(getPlayerUniqueLandCount)
@@ -2639,46 +2470,9 @@ function abandonRound() {
   showScreen("setup-question");
 }
 
-function applySecretLandBonuses() {
-  if (!gameState || !Array.isArray(gameState.players)) return;
-
-  gameState.players.forEach((p) => {
-    ensurePlayerStats(p);
-
-    if (!p.secretLand) {
-      p.secretLandCompleted = false;
-      return;
-    }
-
-    const completed = gameState.history.some(
-      (h) => h.winnerId === p.id && h.land === p.secretLand
-    );
-
-    p.secretLandCompleted = completed;
-    if (completed) {
-      p.score += 3;
-      p.bonusTotal = (p.bonusTotal || 0) + 3;
-
-      // If you want to track breakdown:
-      if (!p.finalBonusBreakdown) {
-        p.finalBonusBreakdown = {};
-      }
-      p.finalBonusBreakdown.secretLand = 3;
-    }
-  });
-}
 
 // ---------- Wire events & bootstrap ----------
-document.addEventListener(
-  "hide.bs.modal",
-  (e) => {
-    const active = document.activeElement;
-    if (active instanceof HTMLElement && e.target.contains(active)) {
-      active.blur();
-    }
-  },
-  true
-);
+
 function wireEvents() {
   debugLog("wireEvents starting");
 
@@ -2719,29 +2513,6 @@ function wireEvents() {
       updatePlayerInputLock();
     }
   );
-
-const secretNextBtn = document.getElementById("wsd-secret-next-btn");
-if (secretNextBtn) {
-  secretNextBtn.addEventListener("click", nextSecretMissionPlayer);
-}
-
-const secretSkipBtn = document.getElementById("wsd-secret-skip-btn");
-if (secretSkipBtn) {
-  secretSkipBtn.addEventListener("click", skipSecretMissions);
-}
-
-function skipSecretMissions() {
-  const modalEl = document.getElementById("modal-secret-missions");
-  const modal =
-    modalEl && typeof bootstrap !== "undefined"
-      ? bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl)
-      : null;
-
-  if (modal) modal.hide();
-
-  startNewRoundCore();
-  showScreen("setup-question");
-}
 
   // Question flow
   $("wsd-attraction-select").addEventListener(
