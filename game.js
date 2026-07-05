@@ -743,16 +743,16 @@ function updateSecretMissionSlide() {
 
   if (secretMissionPhase === "pass") {
     if (labelEl) {
-      labelEl.textContent = `Pass the phone to <strong>${p.name}</strong>`;
+      labelEl.innerHTML = `Pass the phone to <strong>${p.name}</strong>`;
     }
 
     if (missionEl) {
-      missionEl.textContent = `${p.name}, <strong>tap below</strong> when you're ready to see your secret land.`;
+      missionEl.innerHTML = `${p.name}, <strong>tap below</strong> when you're ready to see your secret land.`;
     }
 
     if (helperEl) {
       helperEl.style.display = "block";
-      helperEl.textContent = "Make sure no one else is looking.";
+      helperEl.innerHTML = "Make sure no one else is looking.";
     }
 
     if (btnEl) {
