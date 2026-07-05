@@ -1219,9 +1219,16 @@ function saveAnswerForCurrentPlayer(skip) {
 function pickRandomAnswer() {
   const r = gameState.currentRound;
   const pool = r.answers.slice();
+
+  const ghostAnswer = pool.find(a => a.isGhost);
+  if (ghostAnswer) {
+    pool.push(ghostAnswer);
+  }
+
   const chosenIndex = Math.floor(Math.random() * pool.length);
   r.selectedAnswer = pool[chosenIndex];
 }
+
 
 // Animate “picking” overlay, then call onDone
 function showPickOverlay(onDone) {
