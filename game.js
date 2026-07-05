@@ -1434,11 +1434,15 @@ function getHouseBonusChooser() {
 // - For Ghost, only correct Ghost guessers share the pot.
 function computeRevealAndScoring() {
   const r = gameState.currentRound;
-  const isGhostAnswer = !!r.selectedAnswer.isGhost;
-  const authorId = isGhostAnswer ? null : r.selectedAnswer.playerId;
+  const isGhostAnswer = !!r.selectedAnswer?.isGhost;
+
   const ghostOwnerId = isGhostAnswer
     ? (r.selectedAnswer.ghostOwnerId ?? r.selectedAnswer.playerId)
     : null;
+
+  const authorId = isGhostAnswer
+    ? ghostOwnerId
+    : r.selectedAnswer?.playerId;
 
   const payouts = [];
   let pot = 0;
@@ -1516,6 +1520,7 @@ function computeRevealAndScoring() {
   r.correctGuessers = winners.slice();
   r.wrongGuessCount = 0;
   r.authorBonus = 0;
+  r.ghostGuessBonusAwardedTo = [];
 
   function resolveAmountForWinners(amount, winnerCount) {
     if (!amount || winnerCount === 0) return 0;
@@ -1550,8 +1555,7 @@ function computeRevealAndScoring() {
     if (totalWinnerWeight <= 0) return;
 
     winnerEntries.forEach(entry => {
-      entry.rawShare =
-        (entry.wagerAmount / totalWinnerWeight) * totalPot;
+      entry.rawShare = (entry.wagerAmount / totalWinnerWeight) * totalPot;
       entry.wholeShare = Math.floor(entry.rawShare);
       entry.remainder = entry.rawShare - entry.wholeShare;
     });
@@ -1582,19 +1586,13 @@ function computeRevealAndScoring() {
   }
 
   if (isGhostAnswer) {
-    const ghostSelfOnly =
-      ghostOwnerId != null &&
-      winners.length === 0 &&
-      r.wagers.some(
-        w =>
-          w.playerId === ghostOwnerId &&
-          w.guessedAuthorId === "ghost"
-      );
+    if (winners.length === 0) {
+      r.pot = pot;
 
-    if (winners.length === 0 && !ghostSelfOnly) {
-      r.pot = pot;
-    } else if (winners.length === 0 && ghostSelfOnly) {
-      r.pot = pot;
+      if (ghostOwnerId != null) {
+        const ghostOwnerPayout = payouts.find(pt => pt.playerId === ghostOwnerId);
+        if (ghostOwnerPayout) ghostOwnerPayout.potPart = pot;
+      }
     } else {
       const resolvedPot = resolveAmountForWinners(pot, winners.length);
       distributeWeightedPot(winners, resolvedPot);
@@ -1614,6 +1612,7 @@ function computeRevealAndScoring() {
 
     if (n === 0 && !authorSelfOnly) {
       r.pot = pot;
+
       if (authorId != null) {
         const authorPayout = payouts.find(pt => pt.playerId === authorId);
         if (authorPayout) authorPayout.potPart = pot;
@@ -1624,6 +1623,24 @@ function computeRevealAndScoring() {
       const resolvedPot = resolveAmountForWinners(pot, winners.length);
       distributeWeightedPot(winners, resolvedPot);
       r.pot = resolvedPot;
+    }
+  }
+
+  if (isGhostAnswer) {
+    if (winners.length === 0) {
+      if (ghostOwnerId != null) {
+        const ghostOwnerPayout = payouts.find(pt => pt.playerId === ghostOwnerId);
+        if (ghostOwnerPayout) {
+          ghostOwnerPayout.potPart += 2;
+          r.authorBonus = 2;
+        }
+      }
+    } else {
+      winners.forEach(pid => {
+        const pt = payouts.find(x => x.playerId === pid);
+        if (pt) pt.potPart += 2;
+      });
+      r.ghostGuessBonusAwardedTo = winners.slice();
     }
   }
 
@@ -1727,23 +1744,33 @@ if (r.selectedAnswer?.isGhost) {
 
 function getRevealContext(r) {
   const isGhostAnswer = !!r.selectedAnswer?.isGhost;
-  const author = isGhostAnswer
-    ? null
-    : gameState.players.find(
-        p => p.id === r.selectedAnswer?.playerId
-      );
 
-  const correctGuessers = r.correctGuessers || [];
-  const wagers = r.wagers || [];
-  const payouts = r.payouts || [];
+  const ghostOwner = isGhostAnswer
+    ? gameState.players.find(
+        p => p.id === (r.selectedAnswer?.ghostOwnerId ?? r.selectedAnswer?.playerId)
+      )
+    : null;
+
+  const author = isGhostAnswer
+    ? ghostOwner
+    : gameState.players.find(p => p.id === r.selectedAnswer?.playerId);
+
+  const correctGuessers = Array.isArray(r.correctGuessers) ? r.correctGuessers : [];
+  const wagers = Array.isArray(r.wagers) ? r.wagers : [];
+  const payouts = Array.isArray(r.payouts) ? r.payouts : [];
 
   const authorChoseSelf =
     !isGhostAnswer &&
     !!author &&
     wagers.some(
-      w =>
-        w.playerId === author.id &&
-        parseInt(w.guessedAuthorId, 10) === author.id
+      w => w.playerId === author.id && parseInt(w.guessedAuthorId, 10) === author.id
+    );
+
+  const ghostOwnerChoseGhost =
+    isGhostAnswer &&
+    !!ghostOwner &&
+    wagers.some(
+      w => w.playerId === ghostOwner.id && w.guessedAuthorId === "ghost"
     );
 
   const authorSelfOnly =
@@ -1752,11 +1779,25 @@ function getRevealContext(r) {
     correctGuessers.length === 0 &&
     authorChoseSelf;
 
+  const ghostSelfOnly =
+    isGhostAnswer &&
+    !!ghostOwner &&
+    correctGuessers.length === 0 &&
+    ghostOwnerChoseGhost;
+
   const authorWonRound =
-    !isGhostAnswer &&
     !!author &&
     correctGuessers.length === 0 &&
-    !authorSelfOnly;
+    (
+      isGhostAnswer
+        ? true
+        : !authorSelfOnly
+    );
+
+  const ghostOwnerWonRound =
+    isGhostAnswer &&
+    !!ghostOwner &&
+    correctGuessers.length === 0;
 
   const winnerNames = correctGuessers.length
     ? correctGuessers
@@ -1770,17 +1811,27 @@ function getRevealContext(r) {
     0
   );
 
+  const ghostGuessBonusAwardedTo = Array.isArray(r.ghostGuessBonusAwardedTo)
+    ? r.ghostGuessBonusAwardedTo
+    : [];
+
   return {
     isGhostAnswer,
     author,
+    ghostOwner,
     correctGuessers,
     wagers,
     payouts,
     authorChoseSelf,
+    ghostOwnerChoseGhost,
     authorSelfOnly,
+    ghostSelfOnly,
     authorWonRound,
+    ghostOwnerWonRound,
     winnerNames,
-    potPaidOut
+    potPaidOut,
+    authorBonus: Math.max(0, r.authorBonus || 0),
+    ghostGuessBonusAwardedTo
   };
 }
 
@@ -1788,27 +1839,49 @@ function buildRevealSummaryLines(r) {
   const ctx = getRevealContext(r);
 
   let line1 = "";
+  let line2 = "";
+  let line3 = "";
+
   if (ctx.isGhostAnswer) {
-    line1 = ctx.winnerNames
-      ? `🎉 ${ctx.winnerNames} correctly guessed Ghost.`
-      : "😱 Nobody guessed Ghost — the house wins the Hunny pot.";
+    if (ctx.correctGuessers.length > 0) {
+      line1 = ctx.winnerNames
+        ? `🎉 ${ctx.winnerNames} correctly guessed Ghost.`
+        : "🎉 Ghost was guessed correctly.";
+
+      line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
+
+      line3 =
+        ctx.ghostGuessBonusAwardedTo.length > 0
+          ? `✨ Each correct Ghost guess earned 2 bonus points.`
+          : "";
+    } else {
+      const ghostName = ctx.ghostOwner ? ctx.ghostOwner.name : "The Ghost author";
+      line1 = `👻 Nobody guessed Ghost — ${ghostName} wins the Hunny pot.`;
+      line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
+      line3 =
+        ctx.authorBonus > 0
+          ? `✨ ${ghostName} also earned ${ctx.authorBonus} bonus points for the Ghost answer.`
+          : "";
+    }
   } else if (ctx.authorSelfOnly) {
     line1 =
       "🤔 The author guessed themselves — no one wins the Hunny pot this round.";
+    line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
+    line3 = ctx.author
+      ? `ℹ️ ${ctx.author.name} guessed themselves so no payout was awarded.`
+      : "";
   } else if (ctx.authorWonRound) {
     const name = ctx.author ? ctx.author.name : "The author";
     line1 = `🎯 Author not guessed — ${name} wins the Hunny pot.`;
+    line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
+    line3 = "";
   } else {
     line1 = ctx.winnerNames
       ? `🎉 ${ctx.winnerNames} guessed the author correctly.`
       : "🤔 No winners recorded this round.";
+    line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
+    line3 = "";
   }
-
-  const line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
-
-  const line3 = ctx.authorChoseSelf
-    ? `ℹ️ ${ctx.author ? ctx.author.name : "The author"} guessed themselves so no payout.`
-    : "";
 
   return [line1, line2, line3].filter(Boolean);
 }
@@ -1834,13 +1907,15 @@ function buildRevealRowHTML(r, payout) {
   const netStr = net >= 0 ? `+${net}` : String(net);
 
   const isAuthorRow =
-    !ctx.isGhostAnswer &&
-    ctx.author &&
-    p &&
+    !!ctx.author &&
+    !!p &&
     p.id === ctx.author.id;
 
   const winnerBadge =
-    ctx.authorWonRound && isAuthorRow ? " 👑" : "";
+    ((ctx.isGhostAnswer && ctx.ghostOwnerWonRound && isAuthorRow) ||
+      (!ctx.isGhostAnswer && ctx.authorWonRound && isAuthorRow))
+      ? " 👑"
+      : "";
 
   return `
     <div>
@@ -1848,8 +1923,8 @@ function buildRevealRowHTML(r, payout) {
         ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
       </div>
       <div class="wsd-score-meta">
-              Spent: ${spent} · Earned: ${earned}
-            </div>
+        Spent: ${spent} · Earned: ${earned}
+      </div>
     </div>
     <div class="wsd-score-value ${
       net >= 0 ? "text-success" : "text-danger"
@@ -1902,6 +1977,7 @@ function runRevealAnimation() {
   if (authWrap) authWrap.style.display = "none";
   if (nextWrap) nextWrap.style.display = "none";
   if (confettiEl) confettiEl.innerHTML = "";
+
   renderRevealRows(r, { animate: false });
   const resultsEl = $("wsd-reveal-results");
   if (resultsEl) resultsEl.innerHTML = "";
@@ -1934,7 +2010,7 @@ function runRevealAnimation() {
       authWrap.classList.add("wsd-anim-pop");
     }
 
-    if (!ctx.isGhostAnswer && ctx.correctGuessers.length > 0) {
+    if (ctx.correctGuessers.length > 0) {
       spawnConfetti(confettiEl);
     }
 
@@ -1959,7 +2035,7 @@ function runRevealAnimation() {
     }, (r.payouts || []).length * 120 + 300);
   }, 2100);
 }
-// Simple confetti spawn for reveal/final screens
+
 function spawnConfetti(container) {
   if (!container) return;
   const colors = [
@@ -1977,27 +2053,19 @@ function spawnConfetti(container) {
     Object.assign(dot.style, {
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * -30}px`,
-      background:
-        colors[
-          Math.floor(Math.random() * colors.length)
-        ],
+      background: colors[Math.floor(Math.random() * colors.length)],
       animationDelay: `${Math.random() * 0.6}s`,
-      animationDuration: `${
-        0.9 + Math.random() * 0.6
-      }s`
+      animationDuration: `${0.9 + Math.random() * 0.6}s`
     });
     container.appendChild(dot);
   }
 }
-
-// ---------- Scores, history, final bonuses ----------
 
 function maybeRenderCollectionsScreen() {
   if (typeof window.renderCollectionsScreen === "function") {
     window.renderCollectionsScreen();
   }
 }
-
 // Main scores screen: leaderboard + bonus progress + manual controls
 function renderScoresScreen() {
   const list = $("wsd-scores-list");
@@ -2258,70 +2326,94 @@ function renderHistoryScreen() {
   }
 
   [...gameState.history].reverse().forEach(h => {
-    const author = gameState.players.find(
-      p => p.id === h.authorId
-    );
     const isGhost = !!h.isGhostAnswer;
+    const author = gameState.players.find(p => p.id === h.authorId);
+    const correctGuessers = Array.isArray(h.correctGuessers) ? h.correctGuessers : [];
+    const payouts = Array.isArray(h.payouts) ? h.payouts : [];
+    const manualAdjustments = Array.isArray(h.manualAdjustments) ? h.manualAdjustments : [];
 
     const wrap = document.createElement("div");
     wrap.className = "mb-3 pb-2 border-bottom";
 
-    let html = `<div><strong>Round ${
-      h.roundNumber
-    }</strong>`;
+    const winnerNames = correctGuessers
+      .map(pid => gameState.players.find(p => p.id === pid)?.name)
+      .filter(Boolean)
+      .join(", ");
+
+    const potPaidOut = payouts.reduce(
+      (sum, pt) => sum + Math.max(0, pt.potPart || 0),
+      0
+    );
+
+    let summaryLine = "";
+    if (isGhost) {
+      if (correctGuessers.length > 0) {
+        summaryLine = winnerNames
+          ? `Ghost guessed by: ${winnerNames}`
+          : "Ghost guessed correctly.";
+      } else {
+        summaryLine = author
+          ? `Ghost not guessed — ${author.name} won the round.`
+          : "Ghost not guessed.";
+      }
+    } else {
+      if (correctGuessers.length > 0) {
+        summaryLine = winnerNames
+          ? `Correct guessers: ${winnerNames}`
+          : "Author guessed correctly.";
+      } else {
+        summaryLine = author
+          ? `${author.name} won the round as the author.`
+          : "No correct guessers recorded.";
+      }
+    }
+
+    let html = `<div><strong>Round ${h.roundNumber}</strong>`;
     if (h.park) html += ` — ${h.park}`;
     if (h.land) html += ` · ${h.land}`;
-    if (h.attraction)
-      html += ` · <em>${h.attraction}</em>`;
+    if (h.attraction) html += ` · <em>${h.attraction}</em>`;
     html += `</div>
       <div class="wsd-text-small mt-1">Q: ${h.question}</div>
-      <div class="wsd-text-small mt-1">Answer: &ldquo;${
-        h.selectedAnswerText
-      }&rdquo;</div>
+      <div class="wsd-text-small mt-1">Answer: &ldquo;${h.selectedAnswerText}&rdquo;</div>
       <div class="wsd-text-small mt-1">
-        Author:${
+        Author: ${
           isGhost
-            ? "👻 Ghost"
+            ? `👻 Ghost${author ? ` (${author.name})` : ""}`
             : author
             ? author.name
             : "Unknown"
         }
-      </div>`;
+      </div>
+      <div class="wsd-text-small mt-1">${summaryLine}</div>
+      <div class="wsd-text-small mt-1">Hunny pot paid out: ${potPaidOut} points</div>`;
 
-    h.payouts.forEach(pt => {
-      const pl = gameState.players.find(
-        x => x.id === pt.playerId
-      );
-      const ok = h.correctGuessers.includes(pt.playerId);
-      const deltaStr = `${
-        pt.delta >= 0 ? "+" : ""
-      }${pt.delta}`;
+    payouts.forEach(pt => {
+      const pl = gameState.players.find(x => x.id === pt.playerId);
+      const ok = correctGuessers.includes(pt.playerId);
+      const deltaStr = `${pt.delta >= 0 ? "+" : ""}${pt.delta}`;
       html += `<div class="wsd-text-small mt-1">${
         pl ? pl.name : "?"
       } ${ok ? "✅" : "❌"} (${deltaStr} pts)</div>`;
     });
 
-    if (h.authorBonus > 0) {
+    if (isGhost && h.authorBonus > 0) {
+      html += `<div class="wsd-text-small">Ghost owner bonus: +${h.authorBonus}</div>`;
+    } else if (!isGhost && h.authorBonus > 0) {
       html += `<div class="wsd-text-small">Author bonus: +${h.authorBonus}</div>`;
     }
 
-   // Hunny Pot Hot Round bonus line (if present)
     if (h.hunnyHotBonus && h.hunnyHotBonus > 0) {
       html += `<div class="wsd-text-small">Hunny Pot Hot Round bonus: +${h.hunnyHotBonus} points</div>`;
     }
 
-    (h.manualAdjustments || []).forEach(adj => {
+    manualAdjustments.forEach(adj => {
       if (adj.type === "invertScores") {
         html += `<div class="wsd-text-small">Manual: scores inverted</div>`;
       } else {
-        const pl = gameState.players.find(
-          x => x.id === adj.playerId
-        );
+        const pl = gameState.players.find(x => x.id === adj.playerId);
         html += `<div class="wsd-text-small">Manual: ${
           pl ? pl.name : "?"
-        } ${
-          adj.delta >= 0 ? "+" : ""
-        }${adj.delta}</div>`;
+        } ${adj.delta >= 0 ? "+" : ""}${adj.delta}</div>`;
       }
     });
 
@@ -2423,7 +2515,7 @@ function renderFinalResults() {
       .map(w => w.name)
       .join(
         " & "
-      )} wins! Time to collect that prize!`;
+      )} wins! Time to collect that snack!`;
     banner.classList.remove("wsd-anim-pop");
     void banner.offsetWidth;
     banner.classList.add("wsd-anim-pop");
@@ -2827,20 +2919,32 @@ function rebuildRevealScreen() {
   const r = gameState?.currentRound;
   if (!r?.selectedAnswer) return;
 
-  const isGhost = !!r.selectedAnswer.isGhost;
-  const author = isGhost
-    ? null
-    : gameState.players.find(p => p.id === r.selectedAnswer.playerId);
+  const ctx = getRevealContext(r);
 
   const qEl = $("wsd-reveal-question");
   const ansEl = $("wsd-reveal-answer-text");
   const authWrap = $("wsd-reveal-author-wrap");
   const authEl = $("wsd-reveal-author");
+  const nextWrap = $("wsd-reveal-next-wrap");
+  const countEl = $("wsd-reveal-countdown");
+  const confettiEl = $("wsd-confetti-wrap");
 
   if (qEl) qEl.textContent = r.question || "";
   if (ansEl) ansEl.textContent = r.selectedAnswer.text || "";
-  if (authEl) authEl.textContent = isGhost ? "Ghost" : (author?.name || "Unknown");
+  if (countEl) countEl.textContent = "";
+
+  if (authEl) {
+    authEl.textContent = ctx.isGhostAnswer
+      ? "👻 Ghost"
+      : (ctx.author?.name || "Unknown");
+  }
+
   if (authWrap) authWrap.style.display = "block";
+  if (nextWrap) nextWrap.style.display = "block";
+  if (confettiEl) confettiEl.innerHTML = "";
+
+  renderRevealSummary(r);
+  renderRevealRows(r, { animate: false });
 }
 $("wsd-resume-game-btn")?.addEventListener("click", () => {
   const modalEl = $("modal-resume-game");
