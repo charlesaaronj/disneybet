@@ -1011,7 +1011,6 @@ Object.assign(gameState.currentRound, {
   const maxBonus = playerCount * 2;      // up to double that
 
   // Only allow hot rounds from round 2 onward
-  const roundNumber = gameState.roundNumber || 1;
   const canBeHot =
     playerCount > 0 && roundNumber > 1;
 
