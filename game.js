@@ -714,6 +714,29 @@ function startGameFromSetup() {
 }
 
 function nextSecretMissionPlayer() {
+  if (!gameState || !Array.isArray(gameState.players)) return;
+
+  const isLastPlayer = secretMissionIndex >= gameState.players.length - 1;
+
+  if (isLastPlayer) {
+    const modalEl = document.getElementById("modal-secret-missions");
+
+    if (modalEl && typeof bootstrap !== "undefined") {
+      const modal =
+        bootstrap.Modal.getInstance(modalEl) ||
+        new bootstrap.Modal(modalEl);
+
+      modal.hide();
+    }
+
+    document.body.classList.remove("modal-open");
+    document.body.style.removeProperty("padding-right");
+    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+
+    showScreen("setup-question");
+    return;
+  }
+
   secretMissionIndex += 1;
   updateSecretMissionSlide();
 }
@@ -768,8 +791,6 @@ function showSecretMissionModal() {
 
 
 function updateSecretMissionSlide() {
-  if (!gameState || !gameState.players || !gameState.players.length) return;
-
   const p = gameState.players[secretMissionIndex];
   if (!p) return;
 
@@ -777,16 +798,8 @@ function updateSecretMissionSlide() {
   const missionEl = document.getElementById("wsd-secret-mission-text");
   const btnEl = document.getElementById("wsd-secret-next-btn");
 
-  if (nameEl) {
-    nameEl.textContent = p.name;
-  }
-
-  if (missionEl) {
-    missionEl.textContent = p.secretLand
-      ? "Your secret mission: win an attraction in " + p.secretLand + "."
-      : "Your secret mission has not been assigned yet.";
-  }
-
+  if (nameEl) nameEl.textContent = p.name;
+  if (missionEl) missionEl.textContent = p.secretMission || "";
   if (btnEl) {
     btnEl.textContent =
       secretMissionIndex >= gameState.players.length - 1
@@ -794,7 +807,6 @@ function updateSecretMissionSlide() {
         : "Next player";
   }
 }
-
 
 function nextSecretMissionPlayer() {
   secretMissionIndex += 1;
