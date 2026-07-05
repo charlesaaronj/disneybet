@@ -237,7 +237,6 @@ function ensureStateShape() {
   gameState.settings.minPoints ||= MIN_POINTS;
   gameState.players ||= [];
   gameState.history ||= [];
-  gameState.ghostPool ||= [];
   gameState.questionUsage ||= {};
 
   gameState.players.forEach(p => {
@@ -638,7 +637,6 @@ function startGameFromSetup() {
       ],
       attractions: parkData.attractions,
       questionUsage: {}, // track questions per attraction/category
-      ghostPool: [],
       currentRound: null,
       history: [],
       finalBonusesApplied: false
@@ -831,7 +829,9 @@ function startNewRoundCore() {
   wrongGuessCount: 0,
   authorBonus: 0,
   answerOrder: shuffle(gameState.players.map(p => p.id)),
-  usedGhost: false
+  ghostRound: false,
+  ghostPlayerId: null,
+  ghostBonusAwardedTo: null
 };
 
   saveState();
