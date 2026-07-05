@@ -671,7 +671,7 @@ body {
 
 .modal .modal-body {
   padding: 14px 16px 8px;
-  font-size: 0.9rem;
+  font-size: 0.8rem !important;
   color: var(--wsd-text-main);
   background: var(--wsd-surface-modal);
 }
