@@ -2473,6 +2473,17 @@ function abandonRound() {
 
 // ---------- Wire events & bootstrap ----------
 
+document.addEventListener(
+  "hide.bs.modal",
+  function (e) {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && e.target.contains(active)) {
+      active.blur();
+    }
+  },
+  true
+);
+
 function wireEvents() {
   debugLog("wireEvents starting");
 
