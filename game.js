@@ -704,9 +704,8 @@ function startGameFromSetup() {
   if (startBtn) {
     startBtn.textContent = "Resume game";
   }
-
-renderAttractionOptions();
 assignSecretLandMissions();
+renderAttractionOptions();
 saveState();
 updatePlayerInputLock();
 showSecretMissionModal();
@@ -739,6 +738,7 @@ function updateSecretMissionSlide() {
 
   const labelEl = document.getElementById("wsd-secret-player-label");
   const missionEl = document.getElementById("wsd-secret-mission-text");
+  const helperEl = document.getElementById("wsd-secret-helper-text");
   const btnEl = document.getElementById("wsd-secret-next-btn");
 
   if (secretMissionPhase === "pass") {
@@ -747,7 +747,12 @@ function updateSecretMissionSlide() {
     }
 
     if (missionEl) {
-      missionEl.textContent = `Only ${p.name} should tap below.`;
+      missionEl.textContent = `${p.name}, tap below when you're ready to see your secret land.`;
+    }
+
+    if (helperEl) {
+      helperEl.style.display = "block";
+      helperEl.textContent = "Make sure no one else is looking.";
     }
 
     if (btnEl) {
@@ -765,11 +770,19 @@ function updateSecretMissionSlide() {
     missionEl.textContent = p.secretLand || "Unknown";
   }
 
+  if (helperEl) {
+    helperEl.style.display = "block";
+    helperEl.textContent =
+      secretMissionIndex >= gameState.players.length - 1
+        ? "When you're done, tap below to begin the first round."
+        : "Memorize it, then pass the phone to the next player.";
+  }
+
   if (btnEl) {
     btnEl.textContent =
       secretMissionIndex >= gameState.players.length - 1
         ? "Start game"
-        : "OK, next player";
+        : "Next player";
   }
 }
 
@@ -811,6 +824,17 @@ function nextSecretMissionPlayer() {
     return;
   }
 
+  const modalEl = document.getElementById("modal-secret-missions");
+
+  if (modalEl && typeof bootstrap !== "undefined") {
+    bootstrap.Modal.getInstance(modalEl)?.hide();
+  }
+
+  startNewRoundCore();
+  showScreen("setup-question");
+}
+
+function skipSecretMissions() {
   const modalEl = document.getElementById("modal-secret-missions");
 
   if (modalEl && typeof bootstrap !== "undefined") {
@@ -2652,25 +2676,27 @@ function wireEvents() {
     }
   );
 
-    // Secret missions modal "Next player" button
-  const secretNextBtn = document.getElementById("wsd-secret-next-btn");
+const secretNextBtn = document.getElementById("wsd-secret-next-btn");
 if (secretNextBtn) {
   secretNextBtn.addEventListener("click", nextSecretMissionPlayer);
 }
 
-  const secretSkipBtn = document.getElementById("wsd-secret-skip-btn");
+const secretSkipBtn = document.getElementById("wsd-secret-skip-btn");
 if (secretSkipBtn) {
-  secretSkipBtn.addEventListener("click", () => {
-    const modalEl = document.getElementById("modal-secret-missions");
-    const modal = modalEl && typeof bootstrap !== "undefined"
+  secretSkipBtn.addEventListener("click", skipSecretMissions);
+}
+
+function skipSecretMissions() {
+  const modalEl = document.getElementById("modal-secret-missions");
+  const modal =
+    modalEl && typeof bootstrap !== "undefined"
       ? bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl)
       : null;
 
-    if (modal) modal.hide();
+  if (modal) modal.hide();
 
-    startNewRoundCore();
-    showScreen("setup-question");
-  });
+  startNewRoundCore();
+  showScreen("setup-question");
 }
 
   // Question flow
