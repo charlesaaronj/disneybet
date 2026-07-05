@@ -3056,34 +3056,9 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-    if (scr === "reveal") {
+     if (scr === "reveal") {
     showScreen("reveal");
-
-    const ctx = getRevealContext(r);
-
-    const qEl = $("wsd-reveal-question");
-    const ansEl = $("wsd-reveal-answer-text");
-    const authWrap = $("wsd-reveal-author-wrap");
-    const authEl = $("wsd-reveal-author");
-    const nextWrap = $("wsd-reveal-next-wrap");
-    const countEl = $("wsd-reveal-countdown");
-    const confettiEl = $("wsd-confetti-wrap");
-
-    if (qEl) qEl.textContent = r.question || "";
-    if (ansEl) ansEl.textContent = r.selectedAnswer?.text || "";
-    if (countEl) countEl.textContent = "";
-    if (authEl) {
-      authEl.textContent = ctx.isGhostAnswer
-        ? "👻 Ghost"
-        : (ctx.author?.name || "Unknown");
-    }
-    if (authWrap) authWrap.style.display = "block";
-    if (nextWrap) nextWrap.style.display = "block";
-    if (confettiEl) confettiEl.innerHTML = "";
-
-    renderRevealSummary(r);
-    renderRevealRows(r, { animate: false });
-
+    rebuildRevealScreen();
     return;
   }
 
