@@ -711,8 +711,8 @@ saveState();
 updatePlayerInputLock();
 showSecretMissionModal();
 }
-
 let secretMissionIndex = 0;
+let secretMissionPhase = "pass"; // "pass" | "reveal"
 
 function assignSecretLandMissions() {
   if (!gameState || !Array.isArray(gameState.players) || !Array.isArray(gameState.lands) || !gameState.lands.length) {
@@ -725,7 +725,6 @@ function assignSecretLandMissions() {
     const secretLand = lands[Math.floor(Math.random() * lands.length)];
     p.secretLand = secretLand;
     p.secretLandCompleted = false;
-    p.secretMission = `Your secret land is ${secretLand}. Try to collect it before the game ends.`;
     ensurePlayerStats(p);
   });
 
@@ -742,19 +741,35 @@ function updateSecretMissionSlide() {
   const missionEl = document.getElementById("wsd-secret-mission-text");
   const btnEl = document.getElementById("wsd-secret-next-btn");
 
+  if (secretMissionPhase === "pass") {
+    if (labelEl) {
+      labelEl.textContent = `Pass the phone to ${p.name}`;
+    }
+
+    if (missionEl) {
+      missionEl.textContent = `Only ${p.name} should tap below.`;
+    }
+
+    if (btnEl) {
+      btnEl.textContent = "Reveal secret land";
+    }
+
+    return;
+  }
+
   if (labelEl) {
-    labelEl.textContent = `${p.name}, this is your secret mission:`;
+    labelEl.textContent = `${p.name}, your secret land is:`;
   }
 
   if (missionEl) {
-    missionEl.textContent = p.secretMission || `Your secret land is ${p.secretLand || "unknown"}.`;
+    missionEl.textContent = p.secretLand || "Unknown";
   }
 
   if (btnEl) {
     btnEl.textContent =
       secretMissionIndex >= gameState.players.length - 1
         ? "Start game"
-        : "Next player";
+        : "OK, next player";
   }
 }
 
@@ -762,20 +777,11 @@ function showSecretMissionModal() {
   if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) return;
 
   secretMissionIndex = 0;
+  secretMissionPhase = "pass";
   updateSecretMissionSlide();
 
   const modalEl = document.getElementById("modal-secret-missions");
   if (!modalEl || typeof bootstrap === "undefined") return;
-
-  modalEl.addEventListener(
-    "hidden.bs.modal",
-    () => {
-      document.body.classList.remove("modal-open");
-      document.body.style.removeProperty("padding-right");
-      document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-    },
-    { once: true }
-  );
 
   const modal =
     bootstrap.Modal.getInstance(modalEl) ||
@@ -790,10 +796,17 @@ function showSecretMissionModal() {
 function nextSecretMissionPlayer() {
   if (!gameState || !Array.isArray(gameState.players)) return;
 
+  if (secretMissionPhase === "pass") {
+    secretMissionPhase = "reveal";
+    updateSecretMissionSlide();
+    return;
+  }
+
   const isLastPlayer = secretMissionIndex >= gameState.players.length - 1;
 
   if (!isLastPlayer) {
     secretMissionIndex += 1;
+    secretMissionPhase = "pass";
     updateSecretMissionSlide();
     return;
   }
@@ -801,16 +814,8 @@ function nextSecretMissionPlayer() {
   const modalEl = document.getElementById("modal-secret-missions");
 
   if (modalEl && typeof bootstrap !== "undefined") {
-    const modal =
-      bootstrap.Modal.getInstance(modalEl) ||
-      new bootstrap.Modal(modalEl);
-
-    modal.hide();
+    bootstrap.Modal.getInstance(modalEl)?.hide();
   }
-
-  document.body.classList.remove("modal-open");
-  document.body.style.removeProperty("padding-right");
-  document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
 
   startNewRoundCore();
   showScreen("setup-question");
