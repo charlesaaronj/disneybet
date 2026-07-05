@@ -743,11 +743,11 @@ function updateSecretMissionSlide() {
 
   if (secretMissionPhase === "pass") {
     if (labelEl) {
-      labelEl.textContent = `Pass the phone to ${p.name}`;
+      labelEl.textContent = `Pass the phone to <strong>${p.name}</strong>`;
     }
 
     if (missionEl) {
-      missionEl.textContent = `${p.name}, tap below when you're ready to see your secret land.`;
+      missionEl.textContent = `${p.name}, <strong>tap below</strong> when you're ready to see your secret land.`;
     }
 
     if (helperEl) {
