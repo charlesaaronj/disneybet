@@ -241,16 +241,15 @@ function ensureStateShape() {
   gameState.questionUsage ||= {};
 
   gameState.players.forEach(p => {
-    if (!Array.isArray(p.collected)) p.collected = [];
-    if (typeof p.wins !== "number") p.wins = 0;
-    if (typeof p.bonusTotal !== "number") p.bonusTotal = 0;
+  if (!Array.isArray(p.collected)) p.collected = [];
+  if (typeof p.wins !== "number") p.wins = 0;
+  if (typeof p.bonusTotal !== "number") p.bonusTotal = 0;
+  // Secret mission defaults
+  if (typeof p.secretLand !== "string") p.secretLand = "";
+  if (typeof p.secretLandCompleted !== "boolean") p.secretLandCompleted = false;
 
-    // NEW: secret mission defaults
-    if (typeof p.secretLand !== "string") p.secretLand = null;
-    if (typeof p.secretLandCompleted !== "boolean") p.secretLandCompleted = false;
-
-    ensurePlayerStats(p);
-  });
+  ensurePlayerStats(p);
+});
 
   if (!gameState.currentRound) return;
   const r = gameState.currentRound;
@@ -609,19 +608,21 @@ function startGameFromSetup() {
 
   if (!gameState) {
     const players = names.map((name, id) => ({
-      id,
-      name,
-      score: START_POINTS,
-      wins: 0,
-      collected: [],
-      bonusTotal: 0,
-      stats: {
-        correctGuesses: 0,
-        totalRisked: 0,
-        uniqueLands: []
-      },
-      badgeColor: null
-    }));
+  id,
+  name,
+  score: START_POINTS,
+  wins: 0,
+  collected: [],
+  bonusTotal: 0,
+  secretMission: "",
+  secretMissionEarned: false,
+  stats: {
+    correctGuesses: 0,
+    totalRisked: 0,
+    uniqueLands: []
+  },
+  badgeColor: null
+}));
 
     const palette = shuffle(PLAYER_BADGE_COLORS.slice());
     players.forEach(p => {
@@ -675,20 +676,21 @@ function startGameFromSetup() {
         : index;
 
       return {
-        id: newId,
-        name,
-        score: gameState.settings?.startingPoints ?? START_POINTS,
-        wins: 0,
-        collected: [],
-        bonusTotal: 0,
-        stats: {
-          correctGuesses: 0,
-          totalRisked: 0,
-          uniqueLands: []
-        },
-        badgeColor:
-          PLAYER_BADGE_COLORS[index % PLAYER_BADGE_COLORS.length] || "#999999"
-      };
+  id: newId,
+  name,
+  score: gameState.settings?.startingPoints ?? START_POINTS,
+  wins: 0,
+  collected: [],
+  bonusTotal: 0,
+  secretMission: "",
+  secretMissionEarned: false,
+  stats: {
+    correctGuesses: 0,
+    totalRisked: 0,
+    uniqueLands: []
+  },
+  badgeColor: PLAYER_BADGE_COLORS[index % PLAYER_BADGE_COLORS.length] || "#999999"
+};
     });
   }
 
@@ -853,16 +855,18 @@ function renderSecretMissionProgress() {
   let html = "";
 
   gameState.players.forEach((p) => {
-    const earned = !!p.secretMissionEarned;
-    const icon = earned ? "✅" : "❌";
-    const mission = p.secretMission || "No secret mission assigned yet.";
+    const done = !!p.secretLandCompleted;
+    const icon = done ? "✅" : "❌";
+    const missionText = p.secretLand
+      ? `Collect ${p.secretLand}`
+      : "No secret mission assigned yet.";
 
     html += `
       <div style="padding:12px 0; border-bottom:1px solid rgba(0,0,0,0.07);">
         <div class="wsd-score-row">
           <div>
             <div class="wsd-score-name">${p.name}</div>
-            <div class="wsd-score-meta" style="margin-top:4px;">${mission}</div>
+            <div class="wsd-score-meta" style="margin-top:4px;">${missionText}</div>
           </div>
           <div class="wsd-score-value" style="font-size:1.1rem;">
             ${icon}
