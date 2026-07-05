@@ -1037,6 +1037,8 @@ function proceedToAnswers() {
       titleEl.textContent = "Hunny Pot Hot Round!";
     }
 
+    
+
     try {
       if (modalEl && typeof bootstrap !== "undefined") {
         new bootstrap.Modal(modalEl).show();
@@ -1069,10 +1071,10 @@ function renderAnswerProgress() {
   const playerId = order[idx];
   const player = gameState.players.find(p => p.id === playerId);
 
-  const prog = id("wsd-answer-progress");
-  const label = id("wsd-current-player-label");
-  const ghostWrap = id("wsd-ghost-answer-wrap");
-  const ghostInput = id("wsd-ghost-answer-input");
+  const prog = $("wsd-answer-progress");
+  const label = $("wsd-current-player-label");
+  const ghostWrap = $("wsd-ghost-answer-wrap");
+  const ghostInput = $("wsd-ghost-answer-input");
 
   if (prog) prog.textContent = `Player ${idx + 1} of ${order.length}`;
   if (label) label.textContent = player ? player.name : "Player";
@@ -1087,49 +1089,47 @@ function renderAnswerProgress() {
 // Save the current player’s answer, or “skip” if requested
 function saveAnswerForCurrentPlayer(skip) {
   if (answerSaveLocked) return;
+
   const r = gameState.currentRound;
   const idx = r.answerIndex || 0;
-  const order =
-    r.answerOrder || gameState.players.map(p => p.id);
+  const order = r.answerOrder || gameState.players.map(p => p.id);
   const playerId = order[idx];
-  const player = gameState.players.find(
-    p => p.id === playerId
-  );
+  const player = gameState.players.find(p => p.id === playerId);
 
-  const ansInp = id("wsd-answer-input");
-  const ghostInp = id("wsd-ghost-answer-input");
-  const err = id("wsd-answers-error");
-  
+  const ansInp = $("wsd-answer-input");
+  const ghostInp = $("wsd-ghost-answer-input");
+  const err = $("wsd-answers-error");
+
   const text = ansInp ? ansInp.value.trim() : "";
   const ghostText = ghostInp ? ghostInp.value.trim() : "";
-  
+
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
 
   if (err) err.textContent = "";
 
   if (!skip && !text) {
-    if (err) err.textContent =
-      "Please enter an answer or skip.";
+    if (err) err.textContent = "Please enter an answer or skip.";
     return;
   }
 
-if (!skip) {
-  r.answers.push({
-    playerId: player.id,
-    text,
-    isGhost: false
-  });
-
-  if (isGhostPlayer && ghostText) {
+  if (!skip) {
     r.answers.push({
       playerId: player.id,
-      text: ghostText,
-      isGhost: true
+      text,
+      isGhost: false
     });
+
+    if (isGhostPlayer && ghostText) {
+      r.answers.push({
+        playerId: player.id,
+        text: ghostText,
+        isGhost: true,
+        ghostOwnerId: player.id
+      });
+    }
   }
-}
-if (ansInp) {
+
   const saveBtn = $("wsd-save-answer");
   const skipBtn = $("wsd-skip-player");
 
@@ -1137,79 +1137,80 @@ if (ansInp) {
   if (saveBtn) saveBtn.disabled = true;
   if (skipBtn) skipBtn.disabled = true;
 
-  ansInp.value = "";
+  if (ansInp) ansInp.value = "";
+  if (ghostInp) ghostInp.value = "";
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       if (saveBtn) saveBtn.disabled = false;
       if (skipBtn) skipBtn.disabled = false;
       answerSaveLocked = false;
+
+      r.answerIndex = idx + 1;
+
+      if (r.answerIndex >= order.length) {
+        if (!r.answers.length) {
+          if (err) err.textContent = "No answers were entered. Abandon or go back.";
+          return;
+        }
+
+        const normalized = r.answers
+          .map(a => (a.text || "").trim().toLowerCase())
+          .filter(Boolean);
+
+        const hasDuplicateAnswers =
+          normalized.length !== new Set(normalized).size;
+
+        saveState();
+
+        showPickOverlay(() => {
+          const labelEl = document.querySelector("#screen-select-answer .wsd-form-label");
+          const qEl = $("wsd-select-question");
+          const ansEl = $("wsd-selected-answer");
+          const toWagers = $("wsd-to-wagers");
+          const selectAgain = $("wsd-select-again");
+
+          if (qEl) qEl.textContent = r.question || "";
+
+          if (hasDuplicateAnswers) {
+            if (labelEl) labelEl.textContent = "Round issue";
+            if (ansEl) {
+              ansEl.classList.remove("wsd-anim-pop", "wsd-answer-highlight");
+              void ansEl.offsetWidth;
+              ansEl.textContent = "Oops — two players gave the same answer. Scrap this round and try again!";
+              ansEl.classList.add("wsd-anim-pop");
+            }
+            if (toWagers) toWagers.style.display = "none";
+            if (selectAgain) selectAgain.style.display = "none";
+            showScreen("select-answer");
+            return;
+          }
+
+          pickRandomAnswer();
+          renderSelectAnswerScreen();
+
+          if (labelEl) labelEl.textContent = "A player said";
+          if (toWagers) toWagers.style.display = "";
+          if (selectAgain) selectAgain.style.display = "";
+
+          showScreen("select-answer");
+        });
+      } else {
+        renderAnswerProgress();
+
+        const nextInput = $("wsd-answer-input");
+        if (nextInput) {
+          nextInput.classList.add("wsd-anim-answer-refresh");
+          void nextInput.offsetWidth;
+          setTimeout(() => {
+            nextInput.classList.remove("wsd-anim-answer-refresh");
+          }, 200);
+        }
+
+        saveState();
+      }
     });
   });
-}
-
-r.answerIndex = idx + 1;
-
-  if (r.answerIndex >= order.length) {
-  if (!r.answers.length) {
-    if (err) err.textContent = "No answers were entered. Abandon or go back.";
-    return;
-  }
-
-  const normalized = r.answers
-    .map(a => (a.text || "").trim().toLowerCase())
-    .filter(Boolean);
-
-  const hasDuplicateAnswers = normalized.length !== new Set(normalized).size;
-
-  saveState();
-
-  showPickOverlay(() => {
-    const labelEl = document.querySelector('#screen-select-answer .wsd-form-label');
-    const qEl = $("wsd-select-question");
-    const ansEl = $("wsd-selected-answer");
-    const toWagers = $("wsd-to-wagers");
-    const selectAgain = $("wsd-select-again");
-
-    if (qEl) qEl.textContent = r.question || "";
-
-    if (hasDuplicateAnswers) {
-      if (labelEl) labelEl.textContent = "Round issue";
-      if (ansEl) {
-        ansEl.classList.remove("wsd-anim-pop", "wsd-answer-highlight");
-        void ansEl.offsetWidth;
-        ansEl.textContent = "Oops — two players gave the same answer. Scrap this round and try again!";
-        ansEl.classList.add("wsd-anim-pop");
-      }
-      if (toWagers) toWagers.style.display = "none";
-      if (selectAgain) selectAgain.style.display = "none";
-      showScreen("select-answer");
-      return;
-    }
-
-    pickRandomAnswer();
-    renderSelectAnswerScreen();
-
-    if (labelEl) labelEl.textContent = "A player said";
-    if (toWagers) toWagers.style.display = "";
-    if (selectAgain) selectAgain.style.display = "";
-
-    showScreen("select-answer");
-  });
-} else {
-  renderAnswerProgress();
-  
-  const nextInput = $("wsd-answer-input");
-    if (nextInput) {
-      nextInput.classList.add("wsd-anim-answer-refresh");
-      void nextInput.offsetWidth; // force reflow so animation starts
-      setTimeout(() => {
-        nextInput.classList.remove("wsd-anim-answer-refresh");
-      }, 200);
-    }
-
-  saveState();
-}
 }
 
 // ---------- Random answer selection (with ghost pool) ----------
