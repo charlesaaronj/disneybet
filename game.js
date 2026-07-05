@@ -846,6 +846,34 @@ function skipSecretMissions() {
   startNewRoundCore();
   showScreen("setup-question");
 }
+function renderSecretMissionProgress() {
+  const el = document.getElementById("wsd-secret-progress");
+  if (!el || !gameState || !Array.isArray(gameState.players)) return;
+
+  let html = "";
+
+  gameState.players.forEach((p) => {
+    const earned = !!p.secretMissionEarned;
+    const icon = earned ? "✅" : "❌";
+    const mission = p.secretMission || "No secret mission assigned yet.";
+
+    html += `
+      <div style="padding:12px 0; border-bottom:1px solid rgba(0,0,0,0.07);">
+        <div class="wsd-score-row">
+          <div>
+            <div class="wsd-score-name">${p.name}</div>
+            <div class="wsd-score-meta" style="margin-top:4px;">${mission}</div>
+          </div>
+          <div class="wsd-score-value" style="font-size:1.1rem;">
+            ${icon}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  el.innerHTML = html || `<div class="wsd-text-small">No secret missions yet.</div>`;
+}
 // ---------- Question setup ----------
 
 // Pick a question from GAME_QUESTIONS for this attraction
@@ -2174,8 +2202,9 @@ function renderScoresScreen() {
   list.appendChild(footer);
 
   renderBonusProgress();
-  renderManualAdjustmentsUI();
-  maybeRenderCollectionsScreen();
+renderSecretMissionProgress();
+renderManualAdjustmentsUI();
+maybeRenderCollectionsScreen();
 }
 
 // Show progress toward final bonus categories
