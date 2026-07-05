@@ -275,22 +275,6 @@ body {
 .wsd-btn-primary:active { transform: scale(0.97); }
 .wsd-btn-primary:hover  { filter: brightness(1.06); }
 
-.wsd-btn-primary-modal {
-  display: block;
-  width: auto;
-  border-radius: 999px;
-  border: none;
-  padding: 0.75rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  background: var(--wsd-btn-primary-bg);
-  color: var(--wsd-text-invert);
-  cursor: pointer;
-  min-height: 40px;
-  transition: transform 0.1s, filter 0.1s;
-  letter-spacing: 0.03em;
-  width: 100%;
-}
 .wsd-btn-secondary {
   display: block;
   width: 100%;
@@ -305,6 +289,20 @@ body {
   font-weight: 600;
 }
 .wsd-btn-secondary:hover { background: var(--wsd-surface-badge); }
+
+.wsd-btn-primary-modal {
+  display: block;
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: var(--wsd-btn-primary-bg);
+  color: var(--wsd-text-invert);
+  cursor: pointer;
+  min-height: 48px;
+}
 
 .wsd-btn-danger {
   display: block;
