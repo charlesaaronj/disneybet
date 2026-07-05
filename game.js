@@ -705,67 +705,61 @@ function startGameFromSetup() {
     startBtn.textContent = "Resume game";
   }
 
-  renderAttractionOptions();
-  saveState();
-  updatePlayerInputLock();
-  showScreen("setup-question");
-  startNewRoundCore();
-  showSecretMissionModal();
+renderAttractionOptions();
+assignSecretLandMissions();
+saveState();
+updatePlayerInputLock();
+showSecretMissionModal();
 }
 
-function nextSecretMissionPlayer() {
-  if (!gameState || !Array.isArray(gameState.players)) return;
+let secretMissionIndex = 0;
 
-  const isLastPlayer = secretMissionIndex >= gameState.players.length - 1;
-
-  if (isLastPlayer) {
-    const modalEl = document.getElementById("modal-secret-missions");
-
-    if (modalEl && typeof bootstrap !== "undefined") {
-      const modal =
-        bootstrap.Modal.getInstance(modalEl) ||
-        new bootstrap.Modal(modalEl);
-
-      modal.hide();
-    }
-
-    document.body.classList.remove("modal-open");
-    document.body.style.removeProperty("padding-right");
-    document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-
-    showScreen("setup-question");
-    return;
-  }
-
-  secretMissionIndex += 1;
-  updateSecretMissionSlide();
-}
-
-// -------Assign Secret Land-----------
 function assignSecretLandMissions() {
-  if (!gameState || !Array.isArray(gameState.lands) || !gameState.lands.length) {
+  if (!gameState || !Array.isArray(gameState.players) || !Array.isArray(gameState.lands) || !gameState.lands.length) {
     return;
   }
 
-  const lands = Array.from(gameState.lands); // Set → array
+  const lands = Array.from(gameState.lands);
 
   gameState.players.forEach((p) => {
-    // pick a random land
     const secretLand = lands[Math.floor(Math.random() * lands.length)];
     p.secretLand = secretLand;
     p.secretLandCompleted = false;
+    p.secretMission = `Your secret land is ${secretLand}. Try to collect it before the game ends.`;
     ensurePlayerStats(p);
   });
 
   saveState();
 }
 
-// ----- Secret land mission pass-the-phone -----
+function updateSecretMissionSlide() {
+  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) return;
 
-let secretMissionIndex = 0;
+  const p = gameState.players[secretMissionIndex];
+  if (!p) return;
+
+  const labelEl = document.getElementById("wsd-secret-player-label");
+  const missionEl = document.getElementById("wsd-secret-mission-text");
+  const btnEl = document.getElementById("wsd-secret-next-btn");
+
+  if (labelEl) {
+    labelEl.textContent = `${p.name}, this is your secret mission:`;
+  }
+
+  if (missionEl) {
+    missionEl.textContent = p.secretMission || `Your secret land is ${p.secretLand || "unknown"}.`;
+  }
+
+  if (btnEl) {
+    btnEl.textContent =
+      secretMissionIndex >= gameState.players.length - 1
+        ? "Start game"
+        : "Next player";
+  }
+}
 
 function showSecretMissionModal() {
-  if (!gameState?.players?.length) return;
+  if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) return;
 
   secretMissionIndex = 0;
   updateSecretMissionSlide();
@@ -783,34 +777,43 @@ function showSecretMissionModal() {
     { once: true }
   );
 
-  new bootstrap.Modal(modalEl, {
-    backdrop: "static",
-    keyboard: false
-  }).show();
-}
+  const modal =
+    bootstrap.Modal.getInstance(modalEl) ||
+    new bootstrap.Modal(modalEl, {
+      backdrop: "static",
+      keyboard: false
+    });
 
-
-function updateSecretMissionSlide() {
-  const p = gameState.players[secretMissionIndex];
-  if (!p) return;
-
-  const nameEl = document.getElementById("wsd-secret-player-name");
-  const missionEl = document.getElementById("wsd-secret-mission-text");
-  const btnEl = document.getElementById("wsd-secret-next-btn");
-
-  if (nameEl) nameEl.textContent = p.name;
-  if (missionEl) missionEl.textContent = p.secretMission || "";
-  if (btnEl) {
-    btnEl.textContent =
-      secretMissionIndex >= gameState.players.length - 1
-        ? "Start game"
-        : "Next player";
-  }
+  modal.show();
 }
 
 function nextSecretMissionPlayer() {
-  secretMissionIndex += 1;
-  updateSecretMissionSlide();
+  if (!gameState || !Array.isArray(gameState.players)) return;
+
+  const isLastPlayer = secretMissionIndex >= gameState.players.length - 1;
+
+  if (!isLastPlayer) {
+    secretMissionIndex += 1;
+    updateSecretMissionSlide();
+    return;
+  }
+
+  const modalEl = document.getElementById("modal-secret-missions");
+
+  if (modalEl && typeof bootstrap !== "undefined") {
+    const modal =
+      bootstrap.Modal.getInstance(modalEl) ||
+      new bootstrap.Modal(modalEl);
+
+    modal.hide();
+  }
+
+  document.body.classList.remove("modal-open");
+  document.body.style.removeProperty("padding-right");
+  document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+
+  startNewRoundCore();
+  showScreen("setup-question");
 }
 // ---------- Question setup ----------
 
@@ -2646,19 +2649,24 @@ function wireEvents() {
 
     // Secret missions modal "Next player" button
   const secretNextBtn = document.getElementById("wsd-secret-next-btn");
-  if (secretNextBtn) {
-    secretNextBtn.addEventListener("click", nextSecretMissionPlayer);
-  }
+if (secretNextBtn) {
+  secretNextBtn.addEventListener("click", nextSecretMissionPlayer);
+}
 
-  // Option: trigger missions after starting game
-  const startBtn = document.getElementById("wsd-start-game");
-  if (startBtn) {
-    startBtn.addEventListener("click", () => {
-      startGameFromSetup();
-      // After game is created, show secret missions before first attraction
-      showSecretMissionModal();
-    });
-  }
+  const secretSkipBtn = document.getElementById("wsd-secret-skip-btn");
+if (secretSkipBtn) {
+  secretSkipBtn.addEventListener("click", () => {
+    const modalEl = document.getElementById("modal-secret-missions");
+    const modal = modalEl && typeof bootstrap !== "undefined"
+      ? bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl)
+      : null;
+
+    if (modal) modal.hide();
+
+    startNewRoundCore();
+    showScreen("setup-question");
+  });
+}
 
   // Question flow
   $("wsd-attraction-select").addEventListener(
