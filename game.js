@@ -263,12 +263,19 @@ function ensureStateShape() {
 }
 // Count unique lands collected by a player
 function getPlayerUniqueLandCount(player) {
-  const s = new Set();
+  if (!gameState || !Array.isArray(gameState.attractions)) return 0;
+  if (!player || !Array.isArray(player.collected)) return 0;
+
+  const lands = new Set();
+
   player.collected.forEach(name => {
-    const a = getAttractionByName(name);
-    if (a?.land) s.add(a.land);
+    const attraction = gameState.attractions.find(a => a.name === name);
+    if (attraction && attraction.land) {
+      lands.add(attraction.land);
+    }
   });
-  return s.size;
+
+  return lands.size;
 }
 
 // ---------- Theme application ----------
