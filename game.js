@@ -1442,6 +1442,9 @@ function computeRevealAndScoring() {
   const r = gameState.currentRound;
   const isGhostAnswer = !!r.selectedAnswer.isGhost;
   const authorId = isGhostAnswer ? null : r.selectedAnswer.playerId;
+  const ghostOwnerId = isGhostAnswer
+    ? (r.selectedAnswer.ghostOwnerId ?? r.selectedAnswer.playerId)
+    : null;
 
   const payouts = [];
   let pot = 0;
@@ -1471,15 +1474,12 @@ function computeRevealAndScoring() {
     });
   });
 
-  // Base Hunny Pot: +1 point per player every round
   const baseHunnyPot = gameState.players.length;
   pot += baseHunnyPot;
 
-  // Keep Hot Round bonus the same; add it on top
   const hotBonus = Math.max(0, r.hunnyHotBonus || 0);
   pot += hotBonus;
 
-  // Store for summary/history display
   r.baseHunnyPot = baseHunnyPot;
 
   let winners = [];
@@ -1500,10 +1500,18 @@ function computeRevealAndScoring() {
       .map(w => w.playerId);
   }
 
-  if (!isGhostAnswer && authorId != null) {
-    const uniqueWinners = Array.from(new Set(winners));
+  winners = Array.from(new Set(winners));
 
-    if (uniqueWinners.length === 1 && uniqueWinners[0] === authorId) {
+  if (isGhostAnswer && ghostOwnerId != null) {
+    if (winners.length === 1 && winners[0] === ghostOwnerId) {
+      winners = [];
+    } else {
+      winners = winners.filter(pid => pid !== ghostOwnerId);
+    }
+  }
+
+  if (!isGhostAnswer && authorId != null) {
+    if (winners.length === 1 && winners[0] === authorId) {
       winners = [];
     } else {
       winners = winners.filter(pid => pid !== authorId);
@@ -1580,7 +1588,18 @@ function computeRevealAndScoring() {
   }
 
   if (isGhostAnswer) {
-    if (winners.length === 0) {
+    const ghostSelfOnly =
+      ghostOwnerId != null &&
+      winners.length === 0 &&
+      r.wagers.some(
+        w =>
+          w.playerId === ghostOwnerId &&
+          w.guessedAuthorId === "ghost"
+      );
+
+    if (winners.length === 0 && !ghostSelfOnly) {
+      r.pot = pot;
+    } else if (winners.length === 0 && ghostSelfOnly) {
       r.pot = pot;
     } else {
       const resolvedPot = resolveAmountForWinners(pot, winners.length);
@@ -1622,7 +1641,6 @@ function computeRevealAndScoring() {
 
   applyRoundResults(authorId);
 }
-
 // Apply scoring to players, update collections, ghost pool, and history
 function applyRoundResults(authorId) {
   const r = gameState.currentRound;
@@ -1673,15 +1691,20 @@ function applyRoundResults(authorId) {
     });
   }
 
-if (r.selectedAnswer?.isGhost && r.correctGuessers.length > 0) {
-  const ghostOwner = gameState.players.find(
-    p => p.id === r.selectedAnswer.playerId
-  );
+if (r.selectedAnswer?.isGhost) {
+  const ghostOwnerId =
+    r.selectedAnswer.ghostOwnerId ?? r.selectedAnswer.playerId;
 
-  if (ghostOwner) {
-    ghostOwner.score += 2;
-    ghostOwner.bonusTotal = (ghostOwner.bonusTotal || 0) + 2;
-    r.ghostBonusAwardedTo = ghostOwner.id;
+  if (r.correctGuessers.includes(ghostOwnerId)) {
+    const ghostOwner = gameState.players.find(
+      p => p.id === ghostOwnerId
+    );
+
+    if (ghostOwner) {
+      ghostOwner.score += 2;
+      ghostOwner.bonusTotal = (ghostOwner.bonusTotal || 0) + 2;
+      r.ghostBonusAwardedTo = ghostOwner.id;
+    }
   }
 }
   // History: no house bonus fields anymore
