@@ -289,7 +289,7 @@ body {
   min-height: 40px;
   transition: transform 0.1s, filter 0.1s;
   letter-spacing: 0.03em;
-  max-width: 50%;
+  width: 100%;
 }
 .wsd-btn-secondary {
   display: block;
