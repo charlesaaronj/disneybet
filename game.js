@@ -988,11 +988,22 @@ function proceedToAnswers() {
     return;
   }
 
-  Object.assign(gameState.currentRound, {
-    question: q,
-    answers: [],
-    answerIndex: 0
-  });
+  const roundNumber = gameState.roundNumber || 1;
+const canHaveGhost = roundNumber > 1;
+const isGhostRound = canHaveGhost && Math.random() < 0.2;
+
+const ghostPlayerId = isGhostRound
+  ? gameState.players[Math.floor(Math.random() * gameState.players.length)].id
+  : null;
+
+Object.assign(gameState.currentRound, {
+  question: q,
+  answers: [],
+  answerIndex: 0,
+  ghostRound: isGhostRound,
+  ghostPlayerId,
+  ghostBonusAwardedTo: null
+});
 
   // Roll Hunny Pot Hot Round bonus for this round
   const playerCount = gameState.players.length;
@@ -1049,6 +1060,9 @@ function proceedToAnswers() {
   const ansInp = $("wsd-answer-input");
   if (ansInp) ansInp.value = "";
 
+  const ghostInp = id("wsd-ghost-answer-input");
+  if (ghostInp) ghostInp.value = "";
+
   renderAnswerProgress();
   showScreen("enter-answers");
 }
@@ -1057,20 +1071,24 @@ function proceedToAnswers() {
 // Update the “Player X of Y” indicator and current player label
 function renderAnswerProgress() {
   const r = gameState.currentRound;
-  const idx = r.answerIndex || 0;
-  const order =
-    r.answerOrder || gameState.players.map(p => p.id);
+  const idx = r.answerIndex ?? 0;
+  const order = r.answerOrder || gameState.players.map(p => p.id);
   const playerId = order[idx];
-  const player = gameState.players.find(
-    p => p.id === playerId
-  );
+  const player = gameState.players.find(p => p.id === playerId);
 
-  const prog = $("wsd-answer-progress");
-  const label = $("wsd-current-player-label");
+  const prog = id("wsd-answer-progress");
+  const label = id("wsd-current-player-label");
+  const ghostWrap = id("wsd-ghost-answer-wrap");
+  const ghostInput = id("wsd-ghost-answer-input");
 
-  if (prog) prog.textContent =
-    `Player ${idx + 1} of ${order.length}`;
-  if (label) label.textContent = player ? player.name : "";
+  if (prog) prog.textContent = `Player ${idx + 1} of ${order.length}`;
+  if (label) label.textContent = player ? player.name : "Player";
+
+  const isGhostPlayer =
+    !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
+
+  if (ghostWrap) ghostWrap.style.display = isGhostPlayer ? "block" : "none";
+  if (!isGhostPlayer && ghostInput) ghostInput.value = "";
 }
 
 // Save the current player’s answer, or “skip” if requested
@@ -1085,9 +1103,15 @@ function saveAnswerForCurrentPlayer(skip) {
     p => p.id === playerId
   );
 
-  const ansInp = $("wsd-answer-input");
-  const err = $("wsd-answers-error");
+  const ansInp = id("wsd-answer-input");
+  const ghostInp = id("wsd-ghost-answer-input");
+  const err = id("wsd-answers-error");
+  
   const text = ansInp ? ansInp.value.trim() : "";
+  const ghostText = ghostInp ? ghostInp.value.trim() : "";
+  
+  const isGhostPlayer =
+    !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
 
   if (err) err.textContent = "";
 
@@ -1097,8 +1121,21 @@ function saveAnswerForCurrentPlayer(skip) {
     return;
   }
 
-if (!skip) r.answers.push({ playerId: player.id, text });
+if (!skip) {
+  r.answers.push({
+    playerId: player.id,
+    text,
+    isGhost: false
+  });
 
+  if (isGhostPlayer && ghostText) {
+    r.answers.push({
+      playerId: player.id,
+      text: ghostText,
+      isGhost: true
+    });
+  }
+}
 if (ansInp) {
   const saveBtn = $("wsd-save-answer");
   const skipBtn = $("wsd-skip-player");
@@ -1187,45 +1224,9 @@ r.answerIndex = idx + 1;
 // Pick a random answer from current answers, maybe adding a ghost
 function pickRandomAnswer() {
   const r = gameState.currentRound;
-  const base = r.answers || [];
-  const hasGhostPool =
-    gameState.ghostPool && gameState.ghostPool.length > 0;
-  let pool = base;
-
-  let ghostIndexInPool = -1;
-  let ghostSourceIndex = -1;
-
-  if (hasGhostPool) {
-    const ghostSource =
-      gameState.ghostPool[
-        Math.floor(Math.random() * gameState.ghostPool.length)
-      ];
-    ghostSourceIndex = gameState.ghostPool.indexOf(ghostSource);
-
-    const ghostAnswer = {
-      text: ghostSource.text,
-      isGhost: true,
-      fromRound: ghostSource.fromRound,
-      fromPlayerId: ghostSource.fromPlayerId
-    };
-
-    pool = [...base, ghostAnswer];
-    ghostIndexInPool = pool.length - 1;
-  }
-
+  const pool = r.answers.slice();
   const chosenIndex = Math.floor(Math.random() * pool.length);
-  const chosen = pool[chosenIndex];
-  r.selectedAnswer = chosen;
-
-  // If we used a ghost answer, remove it from the ghost pool
-  if (
-    hasGhostPool &&
-    ghostIndexInPool !== -1 &&
-    chosenIndex === ghostIndexInPool &&
-    ghostSourceIndex !== -1
-  ) {
-    gameState.ghostPool.splice(ghostSourceIndex, 1);
-  }
+  r.selectedAnswer = pool[chosenIndex];
 }
 
 // Animate “picking” overlay, then call onDone
@@ -1324,7 +1325,7 @@ function goToGuessWager() {
     });
 
     // Only add Ghost from round 2 onward
-    if (gameState.roundNumber > 1) {
+    if (gameState.currentRound?.ghostRound) {
       const ghostOpt = document.createElement("option");
       ghostOpt.value = "ghost";
       ghostOpt.textContent = "Ghost";
@@ -1678,6 +1679,17 @@ function applyRoundResults(authorId) {
     });
   }
 
+if (r.selectedAnswer?.isGhost && r.correctGuessers.length > 0) {
+  const ghostOwner = gameState.players.find(
+    p => p.id === r.selectedAnswer.playerId
+  );
+
+  if (ghostOwner) {
+    ghostOwner.score += 2;
+    ghostOwner.bonusTotal = (ghostOwner.bonusTotal || 0) + 2;
+    r.ghostBonusAwardedTo = ghostOwner.id;
+  }
+}
   // History: no house bonus fields anymore
   gameState.history.push({
     roundNumber: gameState.roundNumber,
@@ -1700,23 +1712,6 @@ function applyRoundResults(authorId) {
     hunnyHotBonus: r.hunnyHotBonus || 0,
     isGhostAnswer: !!r.selectedAnswer.isGhost
   });
-
-  // Add unused answers from this round into ghost pool
-  try {
-    gameState.ghostPool ||= [];
-    const rAnswers = r.answers || [];
-    if (r.selectedAnswer) {
-      rAnswers
-        .filter(a => a.text && a !== r.selectedAnswer)
-        .forEach(a => {
-          gameState.ghostPool.push({
-            text: a.text,
-            fromRound: gameState.roundNumber,
-            fromPlayerId: a.playerId
-          });
-        });
-    }
-  } catch (e) {}
 }
 
 function getRevealContext(r) {
@@ -2929,6 +2924,7 @@ function rebuildRoundScreenFromState() {
     const ansInp = $("wsd-answer-input");
     if (enterQ) enterQ.textContent = r.question || "";
     if (ansInp) ansInp.value = "";
+    if (ghostInp) ghostInp.value = "";    
     renderAnswerProgress();
     showScreen("enter-answers");
     return;
