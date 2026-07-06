@@ -1143,6 +1143,7 @@ function saveAnswerForCurrentPlayer(skip) {
     return;
   }
   if (!skip && isGhostPlayer && !ghostText) {
+  renderAnswerProgress();
   if (err) err.textContent = "Please enter both your answer and your Ghost answer.";
   return;
 }
