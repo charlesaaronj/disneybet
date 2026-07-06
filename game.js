@@ -1499,6 +1499,13 @@ function computeRevealAndScoring() {
     ? ghostOwnerId
     : r.selectedAnswer?.playerId;
 
+  const ghostOwnerChoseGhost =
+  isGhostAnswer &&
+  ghostOwnerId != null &&
+  r.wagers.some(
+    w => w.playerId === ghostOwnerId && w.guessedAuthorId === "ghost"
+  );
+
   const payouts = [];
   let pot = 0;
 
@@ -1644,7 +1651,7 @@ function computeRevealAndScoring() {
     if (winners.length === 0 && !ghostOwnerChoseGhost) {
       r.pot = pot;
 
-      if (ghostOwnerId != null) {
+      if (ghostOwnerId != null && !ghostOwnerChoseGhost) {
         const ghostOwnerPayout = payouts.find(pt => pt.playerId === ghostOwnerId);
         if (ghostOwnerPayout) ghostOwnerPayout.potPart = pot;
       }
@@ -1684,7 +1691,7 @@ function computeRevealAndScoring() {
   if (isGhostAnswer) {
     if (winners.length === 0 && !ghostOwnerChoseGhost
 ) {
-      if (ghostOwnerId != null) {
+      if (ghostOwnerId != null && !ghostOwnerChoseGhost) {
         const ghostOwnerPayout = payouts.find(pt => pt.playerId === ghostOwnerId);
         if (ghostOwnerPayout) {
           ghostOwnerPayout.potPart += 2;
