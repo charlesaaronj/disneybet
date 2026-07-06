@@ -805,7 +805,6 @@ function startNewRoundCore() {
     gameState.roundNumber = Math.max(1, gameState.roundNumber || 1);
   } else {
     gameState.roundNumber += 1;
-  }
 } gameState.currentRound = {
   attraction: null,
   question: "",
