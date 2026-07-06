@@ -2548,24 +2548,26 @@ function renderFinalResults() {
   const topWins = sorted[0]?.wins ?? 0;
   const winners = sorted.filter(p => p.score === topScore && p.wins === topWins);
 
-  const banner = id("wsd-winner-banner");
+  const banner = document.getElementById("wsd-winner-banner");
   if (banner) {
     banner.innerHTML =
       winners.map(w => w.name).join(" & ") +
-      (winners.length > 1 ? " win! Time to collect those snacks!" : " wins! Time to collect that snack!");
+      (winners.length > 1
+        ? " win! Time to collect those snacks!"
+        : " wins! Time to collect that snack!");
 
     banner.classList.remove("wsd-anim-pop");
     void banner.offsetWidth;
     banner.classList.add("wsd-anim-pop");
   }
 
-  const confetti = id("wsd-confetti-wrap-end");
+  const confetti = document.getElementById("wsd-confetti-wrap-end");
   if (confetti) {
     confetti.innerHTML = "";
     spawnEndgameConfetti(confetti);
   }
 
-  const c = id("wsd-final-results");
+  const c = document.getElementById("wsd-final-results");
   if (!c) return;
 
   c.innerHTML = "";
