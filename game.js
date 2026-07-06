@@ -1919,21 +1919,22 @@ function buildRevealSummaryLines(r) {
           ? `✨ Each correct Ghost guess earned 2 bonus points.`
           : "";
     } else {
-  const ghostName = ctx.ghostOwner ? ctx.ghostOwner.name : "The Ghost author";
+      const ghostName = ctx.ghostOwner ? ctx.ghostOwner.name : "The Ghost author";
 
-  if (ctx.ghostSelfOnly) {
-    line1 = `👻 ${ghostName} guessed Ghost themselves — no one wins the Hunny pot this round.`;
-    line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
-    line3 = `ℹ️ ${ghostName} was the Ghost author, but no payout was awarded.`;
-  } else {
-    line1 = `👻 Nobody guessed Ghost — ${ghostName} wins the Hunny pot.`;
-    line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
-    line3 =
-      ctx.authorBonus > 0
-        ? `✨ ${ghostName} also earned ${ctx.authorBonus} bonus points for the Ghost answer.`
-        : "";
-  }
-} else if (ctx.authorSelfOnly) {
+      if (ctx.ghostSelfOnly) {
+        line1 = `👻 ${ghostName} guessed Ghost themselves — no one wins the Hunny pot this round.`;
+        line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
+        line3 = `ℹ️ ${ghostName} was the Ghost author, but no payout was awarded.`;
+      } else {
+        line1 = `👻 Nobody guessed Ghost — ${ghostName} wins the Hunny pot.`;
+        line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
+        line3 =
+          ctx.authorBonus > 0
+            ? `✨ ${ghostName} also earned ${ctx.authorBonus} bonus points for the Ghost answer.`
+            : "";
+      }
+    }
+  } else if (ctx.authorSelfOnly) {
     line1 =
       "🤔 The author guessed themselves — no one wins the Hunny pot this round.";
     line2 = `🍯 Hunny pot paid out: ${ctx.potPaidOut} points`;
@@ -1955,7 +1956,6 @@ function buildRevealSummaryLines(r) {
 
   return [line1, line2, line3].filter(Boolean);
 }
-
 function renderRevealSummary(r) {
   const authorLineSummary = $("wsd-no-correct-author-line");
   if (!authorLineSummary) return;
