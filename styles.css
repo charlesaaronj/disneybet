@@ -788,4 +788,121 @@ body {
   50%  { opacity: 1;    transform: scale(1.005); }
   100% { opacity: 1;    transform: scale(1); }
 }
+.wsd-endgame-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.wsd-endgame-spotlight {
+  position: relative;
+  text-align: center;
+  padding: 1.2rem 1rem 1.1rem;
+  margin-bottom: 1rem;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.35), transparent 55%),
+    linear-gradient(135deg, #ffd76a 0%, #d4a017 55%, #b57f00 100%);
+  box-shadow: 0 14px 34px rgba(120, 70, 0, 0.22);
+  color: #fffdf7;
+}
+
+.wsd-endgame-crown {
+  font-size: 2.1rem;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+  animation: wsdFloatCrown 1.8s ease-in-out infinite;
+}
+
+.wsd-winner-banner {
+  background: transparent;
+  box-shadow: none;
+  margin-bottom: 0.35rem;
+  padding: 0;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.18);
+}
+
+.wsd-endgame-subtitle {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.95;
+  margin-bottom: 0.45rem;
+}
+
+.wsd-endgame-score {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2.3rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+
+.wsd-endgame-reason {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  max-width: 26ch;
+  margin: 0 auto;
+  color: rgba(255,255,255,0.96);
+}
+
+.wsd-confetti-wrap-end {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.wsd-final-podium {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 0.55rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.wsd-podium-card {
+  border-radius: 16px;
+  padding: 0.75rem 0.55rem;
+  text-align: center;
+  border: 1px solid var(--wsd-border-gold-soft);
+  background: linear-gradient(180deg, #fffdf7, #fff5dd);
+  box-shadow: var(--wsd-shadow-soft);
+}
+
+.wsd-podium-card.first {
+  min-height: 132px;
+  transform: translateY(-6px);
+  border-color: var(--wsd-border-gold);
+  box-shadow: var(--wsd-shadow-gold);
+}
+
+.wsd-podium-place {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wsd-text-softer);
+  font-weight: 800;
+}
+
+.wsd-podium-name {
+  font-weight: 800;
+  color: var(--wsd-text-main);
+  margin-top: 0.25rem;
+}
+
+.wsd-podium-score {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--wsd-primary);
+  margin-top: 0.25rem;
+}
+
+@keyframes wsdFloatCrown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
 
