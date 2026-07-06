@@ -505,17 +505,26 @@
 
     <!-- ===== SCREEN: GAME_END ===== -->
     <section id="screen-game-end" class="wsd-screen">
-      <div class="wsd-card">
-        <div id="wsd-winner-banner" class="wsd-winner-banner"></div>
-        <div id="wsd-confetti-wrap-end" class="wsd-confetti-wrap"></div>
-        <div class="wsd-section-title">Final results</div>
-        <div id="wsd-final-results" class="mb-3"></div>
-        <div class="wsd-actions-stack">
-          <button id="wsd-view-history-end" class="wsd-btn-secondary" type="button">View round history</button>
-          <button id="wsd-play-again" class="wsd-btn-primary" type="button">Play again</button>
-        </div>
-      </div>
-    </section>
+  <div class="wsd-card wsd-endgame-card">
+    <div id="wsd-confetti-wrap-end" class="wsd-confetti-wrap wsd-confetti-wrap-end"></div>
+
+    <div id="wsd-endgame-spotlight" class="wsd-endgame-spotlight">
+      <div class="wsd-endgame-crown">👑</div>
+      <div id="wsd-winner-banner" class="wsd-winner-banner"></div>
+      <div id="wsd-winner-subtitle" class="wsd-endgame-subtitle"></div>
+      <div id="wsd-winner-score" class="wsd-endgame-score"></div>
+      <div id="wsd-winner-reason" class="wsd-endgame-reason"></div>
+    </div>
+
+    <div class="wsd-section-title">Final results</div>
+    <div id="wsd-final-results" class="mb-3"></div>
+
+    <div class="wsd-actions-stack">
+      <button id="wsd-view-history-end" class="wsd-btn-secondary" type="button">View round history</button>
+      <button id="wsd-play-again" class="wsd-btn-primary" type="button">Play again</button>
+    </div>
+  </div>
+</section>
 
     <!-- ===== SCREEN: HISTORY ===== -->
     <section id="screen-history" class="wsd-screen">
