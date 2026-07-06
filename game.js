@@ -1062,6 +1062,8 @@ function proceedToAnswers() {
 // ---------- Answers flow ----------
 
 // Update the “Player X of Y” indicator and current player label
+let ghostFieldTimer = null;
+
 function renderAnswerProgress() {
   const r = gameState.currentRound;
   const idx = r.answerIndex ?? 0;
@@ -1080,12 +1082,42 @@ function renderAnswerProgress() {
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
 
-  if (ghostWrap) ghostWrap.style.display = isGhostPlayer ? "block" : "none";
-  if (!isGhostPlayer && ghostInput) ghostInput.value = "";
+  if (ghostFieldTimer) {
+    clearTimeout(ghostFieldTimer);
+    ghostFieldTimer = null;
+  }
+
+  if (ghostWrap) ghostWrap.style.display = "none";
+
+  if (!isGhostPlayer) {
+    if (ghostInput) ghostInput.value = "";
+    return;
+  }
+
+  ghostFieldTimer = setTimeout(() => {
+    const currentRound = gameState?.currentRound;
+    const currentIdx = currentRound?.answerIndex ?? 0;
+    const currentOrder = currentRound?.answerOrder || gameState.players.map(p => p.id);
+    const currentPlayerId = currentOrder[currentIdx];
+
+    const stillGhostPlayer =
+      !!currentRound?.ghostRound &&
+      currentPlayerId === currentRound?.ghostPlayerId;
+
+    if (stillGhostPlayer && ghostWrap) {
+      ghostWrap.style.display = "block";
+    }
+  }, 5000);
 }
 
 // Save the current player’s answer, or “skip” if requested
 function saveAnswerForCurrentPlayer(skip) {
+
+  if (ghostFieldTimer) {
+  clearTimeout(ghostFieldTimer);
+  ghostFieldTimer = null;
+}
+  
   if (answerSaveLocked) return;
 
   const r = gameState.currentRound;
