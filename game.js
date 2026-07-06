@@ -2544,89 +2544,43 @@ function renderFinalResults() {
     b.score === a.score ? b.wins - a.wins : b.score - a.score
   );
 
-  const topScore = sorted[0].score;
-  const topWins = sorted[0].wins;
+  const topScore = sorted[0]?.score ?? 0;
+  const topWins = sorted[0]?.wins ?? 0;
   const winners = sorted.filter(p => p.score === topScore && p.wins === topWins);
 
   const banner = id("wsd-winner-banner");
-  const subtitle = id("wsd-winner-subtitle");
-  const scoreEl = id("wsd-winner-score");
-  const reasonEl = id("wsd-winner-reason");
-  const confetti = id("wsd-confetti-wrap-end");
-  const c = id("wsd-final-results");
-
   if (banner) {
-    banner.textContent =
-      winners.length === 1
-        ? `${winners[0].name} wins!`
-        : `${winners.map(w => w.name).join(" & ")} win!`;
+    banner.innerHTML =
+      winners.map(w => w.name).join(" & ") +
+      (winners.length > 1 ? " win! Time to collect those snacks!" : " wins! Time to collect that snack!");
+
     banner.classList.remove("wsd-anim-pop");
     void banner.offsetWidth;
     banner.classList.add("wsd-anim-pop");
   }
 
-  if (subtitle) {
-    subtitle.textContent = winners.length === 1 ? "Queue Line Champion" : "Co-Champions";
-  }
-
-  if (scoreEl) {
-    scoreEl.textContent = `${topScore} points`;
-  }
-
-  if (reasonEl) {
-    if (winners.length === 1) {
-      const w = winners[0];
-      const bonus = w.bonusTotal || 0;
-      reasonEl.textContent =
-        bonus > 0
-          ? `Finished with ${w.wins} correct wins and ${bonus} end-game bonus points.`
-          : `Finished with ${w.wins} correct wins and the top final score of the day.`;
-    } else {
-      reasonEl.textContent = `They finished tied on points and wins, so the snack victory is shared.`;
-    }
-  }
-
+  const confetti = id("wsd-confetti-wrap-end");
   if (confetti) {
     confetti.innerHTML = "";
-    spawnEndgameConfetti(confetti);
-    setTimeout(() => spawnEndgameConfetti(confetti), 450);
+    spawnConfetti(confetti);
   }
 
+  const c = id("wsd-final-results");
   if (!c) return;
+
   c.innerHTML = "";
-
-  const podium = document.createElement("div");
-  podium.className = "wsd-final-podium";
-
-  const podiumPlayers = [sorted[1], sorted[0], sorted[2]].filter(Boolean);
-  const podiumPlaces = ["Second", "First", "Third"];
-
-  podiumPlayers.forEach((p, i) => {
-    const card = document.createElement("div");
-    card.className = `wsd-podium-card ${podiumPlaces[i].toLowerCase() === "first" ? "first" : ""}`;
-    card.innerHTML = `
-      <div class="wsd-podium-place">${podiumPlaces[i]}</div>
-      <div class="wsd-podium-name">${p.name}</div>
-      <div class="wsd-podium-score">${p.score}</div>
-      <div class="wsd-text-small">Wins ${p.wins}</div>
-    `;
-    podium.appendChild(card);
-  });
-
-  c.appendChild(podium);
 
   sorted.forEach((p, i) => {
     const row = document.createElement("div");
     row.className = "wsd-score-row wsd-anim-fade-up";
     row.style.animationDelay = `${i * 0.08}s`;
 
-    const bd = p.finalBonusBreakdown || {};
-    const bonusBits = [
-      bd.topLandCollector ? `🏞 +${bd.topLandCollector}` : "",
-      bd.topAttractionCollector ? `🎢 +${bd.topAttractionCollector}` : "",
-      bd.bestGuesser ? `🎯 +${bd.bestGuesser}` : "",
-      bd.mostRiskyPlayer ? `🔥 +${bd.mostRiskyPlayer}` : ""
-    ].filter(Boolean).join(" ");
+    const bd = p.finalBonusBreakdown || {
+      topLandCollector: 0,
+      topAttractionCollector: 0,
+      bestGuesser: 0,
+      mostRiskyPlayer: 0
+    };
 
     row.innerHTML = `
       <div>
@@ -2634,7 +2588,12 @@ function renderFinalResults() {
         <div class="wsd-score-meta">
           Wins ${p.wins} · Attractions ${p.collected.length} · Lands ${getPlayerUniqueLandCount(p)} · Bonus ${p.bonusTotal || 0}
         </div>
-        ${bonusBits ? `<div class="wsd-text-small" style="margin-top:4px;">${bonusBits}</div>` : ""}
+        <div class="wsd-text-small">
+          ${bd.topLandCollector ? "🏞 +" + bd.topLandCollector + " " : ""}
+          ${bd.topAttractionCollector ? "🎢 +" + bd.topAttractionCollector + " " : ""}
+          ${bd.bestGuesser ? "🎯 +" + bd.bestGuesser + " " : ""}
+          ${bd.mostRiskyPlayer ? "🔥 +" + bd.mostRiskyPlayer : ""}
+        </div>
       </div>
       <div class="wsd-score-value">${p.score}</div>
     `;
