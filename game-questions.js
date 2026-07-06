@@ -12,7 +12,6 @@ const GAME_QUESTIONS = {
         "What cast member role on {{attraction}} would you least like to have?",
         "Starting with \"Back when I worked {{attraction}}…\", what imaginary story do you tell?",
         "What location on {{attraction}} would you most want to do a podcast from?",
-
         "What outlandish activity would you love to do on {{attraction}}?",
         "If you were asked to make {{attraction}} sad, what would you change?",
         "If you were asked to make {{attraction}} scary, what would you change?",
@@ -20,7 +19,6 @@ const GAME_QUESTIONS = {
         "What's your absolute hottest take about {{attraction}}?",
         "What single change to {{attraction}} do you think would make fans furious?",
         "If you could delete one annoyance from {{attraction}}, what would it be?",
-
         "If {{attraction}} crossed over with any other IP, what mash‑up would you create?",
         "What character from another attraction in {{land}} would you bring to {{attraction}}?",
         "If {{attraction}} crossed over with any other attraction, what mash‑up would you create?",
@@ -30,7 +28,6 @@ const GAME_QUESTIONS = {
         "If you could drop any other character into {{attraction}}, who joins the story?",
         "Where in {{attraction}} would you add the character YOU to the attraction?",
         "What other attraction do you rank exactly the same as this one?",
-
         "If you could turn {{attraction}} into a totally different attraction type, what would it become?",
         "How would you change the beginning of {{attraction}}?",
         "How would you change the ending of {{attraction}}?",
@@ -42,7 +39,6 @@ const GAME_QUESTIONS = {
         "Which effect in {{attraction}} really needs an upgrade?",
         "Which effect in {{attraction}} impresses you the most?",
         "Which effect in {{attraction}} looks the fakest to you?",
-
         "If {{attraction}} were a roadside attraction, what would the big billboard outside say?",
         "If {{attraction}} became a stage musical, what would its title be?",
         "If {{attraction}} were a 90s sitcom, what would its title be?",
@@ -51,20 +47,17 @@ const GAME_QUESTIONS = {
         "What quote could you write that sums up {{attraction}}?",
         "What fake company would be the funniest sponsor for {{attraction}}?",
         "What fake sponsor line would you add to {{attraction}}?",
-
         "If you built a themed eatery next to {{attraction}}, what would you call it?",
         "What's your ideal snack to eat right before or after riding {{attraction}}?",
         "What would you serve at a snack stand based on {{attraction}}?",
         "You're designing a quick‑service spot beside {{attraction}} - what's the signature dish?",
         "If {{attraction}} got its own fragrance, what would it be called?",
         "Describe the smell of {{attraction}} in three words or less.",
-
         "What's the strongest real memory you have from your first time on {{attraction}}?",
         "What moment from {{attraction}} do you think you'll still remember in 20 years?",
         "What's the first single word that comes to mind when you step off {{attraction}}?",
         "When do you feel the most completely immersed on {{attraction}}?",
         "When does the illusion totally fall apart for you on {{attraction}}?",
-
         "What detail in {{attraction}} do you love pointing out to people?",
         "What little element in {{attraction}} do you think almost everyone misses?",
         "What's your favorite real trivia fact about {{attraction}}?",
@@ -72,14 +65,12 @@ const GAME_QUESTIONS = {
         "What's your favorite hidden Mickey in {{attraction}}, real or one you just made up?",
         "Where would you hide a hidden Mickey inside {{attraction}}?",
         "What easter egg would you add to {{attraction}}?",
-
         "If {{attraction}} were a song, what would its title be?",
         "What melody or musical moment from {{attraction}} gets stuck in your head all day?",
         "Whose voice performance in {{attraction}} is the absolute best?",
         "What would you name a band that only sings about {{attraction}}?",
         "What would you call a pop single that's inspired by {{attraction}}?",
         "What celebrity would you get to narrate {{attraction}}?",
-
         "Which character from {{attraction}} deserves their own spin‑off attraction?",
         "Which underused character in {{attraction}} needs way more spotlight?",
         "Which existing character in {{attraction}} would you remove entirely?",
@@ -88,7 +79,6 @@ const GAME_QUESTIONS = {
         "Which animatronic in {{attraction}} deserves an entire scene built around them?",
         "If {{attraction}} were a fable, what moral would appear at the end?",
         "Write a one‑line poem about {{attraction}}.",
-
         "What do you like the most about the preshow for {{attraction}}?",
         "If you could completely swap out the preshow for {{attraction}}, what would happen instead?",
         "What simple audience participation bit would you add to the preshow for {{attraction}}?",
@@ -97,7 +87,6 @@ const GAME_QUESTIONS = {
         "What queue detail in {{attraction}} do you always look for every time?",
         "If you could completely swap out the post‑show for {{attraction}}, what would you put there instead?",
         "If the post‑show for {{attraction}} became a mini museum, what's the first {{land}} artifact you'd display?",
-
         "What's the single best moment inside {{attraction}}?",
         "What's the weakest scene in {{attraction}} that you'd call out?",
         "What's the one moment in {{attraction}} you always look forward to?",
@@ -108,7 +97,6 @@ const GAME_QUESTIONS = {
         "What part of {{attraction}} always drags and feels too long?",
         "What part of {{attraction}} should hang just a little bit longer?",
         "What's the best part of {{attraction}} to get evacuated from?",
-
         "How does {{attraction}} stack up against the other attractions in {{land}}?",
         "How does {{attraction}} stack up against the other attractions in {{park}}?",
         "How does {{attraction}} stack up against attractions in other parks?",
@@ -117,14 +105,12 @@ const GAME_QUESTIONS = {
         "Where does {{attraction}} rank among the attractions in {{land}} and why?",
         "What's the longest you would wait in line for {{attraction}}?",
         "What's the shortest you have ever waited for {{attraction}}?",
-
         "What classic element in {{attraction}} should never, ever be changed?",
         "What classic element in {{attraction}} do you think should finally go?",
         "What 10‑second moment from {{attraction}} would make the best viral clip?",
         "What single photo from {{attraction}} would you enter in a photo contest?",
         "If someone stole a prop from {{attraction}}, what would you replace it with?",
         "If someone stole a prop from {{attraction}}, what prop from {{land}} would you put in its place?",
-
         "What location in all of {{park}} would you most want to do a podcast from?",
         "What three words best describe the overall vibe of {{park}}?",
         "If {{park}} were a fable, what moral would appear at the end?",
@@ -138,7 +124,6 @@ const GAME_QUESTIONS = {
         "What's the first thing you do every single time you walk into {{park}}?",
         "What's the last thing you always do before leaving {{park}}?",
         "What moment in {{park}} made you feel like a kid again?",
-
         "You're being chased by a villain from {{park}} — where do you hide?",
         "A character has gone rogue in {{park}} — which attraction do you barricade yourself inside?",
         "You have to survive a night locked inside {{park}} — what's your HQ?",
@@ -147,7 +132,6 @@ const GAME_QUESTIONS = {
         "Which character in {{park}} would be the worst to get stuck next to on every ride?",
         "Which {{park}} character would you most want as your tour guide for the day?",
         "Which character from {{park}} do you think would be the most chaotic theme park guest?",
-
         "What's your absolute hottest take about {{park}}?",
         "What single change to {{park}} do you think would make fans furious?",
         "What classic element in {{park}} should never, ever be changed?",
