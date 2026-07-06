@@ -1641,7 +1641,7 @@ function computeRevealAndScoring() {
   }
 
   if (isGhostAnswer) {
-    if (winners.length === 0) {
+    if (winners.length === 0 && !ghostOwnerChoseGhost) {
       r.pot = pot;
 
       if (ghostOwnerId != null) {
@@ -1682,7 +1682,8 @@ function computeRevealAndScoring() {
   }
 
   if (isGhostAnswer) {
-    if (winners.length === 0) {
+    if (winners.length === 0 && !ghostOwnerChoseGhost
+) {
       if (ghostOwnerId != null) {
         const ghostOwnerPayout = payouts.find(pt => pt.playerId === ghostOwnerId);
         if (ghostOwnerPayout) {
