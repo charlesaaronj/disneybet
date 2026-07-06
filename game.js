@@ -5,9 +5,9 @@
 const APP_VERSION = "1.5";
 
 // ---------- Small DOM + utility helpers ----------
-const id = (x) => document.getElementById(x);
-const sel = (s, root = document) => Array.from(root.querySelectorAll(s));
-const medal = (i) => ["🥇 ", "🥈 ", "🥉 "][i] || "";
+const $ = id => document.getElementById(id);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const medal = i => ["🥇 ", "🥈 ", "🥉 "][i] || "";
 
 const PLAYER_BADGE_COLORS = [
   "#FFB3BA", "#FFDFBA", "#E0BBFF", "#E5E5A6",
