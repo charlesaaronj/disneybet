@@ -985,6 +985,10 @@ function proceedToAnswers() {
   const ghostPlayerId = isGhostRound
     ? gameState.players[Math.floor(Math.random() * gameState.players.length)].id
     : null;
+    
+   gameState.currentRound.ghostRound = isGhostRound;
+   gameState.currentRound.ghostPlayerId = ghostPlayerId;
+
 
   Object.assign(gameState.currentRound, {
     question: q,
