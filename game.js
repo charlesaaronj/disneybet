@@ -566,9 +566,9 @@ function updateTopHeroMeta() {
   }
 
   const roundIndicator = $("wsd-round-indicator");
-  if (roundIndicator) {
-    roundIndicator.textContent = `Round ${(gameState?.roundNumber ?? 0)}`;
-  }
+if (roundIndicator) {
+  roundIndicator.textContent = `Round ${Math.max(1, gameState?.roundNumber || 1)}`;
+}
 }
 
 // Validate setup and either create or update gameState
@@ -627,7 +627,7 @@ function startGameFromSetup() {
 
     gameState = {
       screen: "setup-question",
-      roundNumber: 0,
+      roundNumber: 1,
       settings: {
         park: parkName,
         startingPoints: START_POINTS,
@@ -801,10 +801,11 @@ function renderAttractionOptions() {
 function startNewRoundCore() {
   if (!gameState) return;
 
-if (!gameState.currentRound) {
-  gameState.roundNumber = Math.max(1, gameState.roundNumber || 1);
-} else {
-  gameState.roundNumber += 1;
+  if (!gameState.currentRound) {
+    gameState.roundNumber = Math.max(1, gameState.roundNumber || 1);
+  } else {
+    gameState.roundNumber += 1;
+  }
 } gameState.currentRound = {
   attraction: null,
   question: "",
