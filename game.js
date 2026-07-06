@@ -5,9 +5,9 @@
 const APP_VERSION = "1.5";
 
 // ---------- Small DOM + utility helpers ----------
-const $ = id => document.getElementById(id);
-const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-const medal = i => ["🥇 ", "🥈 ", "🥉 "][i] || "";
+const id = (x) => document.getElementById(x);
+const sel = (s, root = document) => Array.from(root.querySelectorAll(s));
+const medal = (i) => ["🥇 ", "🥈 ", "🥉 "][i] || "";
 
 const PLAYER_BADGE_COLORS = [
   "#FFB3BA", "#FFDFBA", "#E0BBFF", "#E5E5A6",
@@ -982,7 +982,7 @@ function proceedToAnswers() {
 
   const roundNumber = gameState.roundNumber || 1;
   const canHaveGhost = roundNumber > 1;
-  const isGhostRound = canHaveGhost && Math.random() < 0.2;
+  const isGhostRound = canHaveGhost && Math.random() < 0.3;
 
   const ghostPlayerId = isGhostRound
     ? gameState.players[Math.floor(Math.random() * gameState.players.length)].id
@@ -2562,7 +2562,7 @@ function renderFinalResults() {
   const confetti = id("wsd-confetti-wrap-end");
   if (confetti) {
     confetti.innerHTML = "";
-    spawnConfetti(confetti);
+    spawnEndgameConfetti(confetti);
   }
 
   const c = id("wsd-final-results");
