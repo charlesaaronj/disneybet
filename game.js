@@ -1142,6 +1142,10 @@ function saveAnswerForCurrentPlayer(skip) {
     if (err) err.textContent = "Please enter an answer or skip.";
     return;
   }
+  if (!skip && isGhostPlayer && !ghostText) {
+  if (err) err.textContent = "Please enter both your answer and your Ghost answer.";
+  return;
+}
 
   if (!skip) {
     r.answers.push({
