@@ -1107,7 +1107,7 @@ function renderAnswerProgress() {
     if (stillGhostPlayer && ghostWrap) {
       ghostWrap.classList.add("show");
     }
-  }, 3000);
+  }, 2000);
 }
 
 // Save the current player’s answer, or “skip” if requested
@@ -1858,9 +1858,10 @@ function getRevealContext(r) {
     );
 
   const ghostOwnerWonRound =
-    isGhostAnswer &&
-    !!ghostOwner &&
-    correctGuessers.length === 0;
+  isGhostAnswer &&
+  !!ghostOwner &&
+  correctGuessers.length === 0 &&
+  !ghostOwnerChoseGhost;
 
   const winnerNames = correctGuessers.length
     ? correctGuessers
