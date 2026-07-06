@@ -1391,7 +1391,7 @@ function goToGuessWager() {
     if (titleEl) titleEl.textContent = "Ghost Round!";
     if (bodyEl) {
       bodyEl.innerHTML =
-        "A <strong>Ghost answer</strong> 👻 was submitted this round and may be the selected answer. <p>Choose carefully!";
+        "A <strong>Ghost answer</strong> 👻 was submitted this round and may be the selected answer. Choose carefully!";
     }
 
     try {
