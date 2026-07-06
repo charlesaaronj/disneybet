@@ -1064,6 +1064,8 @@ function proceedToAnswers() {
 // Update the “Player X of Y” indicator and current player label
 let ghostFieldTimer = null;
 
+let ghostFieldTimer = null;
+
 function renderAnswerProgress() {
   const r = gameState.currentRound;
   const idx = r.answerIndex ?? 0;
@@ -1082,7 +1084,10 @@ function renderAnswerProgress() {
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
 
-  if (ghostFieldTimer) clearTimeout(ghostFieldTimer);
+  if (ghostFieldTimer) {
+    clearTimeout(ghostFieldTimer);
+    ghostFieldTimer = null;
+  }
 
   if (ghostWrap) ghostWrap.classList.remove("show");
 
@@ -1092,7 +1097,18 @@ function renderAnswerProgress() {
   }
 
   ghostFieldTimer = setTimeout(() => {
-    if (ghostWrap) ghostWrap.classList.add("show");
+    const currentRound = gameState?.currentRound;
+    const currentIdx = currentRound?.answerIndex ?? 0;
+    const currentOrder = currentRound?.answerOrder || gameState.players.map(p => p.id);
+    const currentPlayerId = currentOrder[currentIdx];
+
+    const stillGhostPlayer =
+      !!currentRound?.ghostRound &&
+      currentPlayerId === currentRound?.ghostPlayerId;
+
+    if (stillGhostPlayer && ghostWrap) {
+      ghostWrap.classList.add("show");
+    }
   }, 3000);
 }
 
