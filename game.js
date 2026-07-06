@@ -409,7 +409,9 @@ function showScreen(name) {
   });
 
   // Hero spotlight per screen (no firstSetupGameShown flag anymore)
-  showHeroSpotlightForScreen(name);
+    if (name !== "game-end") {
+    showHeroSpotlightForScreen(name);
+  }
 }
 // ---------- Setup screen + locks ----------
 
