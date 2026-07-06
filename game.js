@@ -1064,8 +1064,6 @@ function proceedToAnswers() {
 // Update the “Player X of Y” indicator and current player label
 let ghostFieldTimer = null;
 
-let ghostFieldTimer = null;
-
 function renderAnswerProgress() {
   const r = gameState.currentRound;
   const idx = r.answerIndex ?? 0;
