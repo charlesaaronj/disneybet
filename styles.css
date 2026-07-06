@@ -907,13 +907,23 @@ body {
 }
 #wsd-ghost-answer-wrap {
   opacity: 0;
+  max-height: 0;
+  overflow: hidden;
   transform: translateY(8px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
   pointer-events: none;
+  margin-bottom: 0 !important;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    max-height 0.4s ease,
+    margin-bottom 0.4s ease;
 }
 
 #wsd-ghost-answer-wrap.show {
   opacity: 1;
+  max-height: 260px;
+  overflow: visible;
   transform: translateY(0);
   pointer-events: auto;
+  margin-bottom: 1rem !important;
 }
