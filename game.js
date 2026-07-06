@@ -1184,6 +1184,7 @@ function saveAnswerForCurrentPlayer(skip) {
 
           pickRandomAnswer();
           renderSelectAnswerScreen();
+          console.log("round:", gameState.roundNumber, "ghostRound:", gameState.currentRound?.ghostRound);
 
           if (labelEl) labelEl.textContent = "A player said";
           if (toWagers) toWagers.style.display = "";
