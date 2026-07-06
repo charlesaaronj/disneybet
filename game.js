@@ -1262,17 +1262,17 @@ function renderSelectAnswerScreen() {
 
 // Build the guess/wager rows and jump to guess-wager screen
 function goToGuessWager() {
-  const errEl = $("wsd-gw-error");
+  const errEl = document.getElementById("wsd-gw-error");
   if (errEl) errEl.textContent = "";
 
   const r = gameState.currentRound;
-  const qEl = $("wsd-gw-question");
-  const ansEl = $("wsd-gw-answer");
+  const qEl = document.getElementById("wsd-gw-question");
+  const ansEl = document.getElementById("wsd-gw-answer");
 
   if (qEl) qEl.textContent = r.question;
   if (ansEl) ansEl.textContent = r.selectedAnswer.text;
 
-  const container = $("wsd-gw-players");
+  const container = document.getElementById("wsd-gw-players");
   if (!container) return;
 
   // Hard reset: remove ALL rows
@@ -1347,27 +1347,27 @@ function goToGuessWager() {
   });
 
   showScreen("guess-wager");
+
   if (gameState.currentRound?.ghostRound) {
-  const modalEl = id("modal-ghost-round");
-  const bodyEl = id("modal-ghost-round-body");
-  const titleEl = id("modal-ghost-round-title");
+    const modalEl = document.getElementById("modal-ghost-round");
+    const bodyEl = document.getElementById("modal-ghost-round-body");
+    const titleEl = document.getElementById("modal-ghost-round-title");
 
-  if (titleEl) titleEl.textContent = "Ghost Round!";
-  if (bodyEl) {
-    bodyEl.textContent =
-      "A Ghost answer was submitted this round. The selected answer may be Ghost. Choose carefully.";
-  }
-
-  try {
-    if (modalEl && typeof bootstrap !== "undefined") {
-      new bootstrap.Modal(modalEl).show();
+    if (titleEl) titleEl.textContent = "Ghost Round!";
+    if (bodyEl) {
+      bodyEl.textContent =
+        "A Ghost answer was submitted this round. The selected answer may be Ghost. Choose carefully.";
     }
-  } catch (e) {
-    console.error("Ghost modal error:", e);
+
+    try {
+      if (modalEl && typeof bootstrap !== "undefined") {
+        new bootstrap.Modal(modalEl).show();
+      }
+    } catch (e) {
+      console.error("Ghost modal error:", e);
+    }
   }
 }
-}
-
 // Reset wagers UI back to starting defaults
 function clearWagersUI() {
   $$("#wsd-gw-players select").forEach(s => {
