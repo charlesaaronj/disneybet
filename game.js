@@ -296,7 +296,9 @@ function applyParkTheme(parkName) {
     ["#modal-wager-help .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-wager-help .modal-header", "color", t ? "#fff" : ""],
     ["#modal-welcome .modal-header", "backgroundImage", t?.hero || ""],
-    ["#modal-welcome .modal-header", "color", t ? "#fff" : ""]
+    ["#modal-welcome .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-ghost-round .modal-header", "backgroundImage", t?.hero],
+    ["#modal-ghost-round .modal-header", "color", t ? "#fff" : ""]
   ].forEach(([sel, prop, val]) => {
     const el = document.querySelector(sel);
     if (el) el.style[prop] = val;
@@ -1213,17 +1215,9 @@ function saveAnswerForCurrentPlayer(skip) {
 function pickRandomAnswer() {
   const r = gameState.currentRound;
   const pool = r.answers.slice();
-
-  const ghostAnswer = pool.find(a => a.isGhost);
-  if (ghostAnswer) {
-    pool.push(ghostAnswer);
-  }
-
   const chosenIndex = Math.floor(Math.random() * pool.length);
   r.selectedAnswer = pool[chosenIndex];
 }
-
-
 // Animate “picking” overlay, then call onDone
 function showPickOverlay(onDone) {
   const overlay = $("wsd-pick-overlay");
@@ -1353,6 +1347,25 @@ function goToGuessWager() {
   });
 
   showScreen("guess-wager");
+  if (gameState.currentRound?.ghostRound) {
+  const modalEl = id("modal-ghost-round");
+  const bodyEl = id("modal-ghost-round-body");
+  const titleEl = id("modal-ghost-round-title");
+
+  if (titleEl) titleEl.textContent = "Ghost Round!";
+  if (bodyEl) {
+    bodyEl.textContent =
+      "A Ghost answer was submitted this round. The selected answer may be Ghost. Choose carefully.";
+  }
+
+  try {
+    if (modalEl && typeof bootstrap !== "undefined") {
+      new bootstrap.Modal(modalEl).show();
+    }
+  } catch (e) {
+    console.error("Ghost modal error:", e);
+  }
+}
 }
 
 // Reset wagers UI back to starting defaults
@@ -2501,64 +2514,131 @@ function computeFinalBonusesAndShow() {
   renderFinalResults();
 }
 
+function spawnEndgameConfetti(container) {
+  if (!container) return;
+
+  const colors = ["#ffcc00", "#ff9500", "#ff3b30", "#34c759", "#007aff", "#af52de", "#ffffff"];
+
+  for (let i = 0; i < 42; i++) {
+    const dot = document.createElement("div");
+    dot.className = "wsd-confetti-dot";
+    Object.assign(dot.style, {
+      left: `${Math.random() * 100}%`,
+      top: `${-20 - Math.random() * 40}px`,
+      width: `${6 + Math.random() * 8}px`,
+      height: `${6 + Math.random() * 10}px`,
+      borderRadius: Math.random() > 0.5 ? "50%" : "2px",
+      background: colors[Math.floor(Math.random() * colors.length)],
+      animationDelay: `${Math.random() * 0.35}s`,
+      animationDuration: `${1.4 + Math.random() * 1.2}s`,
+      transform: `rotate(${Math.random() * 360}deg)`
+    });
+    container.appendChild(dot);
+    setTimeout(() => dot.remove(), 2600);
+  }
+}
 
 // Show final ranking with medals and bonus breakdown
 function renderFinalResults() {
-  const sorted = [...gameState.players].sort(
-    (a, b) =>
-      b.score === a.score
-        ? b.wins - a.wins
-        : b.score - a.score
-  );
-  const topScore = sorted[0].score;
-  const topWins = sorted[0].wins;
-  const winners = sorted.filter(
-    p => p.score === topScore && p.wins === topWins
+  const sorted = [...gameState.players].sort((a, b) =>
+    b.score === a.score ? b.wins - a.wins : b.score - a.score
   );
 
-  const banner = $("wsd-winner-banner");
+  const topScore = sorted[0].score;
+  const topWins = sorted[0].wins;
+  const winners = sorted.filter(p => p.score === topScore && p.wins === topWins);
+
+  const banner = id("wsd-winner-banner");
+  const subtitle = id("wsd-winner-subtitle");
+  const scoreEl = id("wsd-winner-score");
+  const reasonEl = id("wsd-winner-reason");
+  const confetti = id("wsd-confetti-wrap-end");
+  const c = id("wsd-final-results");
+
   if (banner) {
-    banner.innerHTML = `🎉 ${winners
-      .map(w => w.name)
-      .join(
-        " & "
-      )} wins! Time to collect that snack!`;
+    banner.textContent =
+      winners.length === 1
+        ? `${winners[0].name} wins!`
+        : `${winners.map(w => w.name).join(" & ")} win!`;
     banner.classList.remove("wsd-anim-pop");
     void banner.offsetWidth;
     banner.classList.add("wsd-anim-pop");
   }
 
-  spawnConfetti($("wsd-confetti-wrap-end"));
+  if (subtitle) {
+    subtitle.textContent = winners.length === 1 ? "Queue Line Champion" : "Co-Champions";
+  }
 
-  const c = $("wsd-final-results");
+  if (scoreEl) {
+    scoreEl.textContent = `${topScore} points`;
+  }
+
+  if (reasonEl) {
+    if (winners.length === 1) {
+      const w = winners[0];
+      const bonus = w.bonusTotal || 0;
+      reasonEl.textContent =
+        bonus > 0
+          ? `Finished with ${w.wins} correct wins and ${bonus} end-game bonus points.`
+          : `Finished with ${w.wins} correct wins and the top final score of the day.`;
+    } else {
+      reasonEl.textContent = `They finished tied on points and wins, so the snack victory is shared.`;
+    }
+  }
+
+  if (confetti) {
+    confetti.innerHTML = "";
+    spawnEndgameConfetti(confetti);
+    setTimeout(() => spawnEndgameConfetti(confetti), 450);
+  }
+
   if (!c) return;
   c.innerHTML = "";
 
+  const podium = document.createElement("div");
+  podium.className = "wsd-final-podium";
+
+  const podiumPlayers = [sorted[1], sorted[0], sorted[2]].filter(Boolean);
+  const podiumPlaces = ["Second", "First", "Third"];
+
+  podiumPlayers.forEach((p, i) => {
+    const card = document.createElement("div");
+    card.className = `wsd-podium-card ${podiumPlaces[i].toLowerCase() === "first" ? "first" : ""}`;
+    card.innerHTML = `
+      <div class="wsd-podium-place">${podiumPlaces[i]}</div>
+      <div class="wsd-podium-name">${p.name}</div>
+      <div class="wsd-podium-score">${p.score}</div>
+      <div class="wsd-text-small">Wins ${p.wins}</div>
+    `;
+    podium.appendChild(card);
+  });
+
+  c.appendChild(podium);
+
   sorted.forEach((p, i) => {
     const row = document.createElement("div");
-    row.className =
-      "wsd-score-row wsd-anim-fade-up";
+    row.className = "wsd-score-row wsd-anim-fade-up";
     row.style.animationDelay = `${i * 0.08}s`;
+
     const bd = p.finalBonusBreakdown || {};
+    const bonusBits = [
+      bd.topLandCollector ? `🏞 +${bd.topLandCollector}` : "",
+      bd.topAttractionCollector ? `🎢 +${bd.topAttractionCollector}` : "",
+      bd.bestGuesser ? `🎯 +${bd.bestGuesser}` : "",
+      bd.mostRiskyPlayer ? `🔥 +${bd.mostRiskyPlayer}` : ""
+    ].filter(Boolean).join(" ");
+
     row.innerHTML = `
       <div>
         <div class="wsd-score-name">${medal(i)}${p.name}</div>
         <div class="wsd-score-meta">
-          Wins: ${p.wins} · Attractions: ${
-      p.collected.length
-    } · Lands: ${getPlayerUniqueLandCount(
-      p
-    )} · Bonus: +${p.bonusTotal}
+          Wins ${p.wins} · Attractions ${p.collected.length} · Lands ${getPlayerUniqueLandCount(p)} · Bonus ${p.bonusTotal || 0}
         </div>
-        <div class="wsd-text-small">
-          🗺️ +${bd.topLandCollector || 0} · 🎢 +${
-      bd.topAttractionCollector || 0
-    } · 🧠 +${bd.bestGuesser || 0} · 🎲 +${
-      bd.mostRiskyPlayer || 0
-    }
-        </div>
+        ${bonusBits ? `<div class="wsd-text-small" style="margin-top:4px;">${bonusBits}</div>` : ""}
       </div>
-      <div class="wsd-score-value">${p.score}</div>`;
+      <div class="wsd-score-value">${p.score}</div>
+    `;
+
     c.appendChild(row);
   });
 }
