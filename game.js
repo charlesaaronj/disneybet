@@ -1082,12 +1082,9 @@ function renderAnswerProgress() {
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
 
-  if (ghostFieldTimer) {
-    clearTimeout(ghostFieldTimer);
-    ghostFieldTimer = null;
-  }
+  if (ghostFieldTimer) clearTimeout(ghostFieldTimer);
 
-  if (ghostWrap) ghostWrap.style.display = "none";
+  if (ghostWrap) ghostWrap.classList.remove("show");
 
   if (!isGhostPlayer) {
     if (ghostInput) ghostInput.value = "";
@@ -1095,19 +1092,8 @@ function renderAnswerProgress() {
   }
 
   ghostFieldTimer = setTimeout(() => {
-    const currentRound = gameState?.currentRound;
-    const currentIdx = currentRound?.answerIndex ?? 0;
-    const currentOrder = currentRound?.answerOrder || gameState.players.map(p => p.id);
-    const currentPlayerId = currentOrder[currentIdx];
-
-    const stillGhostPlayer =
-      !!currentRound?.ghostRound &&
-      currentPlayerId === currentRound?.ghostPlayerId;
-
-    if (stillGhostPlayer && ghostWrap) {
-      ghostWrap.style.display = "block";
-    }
-  }, 5000);
+    if (ghostWrap) ghostWrap.classList.add("show");
+  }, 3000);
 }
 
 // Save the current player’s answer, or “skip” if requested
