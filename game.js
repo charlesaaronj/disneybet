@@ -248,6 +248,11 @@ function ensureStateShape() {
 
   if (!gameState.currentRound) return;
   const r = gameState.currentRound;
+  
+  if (!Array.isArray(r.wagerOrder)) r.wagerOrder = shuffle(gameState.players.map(p => p.id));
+if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
+if (!Array.isArray(r.wagers)) r.wagers = [];
+
 
   // Round arrays we still care about, without house bonus
   ["correctGuessers", "payouts", "collectionsThisRound"].forEach(k => {
@@ -807,12 +812,14 @@ function startNewRoundCore() {
     gameState.roundNumber += 1;
 } gameState.currentRound = {
   attraction: null,
-  question: "",
-  questionType: "",
+  question: '',
+  questionType: '',
   answers: [],
   selectedAnswer: null,
   answerIndex: 0,
   wagers: [],
+  wagerOrder: shuffle(gameState.players.map(p => p.id)),
+  wagerIndex: 0,
   pot: 0,
   hunnyHotBonus: 0,
   correctGuessers: [],
@@ -827,6 +834,7 @@ function startNewRoundCore() {
   ghostPlayerId: null,
   ghostBonusAwardedTo: null
 };
+
 
   saveState();
 
@@ -1300,184 +1308,310 @@ function renderSelectAnswerScreen() {
 
 // ---------- Guess + wager screen ----------
 
+let wagerSaveLocked = false;
+
+function getCurrentWagerPlayer() {
+  const r = gameState?.currentRound;
+  if (!r) return null;
+  const idx = r.wagerIndex ?? 0;
+  const order = Array.isArray(r.wagerOrder) && r.wagerOrder.length
+    ? r.wagerOrder
+    : gameState.players.map(p => p.id);
+  const playerId = order[idx];
+  return gameState.players.find(p => p.id === playerId) || null;
+}
+
+function getCurrentHunnyPotBreakdown(includeDraft = false) {
+  const r = gameState?.currentRound;
+  if (!r) return { basePoints: 0, wagerPoints: 0, hotBonus: 0, draftAmount: 0, total: 0 };
+
+  const basePoints = gameState.players.length;
+  const wagerPoints = (r.wagers || []).reduce((sum, w) => sum + Math.max(0, parseInt(w.amount, 10) || 0), 0);
+  const hotBonus = Math.max(0, r.hunnyHotBonus || 0);
+
+  let draftAmount = 0;
+  if (includeDraft) {
+    const activePlayer = getCurrentWagerPlayer();
+    const inp = id('wsd-gw-wager');
+    if (activePlayer && inp) {
+      let val = parseInt(inp.value, 10);
+      if (isNaN(val)) val = 0;
+      val = Math.max(0, val);
+      val = Math.min(val, activePlayer.score);
+      draftAmount = val;
+    }
+  }
+
+  return {
+    basePoints,
+    wagerPoints,
+    hotBonus,
+    draftAmount,
+    total: basePoints + wagerPoints + hotBonus + draftAmount
+  };
+}
+
+function updateHoneyPotDisplay(includeDraft = true) {
+  const el = id('wsd-gw-honeypot');
+  if (!el) return;
+  const b = getCurrentHunnyPotBreakdown(includeDraft);
+  const wagerPart = b.wagerPoints + b.draftAmount;
+
+  el.textContent = b.hotBonus > 0
+    ? `Current Hunny pot: ${b.basePoints} base + ${wagerPart} wagered + ${b.hotBonus} Hot Round bonus = ${b.total}`
+    : `Current Hunny pot: ${b.basePoints} base + ${wagerPart} wagered = ${b.total}`;
+}
+
+function populateGuessOptionsForPlayer(player) {
+  const guessSel = id('wsd-gw-guess');
+  if (!guessSel || !player) return;
+
+  guessSel.innerHTML = '';
+
+  gameState.players
+    .filter(p => p.id !== player.id)
+    .forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = String(p.id);
+      opt.textContent = p.name;
+      guessSel.appendChild(opt);
+    });
+
+  if (gameState.currentRound?.ghostRound) {
+    const ghostOpt = document.createElement('option');
+    ghostOpt.value = 'ghost';
+    ghostOpt.textContent = 'Ghost';
+    guessSel.appendChild(ghostOpt);
+  }
+}
+
+function renderWagerProgress() {
+  const r = gameState?.currentRound;
+  if (!r) return;
+
+  const order = Array.isArray(r.wagerOrder) && r.wagerOrder.length
+    ? r.wagerOrder
+    : gameState.players.map(p => p.id);
+
+  if (!Array.isArray(r.wagerOrder) || !r.wagerOrder.length) {
+    r.wagerOrder = order.slice();
+  }
+
+  const idx = r.wagerIndex ?? 0;
+  const player = getCurrentWagerPlayer();
+  const prog = id('wsd-gw-progress');
+  const label = id('wsd-gw-current-player-label');
+  const wagerInp = id('wsd-gw-wager');
+  const err = id('wsd-gw-error');
+
+  if (prog) prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
+  if (label) label.textContent = player ? player.name : 'Player';
+  if (err) err.textContent = '';
+
+  if (player) {
+    populateGuessOptionsForPlayer(player);
+    if (wagerInp) {
+      wagerInp.min = 1;
+      wagerInp.max = player.score;
+      wagerInp.value = Math.min(1, player.score);
+    }
+  }
+
+  updateHoneyPotDisplay(true);
+}
+
+function showPassWagerModal() {
+  const player = getCurrentWagerPlayer();
+  const modalEl = id('modal-pass-wager-phone');
+  const bodyEl = id('modal-pass-wager-phone-body');
+  const titleEl = id('modal-pass-wager-phone-title');
+
+  if (titleEl) titleEl.textContent = 'Secret wager turn';
+  if (bodyEl) {
+    bodyEl.innerHTML = player
+      ? `<strong>Pass the phone to ${player.name}.</strong><br>${player.name}, make your guess and wager privately.`
+      : 'Pass the phone to the next player and make the wager privately.';
+  }
+
+  if (modalEl && typeof bootstrap !== 'undefined') {
+    try {
+      new bootstrap.Modal(modalEl).show();
+    } catch (e) {
+      console.error('Pass wager modal error', e);
+    }
+  }
+}
+
+function showFinalHunnyPotModal() {
+  const modalEl = id('modal-final-honeypot');
+  const bodyEl = id('modal-final-honeypot-body');
+  const titleEl = id('modal-final-honeypot-title');
+  const b = getCurrentHunnyPotBreakdown(false);
+
+  if (titleEl) titleEl.textContent = 'Final Hunny Pot';
+  if (bodyEl) {
+    bodyEl.innerHTML = b.hotBonus > 0
+      ? `<strong>${b.total} points</strong><br>Built from ${b.basePoints} base + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus.`
+      : `<strong>${b.total} points</strong><br>Built from ${b.basePoints} base + ${b.wagerPoints} wagers.`;
+  }
+
+  if (modalEl && typeof bootstrap !== 'undefined') {
+    try {
+      new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false }).show();
+    } catch (e) {
+      console.error('Final Hunny Pot modal error', e);
+      continueFromFinalHunnyPot();
+    }
+  } else {
+    continueFromFinalHunnyPot();
+  }
+}
+
+function continueFromFinalHunnyPot() {
+  computeRevealAndScoring();
+  showScreen('reveal');
+  runRevealAnimation();
+  saveState();
+}
+
+function finishSecretWagers() {
+  updateHoneyPotDisplay(false);
+  saveState();
+  showFinalHunnyPotModal();
+}
+
+function saveWagerForCurrentPlayer() {
+  if (wagerSaveLocked) return;
+
+  const r = gameState?.currentRound;
+  if (!r) return;
+
+  const idx = r.wagerIndex ?? 0;
+  const order = Array.isArray(r.wagerOrder) && r.wagerOrder.length
+    ? r.wagerOrder
+    : gameState.players.map(p => p.id);
+
+  const player = getCurrentWagerPlayer();
+  const guessSel = id('wsd-gw-guess');
+  const wagerInp = id('wsd-gw-wager');
+  const err = id('wsd-gw-error');
+  const saveBtn = id('wsd-save-wager');
+
+  if (err) err.textContent = '';
+  if (!player) {
+    if (err) err.textContent = 'Could not find the current player.';
+    return;
+  }
+
+  const guessedAuthorId = guessSel ? guessSel.value : '';
+  let amount = wagerInp ? parseInt(wagerInp.value, 10) : NaN;
+
+  if (!guessedAuthorId) {
+    if (err) err.textContent = 'Please choose a guess.';
+    return;
+  }
+
+  if (isNaN(amount)) amount = 1;
+  amount = Math.max(1, amount);
+  amount = Math.min(amount, player.score);
+
+  wagerSaveLocked = true;
+  if (saveBtn) saveBtn.disabled = true;
+
+  r.wagers = (r.wagers || []).filter(w => w.playerId !== player.id);
+  r.wagers.push({
+    playerId: player.id,
+    guessedAuthorId,
+    amount
+  });
+
+  if (wagerInp) wagerInp.value = '';
+  if (guessSel) guessSel.selectedIndex = 0;
+
+  r.wagerIndex = idx + 1;
+  saveState();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      wagerSaveLocked = false;
+      if (saveBtn) saveBtn.disabled = false;
+
+      if (r.wagerIndex >= order.length) {
+        finishSecretWagers();
+      } else {
+        renderWagerProgress();
+        showPassWagerModal();
+      }
+    });
+  });
+}
+
 // Build the guess/wager rows and jump to guess-wager screen
 function goToGuessWager() {
-  const errEl = document.getElementById("wsd-gw-error");
-  if (errEl) errEl.textContent = "";
+  const errEl = id('wsd-gw-error');
+  if (errEl) errEl.textContent = '';
 
   const r = gameState.currentRound;
-  const qEl = document.getElementById("wsd-gw-question");
-  const ansEl = document.getElementById("wsd-gw-answer");
+  const qEl = id('wsd-gw-question');
+  const ansEl = id('wsd-gw-answer');
 
   if (qEl) qEl.textContent = r.question;
   if (ansEl) ansEl.textContent = r.selectedAnswer.text;
 
-  const container = document.getElementById("wsd-gw-players");
-  if (!container) return;
+  if (!Array.isArray(r.wagerOrder) || !r.wagerOrder.length) {
+    r.wagerOrder = shuffle(gameState.players.map(p => p.id));
+  }
+  if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
+  if (!Array.isArray(r.wagers)) r.wagers = [];
 
-  // Hard reset: remove ALL rows
-  container.innerHTML = "";
-
-  // Build rows in a fresh container each time
-  const playersShuffled = shuffle(gameState.players);
-
-  playersShuffled.forEach(p => {
-    const row = document.createElement("div");
-    row.className = "mb-3 pb-2 border-bottom";
-
-    const playerLabel = document.createElement("div");
-    playerLabel.className = "wsd-score-row mb-1";
-    const dotColor = p.badgeColor || "#888888";
-    playerLabel.innerHTML =
-      `<div>` +
-      `<div class="wsd-score-name">` +
-      `<span class="wsd-player-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background-color:${dotColor}"></span>` +
-      `<span>${p.name}'s guess</span>` +
-      `</div>` +
-      `<div class="wsd-score-meta">Available points: ${p.score}</div>` +
-      `</div>`;
-    row.appendChild(playerLabel);
-
-    const inner = document.createElement("div");
-    inner.className = "d-flex gap-1";
-
-    const guessSel = document.createElement("select");
-    guessSel.className = "form-select wsd-form-select";
-    guessSel.dataset.playerId = p.id;
-
-   // Player options only, excluding self
-  gameState.players
-  .filter(p2 => p2.id !== p.id)
-  .forEach(p2 => {
-    const opt = document.createElement("option");
-    opt.value = String(p2.id);
-    opt.textContent = p2.name;
-    guessSel.appendChild(opt);
-  });
-
-    // Only add Ghost from round 2 onward
-    if (gameState.currentRound?.ghostRound) {
-      const ghostOpt = document.createElement("option");
-      ghostOpt.value = "ghost";
-      ghostOpt.textContent = "Ghost";
-      guessSel.appendChild(ghostOpt);
-    }
-
-    const wagerInput = document.createElement("input");
-    Object.assign(wagerInput, {
-      type: "number",
-      min: 1,
-      max: p.score,
-      value: Math.min(1, p.score),
-      inputMode: "numeric",
-      pattern: "[0-9]*"
-    });
-    wagerInput.className = "form-control wsd-form-control";
-    wagerInput.style.maxWidth = "90px";
-    wagerInput.dataset.playerId = p.id;
-
-    wagerInput.addEventListener("blur", () => {
-      let val = parseInt(wagerInput.value, 10);
-      if (isNaN(val) || val < 1) val = 1;
-      if (val > p.score) val = p.score;
-      wagerInput.value = val;
-    });
-
-    inner.append(guessSel, wagerInput);
-    row.appendChild(inner);
-    container.appendChild(row);
-  });
-
-  showScreen("guess-wager");
+  showScreen('guess-wager');
+  renderWagerProgress();
+  saveState();
 
   if (gameState.currentRound?.ghostRound) {
-    const modalEl = document.getElementById("modal-ghost-round");
-    const bodyEl = document.getElementById("modal-ghost-round-body");
-    const titleEl = document.getElementById("modal-ghost-round-title");
+    const modalEl = id('modal-ghost-round');
+    const bodyEl = id('modal-ghost-round-body');
+    const titleEl = id('modal-ghost-round-title');
 
-    if (titleEl) titleEl.textContent = "Ghost Round!";
+    if (titleEl) titleEl.textContent = 'Ghost Round!';
     if (bodyEl) {
-      bodyEl.innerHTML =
-        "A <strong>Ghost answer</strong> 👻 was submitted this round and may be the selected answer. Choose carefully!";
+      bodyEl.innerHTML = 'A <strong>Ghost answer</strong> was submitted this round and may be the selected answer. Choose carefully!';
     }
 
-    try {
-      if (modalEl && typeof bootstrap !== "undefined") {
-        new bootstrap.Modal(modalEl).show();
+    if (modalEl && typeof bootstrap !== 'undefined') {
+      try {
+        const ghostModal = new bootstrap.Modal(modalEl);
+        modalEl.addEventListener('hidden.bs.modal', showPassWagerModal, { once: true });
+        ghostModal.show();
+        return;
+      } catch (e) {
+        console.error('Ghost modal error', e);
       }
-    } catch (e) {
-      console.error("Ghost modal error:", e);
     }
   }
+
+  showPassWagerModal();
 }
+
 // Reset wagers UI back to starting defaults
 function clearWagersUI() {
-  $$("#wsd-gw-players select").forEach(s => {
-    s.selectedIndex = 0;
-  });
-  $$("#wsd-gw-players input[type=number]").forEach(inp => {
-    const p = gameState.players.find(
-      pl => pl.id === parseInt(inp.dataset.playerId, 10)
-    );
-    inp.value = Math.min(1, p ? p.score : 1);
-  });
-  const hb = $("wsd-house-bonus");
-  if (hb) hb.value = "0";
+  const player = getCurrentWagerPlayer();
+  const guessSel = id('wsd-gw-guess');
+  const wagerInp = id('wsd-gw-wager');
+
+  if (guessSel) guessSel.selectedIndex = 0;
+  if (wagerInp) {
+    wagerInp.value = Math.min(1, player ? player.score : 1);
+  }
+
+  updateHoneyPotDisplay(true);
 }
+
 
 function lockWagers() {
-  const gwErr = $("wsd-gw-error");
-  if (gwErr) gwErr.textContent = "";
-
-  const hbErr = $("wsd-house-bonus-error");
-  if (hbErr) {
-    hbErr.textContent = "";
-    hbErr.style.display = "none";
-  }
-
-  const hbInput = $("wsd-house-bonus");
-  let houseBonus = hbInput ? parseInt(hbInput.value, 10) : 0;
-  if (isNaN(houseBonus) || houseBonus < 0) houseBonus = 0;
-
-  if (houseBonus > 10) {
-    houseBonus = 10;
-    if (hbInput) hbInput.value = 10;
-    if (hbErr) {
-      hbErr.textContent = "House bonus capped at 10 points.";
-      hbErr.style.display = "block";
-    }
-    return;
-  }
-
-  const wagers = [];
-  $$("#wsd-gw-players select").forEach(sel => {
-    const pid = parseInt(sel.dataset.playerId, 10);
-    const wInp = document.querySelector(
-      `#wsd-gw-players input[data-player-id="${pid}"]`
-    );
-
-    let amount = wInp ? (parseInt(wInp.value, 10) || 1) : 1;
-    if (isNaN(amount) || amount < 1) amount = 1;
-
-    const player = gameState.players.find(pl => pl.id === pid);
-    if (player) amount = Math.min(amount, player.score);
-
-    wagers.push({
-      playerId: pid,
-      guessedAuthorId: sel.value,
-      amount
-    });
-  });
-
-  Object.assign(gameState.currentRound, {
-    wagers
-  });
-
-  computeRevealAndScoring();
-  showScreen("reveal");
-  runRevealAnimation();
-  saveState();
+  saveWagerForCurrentPlayer();
 }
+
 //Set house bonus name
 function getHouseBonusChooser() {
   if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
@@ -2783,19 +2917,19 @@ function wireEvents() {
     abandonRound
   );
 
-  // Guess & wager
-  $("wsd-lock-wagers").addEventListener(
-    "click",
-    lockWagers
-  );
-  $("wsd-clear-wagers").addEventListener(
-    "click",
-    clearWagersUI
-  );
-  $("wsd-abandon-from-gw").addEventListener(
-    "click",
-    abandonRound
-  );
+  // Guess & // Guess wager
+wsd-save-wager?.addEventListener('click', saveWagerForCurrentPlayer);
+wsd-clear-wager?.addEventListener('click', clearWagersUI);
+wsd-abandon-from-gw.addEventListener('click', abandonRound);
+id('wsd-gw-wager')?.addEventListener('input', () => updateHoneyPotDisplay(true));
+id('wsd-final-honeypot-continue')?.addEventListener('click', () => {
+  const modalEl = id('modal-final-honeypot');
+  if (modalEl && typeof bootstrap !== 'undefined') {
+    bootstrap.Modal.getInstance(modalEl)?.hide();
+  }
+  continueFromFinalHunnyPot();
+});
+
 
   // Scores / round navigation
   $("wsd-to-scores").addEventListener(
