@@ -422,25 +422,55 @@
       </div>
     </section>
 
-    <!-- ===== SCREEN: GUESS_WAGER ===== -->
-    <section id="screen-guess-wager" class="wsd-screen">
-      <div class="wsd-card">
-        <div class="wsd-section-title">Guess &amp; wager</div>
-        <div class="wsd-text-small mb-1" id="wsd-gw-question"></div>
-        <div class="wsd-answer-spotlight mb-3" id="wsd-gw-answer"></div>
-        <div class="wsd-text-small mt-2 text-center">
-          <a href="#" data-bs-toggle="modal" data-bs-target="#modal-scoring">How does scoring work?</a>
-        </div>
-        <div id="wsd-gw-players"></div>
-      <div class="mb-3">
-        <div class="wsd-actions-stack">
-          <button id="wsd-lock-wagers" class="wsd-btn-primary" type="button">Lock wagers</button>
-          <button id="wsd-clear-wagers" class="wsd-btn-secondary" type="button">Clear guesses &amp; wagers</button>
-          <button id="wsd-abandon-from-gw" class="wsd-btn-tertiary" type="button">Abandon round</button>
-        </div>
-        <div id="wsd-gw-error" class="wsd-text-small text-danger wsd-mt-3"></div>
-      </div>
-    </section>
+    <!-- <!-- SCREEN GUESS-WAGER -->
+<section id="screen-guess-wager" class="wsd-screen">
+  <div class="wsd-card">
+    <div class="wsd-section-title">Guess &amp; wager</div>
+
+    <div class="wsd-text-small mb-1" id="wsd-gw-question"></div>
+    <div class="wsd-answer-spotlight mb-3" id="wsd-gw-answer"></div>
+
+    <div class="wsd-text-small mb-2 text-center">
+      <a href="#" data-bs-toggle="modal" data-bs-target="#modal-scoring">How does scoring work?</a>
+    </div>
+
+    <div class="wsd-text-small mb-2" id="wsd-gw-progress">Player 1 of 4</div>
+
+    <div class="mb-3">
+      <label class="wsd-form-label" id="wsd-gw-current-player-label">Player</label>
+      <div class="wsd-text-small mb-2">Make your guess and wager privately.</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="wsd-form-label" for="wsd-gw-guess">Who said it?</label>
+      <select id="wsd-gw-guess" class="form-select wsd-form-select"></select>
+    </div>
+
+    <div class="mb-3">
+      <label class="wsd-form-label" for="wsd-gw-wager">Wager</label>
+      <input
+        id="wsd-gw-wager"
+        type="number"
+        min="1"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        class="form-control wsd-form-control"
+        placeholder="Enter your wager"
+      />
+    </div>
+
+    <div id="wsd-gw-honeypot" class="wsd-text-small mb-3"></div>
+
+    <div class="wsd-actions-stack">
+      <button id="wsd-save-wager" class="wsd-btn-primary" type="button">Save &amp; pass</button>
+      <button id="wsd-clear-wager" class="wsd-btn-secondary" type="button">Clear this turn</button>
+      <button id="wsd-abandon-from-gw" class="wsd-btn-tertiary" type="button">Abandon round</button>
+    </div>
+
+    <div id="wsd-gw-error" class="wsd-text-small text-danger wsd-mt-3"></div>
+  </div>
+</section>
+
 
     <!-- ===== SCREEN: REVEAL ===== -->
     <section id="screen-reveal" class="wsd-screen">
@@ -881,6 +911,45 @@
     </div>
   </div>
 </div>
+
+<!-- Secret wager pass-the-phone -->
+<div class="modal fade" id="modal-pass-wager-phone" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-pass-wager-phone-title">Secret wager turn</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="font-size:0.85rem" id="modal-pass-wager-phone-body">
+        Pass the phone to the next player.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="wsd-btn-primary-modal" data-bs-dismiss="modal">Ready</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Final Hunny Pot modal -->
+<div class="modal fade" id="modal-final-honeypot" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="wsd-final-honeypot-title">Final Hunny Pot</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="font-size:0.9rem" id="modal-final-honeypot-body">
+        Final pot details go here.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="wsd-btn-primary-modal" id="wsd-final-honeypot-continue">
+          Reveal winner
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- Spotlight overlay -->
 <div id="wsd-spotlight-overlay" class="wsd-spotlight-overlay" style="display:none;">
