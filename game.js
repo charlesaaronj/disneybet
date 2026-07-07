@@ -1551,12 +1551,8 @@ function goToGuessWager() {
   const errEl = id('wsd-gw-error');
   if (errEl) errEl.textContent = '';
 
-  const r = gameState.currentRound;
-  const qEl = id('wsd-gw-question');
-  const ansEl = id('wsd-gw-answer');
-
-  if (qEl) qEl.textContent = r.question;
-  if (ansEl) ansEl.textContent = r.selectedAnswer.text;
+  const r = gameState?.currentRound;
+  if (!r || !r.selectedAnswer) return;
 
   if (!Array.isArray(r.wagerOrder) || !r.wagerOrder.length) {
     r.wagerOrder = shuffle(gameState.players.map(p => p.id));
@@ -1564,33 +1560,30 @@ function goToGuessWager() {
   if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
   if (!Array.isArray(r.wagers)) r.wagers = [];
 
+  const qEl = id('wsd-gw-question');
+  const ansEl = id('wsd-gw-answer');
+  if (qEl) qEl.textContent = r.question || '';
+  if (ansEl) ansEl.textContent = r.selectedAnswer.text || '';
+
   showScreen('guess-wager');
   renderWagerProgress();
-  saveState();
 
-  if (gameState.currentRound?.ghostRound) {
+  if (r.ghostRound) {
     const modalEl = id('modal-ghost-round');
     const bodyEl = id('modal-ghost-round-body');
     const titleEl = id('modal-ghost-round-title');
-
     if (titleEl) titleEl.textContent = 'Ghost Round!';
     if (bodyEl) {
       bodyEl.innerHTML = 'A <strong>Ghost answer</strong> was submitted this round and may be the selected answer. Choose carefully!';
     }
-
-    if (modalEl && typeof bootstrap !== 'undefined') {
-      try {
-        const ghostModal = new bootstrap.Modal(modalEl);
-        modalEl.addEventListener('hidden.bs.modal', showPassWagerModal, { once: true });
-        ghostModal.show();
-        return;
-      } catch (e) {
-        console.error('Ghost modal error', e);
+    try {
+      if (modalEl && typeof bootstrap !== 'undefined') {
+        new bootstrap.Modal(modalEl).show();
       }
+    } catch (e) {
+      console.error('Ghost modal error', e);
     }
   }
-
-  showPassWagerModal();
 }
 
 // Reset wagers UI back to starting defaults
@@ -2898,6 +2891,12 @@ function wireEvents() {
   );
 
   // Select answer
+
+const toWagersBtn = id('wsd-to-wagers');
+if (toWagersBtn) {
+  toWagersBtn.addEventListener('click', goToGuessWager);
+}
+
   $("wsd-select-again").addEventListener(
     "click",
     () => {
