@@ -1345,13 +1345,15 @@ function goToGuessWager() {
     guessSel.className = "form-select wsd-form-select";
     guessSel.dataset.playerId = p.id;
 
-    // Player options only
-    gameState.players.forEach(p2 => {
-      const opt = document.createElement("option");
-      opt.value = String(p2.id);
-      opt.textContent = p2.name;
-      guessSel.appendChild(opt);
-    });
+   // Player options only, excluding self
+  gameState.players
+  .filter(p2 => p2.id !== p.id)
+  .forEach(p2 => {
+    const opt = document.createElement("option");
+    opt.value = String(p2.id);
+    opt.textContent = p2.name;
+    guessSel.appendChild(opt);
+  });
 
     // Only add Ghost from round 2 onward
     if (gameState.currentRound?.ghostRound) {
