@@ -1377,13 +1377,21 @@ function populateGuessOptionsForPlayer(player) {
       guessSel.appendChild(opt);
     });
 
-  if (gameState.currentRound?.ghostRound) {
+  const selectedAnswer = gameState.currentRound?.selectedAnswer;
+  const selectedAuthorId = selectedAnswer?.isGhost
+    ? (selectedAnswer.ghostOwnerId ?? selectedAnswer.playerId)
+    : selectedAnswer?.playerId;
+
+  const isAuthor = player.id === selectedAuthorId;
+
+  if (gameState.currentRound?.ghostRound && !isAuthor) {
     const ghostOpt = document.createElement('option');
     ghostOpt.value = 'ghost';
     ghostOpt.textContent = 'Ghost';
     guessSel.appendChild(ghostOpt);
   }
 }
+
 
 function renderWagerProgress() {
   const r = gameState?.currentRound;
