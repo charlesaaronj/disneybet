@@ -66,7 +66,7 @@ function requireState(fn) {
 }
 
 // ---------- Constants & configuration ----------
-
+const id = $;
 const MIN_POINTS = 1;
 const START_POINTS = 10;
 
