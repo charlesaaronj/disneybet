@@ -1429,30 +1429,43 @@ function renderWagerProgress() {
   const err = $('wsd-gw-error');
   const guessSel = $('wsd-gw-guess');
 
-  if (prog) prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
-  if (label) label.textContent = player ? player.name : 'Player';
+  if (prog) {
+    prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
+  }
+  if (label) {
+    label.textContent = player ? player.name : 'Player';
+
+    // Animate current player name
+    label.classList.remove('wsd-name-refresh');
+    void label.offsetWidth;
+    label.classList.add('wsd-name-refresh');
+  }
   if (err) err.textContent = '';
 
   if (player) {
     populateGuessOptionsForPlayer(player);
 
-    // Apply a subtle refresh animation to the dropdown
+    // Animate dropdown
     if (guessSel) {
       guessSel.classList.remove('wsd-select-refresh');
-      void guessSel.offsetWidth; // force reflow
+      void guessSel.offsetWidth;
       guessSel.classList.add('wsd-select-refresh');
     }
 
+    // Animate wager input
     if (wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
+
+      wagerInp.classList.remove('wsd-wager-refresh');
+      void wagerInp.offsetWidth;
+      wagerInp.classList.add('wsd-wager-refresh');
     }
   }
 
   updateHoneyPotDisplay(true);
 }
-
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
   const modalEl = $('modal-pass-wager-phone');
