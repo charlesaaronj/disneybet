@@ -1085,7 +1085,7 @@ function renderAnswerProgress() {
   const ghostInput = $("wsd-ghost-answer-input");
 
   if (prog) prog.textContent = `Player ${idx + 1} of ${order.length}`;
-  if (label) label.textContent = player ? player.name : "Player";
+  if (label) label.textContent = player ? `${player.name}'s guess` : "Author's guess";
 
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
