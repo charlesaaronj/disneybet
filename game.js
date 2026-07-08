@@ -2889,44 +2889,30 @@ function wireEvents() {
     "click",
     abandonRound
   );
+  
+// Select answer
+document.getElementById('wsd-select-again')?.addEventListener('click', () => {
+  showPickOverlay(() => {
+    pickRandomAnswer();
+    renderSelectAnswerScreen();
+    saveState();
+  });
+});
 
-  // Select answer
+document.getElementById('wsd-to-wagers')?.addEventListener('click', goToGuessWager);
+document.getElementById('wsd-abandon-from-select')?.addEventListener('click', abandonRound);
 
-const toWagersBtn = id('wsd-to-wagers');
-if (toWagersBtn) {
-  toWagersBtn.addEventListener('click', goToGuessWager);
-}
+// Guess wager
+document.getElementById('wsd-save-wager')?.addEventListener('click', saveCurrentWagerAndAdvance);
+document.getElementById('wsd-clear-wager')?.addEventListener('click', clearCurrentWagerTurn);
+document.getElementById('wsd-abandon-from-gw')?.addEventListener('click', abandonRound);
+document.getElementById('wsd-gw-wager')?.addEventListener('input', () => updateHoneyPotDisplay(true));
 
-  $("wsd-select-again").addEventListener(
-    "click",
-    () => {
-      showPickOverlay(() => {
-        pickRandomAnswer();
-        renderSelectAnswerScreen();
-        saveState();
-      });
-    }
-  );
-  $("wsd-to-wagers").addEventListener(
-    "click",
-    goToGuessWager
-  );
-  $("wsd-abandon-from-select").addEventListener(
-    "click",
-    abandonRound
-  );
-
-  // Guess & // Guess wager
-wsd-save-wager?.addEventListener('click', saveWagerForCurrentPlayer);
-wsd-clear-wager?.addEventListener('click', clearWagersUI);
-wsd-abandon-from-gw.addEventListener('click', abandonRound);
-id('wsd-gw-wager')?.addEventListener('input', () => updateHoneyPotDisplay(true));
-id('wsd-final-honeypot-continue')?.addEventListener('click', () => {
-  const modalEl = id('modal-final-honeypot');
+document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click', () => {
+  const modalEl = document.getElementById('modal-final-honeypot');
   if (modalEl && typeof bootstrap !== 'undefined') {
     bootstrap.Modal.getInstance(modalEl)?.hide();
   }
-  continueFromFinalHunnyPot();
 });
 
 
