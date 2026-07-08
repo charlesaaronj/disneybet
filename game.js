@@ -1535,7 +1535,7 @@ function continueFromFinalHunnyPot() {
 function finishSecretWagers() {
   updateHoneyPotDisplay(false);
   saveState();
-  showFinalHunnyPotModal();
+  continueFromFinalHunnyPot();
 }
 
 function saveWagerForCurrentPlayer() {
