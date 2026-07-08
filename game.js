@@ -1363,7 +1363,7 @@ function updateHoneyPotDisplay(includeDraft = true) {
 }
 
 function populateGuessOptionsForPlayer(player) {
-  const guessSel = id('wsd-gw-guess');
+  const guessSel = $('wsd-gw-guess');
   if (!guessSel || !player) return;
 
   guessSel.innerHTML = '';
