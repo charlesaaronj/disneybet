@@ -1457,10 +1457,11 @@ function renderWagerProgress() {
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
-      // Wager refresh animation — fresh start
-    wagerInp.classList.remove('wsd-wager-refresh');
-    void wagerInp.offsetWidth;           // force layout
-    wagerInp.classList.add('wsd-wager-refresh');
+     
+   / Fade/dissolve animation for the dropdown
+      guessSel.classList.remove('wsd-guess-fade');
+      void guessSel.offsetWidth;     // force layout so removal is applied
+      guessSel.classList.add('wsd-guess-fade');
       
     }
   }
