@@ -1461,8 +1461,17 @@ function renderWagerProgress() {
       guessSel.classList.remove('wsd-guess-fade');
       void guessSel.offsetWidth;     // force layout so removal is applied
       guessSel.classList.add('wsd-guess-fade');
-      
     }
+    if (wagerInp) {
+    wagerInp.min = 1;
+    wagerInp.max = player.score;
+    wagerInp.value = Math.min(1, player.score);
+
+    wagerInp.classList.remove('wsd-guess-fade');
+    void wagerInp.offsetWidth;
+    wagerInp.classList.add('wsd-guess-fade');
+  }
+}
   }
 
   updateHoneyPotDisplay(true);
