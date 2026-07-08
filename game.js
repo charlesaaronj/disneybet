@@ -1433,47 +1433,35 @@ function renderWagerProgress() {
   const err      = $('wsd-gw-error');
   const guessSel = $('wsd-gw-guess');
 
-  // Progress line
   if (prog) {
     prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   }
 
-  // Current player name, scoped to this screen
   if (label) {
     if (player) {
       label.textContent = `${player.name}'s guess`;
     } else {
       label.textContent = 'Who said it?';
     }
-
-    label.classList.remove('wsd-name-refresh');
-    void label.offsetWidth;
-    label.classList.add('wsd-name-refresh');
   }
 
   if (err) err.textContent = '';
 
   if (player) {
-    // Guess dropdown
     if (guessSel) {
       populateGuessOptionsForPlayer(player);
-      guessSel.classList.remove('wsd-select-refresh');
-      void guessSel.offsetWidth;
-      guessSel.classList.add('wsd-select-refresh');
     }
 
-    // Wager field
     if (wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
-      // Use the same animation you already use for the answer field
-      wagerInp.classList.add('wsd-anim-answer-refresh');
-      void wagerInp.offsetWidth;
-      setTimeout(() => {
-        wagerInp.classList.remove('wsd-anim-answer-refresh');
-      }, 200);
+      // Wager refresh animation — fresh start
+    wagerInp.classList.remove('wsd-wager-refresh');
+    void wagerInp.offsetWidth;           // force layout
+    wagerInp.classList.add('wsd-wager-refresh');
+      
     }
   }
 
