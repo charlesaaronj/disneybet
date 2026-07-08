@@ -1332,7 +1332,7 @@ function getCurrentHunnyPotBreakdown(includeDraft = false) {
   let draftAmount = 0;
   if (includeDraft) {
     const activePlayer = getCurrentWagerPlayer();
-    const inp = id('wsd-gw-wager');
+    const inp = $('wsd-gw-wager');
     if (activePlayer && inp) {
       let val = parseInt(inp.value, 10);
       if (isNaN(val)) val = 0;
