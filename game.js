@@ -3371,6 +3371,7 @@ document.addEventListener("DOMContentLoaded", () => {
 if (verEl) verEl.textContent = `v${APP_VERSION}`;
 
   wireEvents();
+  initHeroSpotlightAfterWelcome();
 
   const startBtn = $("wsd-start-game");
   if (startBtn) {
