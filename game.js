@@ -1472,7 +1472,7 @@ function renderWagerProgress() {
     wagerInp.classList.add('wsd-guess-fade');
   }
 }
-  }
+  
 
   updateHoneyPotDisplay(true);
 }
