@@ -927,3 +927,21 @@ body {
   pointer-events: auto;
   margin-bottom: 1rem !important;
 }
+.wsd-select-refresh {
+  animation: wsd-select-refresh 180ms ease-out;
+}
+
+@keyframes wsd-select-refresh {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.0;
+  }
+  60% {
+    transform: scale(1.02);
+    opacity: 1.0;
+  }
+  100% {
+    transform: scale(1.0);
+    opacity: 1.0;
+  }
+}
