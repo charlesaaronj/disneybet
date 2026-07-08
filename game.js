@@ -1368,6 +1368,7 @@ function populateGuessOptionsForPlayer(player) {
 
   guessSel.innerHTML = '';
 
+  // Base options: all other players, never themselves
   gameState.players
     .filter(p => p.id !== player.id)
     .forEach(p => {
@@ -1377,14 +1378,23 @@ function populateGuessOptionsForPlayer(player) {
       guessSel.appendChild(opt);
     });
 
-  const selectedAnswer = gameState.currentRound?.selectedAnswer;
-  const selectedAuthorId = selectedAnswer?.isGhost
-    ? (selectedAnswer.ghostOwnerId ?? selectedAnswer.playerId)
-    : selectedAnswer?.playerId;
+  const r = gameState.currentRound;
+  const selected = r?.selectedAnswer;
 
-  const isAuthor = player.id === selectedAuthorId;
+  if (!r?.ghostRound || !selected) {
+    // Not a ghost round, or no selected answer yet: no Ghost option at all
+    return;
+  }
 
-  if (gameState.currentRound?.ghostRound && !isAuthor) {
+  // Determine whose answer it is
+  const authorId = selected.isGhost
+    ? (selected.ghostOwnerId ?? selected.playerId)
+    : selected.playerId;
+
+  // Only non-author players see Ghost as a guess target
+  const isAuthor = player.id === authorId;
+
+  if (!isAuthor) {
     const ghostOpt = document.createElement('option');
     ghostOpt.value = 'ghost';
     ghostOpt.textContent = 'Ghost';
@@ -1545,11 +1555,10 @@ function saveWagerForCurrentPlayer() {
       if (saveBtn) saveBtn.disabled = false;
 
       if (r.wagerIndex >= order.length) {
-        finishSecretWagers();
-      } else {
-        renderWagerProgress();
-        showPassWagerModal();
-      }
+  finishSecretWagers();
+} else {
+  renderWagerProgress();
+}
     });
   });
 }
