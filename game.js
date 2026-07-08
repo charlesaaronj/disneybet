@@ -2114,6 +2114,18 @@ function buildRevealSummaryLines(r) {
   let line1 = "";
   let line2 = buildHunnyPotLine(r);
   let line3 = "";
+  let line4 = "";
+
+  const collectedNames = (r.collectionsThisRound || [])
+    .map(pid => gameState.players.find(p => p.id === pid)?.name)
+    .filter(Boolean)
+    .join(", ");
+
+  if (collectedNames && r.attraction) {
+    line4 = `🎢 Collected this round: ${collectedNames} collected ${r.attraction.name} (${r.attraction.land}).`;
+  } else if (r.attraction) {
+    line4 = `🎢 No one collected ${r.attraction.name} (${r.attraction.land}) this round.`;
+  }
 
   if (ctx.isGhostAnswer) {
     const ghostName = ctx.ghostOwner.name;
@@ -2141,7 +2153,7 @@ function buildRevealSummaryLines(r) {
     line1 = `🎉 ${ctx.winnerNames} guessed the author and won the round.`;
   }
 
-  return [line1, line2, line3].filter(Boolean);
+  return [line1, line4, line2, line3].filter(Boolean);
 }
 
 function renderRevealSummary(r) {
