@@ -1295,15 +1295,21 @@ function showPickOverlay(onDone) {
 // Show selected answer on the “Select answer” screen
 function renderSelectAnswerScreen() {
   const r = gameState.currentRound;
-  const qEl = $("wsd-select-question");
-  const ansEl = $("wsd-selected-answer");
+  const qEl = $('wsd-select-question');
+  const ansEl = $('wsd-selected-answer');
   if (qEl) qEl.textContent = r.question;
   if (!ansEl) return;
 
-  ansEl.classList.remove("wsd-anim-pop");
+  ansEl.classList.remove('wsd-anim-pop');
   void ansEl.offsetWidth;
   ansEl.textContent = `"${r.selectedAnswer.text}"`;
-  ansEl.classList.add("wsd-anim-pop", "wsd-answer-highlight");
+  ansEl.classList.add('wsd-anim-pop', 'wsd-answer-highlight');
+
+  // Explicit label for this screen only
+  const labelEl = document.querySelector('#screen-select-answer .wsd-form-label');
+  if (labelEl) {
+    labelEl.textContent = 'A player said';
+  }
 }
 
 // ---------- Guess + wager screen ----------
@@ -1356,7 +1362,7 @@ function updateHoneyPotDisplay(includeDraft = true) {
   if (!el) return;
   const b = getCurrentHunnyPotBreakdown(includeDraft);
 
-  el.textContent = b.total;
+  el.textContent = `Current Hunny pot total: ${b.total}`;
 }
 
 function populateGuessOptionsForPlayer(player) {
@@ -1410,6 +1416,7 @@ function renderWagerProgress() {
   const r = gameState?.currentRound;
   if (!r) return;
 
+  // Ensure we have a wager order
   const order = Array.isArray(r.wagerOrder) && r.wagerOrder.length
     ? r.wagerOrder
     : gameState.players.map(p => p.id);
@@ -1420,47 +1427,59 @@ function renderWagerProgress() {
 
   const idx = r.wagerIndex ?? 0;
   const player = getCurrentWagerPlayer();
-  const prog = $('wsd-gw-progress');
-  const label = $('wsd-gw-current-player-label');
+
+  const prog     = $('wsd-gw-progress');
+  const label    = $('wsd-gw-current-player-label');
   const wagerInp = $('wsd-gw-wager');
-  const err = $('wsd-gw-error');
+  const err      = $('wsd-gw-error');
   const guessSel = $('wsd-gw-guess');
 
+  // "Player 1 of 4"
   if (prog) {
     prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   }
-  if (label) {
-    label.textContent = player ? player.name : 'Player';
 
-    // Animate current player name
+  // Current player name: "Aaron's guess"
+  if (label) {
+    if (player) {
+      label.textContent = `${player.name}'s guess`;
+    } else {
+      label.textContent = "Author's guess";
+    }
+
+    // Name refresh animation
     label.classList.remove('wsd-name-refresh');
-    void label.offsetWidth;
+    void label.offsetWidth;              // <-- force reflow
     label.classList.add('wsd-name-refresh');
   }
+
   if (err) err.textContent = '';
 
   if (player) {
-    populateGuessOptionsForPlayer(player);
-
-    // Animate dropdown
+    // Populate guess options for this player
     if (guessSel) {
+      populateGuessOptionsForPlayer(player);
+
+      // Guess dropdown refresh animation
       guessSel.classList.remove('wsd-select-refresh');
-      void guessSel.offsetWidth;
+      void guessSel.offsetWidth;         // <-- force reflow
       guessSel.classList.add('wsd-select-refresh');
     }
 
-    // Animate wager input
+    // Wager field min/max/value + refresh animation
     if (wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
+      // Wager refresh animation
       wagerInp.classList.remove('wsd-wager-refresh');
-      void wagerInp.offsetWidth;
+      void wagerInp.offsetWidth;         // <-- force reflow
       wagerInp.classList.add('wsd-wager-refresh');
     }
   }
 
+  // Hunny pot total with label
   updateHoneyPotDisplay(true);
 }
 function showPassWagerModal() {
