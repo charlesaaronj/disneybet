@@ -928,20 +928,20 @@ body {
   margin-bottom: 1rem !important;
 }
 .wsd-select-refresh {
-  animation: wsd-select-refresh 180ms ease-out;
+  animation: wsd-select-refresh 160ms ease-out;
 }
 
 @keyframes wsd-select-refresh {
   0% {
-    transform: scale(0.96);
+    transform: translateY(2px);
     opacity: 0.0;
   }
   60% {
-    transform: scale(1.02);
+    transform: translateY(-1px);
     opacity: 1.0;
   }
   100% {
-    transform: scale(1.0);
+    transform: translateY(0);
     opacity: 1.0;
   }
 }
