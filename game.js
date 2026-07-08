@@ -1368,7 +1368,7 @@ function populateGuessOptionsForPlayer(player) {
 
   guessSel.innerHTML = '';
 
-  // Base options: all other players, never themselves
+  // Base options: all other players
   gameState.players
     .filter(p => p.id !== player.id)
     .forEach(p => {
@@ -1381,19 +1381,16 @@ function populateGuessOptionsForPlayer(player) {
   const r = gameState.currentRound;
   const selected = r?.selectedAnswer;
 
-  if (!r?.ghostRound || !selected) {
-    // Not a ghost round, or no selected answer yet: no Ghost option at all
-    return;
-  }
+  // Only ghost rounds can show Ghost
+  if (!r?.ghostRound || !selected) return;
 
-  // Determine whose answer it is
   const authorId = selected.isGhost
     ? (selected.ghostOwnerId ?? selected.playerId)
     : selected.playerId;
 
-  // Only non-author players see Ghost as a guess target
   const isAuthor = player.id === authorId;
 
+  // Show Ghost for everyone except the author
   if (!isAuthor) {
     const ghostOpt = document.createElement('option');
     ghostOpt.value = 'ghost';
@@ -1401,8 +1398,6 @@ function populateGuessOptionsForPlayer(player) {
     guessSel.appendChild(ghostOpt);
   }
 }
-
-
 function renderWagerProgress() {
   const r = gameState?.currentRound;
   if (!r) return;
@@ -1421,6 +1416,7 @@ function renderWagerProgress() {
   const label = $('wsd-gw-current-player-label');
   const wagerInp = $('wsd-gw-wager');
   const err = $('wsd-gw-error');
+  const guessSel = $('wsd-gw-guess');
 
   if (prog) prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   if (label) label.textContent = player ? player.name : 'Player';
@@ -1428,6 +1424,14 @@ function renderWagerProgress() {
 
   if (player) {
     populateGuessOptionsForPlayer(player);
+
+    // Smooth refresh animation for the dropdown
+    if (guessSel) {
+      guessSel.classList.remove('wsd-select-refresh');
+      void guessSel.offsetWidth; // reflow
+      guessSel.classList.add('wsd-select-refresh');
+    }
+
     if (wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
@@ -1437,7 +1441,6 @@ function renderWagerProgress() {
 
   updateHoneyPotDisplay(true);
 }
-
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
   const modalEl = $('modal-pass-wager-phone');
