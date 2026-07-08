@@ -1399,10 +1399,10 @@ function renderWagerProgress() {
 
   const idx = r.wagerIndex ?? 0;
   const player = getCurrentWagerPlayer();
-  const prog = id('wsd-gw-progress');
-  const label = id('wsd-gw-current-player-label');
-  const wagerInp = id('wsd-gw-wager');
-  const err = id('wsd-gw-error');
+  const prog = $('wsd-gw-progress');
+  const label = $('wsd-gw-current-player-label');
+  const wagerInp = $('wsd-gw-wager');
+  const err = $('wsd-gw-error');
 
   if (prog) prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   if (label) label.textContent = player ? player.name : 'Player';
@@ -1422,9 +1422,9 @@ function renderWagerProgress() {
 
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
-  const modalEl = id('modal-pass-wager-phone');
-  const bodyEl = id('modal-pass-wager-phone-body');
-  const titleEl = id('modal-pass-wager-phone-title');
+  const modalEl = $('modal-pass-wager-phone');
+  const bodyEl = $('modal-pass-wager-phone-body');
+  const titleEl = $('modal-pass-wager-phone-title');
 
   if (titleEl) titleEl.textContent = 'Secret wager turn';
   if (bodyEl) {
@@ -1443,9 +1443,9 @@ function showPassWagerModal() {
 }
 
 function showFinalHunnyPotModal() {
-  const modalEl = id('modal-final-honeypot');
-  const bodyEl = id('modal-final-honeypot-body');
-  const titleEl = id('modal-final-honeypot-title');
+  const modalEl = $('modal-final-honeypot');
+  const bodyEl = $('modal-final-honeypot-body');
+  const titleEl = $('modal-final-honeypot-title');
   const b = getCurrentHunnyPotBreakdown(false);
 
   if (titleEl) titleEl.textContent = 'Final Hunny Pot';
@@ -1492,10 +1492,10 @@ function saveWagerForCurrentPlayer() {
     : gameState.players.map(p => p.id);
 
   const player = getCurrentWagerPlayer();
-  const guessSel = id('wsd-gw-guess');
-  const wagerInp = id('wsd-gw-wager');
-  const err = id('wsd-gw-error');
-  const saveBtn = id('wsd-save-wager');
+  const guessSel = $('wsd-gw-guess');
+  const wagerInp = $('wsd-gw-wager');
+  const err = $('wsd-gw-error');
+  const saveBtn = $('wsd-save-wager');
 
   if (err) err.textContent = '';
   if (!player) {
