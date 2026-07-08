@@ -1085,7 +1085,7 @@ function renderAnswerProgress() {
   const ghostInput = $("wsd-ghost-answer-input");
 
   if (prog) prog.textContent = `Player ${idx + 1} of ${order.length}`;
-  if (label) label.textContent = player ? `${player.name}'s guess` : "Author's guess";
+  if (label) label.textContent = player ? `${player.name}` : "Author";
 
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
@@ -1416,7 +1416,6 @@ function renderWagerProgress() {
   const r = gameState?.currentRound;
   if (!r) return;
 
-  // Ensure we have a wager order
   const order = Array.isArray(r.wagerOrder) && r.wagerOrder.length
     ? r.wagerOrder
     : gameState.players.map(p => p.id);
@@ -1425,7 +1424,7 @@ function renderWagerProgress() {
     r.wagerOrder = order.slice();
   }
 
-  const idx = r.wagerIndex ?? 0;
+  const idx    = r.wagerIndex ?? 0;
   const player = getCurrentWagerPlayer();
 
   const prog     = $('wsd-gw-progress');
@@ -1434,54 +1433,50 @@ function renderWagerProgress() {
   const err      = $('wsd-gw-error');
   const guessSel = $('wsd-gw-guess');
 
-  // "Player 1 of 4"
+  // Progress line
   if (prog) {
     prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   }
 
-  // Current player name: "Aaron's guess"
+  // Current player name, scoped to this screen
   if (label) {
     if (player) {
       label.textContent = `${player.name}'s guess`;
     } else {
-      label.textContent = "Author's guess";
+      label.textContent = 'Who said it?';
     }
 
-    // Name refresh animation
     label.classList.remove('wsd-name-refresh');
-    void label.offsetWidth;              // <-- force reflow
+    void label.offsetWidth;
     label.classList.add('wsd-name-refresh');
   }
 
   if (err) err.textContent = '';
 
   if (player) {
-    // Populate guess options for this player
+    // Guess dropdown
     if (guessSel) {
       populateGuessOptionsForPlayer(player);
-
-      // Guess dropdown refresh animation
       guessSel.classList.remove('wsd-select-refresh');
-      void guessSel.offsetWidth;         // <-- force reflow
+      void guessSel.offsetWidth;
       guessSel.classList.add('wsd-select-refresh');
     }
 
-    // Wager field min/max/value + refresh animation
+    // Wager field
     if (wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
-      // Wager refresh animation
       wagerInp.classList.remove('wsd-wager-refresh');
-      void wagerInp.offsetWidth;         // <-- force reflow
+      void wagerInp.offsetWidth;
       wagerInp.classList.add('wsd-wager-refresh');
     }
   }
 
-  // Hunny pot total with label
   updateHoneyPotDisplay(true);
 }
+
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
   const modalEl = $('modal-pass-wager-phone');
