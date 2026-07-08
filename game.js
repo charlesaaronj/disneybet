@@ -1548,7 +1548,7 @@ function saveWagerForCurrentPlayer() {
 
 // Build the guess/wager rows and jump to guess-wager screen
 function goToGuessWager() {
-  const errEl = id('wsd-gw-error');
+  const errEl = $('wsd-gw-error');
   if (errEl) errEl.textContent = '';
 
   const r = gameState?.currentRound;
@@ -1560,8 +1560,8 @@ function goToGuessWager() {
   if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
   if (!Array.isArray(r.wagers)) r.wagers = [];
 
-  const qEl = id('wsd-gw-question');
-  const ansEl = id('wsd-gw-answer');
+  const qEl = $('wsd-gw-question');
+  const ansEl = $('wsd-gw-answer');
   if (qEl) qEl.textContent = r.question || '';
   if (ansEl) ansEl.textContent = r.selectedAnswer.text || '';
 
@@ -1569,12 +1569,13 @@ function goToGuessWager() {
   renderWagerProgress();
 
   if (r.ghostRound) {
-    const modalEl = id('modal-ghost-round');
-    const bodyEl = id('modal-ghost-round-body');
-    const titleEl = id('modal-ghost-round-title');
+    const modalEl = $('modal-ghost-round');
+    const bodyEl = $('modal-ghost-round-body');
+    const titleEl = $('modal-ghost-round-title');
     if (titleEl) titleEl.textContent = 'Ghost Round!';
     if (bodyEl) {
-      bodyEl.innerHTML = 'A <strong>Ghost answer</strong> was submitted this round and may be the selected answer. Choose carefully!';
+      bodyEl.innerHTML =
+        'A <strong>Ghost answer</strong> was submitted this round and may be the selected answer. Choose carefully!';
     }
     try {
       if (modalEl && typeof bootstrap !== 'undefined') {
@@ -1589,8 +1590,8 @@ function goToGuessWager() {
 // Reset wagers UI back to starting defaults
 function clearWagersUI() {
   const player = getCurrentWagerPlayer();
-  const guessSel = id('wsd-gw-guess');
-  const wagerInp = id('wsd-gw-wager');
+  const guessSel = $('wsd-gw-guess');
+  const wagerInp = $('wsd-gw-wager');
 
   if (guessSel) guessSel.selectedIndex = 0;
   if (wagerInp) {
