@@ -105,7 +105,7 @@ const SCREEN_META = {
     icon: "💰",
     title: "Guess & wager",
     instruction:
-      "All - guess Who Said Diz & wager points."
+      "Pass the phone around & let player secretly submit their guesses & wager."
   },
   "reveal": {
     icon: "🔍",
