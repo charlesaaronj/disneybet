@@ -927,33 +927,19 @@ body {
   pointer-events: auto;
   margin-bottom: 1rem !important;
 }
-
+/* Simple wager refresh bump */
 .wsd-wager-refresh {
-  animation: wsd-wager-refresh 360ms ease-out;
+  animation: wsd-wager-refresh 180ms ease-out;
 }
 
 @keyframes wsd-wager-refresh {
-  0%   { transform: scale(0.98); opacity: 0.0; }
-  60%  { transform: scale(1.02); opacity: 1.0; }
-  100% { transform: scale(1.00); opacity: 1.0; }
+  0% {
+    transform: translateY(2px);
+    opacity: 0.0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1.0;
+  }
 }
 
-.wsd-name-refresh {
-  animation: wsd-name-refresh 160ms ease-out;
-}
-
-@keyframes wsd-name-refresh {
-  0%   { transform: translateY(2px); opacity: 0.0; }
-  60%  { transform: translateY(-1px); opacity: 1.0; }
-  100% { transform: translateY(0); opacity: 1.0; }
-}
-
-.wsd-select-refresh {
-  animation: wsd-select-refresh 160ms ease-out;
-}
-
-@keyframes wsd-select-refresh {
-  0%   { transform: translateY(2px); opacity: 0.0; }
-  60%  { transform: translateY(-1px); opacity: 1.0; }
-  100% { transform: translateY(0); opacity: 1.0; }
-}
