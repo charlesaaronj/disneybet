@@ -1368,7 +1368,7 @@ function populateGuessOptionsForPlayer(player) {
 
   guessSel.innerHTML = '';
 
-  // Base options: all other players
+  // Base options: all other players, never themselves
   gameState.players
     .filter(p => p.id !== player.id)
     .forEach(p => {
@@ -1379,20 +1379,29 @@ function populateGuessOptionsForPlayer(player) {
     });
 
   const r = gameState.currentRound;
-  const selected = r?.selectedAnswer;
-
-  // Only show Ghost if the selected answer itself is a Ghost answer
-  if (!r?.ghostRound || !selected?.isGhost) {
+  if (!r?.ghostRound) {
+    // Not a Ghost round: no Ghost option at all
     return;
   }
 
-  // Ghost owner is the person whose Ghost answer was chosen
-  const ghostOwnerId = selected.ghostOwnerId ?? selected.playerId;
+  // Is there any Ghost answer in the pool this round?
+  const hasGhostInPool = Array.isArray(r.answers) &&
+    r.answers.some(a => a && a.isGhost);
 
-  // Current wager player is the ghost owner?
-  const isGhostOwner = player.id === ghostOwnerId;
+  if (!hasGhostInPool) {
+    // Ghost not in the pool → no Ghost guess target
+    return;
+  }
 
-  // Everyone except the ghost owner sees Ghost in the dropdown
+  // Find the ghost owner (the player whose Ghost answer is in the pool)
+  const ghostAnswer = r.answers.find(a => a && a.isGhost);
+  const ghostOwnerId = ghostAnswer
+    ? (ghostAnswer.ghostOwnerId ?? ghostAnswer.playerId)
+    : null;
+
+  // Hide Ghost only for the ghost owner; show for everyone else
+  const isGhostOwner = ghostOwnerId != null && player.id === ghostOwnerId;
+
   if (!isGhostOwner) {
     const ghostOpt = document.createElement('option');
     ghostOpt.value = 'ghost';
@@ -1427,10 +1436,10 @@ function renderWagerProgress() {
   if (player) {
     populateGuessOptionsForPlayer(player);
 
-    // Smooth refresh animation for the dropdown
+    // Apply a subtle refresh animation to the dropdown
     if (guessSel) {
       guessSel.classList.remove('wsd-select-refresh');
-      void guessSel.offsetWidth; // reflow to restart animation
+      void guessSel.offsetWidth; // force reflow
       guessSel.classList.add('wsd-select-refresh');
     }
 
@@ -1443,6 +1452,7 @@ function renderWagerProgress() {
 
   updateHoneyPotDisplay(true);
 }
+
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
   const modalEl = $('modal-pass-wager-phone');
