@@ -1457,8 +1457,7 @@ function renderWagerProgress() {
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
-     
-   / Fade/dissolve animation for the dropdown
+  // Fade/dissolve animation for the dropdown
       guessSel.classList.remove('wsd-guess-fade');
       void guessSel.offsetWidth;     // force layout so removal is applied
       guessSel.classList.add('wsd-guess-fade');
