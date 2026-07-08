@@ -927,19 +927,17 @@ body {
   pointer-events: auto;
   margin-bottom: 1rem !important;
 }
-/* Simple wager refresh bump */
-.wsd-wager-refresh {
-  animation: wsd-wager-refresh 180ms ease-out;
+.wsd-guess-fade {
+  animation: wsd-guess-fade 200ms ease-out;
 }
 
-@keyframes wsd-wager-refresh {
+@keyframes wsd-guess-fade {
   0% {
+    opacity: 0;
     transform: translateY(2px);
-    opacity: 0.0;
   }
   100% {
+    opacity: 1;
     transform: translateY(0);
-    opacity: 1.0;
   }
 }
-
