@@ -1468,16 +1468,18 @@ function renderWagerProgress() {
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
-     // Use the same animation you already use for the answer field
-  wagerInp.classList.add('wsd-anim-answer-refresh');
-  void wagerInp.offsetWidth;
-  setTimeout(() => {
-    wagerInp.classList.remove('wsd-anim-answer-refresh');
-  }, 200);
-}
+      // Use the same animation you already use for the answer field
+      wagerInp.classList.add('wsd-anim-answer-refresh');
+      void wagerInp.offsetWidth;
+      setTimeout(() => {
+        wagerInp.classList.remove('wsd-anim-answer-refresh');
+      }, 200);
+    }
+  }
 
   updateHoneyPotDisplay(true);
 }
+
 
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
