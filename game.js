@@ -1371,6 +1371,13 @@ function populateGuessOptionsForPlayer(player) {
 
   guessSel.innerHTML = '';
 
+  const defaultOpt = document.createElement('option');
+  defaultOpt.value = '';
+  defaultOpt.textContent = 'Select';
+  defaultOpt.selected = true;
+  defaultOpt.disabled = true;
+  guessSel.appendChild(defaultOpt);
+
   // Base options: all other players, never themselves
   gameState.players
     .filter(p => p.id !== player.id)
@@ -1383,26 +1390,21 @@ function populateGuessOptionsForPlayer(player) {
 
   const r = gameState.currentRound;
   if (!r?.ghostRound) {
-    // Not a Ghost round: no Ghost option at all
     return;
   }
 
-  // Is there any Ghost answer in the pool this round?
   const hasGhostInPool = Array.isArray(r.answers) &&
     r.answers.some(a => a && a.isGhost);
 
   if (!hasGhostInPool) {
-    // Ghost not in the pool → no Ghost guess target
     return;
   }
 
-  // Find the ghost owner (the player whose Ghost answer is in the pool)
   const ghostAnswer = r.answers.find(a => a && a.isGhost);
   const ghostOwnerId = ghostAnswer
     ? (ghostAnswer.ghostOwnerId ?? ghostAnswer.playerId)
     : null;
 
-  // Hide Ghost only for the ghost owner; show for everyone else
   const isGhostOwner = ghostOwnerId != null && player.id === ghostOwnerId;
 
   if (!isGhostOwner) {
@@ -1412,6 +1414,7 @@ function populateGuessOptionsForPlayer(player) {
     guessSel.appendChild(ghostOpt);
   }
 }
+
 function renderWagerProgress() {
   const r = gameState?.currentRound;
   if (!r) return;
