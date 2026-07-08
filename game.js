@@ -2102,7 +2102,7 @@ function buildHunnyPotLine(r) {
   const total = basePoints + wagerPoints + hotBonus;
 
   if (hotBonus > 0) {
-    return `🍯 Hunny pot: ${basePoints} base + ${wagerPoints} wagers + ${hotBonus} Hot Round bonus = ${total}`;
+    return `🍯 Hunny pot: ${basePoints} base + ${wagerPoints} wagers + ${hotBonus} Hot Round = ${total}`;
   }
 
   return `🍯 Hunny pot: ${basePoints} base + ${wagerPoints} wagers = ${total}`;
