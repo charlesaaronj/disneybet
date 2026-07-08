@@ -5,7 +5,7 @@
 const APP_VERSION = "1.5";
 
 // ---------- Small DOM + utility helpers ----------
-const $ = id => document.getElementBy$(id);
+const $ = id => document.getElementById(id);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const medal = i => ["🥇 ", "🥈 ", "🥉 "][i] || "";
 
@@ -66,7 +66,7 @@ function requireState(fn) {
 }
 
 // ---------- Constants & configuration ----------
-const id = $;
+
 const MIN_POINTS = 1;
 const START_POINTS = 10;
 
@@ -390,7 +390,7 @@ const ALL_SCREENS = Object.keys(SCREEN_META);
 function showScreen(name) {
   // Toggle active screen
   ALL_SCREENS.forEach(key => {
-    const el = document.getElementBy$(`screen-${key}`);
+    const el = document.getElementById(`screen-${key}`);
     if (el) {
       el.classList.toggle("wsd-screen-active", key === name);
     }
@@ -1332,7 +1332,7 @@ function getCurrentHunnyPotBreakdown(includeDraft = false) {
   let draftAmount = 0;
   if (includeDraft) {
     const activePlayer = getCurrentWagerPlayer();
-    const inp = $('wsd-gw-wager');
+    const inp = id('wsd-gw-wager');
     if (activePlayer && inp) {
       let val = parseInt(inp.value, 10);
       if (isNaN(val)) val = 0;
@@ -1352,7 +1352,7 @@ function getCurrentHunnyPotBreakdown(includeDraft = false) {
 }
 
 function updateHoneyPotDisplay(includeDraft = true) {
-  const el = $('wsd-gw-honeypot');
+  const el = id('wsd-gw-honeypot');
   if (!el) return;
   const b = getCurrentHunnyPotBreakdown(includeDraft);
   const wagerPart = b.wagerPoints + b.draftAmount;
@@ -1363,7 +1363,7 @@ function updateHoneyPotDisplay(includeDraft = true) {
 }
 
 function populateGuessOptionsForPlayer(player) {
-  const guessSel = $('wsd-gw-guess');
+  const guessSel = id('wsd-gw-guess');
   if (!guessSel || !player) return;
 
   guessSel.innerHTML = '';
@@ -1399,10 +1399,10 @@ function renderWagerProgress() {
 
   const idx = r.wagerIndex ?? 0;
   const player = getCurrentWagerPlayer();
-  const prog = $('wsd-gw-progress');
-  const label = $('wsd-gw-current-player-label');
-  const wagerInp = $('wsd-gw-wager');
-  const err = $('wsd-gw-error');
+  const prog = id('wsd-gw-progress');
+  const label = id('wsd-gw-current-player-label');
+  const wagerInp = id('wsd-gw-wager');
+  const err = id('wsd-gw-error');
 
   if (prog) prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   if (label) label.textContent = player ? player.name : 'Player';
@@ -1422,9 +1422,9 @@ function renderWagerProgress() {
 
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
-  const modalEl = $('modal-pass-wager-phone');
-  const bodyEl = $('modal-pass-wager-phone-body');
-  const titleEl = $('modal-pass-wager-phone-title');
+  const modalEl = id('modal-pass-wager-phone');
+  const bodyEl = id('modal-pass-wager-phone-body');
+  const titleEl = id('modal-pass-wager-phone-title');
 
   if (titleEl) titleEl.textContent = 'Secret wager turn';
   if (bodyEl) {
@@ -1443,9 +1443,9 @@ function showPassWagerModal() {
 }
 
 function showFinalHunnyPotModal() {
-  const modalEl = $('modal-final-honeypot');
-  const bodyEl = $('modal-final-honeypot-body');
-  const titleEl = $('modal-final-honeypot-title');
+  const modalEl = id('modal-final-honeypot');
+  const bodyEl = id('modal-final-honeypot-body');
+  const titleEl = id('modal-final-honeypot-title');
   const b = getCurrentHunnyPotBreakdown(false);
 
   if (titleEl) titleEl.textContent = 'Final Hunny Pot';
@@ -1492,10 +1492,10 @@ function saveWagerForCurrentPlayer() {
     : gameState.players.map(p => p.id);
 
   const player = getCurrentWagerPlayer();
-  const guessSel = $('wsd-gw-guess');
-  const wagerInp = $('wsd-gw-wager');
-  const err = $('wsd-gw-error');
-  const saveBtn = $('wsd-save-wager');
+  const guessSel = id('wsd-gw-guess');
+  const wagerInp = id('wsd-gw-wager');
+  const err = id('wsd-gw-error');
+  const saveBtn = id('wsd-save-wager');
 
   if (err) err.textContent = '';
   if (!player) {
@@ -1548,7 +1548,7 @@ function saveWagerForCurrentPlayer() {
 
 // Build the guess/wager rows and jump to guess-wager screen
 function goToGuessWager() {
-  const errEl = $('wsd-gw-error');
+  const errEl = id('wsd-gw-error');
   if (errEl) errEl.textContent = '';
 
   const r = gameState?.currentRound;
@@ -1560,8 +1560,8 @@ function goToGuessWager() {
   if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
   if (!Array.isArray(r.wagers)) r.wagers = [];
 
-  const qEl = $('wsd-gw-question');
-  const ansEl = $('wsd-gw-answer');
+  const qEl = id('wsd-gw-question');
+  const ansEl = id('wsd-gw-answer');
   if (qEl) qEl.textContent = r.question || '';
   if (ansEl) ansEl.textContent = r.selectedAnswer.text || '';
 
@@ -1569,9 +1569,9 @@ function goToGuessWager() {
   renderWagerProgress();
 
   if (r.ghostRound) {
-    const modalEl = $('modal-ghost-round');
-    const bodyEl = $('modal-ghost-round-body');
-    const titleEl = $('modal-ghost-round-title');
+    const modalEl = id('modal-ghost-round');
+    const bodyEl = id('modal-ghost-round-body');
+    const titleEl = id('modal-ghost-round-title');
     if (titleEl) titleEl.textContent = 'Ghost Round!';
     if (bodyEl) {
       bodyEl.innerHTML = 'A <strong>Ghost answer</strong> was submitted this round and may be the selected answer. Choose carefully!';
@@ -1589,8 +1589,8 @@ function goToGuessWager() {
 // Reset wagers UI back to starting defaults
 function clearWagersUI() {
   const player = getCurrentWagerPlayer();
-  const guessSel = $('wsd-gw-guess');
-  const wagerInp = $('wsd-gw-wager');
+  const guessSel = id('wsd-gw-guess');
+  const wagerInp = id('wsd-gw-wager');
 
   if (guessSel) guessSel.selectedIndex = 0;
   if (wagerInp) {
@@ -2728,7 +2728,7 @@ function renderFinalResults() {
   const topWins = sorted[0]?.wins ?? 0;
   const winners = sorted.filter(p => p.score === topScore && p.wins === topWins);
 
-  const banner = document.getElementBy$("wsd-winner-banner");
+  const banner = document.getElementById("wsd-winner-banner");
   if (banner) {
     banner.innerHTML =
       winners.map(w => w.name).join(" & ") +
@@ -2741,13 +2741,13 @@ function renderFinalResults() {
     banner.classList.add("wsd-anim-pop");
   }
 
-  const confetti = document.getElementBy$("wsd-confetti-wrap-end");
+  const confetti = document.getElementById("wsd-confetti-wrap-end");
   if (confetti) {
     confetti.innerHTML = "";
     spawnEndgameConfetti(confetti);
   }
 
-  const c = document.getElementBy$("wsd-final-results");
+  const c = document.getElementById("wsd-final-results");
   if (!c) return;
 
   c.innerHTML = "";
@@ -2891,7 +2891,7 @@ function wireEvents() {
   );
   
 // Select answer
-document.getElementBy$('wsd-select-again')?.addEventListener('click', () => {
+document.getElementById('wsd-select-again')?.addEventListener('click', () => {
   showPickOverlay(() => {
     pickRandomAnswer();
     renderSelectAnswerScreen();
@@ -2899,17 +2899,17 @@ document.getElementBy$('wsd-select-again')?.addEventListener('click', () => {
   });
 });
 
-document.getElementBy$('wsd-to-wagers')?.addEventListener('click', goToGuessWager);
-document.getElementBy$('wsd-abandon-from-select')?.addEventListener('click', abandonRound);
+document.getElementById('wsd-to-wagers')?.addEventListener('click', goToGuessWager);
+document.getElementById('wsd-abandon-from-select')?.addEventListener('click', abandonRound);
 
 // Guess wager
-document.getElementBy$('wsd-save-wager')?.addEventListener('click', saveWagerForCurrentPlayer);
-document.getElementBy$('wsd-clear-wager')?.addEventListener('click', clearWagersUI);
-document.getElementBy$('wsd-abandon-from-gw')?.addEventListener('click', abandonRound);
-document.getElementBy$('wsd-gw-wager')?.addEventListener('input', () => updateHoneyPotDisplay(true));
+document.getElementById('wsd-save-wager')?.addEventListener('click', saveWagerForCurrentPlayer);
+document.getElementById('wsd-clear-wager')?.addEventListener('click', clearWagersUI);
+document.getElementById('wsd-abandon-from-gw')?.addEventListener('click', abandonRound);
+document.getElementById('wsd-gw-wager')?.addEventListener('input', () => updateHoneyPotDisplay(true));
 
-document.getElementBy$('wsd-final-honeypot-continue')?.addEventListener('click', () => {
-  const modalEl = document.getElementBy$('modal-final-honeypot');
+document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click', () => {
+  const modalEl = document.getElementById('modal-final-honeypot');
 
   if (modalEl && typeof bootstrap !== 'undefined') {
     bootstrap.Modal.getInstance(modalEl)?.hide();
