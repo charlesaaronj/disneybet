@@ -1352,7 +1352,7 @@ function getCurrentHunnyPotBreakdown(includeDraft = false) {
 }
 
 function updateHoneyPotDisplay(includeDraft = true) {
-  const el = id('wsd-gw-honeypot');
+  const el = $('wsd-gw-honeypot');
   if (!el) return;
   const b = getCurrentHunnyPotBreakdown(includeDraft);
   const wagerPart = b.wagerPoints + b.draftAmount;
