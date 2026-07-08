@@ -1381,17 +1381,19 @@ function populateGuessOptionsForPlayer(player) {
   const r = gameState.currentRound;
   const selected = r?.selectedAnswer;
 
-  // Only ghost rounds can show Ghost
-  if (!r?.ghostRound || !selected) return;
+  // Only show Ghost if the selected answer itself is a Ghost answer
+  if (!r?.ghostRound || !selected?.isGhost) {
+    return;
+  }
 
-  const authorId = selected.isGhost
-    ? (selected.ghostOwnerId ?? selected.playerId)
-    : selected.playerId;
+  // Ghost owner is the person whose Ghost answer was chosen
+  const ghostOwnerId = selected.ghostOwnerId ?? selected.playerId;
 
-  const isAuthor = player.id === authorId;
+  // Current wager player is the ghost owner?
+  const isGhostOwner = player.id === ghostOwnerId;
 
-  // Show Ghost for everyone except the author
-  if (!isAuthor) {
+  // Everyone except the ghost owner sees Ghost in the dropdown
+  if (!isGhostOwner) {
     const ghostOpt = document.createElement('option');
     ghostOpt.value = 'ghost';
     ghostOpt.textContent = 'Ghost';
@@ -1428,7 +1430,7 @@ function renderWagerProgress() {
     // Smooth refresh animation for the dropdown
     if (guessSel) {
       guessSel.classList.remove('wsd-select-refresh');
-      void guessSel.offsetWidth; // reflow
+      void guessSel.offsetWidth; // reflow to restart animation
       guessSel.classList.add('wsd-select-refresh');
     }
 
