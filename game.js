@@ -2903,16 +2903,19 @@ document.getElementById('wsd-to-wagers')?.addEventListener('click', goToGuessWag
 document.getElementById('wsd-abandon-from-select')?.addEventListener('click', abandonRound);
 
 // Guess wager
-document.getElementById('wsd-save-wager')?.addEventListener('click', saveCurrentWagerAndAdvance);
-document.getElementById('wsd-clear-wager')?.addEventListener('click', clearCurrentWagerTurn);
+document.getElementById('wsd-save-wager')?.addEventListener('click', saveWagerForCurrentPlayer);
+document.getElementById('wsd-clear-wager')?.addEventListener('click', clearWagersUI);
 document.getElementById('wsd-abandon-from-gw')?.addEventListener('click', abandonRound);
 document.getElementById('wsd-gw-wager')?.addEventListener('input', () => updateHoneyPotDisplay(true));
 
 document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click', () => {
   const modalEl = document.getElementById('modal-final-honeypot');
+
   if (modalEl && typeof bootstrap !== 'undefined') {
     bootstrap.Modal.getInstance(modalEl)?.hide();
   }
+
+  continueFromFinalHunnyPot();
 });
 
 
