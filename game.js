@@ -1355,11 +1355,8 @@ function updateHoneyPotDisplay(includeDraft = true) {
   const el = $('wsd-gw-honeypot');
   if (!el) return;
   const b = getCurrentHunnyPotBreakdown(includeDraft);
-  const wagerPart = b.wagerPoints + b.draftAmount;
 
-  el.textContent = b.hotBonus > 0
-    ? `Current Hunny pot: ${b.basePoints} base + ${wagerPart} wagered + ${b.hotBonus} Hot Round bonus = ${b.total}`
-    : `Current Hunny pot: ${b.basePoints} base + ${wagerPart} wagered = ${b.total}`;
+  el.textContent = b.total;
 }
 
 function populateGuessOptionsForPlayer(player) {
