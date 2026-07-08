@@ -929,7 +929,7 @@ body {
 }
 
 .wsd-wager-refresh {
-  animation: wsd-wager-refresh 160ms ease-out;
+  animation: wsd-wager-refresh 360ms ease-out;
 }
 
 @keyframes wsd-wager-refresh {
