@@ -958,20 +958,19 @@ body {
 .wsd-wager-inline {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.7rem;
 }
 
 .wsd-wager-inline-btn {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   border-radius: 999px;
   border: none;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   line-height: 1;
   font-weight: 600;
   color: #fff;
   background: var(--wsd-btn-primary-bg, linear-gradient(180deg,#42229b,#6a3df0));
-  box-shadow: 0 4px 10px rgba(66,34,155,0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -991,8 +990,7 @@ body {
 .wsd-wager-inline-value {
   min-width: 32px;
   text-align: center;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #42229b;
 }
