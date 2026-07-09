@@ -1428,7 +1428,6 @@ function getCurrentWagerPlayer() {
 function syncWagerDisplay(animate = false) {
   const inp = $("wsd-gw-wager");
   const valEl = $("wsd-wager-value");
-  const rangeEl = $("wsd-wager-range");
   const minusBtn = $("wsd-wager-minus");
   const plusBtn = $("wsd-wager-plus");
   const player = getCurrentWagerPlayer();
@@ -1446,9 +1445,7 @@ function syncWagerDisplay(animate = false) {
 
   value = Math.max(min, Math.min(max, value));
   inp.value = value;
-
   valEl.textContent = value;
-  if (rangeEl) rangeEl.textContent = `${min} to ${max}`;
 
   if (minusBtn) minusBtn.disabled = value <= min;
   if (plusBtn) plusBtn.disabled = value >= max;
@@ -1484,6 +1481,7 @@ function initWagerStepper() {
   $("wsd-wager-minus")?.addEventListener("click", () => changeWagerBy(-1));
   $("wsd-wager-plus")?.addEventListener("click", () => changeWagerBy(1));
 }
+
 function setCurrentPlayerWagerFromState() {
   const inp = $("wsd-gw-wager");
   const player = getCurrentWagerPlayer();
