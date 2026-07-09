@@ -449,6 +449,38 @@
 
     <div class="mb-3">
       <label class="wsd-form-label" for="wsd-gw-wager">Wager</label>
+<div class="wsd-card wsd-wager-stepper-card mb-3">
+  <div class="wsd-form-label text-center mb-2">Wager</div>
+
+  <div class="wsd-wager-stepper" aria-label="Wager selector">
+    <button
+      type="button"
+      id="wsd-wager-minus"
+      class="wsd-wager-btn"
+      aria-label="Decrease wager"
+    >
+      −
+    </button>
+
+    <div class="wsd-wager-value-wrap">
+      <div id="wsd-wager-value" class="wsd-wager-value">1</div>
+      <div id="wsd-wager-range" class="wsd-wager-range">1 to 10</div>
+    </div>
+
+    <button
+      type="button"
+      id="wsd-wager-plus"
+      class="wsd-wager-btn"
+      aria-label="Increase wager"
+    >
+      +
+    </button>
+  </div>
+
+  <input type="hidden" id="wsd-gw-wager" value="1" min="1" max="10" />
+</div>
+
+      
       <input
         id="wsd-gw-wager"
         type="number"
