@@ -2272,7 +2272,7 @@ function buildRevealRowHTML(r, payout) {
         ${ok ? "✅ " : ""}${p ? p.name : "?"}${winnerBadge}
       </div>
       <div class="wsd-score-meta">
-        Spent: ${spent} · Earned: ${earned}
+        Wagered: ${spent} · Earned: ${earned}
       </div>
     </div>
     <div class="wsd-score-value ${
