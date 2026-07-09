@@ -1414,7 +1414,85 @@ function populateGuessOptionsForPlayer(player) {
     guessSel.appendChild(ghostOpt);
   }
 }
+function getCurrentWagerPlayer() {
+  const r = gameState?.currentRound;
+  if (!r) return null;
 
+  const order = r.wagerOrder || gameState.players.map(p => p.id);
+  const idx = r.wagerIndex ?? 0;
+  const playerId = order[idx];
+
+  return gameState.players.find(p => p.id === playerId) || null;
+}
+
+function syncWagerDisplay(animate = false) {
+  const inp = $("wsd-gw-wager");
+  const valEl = $("wsd-wager-value");
+  const rangeEl = $("wsd-wager-range");
+  const minusBtn = $("wsd-wager-minus");
+  const plusBtn = $("wsd-wager-plus");
+  const player = getCurrentWagerPlayer();
+
+  if (!inp || !valEl || !player) return;
+
+  const min = 1;
+  const max = Math.max(min, player.score || 1);
+
+  inp.min = min;
+  inp.max = max;
+
+  let value = parseInt(inp.value, 10);
+  if (isNaN(value)) value = min;
+
+  value = Math.max(min, Math.min(max, value));
+  inp.value = value;
+
+  valEl.textContent = value;
+  if (rangeEl) rangeEl.textContent = `${min} to ${max}`;
+
+  if (minusBtn) minusBtn.disabled = value <= min;
+  if (plusBtn) plusBtn.disabled = value >= max;
+
+  if (animate) {
+    valEl.classList.remove("wsd-wager-value-pop");
+    void valEl.offsetWidth;
+    valEl.classList.add("wsd-wager-value-pop");
+  }
+
+  if (typeof updateHoneyPotDisplay === "function") {
+    updateHoneyPotDisplay(true);
+  }
+}
+
+function changeWagerBy(delta) {
+  const inp = $("wsd-gw-wager");
+  const player = getCurrentWagerPlayer();
+  if (!inp || !player) return;
+
+  const min = 1;
+  const max = Math.max(min, player.score || 1);
+  const current = parseInt(inp.value, 10) || min;
+  const next = Math.max(min, Math.min(max, current + delta));
+
+  if (next === current) return;
+
+  inp.value = next;
+  syncWagerDisplay(true);
+}
+
+function initWagerStepper() {
+  $("wsd-wager-minus")?.addEventListener("click", () => changeWagerBy(-1));
+  $("wsd-wager-plus")?.addEventListener("click", () => changeWagerBy(1));
+}
+function setCurrentPlayerWagerFromState() {
+  const inp = $("wsd-gw-wager");
+  const player = getCurrentWagerPlayer();
+  const r = gameState?.currentRound;
+  if (!inp || !player || !r) return;
+
+  const saved = (r.wagers || []).find(w => w.playerId === player.id);
+  inp.value = saved?.wager || 1;
+}
 function renderWagerProgress() {
   const r = gameState?.currentRound;
   if (!r) return;
@@ -1475,8 +1553,8 @@ function renderWagerProgress() {
     wagerInp.classList.add('wsd-guess-fade');
   }
 }
-  
-
+  setCurrentPlayerWagerFromState();
+  syncWagerDisplay();
   updateHoneyPotDisplay(true);
 }
 
@@ -2871,6 +2949,10 @@ function abandonRound() {
 
 
 // ---------- Wire events & bootstrap ----------
+
+document.addEventListener("DOMContentLoaded", () => {
+  initWagerStepper();
+});
 
 document.addEventListener(
   "hide.bs.modal",
