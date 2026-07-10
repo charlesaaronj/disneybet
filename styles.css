@@ -502,7 +502,7 @@ body {
   font-weight: 600;
   font-style: italic;
   text-align: center;
-  border-left: 4px solid var(--wsd-primary);
+  border-left: 4px solid var(--wsd-btn-primary-bg);
   animation: wsdFadeSlideUp 0.5s ease both;
   color: var(--wsd-text-main);
 }
