@@ -225,7 +225,7 @@ body {
 .wsd-form-control,
 .wsd-form-select {
   border-radius: 10px !important;
-  border: 1.5px solid var(--wsd-border-gold);
+  border: 1.5px solid var(--wsd-gold-strong);
   font-size: 16px;
   padding: 0.55rem 0.75rem;
   background: var(--wsd-surface-input);
