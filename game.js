@@ -985,7 +985,7 @@ function proceedToAnswers() {
 
   const roundNumber = gameState.roundNumber || 1;
   const canHaveGhost = roundNumber > 1;
-  const isGhostRound = canHaveGhost && Math.random() < 0.9;
+  const isGhostRound = canHaveGhost && Math.random() < 0.3;
 
   const ghostPlayerId = isGhostRound
     ? gameState.players[Math.floor(Math.random() * gameState.players.length)].id
