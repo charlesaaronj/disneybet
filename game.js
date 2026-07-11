@@ -362,10 +362,6 @@ function showHeroSpotlightForScreen(screenName) {
     document.removeEventListener("click", onDocClick, true);
   }
 
-  function onDocClick() {
-    clearSpotlight();
-  }
-
   if (backdrop) backdrop.addEventListener("click", clearSpotlight);
   document.addEventListener("click", onDocClick, true);
 }
