@@ -3052,6 +3052,27 @@ function wireEvents() {
   );
 
   // Answers
+
+const answerInput = $("wsd-answer-input");
+if (answerInput) {
+  answerInput.addEventListener("input", () => {
+    const r = gameState?.currentRound;
+    if (!r?.ghostRound) return;
+
+    const idx = r.answerIndex ?? 0;
+    const order = r.answerOrder || gameState.players.map(p => p.id);
+    const playerId = order[idx];
+    const isGhostPlayer = playerId === r.ghostPlayerId;
+
+    const ghostWrap = $("wsd-ghost-answer-wrap");
+    const text = answerInput.value.trim();
+
+    if (isGhostPlayer && text && ghostWrap && !ghostWrap.classList.contains("show")) {
+      ghostWrap.classList.add("show");
+    }
+  });
+}
+
   $("wsd-save-answer").addEventListener(
     "click",
     () => saveAnswerForCurrentPlayer(false)
