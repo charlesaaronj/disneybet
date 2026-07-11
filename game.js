@@ -1287,7 +1287,7 @@ function showPickOverlay(onDone, labelText = "Selecting an answer...", holdMs = 
       overlay.style.opacity = "1";
       overlay.style.transition = "";
       if (typeof onDone === "function") onDone();
-    }, 350);
+    }, 400);
   }, holdMs);
 }
 
