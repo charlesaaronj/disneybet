@@ -1100,32 +1100,15 @@ function renderAnswerProgress() {
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
 
-  if (ghostFieldTimer) {
-    clearTimeout(ghostFieldTimer);
-    ghostFieldTimer = null;
-  }
+  if (ghostFieldTimer) clearTimeout(ghostFieldTimer);
+ghostFieldTimer = null;
 
-  if (ghostWrap) ghostWrap.classList.remove("show");
+if (ghostWrap) ghostWrap.classList.remove("show");
 
-  if (!isGhostPlayer) {
-    if (ghostInput) ghostInput.value = "";
-    return;
-  }
+if (!isGhostPlayer) {
+  if (ghostInput) ghostInput.value = "";
+}
 
-  ghostFieldTimer = setTimeout(() => {
-    const currentRound = gameState?.currentRound;
-    const currentIdx = currentRound?.answerIndex ?? 0;
-    const currentOrder = currentRound?.answerOrder || gameState.players.map(p => p.id);
-    const currentPlayerId = currentOrder[currentIdx];
-
-    const stillGhostPlayer =
-      !!currentRound?.ghostRound &&
-      currentPlayerId === currentRound?.ghostPlayerId;
-
-    if (stillGhostPlayer && ghostWrap) {
-      ghostWrap.classList.add("show");
-    }
-  }, 2000);
 }
 
 // Save the current player’s answer, or “skip” if requested
