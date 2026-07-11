@@ -1668,19 +1668,25 @@ function saveWagerForCurrentPlayer() {
   r.wagerIndex = idx + 1;
   saveState();
 
-  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       wagerSaveLocked = false;
       if (saveBtn) saveBtn.disabled = false;
 
       if (r.wagerIndex >= order.length) {
-  finishSecretWagers();
-} else {
-  renderWagerProgress();
-}
+        finishSecretWagers();
+      } else {
+        const nextPlayerId = order[r.wagerIndex];
+        const nextPlayer = gameState.players.find(p => p.id === nextPlayerId);
+
+        showPickOverlay(() => {
+          renderWagerProgress();
+        }, `Pass the phone to ${nextPlayer ? nextPlayer.name : "the next player"}...`, 900);
+      }
     });
   });
 }
+
 
 // Build the guess/wager rows and jump to guess-wager screen
 function goToGuessWager() {
