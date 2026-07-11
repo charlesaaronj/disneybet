@@ -2006,28 +2006,30 @@ function applyRoundResults(authorId) {
       (p.stats.correctGuesses || 0) + 1;
   });
 
-  r.collectionsThisRound = [];
+r.collectionsThisRound = [];
 
-  if (r.attraction) {
-    r.correctGuessers.forEach(pid => {
-      const p = gameState.players.find(pl => pl.id === pid);
-      if (!p) return;
+if (r.attraction) {
+  let collectors = Array.isArray(r.correctGuessers) ? r.correctGuessers.slice() : [];
 
-      if (!p.collected.includes(r.attraction.name)) {
-        p.collected.push(r.attraction.name);
-        r.collectionsThisRound.push(pid);
-      }
-
-      ensurePlayerStats(p);
-
-      if (
-        r.attraction.land &&
-        !p.stats.uniqueLands.includes(r.attraction.land)
-      ) {
-        p.stats.uniqueLands.push(r.attraction.land);
-      }
-    });
+  if (!collectors.length && authorId != null) {
+    collectors = [authorId];
   }
+
+  collectors.forEach(pid => {
+    const p = gameState.players.find(pl => pl.id === pid);
+    if (!p) return;
+
+    if (!p.collected.includes(r.attraction.name)) {
+      p.collected.push(r.attraction.name);
+      r.collectionsThisRound.push(pid);
+    }
+
+    ensurePlayerStats(p);
+    if (r.attraction.land && !p.stats.uniqueLands.includes(r.attraction.land)) {
+      p.stats.uniqueLands.push(r.attraction.land);
+    }
+  });
+}
 
 if (r.selectedAnswer?.isGhost) {
   const ghostOwnerId =
