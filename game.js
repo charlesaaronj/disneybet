@@ -1232,20 +1232,26 @@ function saveAnswerForCurrentPlayer(skip) {
 
           showScreen("select-answer");
         });
-      } else {
-        renderAnswerProgress();
-
-        const nextInput = $("wsd-answer-input");
-        if (nextInput) {
-          nextInput.classList.add("wsd-anim-answer-refresh");
-          void nextInput.offsetWidth;
-          setTimeout(() => {
-            nextInput.classList.remove("wsd-anim-answer-refresh");
-          }, 200);
-        }
+            } else {
+        const nextPlayerId = order[r.answerIndex];
+        const nextPlayer = gameState.players.find(p => p.id === nextPlayerId);
 
         saveState();
+
+        showPickOverlay(() => {
+          renderAnswerProgress();
+
+          const nextInput = $("wsd-answer-input");
+          if (nextInput) {
+            nextInput.classList.add("wsd-anim-answer-refresh");
+            void nextInput.offsetWidth;
+            setTimeout(() => {
+              nextInput.classList.remove("wsd-anim-answer-refresh");
+            }, 200);
+          }
+        }, `Pass the phone to ${nextPlayer ? nextPlayer.name : "the next player"}...`, 900);
       }
+
     });
   });
 }
@@ -1260,15 +1266,15 @@ function pickRandomAnswer() {
   r.selectedAnswer = pool[chosenIndex];
 }
 // Animate “picking” overlay, then call onDone
-function showPickOverlay(onDone) {
+function showPickOverlay(onDone, labelText = "Selecting an answer...", holdMs = 1400) {
   const overlay = $("wsd-pick-overlay");
   if (!overlay) {
-    onDone();
+    if (typeof onDone === "function") onDone();
     return;
   }
 
   const labelEl = $("wsd-pick-label");
-  if (labelEl) labelEl.textContent = "Selecting an answer...";
+  if (labelEl) labelEl.textContent = labelText;
 
   overlay.style.display = "flex";
   overlay.style.opacity = "1";
@@ -1280,10 +1286,11 @@ function showPickOverlay(onDone) {
       overlay.style.display = "none";
       overlay.style.opacity = "1";
       overlay.style.transition = "";
-      onDone();
+      if (typeof onDone === "function") onDone();
     }, 350);
-  }, 1400);
+  }, holdMs);
 }
+
 
 // Show selected answer on the “Select answer” screen
 function renderSelectAnswerScreen() {
