@@ -1725,17 +1725,25 @@ function goToGuessWager() {
   if (ansEl) ansEl.textContent = r.selectedAnswer.text || '';
 
   showScreen('guess-wager');
-  renderWagerProgress();
+
+  const firstPlayerId = r.wagerOrder[r.wagerIndex];
+  const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
+
+  showPickOverlay(() => {
+    renderWagerProgress();
+  }, `Pass the phone to ${firstPlayer ? firstPlayer.name : 'the next player'}...`, 900);
 
   if (r.ghostRound) {
     const modalEl = $('modal-ghost-round');
     const bodyEl = $('modal-ghost-round-body');
     const titleEl = $('modal-ghost-round-title');
+
     if (titleEl) titleEl.textContent = 'Ghost Round!';
     if (bodyEl) {
       bodyEl.innerHTML =
         'A <strong>Ghost answer</strong> was submitted this round and may be the selected answer. Choose carefully!';
     }
+
     try {
       if (modalEl && typeof bootstrap !== 'undefined') {
         new bootstrap.Modal(modalEl).show();
@@ -1745,6 +1753,7 @@ function goToGuessWager() {
     }
   }
 }
+
 
 // Reset wagers UI back to starting defaults
 function clearWagersUI() {
