@@ -322,6 +322,12 @@ function applyParkTheme(parkName) {
 
 // Spotlight per screen (after welcome)
 function showHeroSpotlightForScreen(screenName) {
+  console.log('[spotlight called]', {
+  screenName,
+  activeSetup: document.getElementById('screen-setup-game')?.classList.contains('wsd-screen-active'),
+  activeQuestion: document.getElementById('screen-setup-question')?.classList.contains('wsd-screen-active'),
+  gameStateScreen: gameState?.screen
+});
   if (!screenName) return;
 
   const storageKey = `wsd_hero_spotlight_${screenName}`;
@@ -339,11 +345,13 @@ function showHeroSpotlightForScreen(screenName) {
   }
   heroCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
+  console.log('[spotlight applied]', screenName);
   heroCard.scrollIntoView({ behavior: "smooth", block: "center" });
 
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
 
   function clearSpotlight() {
+    console.log('[spotlight cleared]', screenName, 'gameState.screen =', gameState?.screen);
     heroCard.classList.remove("wsd-hero-card-spotlight");
     overlay.style.display = "none";
     try {
@@ -389,6 +397,7 @@ const ALL_SCREENS = Object.keys(SCREEN_META);
 
 function showScreen(name) {
   // Toggle active screen
+  console.log('[showScreen]', name, 'gameState.screen before =', gameState?.screen);
   ALL_SCREENS.forEach(key => {
     const el = document.getElementById(`screen-${key}`);
     if (el) {
@@ -416,6 +425,7 @@ function showScreen(name) {
   // Hero spotlight per screen (no firstSetupGameShown flag anymore)
     if (name !== "game-end") {
     showHeroSpotlightForScreen(name);
+    console.log('[showScreen done]', name, 'gameState.screen after =', gameState?.screen);
   }
 }
 // ---------- Setup screen + locks ----------
