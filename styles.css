@@ -993,3 +993,7 @@ body {
   font-size: 1.2rem;
   font-weight: 600; 
 }
+html, body {
+  touch-action: manipulation;
+}
+
