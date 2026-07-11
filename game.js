@@ -2011,8 +2011,13 @@ r.collectionsThisRound = [];
 if (r.attraction) {
   let collectors = Array.isArray(r.correctGuessers) ? r.correctGuessers.slice() : [];
 
-  if (!collectors.length && authorId != null) {
-    collectors = [authorId];
+  if (!collectors.length) {
+    if (r.selectedAnswer?.isGhost) {
+      const ghostOwnerId = r.selectedAnswer.ghostOwnerId ?? r.selectedAnswer.playerId;
+      if (ghostOwnerId != null) collectors = [ghostOwnerId];
+    } else if (authorId != null) {
+      collectors = [authorId];
+    }
   }
 
   collectors.forEach(pid => {
