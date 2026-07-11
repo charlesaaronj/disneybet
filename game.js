@@ -322,30 +322,19 @@ function applyParkTheme(parkName) {
 
 // Spotlight per screen (after welcome)
 function showHeroSpotlightForScreen(screenName) {
-  console.log('[spotlight called]', {
-  screenName,
-  activeSetup: document.getElementById('screen-setup-game')?.classList.contains('wsd-screen-active'),
-  activeQuestion: document.getElementById('screen-setup-question')?.classList.contains('wsd-screen-active'),
-  gameStateScreen: gameState?.screen
-});
   if (!screenName) return;
 
-  const storageKey = `wsd_hero_spotlight_${screenName}`;
-
+  const storageKey = `wsd-hero-spotlight-${screenName}`;
   try {
-    if (localStorage.getItem(storageKey) === "1") {
-      return;
-    }
+    if (localStorage.getItem(storageKey) === "1") return;
   } catch (e) {}
 
   const heroCard = document.querySelector(".wsd-hero-card");
-  const overlay = $("wsd-spotlight-overlay");
-  if (!heroCard || !overlay) {
-    return;
-  }
+  const overlay = document.getElementById("wsd-spotlight-overlay");
+  if (!heroCard || !overlay) return;
+
   heroCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
-  console.log('[spotlight applied]', screenName);
   heroCard.scrollIntoView({ behavior: "smooth", block: "center" });
 
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
@@ -359,11 +348,9 @@ function showHeroSpotlightForScreen(screenName) {
     } catch (e) {}
 
     if (backdrop) backdrop.removeEventListener("click", clearSpotlight);
-    document.removeEventListener("click", onDocClick, true);
   }
 
   if (backdrop) backdrop.addEventListener("click", clearSpotlight);
-  document.addEventListener("click", onDocClick, true);
 }
 
 function initHeroSpotlightAfterWelcome() {
