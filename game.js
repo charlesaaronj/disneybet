@@ -1057,8 +1057,25 @@ function proceedToAnswers() {
   if (ghostInp) ghostInp.value = "";
 
   saveState();
+showScreen("enter-answers");
+
+const firstPlayerId =
+  gameState.currentRound.answerOrder?.[gameState.currentRound.answerIndex ?? 0];
+const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
+
+showPickOverlay(() => {
   renderAnswerProgress();
-  showScreen("enter-answers");
+
+  const nextInput = $("wsd-answer-input");
+  if (nextInput) {
+    nextInput.classList.add("wsd-anim-answer-refresh");
+    void nextInput.offsetWidth;
+    setTimeout(() => {
+      nextInput.classList.remove("wsd-anim-answer-refresh");
+    }, 200);
+  }
+}, `Pass the phone to ${firstPlayer ? firstPlayer.name : "the next player"}...`, 900);
+
 }
 // ---------- Answers flow ----------
 
