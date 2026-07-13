@@ -2223,7 +2223,7 @@ function buildRevealSummaryLines(r) {
     .join(", ");
 
   if (collectedNames && r.attraction) {
-    line4 = `🎢 ${collectedNames} collected ${r.attraction.name} (${r.attraction.land}).`;
+    line4 = `🎢 ${collectedNames} collected ${r.attraction.name}.`;
   } else if (r.attraction) {
     line4 = `🎢 No one collected ${r.attraction.name} (${r.attraction.land}) this round.`;
   }
