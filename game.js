@@ -35,6 +35,11 @@ function shuffle(a) {
 
 function resetGame() {
   localStorage.removeItem("whoSaidDiz");
+  try {
+    Object.keys(localStorage)
+      .filter(key => key.startsWith("wsd-hero-spotlight-"))
+      .forEach(key => localStorage.removeItem(key));
+  } catch (e) {}
   location.reload();
 }
 
@@ -702,7 +707,7 @@ function startGameFromSetup() {
 
   const startBtn = $("wsd-start-game");
   if (startBtn) {
-    startBtn.textContent = gameState ? "Resume game" : "Start game";
+    startBtn.textContent = "Resume game";
   }
 
   renderAttractionOptions();
@@ -1414,16 +1419,6 @@ function populateGuessOptionsForPlayer(player) {
     guessSel.appendChild(ghostOpt);
   }
 }
-function getCurrentWagerPlayer() {
-  const r = gameState?.currentRound;
-  if (!r) return null;
-
-  const order = r.wagerOrder || gameState.players.map(p => p.id);
-  const idx = r.wagerIndex ?? 0;
-  const playerId = order[idx];
-
-  return gameState.players.find(p => p.id === playerId) || null;
-}
 
 function syncWagerDisplay(animate = false) {
   const inp = $("wsd-gw-wager");
@@ -1565,9 +1560,16 @@ function showPassWagerModal() {
 
   if (titleEl) titleEl.textContent = 'Secret wager turn';
   if (bodyEl) {
-    bodyEl.innerHTML = player
-      ? `<strong>Pass the phone to ${player.name}.</strong><br>${player.name}, make your guess and wager privately.`
-      : 'Pass the phone to the next player and make the wager privately.';
+    bodyEl.textContent = '';
+    if (player) {
+      const strong = document.createElement('strong');
+      strong.textContent = `Pass the phone to ${player.name}.`;
+      bodyEl.appendChild(strong);
+      bodyEl.appendChild(document.createElement('br'));
+      bodyEl.appendChild(document.createTextNode(`${player.name}, make your guess and wager privately.`));
+    } else {
+      bodyEl.textContent = 'Pass the phone to the next player and make the wager privately.';
+    }
   }
 
   if (modalEl && typeof bootstrap !== 'undefined') {
@@ -1587,9 +1589,16 @@ function showFinalHunnyPotModal() {
 
   if (titleEl) titleEl.textContent = 'Final Hunny Pot';
   if (bodyEl) {
-    bodyEl.innerHTML = b.hotBonus > 0
-      ? `<strong>${b.total} points</strong><br>Built from ${b.basePoints} base + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus.`
-      : `<strong>${b.total} points</strong><br>Built from ${b.basePoints} base + ${b.wagerPoints} wagers.`;
+    bodyEl.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = `${b.total} points`;
+    bodyEl.appendChild(strong);
+    bodyEl.appendChild(document.createElement('br'));
+    bodyEl.appendChild(document.createTextNode(
+      b.hotBonus > 0
+        ? `Built from ${b.basePoints} base + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus.`
+        : `Built from ${b.basePoints} base + ${b.wagerPoints} wagers.`
+    ));
   }
 
   if (modalEl && typeof bootstrap !== 'undefined') {
@@ -1723,8 +1732,12 @@ function goToGuessWager() {
 
     if (titleEl) titleEl.textContent = 'Ghost Round!';
     if (bodyEl) {
-      bodyEl.innerHTML =
-        'A <strong>Ghost answer</strong> was submitted this round and may be the selected answer. Choose carefully!';
+      bodyEl.textContent = '';
+      bodyEl.appendChild(document.createTextNode('A '));
+      const strong = document.createElement('strong');
+      strong.textContent = 'Ghost answer';
+      bodyEl.appendChild(strong);
+      bodyEl.appendChild(document.createTextNode(' was submitted this round and may be the selected answer. Choose carefully!'));
     }
 
     try {
@@ -2059,20 +2072,15 @@ if (r.attraction) {
 }
 
 if (r.selectedAnswer?.isGhost) {
-  const ghostOwnerId =
-    r.selectedAnswer.ghostOwnerId ?? r.selectedAnswer.playerId;
+  const ghostBonusRecipients = Array.isArray(r.ghostGuessBonusAwardedTo)
+    ? r.ghostGuessBonusAwardedTo.slice()
+    : [];
 
-  if (r.correctGuessers.includes(ghostOwnerId)) {
-    const ghostOwner = gameState.players.find(
-      p => p.id === ghostOwnerId
-    );
-
-    if (ghostOwner) {
-      ghostOwner.score += 2;
-      ghostOwner.bonusTotal = (ghostOwner.bonusTotal || 0) + 2;
-      r.ghostBonusAwardedTo = ghostOwner.id;
-    }
-  }
+  ghostBonusRecipients.forEach(pid => {
+    const player = gameState.players.find(p => p.id === pid);
+    if (!player) return;
+    player.bonusTotal = (player.bonusTotal || 0) + 2;
+  });
 }
   // History: no house bonus fields anymore
   gameState.history.push({
@@ -2989,23 +2997,23 @@ function wireEvents() {
   debugLog("wireEvents starting");
 
   // Setup screen
-  $("wsd-start-game").addEventListener(
+  $("wsd-start-game")?.addEventListener(
     "click",
     startGameFromSetup
   );
-  $("wsd-reset-setup").addEventListener("click", () => {
+  $("wsd-reset-setup")?.addEventListener("click", () => {
     confirmThenReset(
       "Restart this game and clear all scores and history?",
       "restart"
     );
   });
-  $("wsd-add-player").addEventListener("click", () => {
+  $("wsd-add-player")?.addEventListener("click", () => {
     const c = $("wsd-player-inputs");
     if (!c || c.querySelectorAll("input").length >= 8) return;
     addPlayerInput(c);
   });
 
-  $("wsd-park-select").addEventListener(
+  $("wsd-park-select")?.addEventListener(
     "change",
     () => {
       const sel = $("wsd-park-select");
@@ -3027,26 +3035,26 @@ function wireEvents() {
   );
 
   // Question flow
-  $("wsd-attraction-select").addEventListener(
+  $("wsd-attraction-select")?.addEventListener(
     "change",
     () => {
       onAttractionChange();
       updateQuestionLock();
     }
   );
-  $("wsd-generate-question").addEventListener(
+  $("wsd-generate-question")?.addEventListener(
     "click",
     onGenerateNewQuestion
   );
-  $("wsd-enter-custom-question").addEventListener(
+  $("wsd-enter-custom-question")?.addEventListener(
     "click",
     onEnterCustomQuestion
   );
-  $("wsd-to-answers").addEventListener(
+  $("wsd-to-answers")?.addEventListener(
     "click",
     proceedToAnswers
   );
-  $("wsd-abandon-from-setupq").addEventListener(
+  $("wsd-abandon-from-setupq")?.addEventListener(
     "click",
     abandonRound
   );
@@ -3073,15 +3081,15 @@ if (answerInput) {
   });
 }
 
-  $("wsd-save-answer").addEventListener(
+  $("wsd-save-answer")?.addEventListener(
     "click",
     () => saveAnswerForCurrentPlayer(false)
   );
-  $("wsd-skip-player").addEventListener(
+  $("wsd-skip-player")?.addEventListener(
     "click",
     () => saveAnswerForCurrentPlayer(true)
   );
-  $("wsd-abandon-from-answers").addEventListener(
+  $("wsd-abandon-from-answers")?.addEventListener(
     "click",
     abandonRound
   );
@@ -3116,21 +3124,21 @@ document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click'
 
 
   // Scores / round navigation
-  $("wsd-to-scores").addEventListener(
+  $("wsd-to-scores")?.addEventListener(
     "click",
     () => {
       renderScoresScreen();
       showScreen("scores");
     }
   );
-  $("wsd-start-round").addEventListener(
+  $("wsd-start-round")?.addEventListener(
     "click",
     () => {
       startNewRoundCore();
       showScreen("setup-question");
     }
   );
-  $("wsd-view-history").addEventListener(
+  $("wsd-view-history")?.addEventListener(
     "click",
     () => {
       renderHistoryScreen();
@@ -3139,13 +3147,13 @@ document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click'
   );
 
   // End game / restart
-  $("wsd-end-game").addEventListener("click", () => {
+  $("wsd-end-game")?.addEventListener("click", () => {
     confirmThenReset(
       "End this game and show final scores? You cannot keep playing this game afterward.",
       "end"
     );
   });
-  $("wsd-restart-game").addEventListener(
+  $("wsd-restart-game")?.addEventListener(
     "click",
     () => {
       confirmThenReset(
@@ -3154,18 +3162,18 @@ document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click'
       );
     }
   );
-  $("wsd-play-again").addEventListener(
+  $("wsd-play-again")?.addEventListener(
     "click",
     resetGame
   );
-  $("wsd-view-history-end").addEventListener(
+  $("wsd-view-history-end")?.addEventListener(
     "click",
     () => {
       renderHistoryScreen();
       showScreen("history");
     }
   );
-  $("wsd-close-history").addEventListener(
+  $("wsd-close-history")?.addEventListener(
     "click",
     () => {
       const fb = gameState
@@ -3456,9 +3464,10 @@ function rebuildRoundScreenFromState() {
   if (scr === "enter-answers") {
     const enterQ = $("wsd-enter-question");
     const ansInp = $("wsd-answer-input");
+    const ghostInp = $("wsd-ghost-answer-input");
     if (enterQ) enterQ.textContent = r.question || "";
     if (ansInp) ansInp.value = "";
-    if (ghostInp) ghostInp.value = "";    
+    if (ghostInp) ghostInp.value = "";
     renderAnswerProgress();
     showScreen("enter-answers");
     return;
