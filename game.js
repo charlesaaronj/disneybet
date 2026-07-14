@@ -1482,6 +1482,8 @@ function changeWagerBy(delta) {
 }
 
 function initWagerStepper() {
+  if (window.__wsdWagerStepperBound) return;
+  window.__wsdWagerStepperBound = true;
   $("wsd-wager-minus")?.addEventListener("click", () => changeWagerBy(-1));
   $("wsd-wager-plus")?.addEventListener("click", () => changeWagerBy(1));
 }
@@ -3009,7 +3011,6 @@ function abandonRound() {
 // ---------- Wire events & bootstrap ----------
 
 document.addEventListener("DOMContentLoaded", () => {
-  initWagerStepperBindings();
   initWagerStepper();
 });
 
