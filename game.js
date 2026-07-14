@@ -331,7 +331,6 @@ function applyParkTheme(parkName) {
 // Spotlight per screen (after welcome)
 function showHeroSpotlightForScreen(screenName) {
   if (!screenName) return;
-  if (window.__wsdSuppressSpotlight) return;
 
   const storageKey = `wsd-hero-spotlight-${screenName}`;
   try {
@@ -365,7 +364,6 @@ function showHeroSpotlightForScreen(screenName) {
 function initHeroSpotlightAfterWelcome() {
   const modalEl = $("modal-welcome");
   if (!modalEl || typeof bootstrap === "undefined") {
-    window.__wsdSuppressSpotlight = false;
     return;
   }
 
@@ -715,10 +713,11 @@ function startGameFromSetup() {
     startBtn.textContent = "Resume game";
   }
 
-  startNewRoundCore();
   renderAttractionOptions();
+  saveState();
   updatePlayerInputLock();
   showScreen("setup-question");
+  startNewRoundCore();
 
 }
 
@@ -1013,7 +1012,6 @@ function proceedToAnswers() {
     answerIndex: 0,
     ghostRound: isGhostRound,
     ghostPlayerId,
-    ghostRoundInfoShown: false,
     ghostBonusAwardedTo: null
   });
 
@@ -1540,7 +1538,7 @@ function renderWagerProgress() {
     if (wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
-      wagerInp.value = Math.max(1, Math.min(1, player.score));
+      wagerInp.value = Math.min(1, player.score);
 
   // Fade/dissolve animation for the dropdown
       guessSel.classList.remove('wsd-guess-fade');
@@ -1550,7 +1548,7 @@ function renderWagerProgress() {
     if (wagerInp) {
     wagerInp.min = 1;
     wagerInp.max = player.score;
-    wagerInp.value = Math.max(1, Math.min(1, player.score));
+    wagerInp.value = Math.min(1, player.score);
 
     wagerInp.classList.remove('wsd-guess-fade');
     void wagerInp.offsetWidth;
@@ -1643,26 +1641,6 @@ function finishSecretWagers() {
   continueFromFinalHunnyPot();
 }
 
-function renderGuessWagerScreen() {
-  const r = gameState?.currentRound;
-  if (!r || !r.selectedAnswer) return false;
-
-  if (!Array.isArray(r.wagerOrder) || !r.wagerOrder.length) {
-    r.wagerOrder = shuffle(gameState.players.map(p => p.id));
-  }
-  if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
-  if (!Array.isArray(r.wagers)) r.wagers = [];
-
-  const qEl = $('wsd-gw-question');
-  const ansEl = $('wsd-gw-answer');
-  if (qEl) qEl.textContent = r.question || '';
-  if (ansEl) ansEl.textContent = r.selectedAnswer.text || '';
-
-  showScreen('guess-wager');
-  renderWagerProgress();
-  return true;
-}
-
 function saveWagerForCurrentPlayer() {
   if (wagerSaveLocked) return;
 
@@ -1742,17 +1720,27 @@ function goToGuessWager() {
   const r = gameState?.currentRound;
   if (!r || !r.selectedAnswer) return;
 
-  if (!renderGuessWagerScreen()) return;
+  if (!Array.isArray(r.wagerOrder) || !r.wagerOrder.length) {
+    r.wagerOrder = shuffle(gameState.players.map(p => p.id));
+  }
+  if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
+  if (!Array.isArray(r.wagers)) r.wagers = [];
 
-  const currentPlayerId = r.wagerOrder[r.wagerIndex];
-  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
+  const qEl = $('wsd-gw-question');
+  const ansEl = $('wsd-gw-answer');
+  if (qEl) qEl.textContent = r.question || '';
+  if (ansEl) ansEl.textContent = r.selectedAnswer.text || '';
+
+  showScreen('guess-wager');
+
+  const firstPlayerId = r.wagerOrder[r.wagerIndex];
+  const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
 
   showPickOverlay(() => {
     renderWagerProgress();
-  }, `Pass the phone to ${currentPlayer ? currentPlayer.name : 'the next player'}...`, 900);
+  }, `Pass the phone to ${firstPlayer ? firstPlayer.name : 'the next player'}...`, 900);
 
-  if (r.ghostRound && !r.ghostRoundInfoShown) {
-    r.ghostRoundInfoShown = true;
+  if (r.ghostRound) {
     const modalEl = $('modal-ghost-round');
     const bodyEl = $('modal-ghost-round-body');
     const titleEl = $('modal-ghost-round-title');
@@ -1775,8 +1763,6 @@ function goToGuessWager() {
       console.error('Ghost modal error', e);
     }
   }
-
-  saveState();
 }
 
 
@@ -3004,7 +2990,6 @@ function abandonRound() {
 
   startNewRoundCore();
   showScreen("setup-question");
-  window.__wsdSuppressSpotlight = false;
 }
 
 
@@ -3024,6 +3009,40 @@ document.addEventListener(
   },
   true
 );
+
+function resumeRoundFlow() {
+  if (!gameState || !gameState.currentRound) {
+    showScreen("setup-question");
+    return;
+  }
+
+  const scr = gameState.screen;
+
+  if (scr === "enter-answers") {
+    switchScreenUI("enter-answers");
+    renderAnswerProgress();
+    return;
+  }
+
+  if (scr === "select-answer") {
+    switchScreenUI("select-answer");
+    renderSelectAnswerScreen();
+    return;
+  }
+
+  if (scr === "guess-wager") {
+    renderGuessWagerScreen();
+    return;
+  }
+
+  if (scr === "reveal") {
+    switchScreenUI("reveal");
+    runRevealAnimation();
+    return;
+  }
+
+  showScreen("setup-question");
+}
 
 function wireEvents() {
   debugLog("wireEvents starting");
@@ -3295,7 +3314,6 @@ function showResumeModal() {
 }
 
 function rebuildCurrentScreen() {
-  window.__wsdSuppressSpotlight = true;
   if (!gameState) return;
 
   const parkName = gameState.settings?.park || "Not set";
@@ -3309,14 +3327,13 @@ function rebuildCurrentScreen() {
   if (scr === "setup-question") rebuildSetupQuestionScreen();
   if (scr === "enter-answers") rebuildEnterAnswersScreen();
   if (scr === "select-answer") renderSelectAnswerScreen();
-  if (scr === "guess-wager") renderGuessWagerScreen();
+  if (scr === "guess-wager") goToGuessWager();
   if (scr === "reveal") rebuildRevealScreen();
   if (scr === "scores") renderScoresScreen();
   if (scr === "history") renderHistoryScreen();
   if (scr === "game-end") renderFinalResults();
 
-  switchScreenUI(scr);
-  window.__wsdSuppressSpotlight = false;
+  showScreen(scr);
 }
 function rebuildSetupGameScreen() {
   initSetupScreen();
@@ -3449,7 +3466,6 @@ function rebuildSetupScreenFromState() {
   updatePlayerInputLock();
 }
 function rebuildRoundScreenFromState() {
-  window.__wsdSuppressSpotlight = true;
   if (!gameState) {
     showScreen("setup-game");
     return;
@@ -3510,14 +3526,12 @@ function rebuildRoundScreenFromState() {
 
   if (scr === "select-answer") {
     renderSelectAnswerScreen();
-    switchScreenUI("select-answer");
-    window.__wsdSuppressSpotlight = false;
+    showScreen("select-answer");
     return;
   }
 
   if (scr === "guess-wager") {
-    renderGuessWagerScreen();
-    window.__wsdSuppressSpotlight = false;
+    goToGuessWager();
     return;
   }
 
