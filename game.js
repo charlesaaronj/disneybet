@@ -40,11 +40,6 @@ function resetGame() {
       .filter(key => key.startsWith("wsd-hero-spotlight-"))
       .forEach(key => localStorage.removeItem(key));
   } catch (e) {}
-  try {
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  } catch (e) {
-    window.scrollTo(0, 0);
-  }
   location.reload();
 }
 
@@ -243,8 +238,8 @@ function ensureStateShape() {
   if (!gameState) return;
 
   gameState.settings ??= {};
-  gameState.settings.startingPoints ||= START_POINTS;
-  gameState.settings.minPoints ||= MIN_POINTS;
+  if (typeof gameState.settings.startingPoints !== "number") gameState.settings.startingPoints = START_POINTS;
+  if (typeof gameState.settings.minPoints !== "number") gameState.settings.minPoints = MIN_POINTS;
   gameState.players ||= [];
   gameState.history ||= [];
   gameState.questionUsage ||= {};
@@ -269,6 +264,9 @@ if (!Array.isArray(r.wagers)) r.wagers = [];
     r[k] ||= [];
   });
 if (typeof r.hunnyHotBonus !== "number") r.hunnyHotBonus = 0;
+if (typeof r.scoringApplied !== "boolean") r.scoringApplied = false;
+if (typeof r.ghostRoundInfoShown !== "boolean") r.ghostRoundInfoShown = false;
+if (!Array.isArray(r.ghostGuessBonusAwardedTo)) r.ghostGuessBonusAwardedTo = [];
 }
 
 // Convenience lookup
@@ -333,6 +331,7 @@ function applyParkTheme(parkName) {
 // Spotlight per screen (after welcome)
 function showHeroSpotlightForScreen(screenName) {
   if (!screenName) return;
+  if (window.__wsdSuppressSpotlight) return;
 
   const storageKey = `wsd-hero-spotlight-${screenName}`;
   try {
@@ -345,28 +344,7 @@ function showHeroSpotlightForScreen(screenName) {
 
   heroCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
-
-  const doScroll = () => {
-    try {
-      window.scrollTo({ top: 0, behavior: "auto" });
-    } catch (e) {
-      window.scrollTo(0, 0);
-    }
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        try {
-          heroCard.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
-        } catch (e) {
-          heroCard.scrollIntoView(true);
-        }
-      });
-    });
-  };
-
-  doScroll();
-  setTimeout(doScroll, 250);
-  window.addEventListener("load", doScroll, { once: true });
+  heroCard.scrollIntoView({ behavior: "smooth", block: "center" });
 
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
 
@@ -387,6 +365,7 @@ function showHeroSpotlightForScreen(screenName) {
 function initHeroSpotlightAfterWelcome() {
   const modalEl = $("modal-welcome");
   if (!modalEl || typeof bootstrap === "undefined") {
+    window.__wsdSuppressSpotlight = false;
     return;
   }
 
@@ -409,9 +388,7 @@ window.initHeroSpotlightFirstVisit = function () {
 
 const ALL_SCREENS = Object.keys(SCREEN_META);
 
-function showScreen(name) {
-  // Toggle active screen
-  console.log('[showScreen]', name, 'gameState.screen before =', gameState?.screen);
+function switchScreenUI(name) {
   ALL_SCREENS.forEach(key => {
     const el = document.getElementById(`screen-${key}`);
     if (el) {
@@ -419,14 +396,6 @@ function showScreen(name) {
     }
   });
 
-  // Persist current screen in gameState
-  if (gameState) {
-    gameState.screen = name;
-    saveState();
-    updateTopHeroMeta();
-  }
-
-  // Update step icon, title, and instruction
   const m = SCREEN_META[name] || SCREEN_META["setup-game"];
   ["wsd-step-icon", "wsd-step-title", "wsd-step-instruction"].forEach(id => {
     const el = $(id);
@@ -435,9 +404,19 @@ function showScreen(name) {
     if (id === "wsd-step-title") el.textContent = m.title;
     if (id === "wsd-step-instruction") el.textContent = m.instruction;
   });
+}
 
-  // Hero spotlight per screen (no firstSetupGameShown flag anymore)
-    if (name !== "game-end") {
+function showScreen(name) {
+  console.log('[showScreen]', name, 'gameState.screen before =', gameState?.screen);
+  switchScreenUI(name);
+
+  if (gameState) {
+    gameState.screen = name;
+    updateTopHeroMeta();
+    saveState();
+  }
+
+  if (name !== "game-end") {
     showHeroSpotlightForScreen(name);
     console.log('[showScreen done]', name, 'gameState.screen after =', gameState?.screen);
   }
@@ -736,11 +715,10 @@ function startGameFromSetup() {
     startBtn.textContent = "Resume game";
   }
 
+  startNewRoundCore();
   renderAttractionOptions();
-  saveState();
   updatePlayerInputLock();
   showScreen("setup-question");
-  startNewRoundCore();
 
 }
 
@@ -856,7 +834,10 @@ function startNewRoundCore() {
   answerOrder: shuffle(gameState.players.map(p => p.id)),
   ghostRound: false,
   ghostPlayerId: null,
-  ghostBonusAwardedTo: null
+  ghostRoundInfoShown: false,
+  ghostBonusAwardedTo: null,
+  ghostGuessBonusAwardedTo: [],
+  scoringApplied: false
 };
 
 
@@ -1032,6 +1013,7 @@ function proceedToAnswers() {
     answerIndex: 0,
     ghostRound: isGhostRound,
     ghostPlayerId,
+    ghostRoundInfoShown: false,
     ghostBonusAwardedTo: null
   });
 
@@ -1222,6 +1204,7 @@ function saveAnswerForCurrentPlayer(skip) {
         }
 
         const normalized = r.answers
+          .filter(a => a && !a.isGhost)
           .map(a => (a.text || "").trim().toLowerCase())
           .filter(Boolean);
 
@@ -1510,7 +1493,7 @@ function setCurrentPlayerWagerFromState() {
   if (!inp || !player || !r) return;
 
   const saved = (r.wagers || []).find(w => w.playerId === player.id);
-  inp.value = saved?.wager || 1;
+  inp.value = saved?.amount ?? 1;
 }
 function renderWagerProgress() {
   const r = gameState?.currentRound;
@@ -1555,7 +1538,7 @@ function renderWagerProgress() {
     if (wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
-      wagerInp.value = Math.min(1, player.score);
+      wagerInp.value = Math.max(1, Math.min(1, player.score));
 
   // Fade/dissolve animation for the dropdown
       guessSel.classList.remove('wsd-guess-fade');
@@ -1565,7 +1548,7 @@ function renderWagerProgress() {
     if (wagerInp) {
     wagerInp.min = 1;
     wagerInp.max = player.score;
-    wagerInp.value = Math.min(1, player.score);
+    wagerInp.value = Math.max(1, Math.min(1, player.score));
 
     wagerInp.classList.remove('wsd-guess-fade');
     void wagerInp.offsetWidth;
@@ -1640,7 +1623,13 @@ function showFinalHunnyPotModal() {
 }
 
 function continueFromFinalHunnyPot() {
-  computeRevealAndScoring();
+  const r = gameState?.currentRound;
+  if (!r) return;
+
+  if (!r.scoringApplied) {
+    computeRevealAndScoring();
+  }
+
   showScreen('reveal');
   runRevealAnimation();
   saveState();
@@ -1650,6 +1639,26 @@ function finishSecretWagers() {
   updateHoneyPotDisplay(false);
   saveState();
   continueFromFinalHunnyPot();
+}
+
+function renderGuessWagerScreen() {
+  const r = gameState?.currentRound;
+  if (!r || !r.selectedAnswer) return false;
+
+  if (!Array.isArray(r.wagerOrder) || !r.wagerOrder.length) {
+    r.wagerOrder = shuffle(gameState.players.map(p => p.id));
+  }
+  if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
+  if (!Array.isArray(r.wagers)) r.wagers = [];
+
+  const qEl = $('wsd-gw-question');
+  const ansEl = $('wsd-gw-answer');
+  if (qEl) qEl.textContent = r.question || '';
+  if (ansEl) ansEl.textContent = r.selectedAnswer.text || '';
+
+  showScreen('guess-wager');
+  renderWagerProgress();
+  return true;
 }
 
 function saveWagerForCurrentPlayer() {
@@ -1731,27 +1740,17 @@ function goToGuessWager() {
   const r = gameState?.currentRound;
   if (!r || !r.selectedAnswer) return;
 
-  if (!Array.isArray(r.wagerOrder) || !r.wagerOrder.length) {
-    r.wagerOrder = shuffle(gameState.players.map(p => p.id));
-  }
-  if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
-  if (!Array.isArray(r.wagers)) r.wagers = [];
+  if (!renderGuessWagerScreen()) return;
 
-  const qEl = $('wsd-gw-question');
-  const ansEl = $('wsd-gw-answer');
-  if (qEl) qEl.textContent = r.question || '';
-  if (ansEl) ansEl.textContent = r.selectedAnswer.text || '';
-
-  showScreen('guess-wager');
-
-  const firstPlayerId = r.wagerOrder[r.wagerIndex];
-  const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
+  const currentPlayerId = r.wagerOrder[r.wagerIndex];
+  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
 
   showPickOverlay(() => {
     renderWagerProgress();
-  }, `Pass the phone to ${firstPlayer ? firstPlayer.name : 'the next player'}...`, 900);
+  }, `Pass the phone to ${currentPlayer ? currentPlayer.name : 'the next player'}...`, 900);
 
-  if (r.ghostRound) {
+  if (r.ghostRound && !r.ghostRoundInfoShown) {
+    r.ghostRoundInfoShown = true;
     const modalEl = $('modal-ghost-round');
     const bodyEl = $('modal-ghost-round-body');
     const titleEl = $('modal-ghost-round-title');
@@ -1774,6 +1773,8 @@ function goToGuessWager() {
       console.error('Ghost modal error', e);
     }
   }
+
+  saveState();
 }
 
 
@@ -1814,6 +1815,7 @@ function getHouseBonusChooser() {
 // - For Ghost, only correct Ghost guessers share the pot.
 function computeRevealAndScoring() {
   const r = gameState.currentRound;
+  if (!r || r.scoringApplied) return;
   const isGhostAnswer = !!r.selectedAnswer?.isGhost;
 
   const ghostOwnerId = isGhostAnswer
@@ -2039,6 +2041,7 @@ function computeRevealAndScoring() {
   r.payouts = payouts;
 
   applyRoundResults(authorId);
+  r.scoringApplied = true;
 }
 // Apply scoring to players, update collections, ghost pool, and history
 function applyRoundResults(authorId) {
@@ -2999,12 +3002,14 @@ function abandonRound() {
 
   startNewRoundCore();
   showScreen("setup-question");
+  window.__wsdSuppressSpotlight = false;
 }
 
 
 // ---------- Wire events & bootstrap ----------
 
 document.addEventListener("DOMContentLoaded", () => {
+  initWagerStepperBindings();
   initWagerStepper();
 });
 
@@ -3289,6 +3294,7 @@ function showResumeModal() {
 }
 
 function rebuildCurrentScreen() {
+  window.__wsdSuppressSpotlight = true;
   if (!gameState) return;
 
   const parkName = gameState.settings?.park || "Not set";
@@ -3302,13 +3308,14 @@ function rebuildCurrentScreen() {
   if (scr === "setup-question") rebuildSetupQuestionScreen();
   if (scr === "enter-answers") rebuildEnterAnswersScreen();
   if (scr === "select-answer") renderSelectAnswerScreen();
-  if (scr === "guess-wager") goToGuessWager();
+  if (scr === "guess-wager") renderGuessWagerScreen();
   if (scr === "reveal") rebuildRevealScreen();
   if (scr === "scores") renderScoresScreen();
   if (scr === "history") renderHistoryScreen();
   if (scr === "game-end") renderFinalResults();
 
-  showScreen(scr);
+  switchScreenUI(scr);
+  window.__wsdSuppressSpotlight = false;
 }
 function rebuildSetupGameScreen() {
   initSetupScreen();
@@ -3441,6 +3448,7 @@ function rebuildSetupScreenFromState() {
   updatePlayerInputLock();
 }
 function rebuildRoundScreenFromState() {
+  window.__wsdSuppressSpotlight = true;
   if (!gameState) {
     showScreen("setup-game");
     return;
@@ -3501,12 +3509,14 @@ function rebuildRoundScreenFromState() {
 
   if (scr === "select-answer") {
     renderSelectAnswerScreen();
-    showScreen("select-answer");
+    switchScreenUI("select-answer");
+    window.__wsdSuppressSpotlight = false;
     return;
   }
 
   if (scr === "guess-wager") {
-    goToGuessWager();
+    renderGuessWagerScreen();
+    window.__wsdSuppressSpotlight = false;
     return;
   }
 
