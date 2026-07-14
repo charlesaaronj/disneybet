@@ -40,6 +40,11 @@ function resetGame() {
       .filter(key => key.startsWith("wsd-hero-spotlight-"))
       .forEach(key => localStorage.removeItem(key));
   } catch (e) {}
+  try {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  } catch (e) {
+    window.scrollTo(0, 0);
+  }
   location.reload();
 }
 
@@ -340,7 +345,28 @@ function showHeroSpotlightForScreen(screenName) {
 
   heroCard.classList.add("wsd-hero-card-spotlight");
   overlay.style.display = "block";
-  heroCard.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  const doScroll = () => {
+    try {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        try {
+          heroCard.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+        } catch (e) {
+          heroCard.scrollIntoView(true);
+        }
+      });
+    });
+  };
+
+  doScroll();
+  setTimeout(doScroll, 250);
+  window.addEventListener("load", doScroll, { once: true });
 
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
 
