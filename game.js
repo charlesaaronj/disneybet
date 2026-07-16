@@ -1510,18 +1510,30 @@ function renderWagerProgress() {
   const idx    = r.wagerIndex ?? 0;
   const player = getCurrentWagerPlayer();
 
-  const prog     = $('wsd-gw-progress');
-  const label    = $('wsd-gw-current-player-label');
-  const wagerInp = $('wsd-gw-wager');
-  const err      = $('wsd-gw-error');
-  const guessSel = $('wsd-gw-guess');
+  const prog       = $('wsd-gw-progress');
+  const label      = $('wsd-gw-current-player-label');
+  const wagerInp   = $('wsd-gw-wager');
+  const err        = $('wsd-gw-error');
+  const guessSel   = $('wsd-gw-guess');
+  const wagerRow   = $('wsd-wager-row');
+  const authorNote = $('wsd-author-wager-note');
+
+  // Figure out who the author is for this selected answer
+  const selected = r.selectedAnswer;
+  const authorId = selected?.isGhost
+    ? (selected.ghostOwnerId ?? selected.playerId)
+    : selected?.playerId;
+
+  const isAuthorTurn = !!player && player.id === authorId;
 
   if (prog) {
     prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   }
 
   if (label) {
-    if (player) {
+    if (isAuthorTurn && player) {
+      label.textContent = `${player.name} (author)`;
+    } else if (player) {
       label.textContent = `${player.name}'s guess`;
     } else {
       label.textContent = 'Who said it?';
@@ -1530,36 +1542,45 @@ function renderWagerProgress() {
 
   if (err) err.textContent = '';
 
+  // Toggle wager controls vs. author instruction
+  if (isAuthorTurn) {
+    if (wagerRow) wagerRow.style.display = 'none';
+    if (authorNote) {
+      authorNote.textContent =
+        "You wrote this answer. You may choose a guess, but you cannot wager. Your wager is always 0 and does not affect scores.";
+      authorNote.style.display = 'block';
+    }
+  } else {
+    if (wagerRow) wagerRow.style.display = '';
+    if (authorNote) authorNote.style.display = 'none';
+  }
+
   if (player) {
     if (guessSel) {
       populateGuessOptionsForPlayer(player);
     }
 
-    if (wagerInp) {
+    if (!isAuthorTurn && wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
-  // Fade/dissolve animation for the dropdown
+      // Fade/dissolve animation for the dropdown
       guessSel.classList.remove('wsd-guess-fade');
       void guessSel.offsetWidth;     // force layout so removal is applied
       guessSel.classList.add('wsd-guess-fade');
-    }
-    if (wagerInp) {
-    wagerInp.min = 1;
-    wagerInp.max = player.score;
-    wagerInp.value = Math.min(1, player.score);
 
-    wagerInp.classList.remove('wsd-guess-fade');
-    void wagerInp.offsetWidth;
-    wagerInp.classList.add('wsd-guess-fade');
+      // Fade animation for the wager input
+      wagerInp.classList.remove('wsd-guess-fade');
+      void wagerInp.offsetWidth;
+      wagerInp.classList.add('wsd-guess-fade');
+    }
   }
-}
+
   setCurrentPlayerWagerFromState();
   syncWagerDisplay();
   updateHoneyPotDisplay(true);
 }
-
 
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
@@ -1652,17 +1673,24 @@ function saveWagerForCurrentPlayer() {
     ? r.wagerOrder
     : gameState.players.map(p => p.id);
 
-  const player = getCurrentWagerPlayer();
+  const player   = getCurrentWagerPlayer();
   const guessSel = $('wsd-gw-guess');
   const wagerInp = $('wsd-gw-wager');
-  const err = $('wsd-gw-error');
-  const saveBtn = $('wsd-save-wager');
+  const err      = $('wsd-gw-error');
+  const saveBtn  = $('wsd-save-wager');
 
   if (err) err.textContent = '';
   if (!player) {
     if (err) err.textContent = 'Could not find the current player.';
     return;
   }
+
+  // Figure out if this player is the author of the selected answer
+  const selected = r.selectedAnswer;
+  const authorId = selected?.isGhost
+    ? (selected.ghostOwnerId ?? selected.playerId)
+    : selected?.playerId;
+  const isAuthorTurn = !!player && player.id === authorId;
 
   const guessedAuthorId = guessSel ? guessSel.value : '';
   let amount = wagerInp ? parseInt(wagerInp.value, 10) : NaN;
@@ -1675,6 +1703,11 @@ function saveWagerForCurrentPlayer() {
   if (isNaN(amount)) amount = 1;
   amount = Math.max(1, amount);
   amount = Math.min(amount, player.score);
+
+  // Authors cannot wager: their wager is always 0
+  if (isAuthorTurn) {
+    amount = 0;
+  }
 
   wagerSaveLocked = true;
   if (saveBtn) saveBtn.disabled = true;
@@ -1692,7 +1725,7 @@ function saveWagerForCurrentPlayer() {
   r.wagerIndex = idx + 1;
   saveState();
 
-    requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       wagerSaveLocked = false;
       if (saveBtn) saveBtn.disabled = false;
