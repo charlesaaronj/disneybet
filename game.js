@@ -1515,10 +1515,10 @@ function renderWagerProgress() {
   const wagerInp   = $('wsd-gw-wager');
   const err        = $('wsd-gw-error');
   const guessSel   = $('wsd-gw-guess');
-  const wagerRow   = $('wsd-wager-row');
+  const wagerRow   = document.querySelector('.wsd-wager-row');
   const authorNote = $('wsd-author-wager-note');
 
-  // Figure out who the author is for this selected answer
+  // Who is the author of the selected answer?
   const selected = r.selectedAnswer;
   const authorId = selected?.isGhost
     ? (selected.ghostOwnerId ?? selected.playerId)
@@ -1542,17 +1542,16 @@ function renderWagerProgress() {
 
   if (err) err.textContent = '';
 
-  // Toggle wager controls vs. author instruction
-  if (isAuthorTurn) {
-    if (wagerRow) wagerRow.style.display = 'none';
-    if (authorNote) {
-      authorNote.textContent =
-        "You wrote this answer. You may choose a guess, but you cannot wager. Your wager is always 0 and does not affect scores.";
-      authorNote.style.display = 'block';
-    }
-  } else {
-    if (wagerRow) wagerRow.style.display = '';
-    if (authorNote) authorNote.style.display = 'none';
+  // Always show the wager row on load
+  if (wagerRow) wagerRow.style.display = '';
+
+  // Show author note if it's the author's turn, but leave wager visible
+  if (isAuthorTurn && authorNote) {
+    authorNote.textContent =
+      "You wrote this answer. You may choose a guess, but you cannot wager. Your wager is always 0 and does not affect scores.";
+    authorNote.style.display = 'block';
+  } else if (authorNote) {
+    authorNote.style.display = 'none';
   }
 
   if (player) {
@@ -1560,14 +1559,14 @@ function renderWagerProgress() {
       populateGuessOptionsForPlayer(player);
     }
 
-    if (!isAuthorTurn && wagerInp) {
+    if (wagerInp) {
       wagerInp.min = 1;
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
       // Fade/dissolve animation for the dropdown
       guessSel.classList.remove('wsd-guess-fade');
-      void guessSel.offsetWidth;     // force layout so removal is applied
+      void guessSel.offsetWidth;
       guessSel.classList.add('wsd-guess-fade');
 
       // Fade animation for the wager input
@@ -3028,6 +3027,35 @@ function abandonRound() {
 
 
 // ---------- Wire events & bootstrap ----------
+document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
+  const r = gameState?.currentRound;
+  if (!r) return;
+
+  const player     = getCurrentWagerPlayer();
+  const guessSel   = $('wsd-gw-guess');
+  const wagerRow   = document.querySelector('.wsd-wager-row');
+  const wagerInp   = $('wsd-gw-wager');
+
+  const selected = r.selectedAnswer;
+  const authorId = selected?.isGhost
+    ? (selected.ghostOwnerId ?? selected.playerId)
+    : selected?.playerId;
+  const isAuthorTurn = !!player && player.id === authorId;
+
+  const selectedGuessId = guessSel ? guessSel.value : '';
+
+  // Only authors get their wager hidden after they choose a guess
+  if (isAuthorTurn && selectedGuessId) {
+    // Hide wager controls and lock wager at 0
+    if (wagerRow) wagerRow.style.display = 'none';
+    if (wagerInp) {
+      wagerInp.value = '0';
+    }
+
+    syncWagerDisplay(true);
+    updateHoneyPotDisplay(true);
+  }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   initWagerStepper();
