@@ -1745,6 +1745,7 @@ function saveWagerForCurrentPlayer() {
 }
 
 
+
 // Build the guess/wager rows and jump to guess-wager screen
 function goToGuessWager() {
   const errEl = $('wsd-gw-error');
