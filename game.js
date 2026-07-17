@@ -1518,22 +1518,12 @@ function renderWagerProgress() {
   const wagerRow   = document.querySelector('.wsd-wager-row');
   const authorNote = $('wsd-author-wager-note');
 
-  // Who is the author of the selected answer?
-  const selected = r.selectedAnswer;
-  const authorId = selected?.isGhost
-    ? (selected.ghostOwnerId ?? selected.playerId)
-    : selected?.playerId;
-
-  const isAuthorTurn = !!player && player.id === authorId;
-
   if (prog) {
     prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   }
 
   if (label) {
-    if (isAuthorTurn && player) {
-      label.textContent = `${player.name} (author)`;
-    } else if (player) {
+    if (player) {
       label.textContent = `${player.name}'s guess`;
     } else {
       label.textContent = 'Who said it?';
@@ -1542,17 +1532,9 @@ function renderWagerProgress() {
 
   if (err) err.textContent = '';
 
-  // Always show the wager row on load
+  // Default: wager visible, author note hidden
   if (wagerRow) wagerRow.style.display = '';
-
-  // Show author note if it's the author's turn, but leave wager visible
-  if (isAuthorTurn && authorNote) {
-    authorNote.textContent =
-      "You wrote this answer. You may choose a guess, but you cannot wager. Your wager is always 0 and does not affect scores.";
-    authorNote.style.display = 'block';
-  } else if (authorNote) {
-    authorNote.style.display = 'none';
-  }
+  if (authorNote) authorNote.style.display = 'none';
 
   if (player) {
     if (guessSel) {
@@ -1580,6 +1562,7 @@ function renderWagerProgress() {
   syncWagerDisplay();
   updateHoneyPotDisplay(true);
 }
+
 
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
@@ -3035,27 +3018,51 @@ document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
   const guessSel   = $('wsd-gw-guess');
   const wagerRow   = document.querySelector('.wsd-wager-row');
   const wagerInp   = $('wsd-gw-wager');
-
-  const selected = r.selectedAnswer;
-  const authorId = selected?.isGhost
-    ? (selected.ghostOwnerId ?? selected.playerId)
-    : selected?.playerId;
-  const isAuthorTurn = !!player && player.id === authorId;
+  const authorNote = $('wsd-author-wager-note');
 
   const selectedGuessId = guessSel ? guessSel.value : '';
 
-  // Only authors get their wager hidden after they choose a guess
-  if (isAuthorTurn && selectedGuessId) {
-    // Hide wager controls and lock wager at 0
+  // Who is the author of the selected answer?
+  const selectedAnswer = r.selectedAnswer;
+  const authorId = selectedAnswer?.isGhost
+    ? (selectedAnswer.ghostOwnerId ?? selectedAnswer.playerId)
+    : selectedAnswer?.playerId;
+
+  const isAuthorTurn = !!player && player.id === authorId;
+
+  // Non-author turns: always show normal screen
+  if (!isAuthorTurn) {
+    if (authorNote) authorNote.style.display = 'none';
+    if (wagerRow) wagerRow.style.display = '';
+    return;
+  }
+
+  // Author's turn: only change the screen AFTER they pick a guess
+  if (selectedGuessId) {
+    // Hide wager controls
     if (wagerRow) wagerRow.style.display = 'none';
+
+    // Lock stored wager at 0
     if (wagerInp) {
       wagerInp.value = '0';
     }
 
+    // Show the concise explanation
+    if (authorNote) {
+      authorNote.textContent =
+        "You wrote this answer. You may choose a guess, but you cannot wager. Your wager is always 0 and does not affect scores.";
+      authorNote.style.display = 'block';
+    }
+
     syncWagerDisplay(true);
     updateHoneyPotDisplay(true);
+  } else {
+    // No selection (or cleared): revert to normal
+    if (authorNote) authorNote.style.display = 'none';
+    if (wagerRow) wagerRow.style.display = '';
   }
 });
+
 
 document.addEventListener("DOMContentLoaded", () => {
   initWagerStepper();
