@@ -3015,32 +3015,37 @@ document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
   if (!r) return;
 
   const player     = getCurrentWagerPlayer();
-  const guessSel   = $('wsd-gw-guess');
+  const guessSel   = document.getElementById('wsd-gw-guess');
   const wagerRow   = document.querySelector('.wsd-wager-row');
-  const wagerInp   = $('wsd-gw-wager');
-  const authorNote = $('wsd-author-wager-note');
+  const wagerInp   = document.getElementById('wsd-gw-wager');
+  const authorNote = document.getElementById('wsd-author-wager-note');
+
+  console.log('authorNote element:', authorNote); // TEMP: remove when working
 
   const selectedGuessId = guessSel ? guessSel.value : '';
 
   // Who is the author of the selected answer?
   const selectedAnswer = r.selectedAnswer;
-  const authorId = selectedAnswer?.isGhost
+  const authorId = selectedAnswer && selectedAnswer.isGhost
     ? (selectedAnswer.ghostOwnerId ?? selectedAnswer.playerId)
-    : selectedAnswer?.playerId;
+    : (selectedAnswer ? selectedAnswer.playerId : null);
 
   const isAuthorTurn = !!player && player.id === authorId;
 
-  // Non-author turns: always show normal screen
+  // Non-author turns: keep normal screen
   if (!isAuthorTurn) {
     if (authorNote) authorNote.style.display = 'none';
     if (wagerRow) wagerRow.style.display = '';
     return;
   }
 
-  // Author's turn: only change the screen AFTER they pick a guess
+  // Author turn: only change screen AFTER they pick a guess
   if (selectedGuessId) {
-    // Hide wager controls
-    if (wagerRow) wagerRow.style.display = 'none';
+    // Hide wager row
+    if (wagerRow) {
+      console.log('Hiding wagerRow for author');
+      wagerRow.style.display = 'none';
+    }
 
     // Lock stored wager at 0
     if (wagerInp) {
@@ -3049,6 +3054,7 @@ document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
 
     // Show the concise explanation
     if (authorNote) {
+      console.log('Showing authorNote for author');
       authorNote.textContent =
         "You wrote this answer. You may choose a guess, but you cannot wager. Your wager is always 0 and does not affect scores.";
       authorNote.style.display = 'block';
@@ -3057,7 +3063,7 @@ document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
     syncWagerDisplay(true);
     updateHoneyPotDisplay(true);
   } else {
-    // No selection (or cleared): revert to normal
+    // If no guess selected, revert to normal
     if (authorNote) authorNote.style.display = 'none';
     if (wagerRow) wagerRow.style.display = '';
   }
