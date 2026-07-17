@@ -3056,7 +3056,7 @@ document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
     if (authorNote) {
       console.log('Showing authorNote for author');
       authorNote.textContent =
-        "You wrote this answer so your wager is automatically 0.";
+        "You wrote this answer so your wager is 0.";
       authorNote.style.display = 'block';
     }
 
