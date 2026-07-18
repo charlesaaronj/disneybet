@@ -3554,23 +3554,36 @@ function rebuildRoundScreenFromState() {
 
   const r = gameState.currentRound;
   if (!r) {
-    // No active round: go to setup-question.
     showScreen("setup-question");
     return;
   }
 
-  // If a selected answer exists, always resume wagers via bottom nav.
+  // If a selected answer exists, round icon always resumes wagers
   if (r.selectedAnswer) {
     goToGuessWager();
     return;
   }
 
-  // Otherwise, fall back to previous screen-based logic.
   const scr = ROUND_SCREENS.includes(gameState.screen)
     ? gameState.screen
     : "setup-question";
 
   if (scr === "setup-question") {
+    // NEW: if we already have any answers, resume the answers screen instead
+    const hasAnyAnswers = Array.isArray(r.answers) && r.answers.some(a => !a.isGhost);
+    if (hasAnyAnswers) {
+      const enterQ = $("wsd-enter-question");
+      const ansInp = $("wsd-answer-input");
+      const ghostInp = $("wsd-ghost-answer-input");
+      if (enterQ) enterQ.textContent = r.question || "";
+      if (ansInp) ansInp.value = "";
+      if (ghostInp) ghostInp.value = "";
+      renderAnswerProgress();
+      showScreen("enter-answers");
+      return;
+    }
+
+    // No answers yet: rebuild the question screen from currentRound
     const attrSel = $("wsd-attraction-select");
     const meta = $("wsd-attraction-meta");
     const badge = $("wsd-question-type-badge");
@@ -3631,9 +3644,10 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  // Last resort: keep the user inside the round at the answer screen.
+  // Last resort: keep user in the round, not back at question
   showScreen("enter-answers");
 }
+
 
 // ---------- Bootstrapping on DOM ready ----------
 
