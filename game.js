@@ -3542,6 +3542,7 @@ function rebuildSetupScreenFromState() {
 }
 function rebuildRoundScreenFromState() {
   if (!gameState) {
+    // No game at all: go to setup-game.
     showScreen("setup-game");
     return;
   }
@@ -3553,11 +3554,16 @@ function rebuildRoundScreenFromState() {
   renderAttractionOptions();
 
   const r = gameState.currentRound;
-  const scr = ROUND_SCREENS.includes(gameState.screen) ? gameState.screen : "setup-question";
-
   if (!r) {
+    // Game exists but no active round: go to setup-question.
     showScreen("setup-question");
     return;
+  }
+
+  // Use last known round screen; if it's not a round screen, default to enter-answers.
+  let scr = gameState.screen;
+  if (!ROUND_SCREENS.includes(scr)) {
+    scr = "enter-answers";
   }
 
   if (scr === "setup-question") {
@@ -3566,22 +3572,25 @@ function rebuildRoundScreenFromState() {
     const badge = $("wsd-question-type-badge");
 
     if (attrSel && r.attraction) {
-  const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
-  if (idx >= 0) {
-    attrSel.value = String(idx);
-    // remove the placeholder "Select an attraction" option
-    const placeholder = attrSel.querySelector('option[value=""]');
-    if (placeholder) placeholder.remove();
-  }
-}
-
+      const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
+      if (idx >= 0) {
+        attrSel.value = String(idx);
+        const placeholder = attrSel.querySelector('option[value=""]');
+        if (placeholder) placeholder.remove();
+      }
+    }
 
     if (meta) {
       meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
     }
 
     setQuestionDisplay(r.question || "Select the attraction you're in line for above. 👆");
-    if (badge) badge.textContent = r.questionType === "custom" ? "Custom question" : (r.question ? "Question" : "Pending");
+    if (badge) {
+      badge.textContent =
+        r.questionType === "custom"
+          ? "Custom question"
+          : (r.question ? "Question" : "Pending");
+    }
     updateQuestionLock();
     showScreen("setup-question");
     return;
@@ -3610,14 +3619,16 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-     if (scr === "reveal") {
+  if (scr === "reveal") {
     showScreen("reveal");
     rebuildRevealScreen();
     return;
   }
 
-  showScreen("setup-question");
+  // Last resort: stay inside the round by going to enter-answers.
+  showScreen("enter-answers");
 }
+
 // ---------- Bootstrapping on DOM ready ----------
 
 document.addEventListener("DOMContentLoaded", () => {
