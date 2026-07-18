@@ -3542,7 +3542,6 @@ function rebuildSetupScreenFromState() {
 }
 function rebuildRoundScreenFromState() {
   if (!gameState) {
-    // No game at all: go to setup-game.
     showScreen("setup-game");
     return;
   }
@@ -3555,16 +3554,21 @@ function rebuildRoundScreenFromState() {
 
   const r = gameState.currentRound;
   if (!r) {
-    // Game exists but no active round: go to setup-question.
+    // No active round: go to setup-question.
     showScreen("setup-question");
     return;
   }
 
-  // Use last known round screen; if it's not a round screen, default to enter-answers.
-  let scr = gameState.screen;
-  if (!ROUND_SCREENS.includes(scr)) {
-    scr = "enter-answers";
+  // If a selected answer exists, always resume wagers via bottom nav.
+  if (r.selectedAnswer) {
+    goToGuessWager();
+    return;
   }
+
+  // Otherwise, fall back to previous screen-based logic.
+  const scr = ROUND_SCREENS.includes(gameState.screen)
+    ? gameState.screen
+    : "setup-question";
 
   if (scr === "setup-question") {
     const attrSel = $("wsd-attraction-select");
@@ -3584,7 +3588,9 @@ function rebuildRoundScreenFromState() {
       meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
     }
 
-    setQuestionDisplay(r.question || "Select the attraction you're in line for above. 👆");
+    setQuestionDisplay(
+      r.question || "Select the attraction you're in line for above. 👆"
+    );
     if (badge) {
       badge.textContent =
         r.questionType === "custom"
@@ -3625,7 +3631,7 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  // Last resort: stay inside the round by going to enter-answers.
+  // Last resort: keep the user inside the round at the answer screen.
   showScreen("enter-answers");
 }
 
