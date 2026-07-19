@@ -3546,7 +3546,7 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  const parkName = gameState.settings?.park || "";
+  const parkName = gameState.settings?.park;
   const parkLabel = $("wsd-park-label");
   if (parkLabel) parkLabel.textContent = parkName || "Not set";
   applyParkTheme(parkName);
@@ -3558,94 +3558,40 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  // Decide high-level phase based on round state,
-  // not only on gameState.screen
-  const hasAnyAnswers = Array.isArray(r.answers) && r.answers.some(a => !a.isGhost);
-  const hasSelectedAnswer = !!r.selectedAnswer;
-  const hasAnyWagers = Array.isArray(r.wagers) && r.wagers.length > 0;
-  const hasScoring = !!r.scoringApplied;
+  const scr = ROUNDSCREENS.includes(gameState.screen)
+    ? gameState.screen
+    : "setup-question";
 
-  // 1. No answers yet → question or enter-answers
-  if (!hasAnyAnswers) {
-    // If there is no question yet, stay on setup-question
-    if (!r.question) {
-      const attrSel = $("wsd-attraction-select");
-      const meta = $("wsd-attraction-meta");
-      const badge = $("wsd-question-type-badge");
+  if (scr === "setup-question") {
+    rebuildSetupQuestionScreen();
+    showScreen("setup-question");
+    return;
+  }
 
-      if (attrSel && r.attraction) {
-        const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
-        if (idx >= 0) {
-          attrSel.value = String(idx);
-          const placeholder = attrSel.querySelector('option[value=""]');
-          if (placeholder) placeholder.remove();
-        }
-      }
-
-      if (meta) {
-        meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
-      }
-
-      setQuestionDisplay(
-        r.question || "Select the attraction you're in line for above. 👆"
-      );
-      if (badge) {
-        badge.textContent =
-          r.questionType === "custom"
-            ? "Custom question"
-            : (r.question ? "Question" : "Pending");
-      }
-      updateQuestionLock();
-      showScreen("setup-question");
-      return;
-    }
-
-    // Question exists but no answers yet: go to enter-answers
-    const enterQ = $("wsd-enter-question");
-    const ansInp = $("wsd-answer-input");
-    const ghostInp = $("wsd-ghost-answer-input");
-    if (enterQ) enterQ.textContent = r.question || "";
-    if (ansInp) ansInp.value = "";
-    if (ghostInp) ghostInp.value = "";
-    renderAnswerProgress();
+  if (scr === "enter-answers") {
+    rebuildEnterAnswersScreen();
     showScreen("enter-answers");
     return;
   }
 
-  // 2. Answers exist, but no selected answer yet → select-answer phase
-  if (hasAnyAnswers && !hasSelectedAnswer) {
+  if (scr === "select-answer") {
     renderSelectAnswerScreen();
     showScreen("select-answer");
     return;
   }
 
-  // 3. Selected answer exists, but no scoring yet:
-  //    if no wagers → go to select-answer (to see the chosen answer),
-  //    if wagers → go to guess-wager.
-  if (hasSelectedAnswer && !hasScoring) {
-    if (!hasAnyWagers) {
-      renderSelectAnswerScreen();
-      showScreen("select-answer");
-      return;
-    }
-
-    // Wagers in progress → guess-wager
+  if (scr === "guess-wager") {
     goToGuessWager();
     return;
   }
 
-  // 4. Scoring applied → reveal screen
-  if (hasSelectedAnswer && hasScoring) {
-    showScreen("reveal");
+  if (scr === "reveal") {
     rebuildRevealScreen();
+    showScreen("reveal");
     return;
   }
 
-  // Safety fallback: stay inside round on enter-answers
-  const enterQ = $("wsd-enter-question");
-  if (enterQ) enterQ.textContent = r.question || "";
-  renderAnswerProgress();
-  showScreen("enter-answers");
+  showScreen("setup-question");
 }
 
 // ---------- Bootstrapping on DOM ready ----------
