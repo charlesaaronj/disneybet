@@ -3086,11 +3086,37 @@ document.addEventListener(
 );
 
 function resumeRoundFlow() {
-  if (!gameState) {
-    showScreen("setup-game");
+  if (!gameState || !gameState.currentRound) {
+    showScreen("setup-question");
     return;
   }
-  rebuildCurrentScreen();
+
+  const scr = gameState.screen;
+
+  if (scr === "enter-answers") {
+    switchScreenUI("enter-answers");
+    renderAnswerProgress();
+    return;
+  }
+
+  if (scr === "select-answer") {
+    switchScreenUI("select-answer");
+    renderSelectAnswerScreen();
+    return;
+  }
+
+  if (scr === "guess-wager") {
+    renderGuessWagerScreen();
+    return;
+  }
+
+  if (scr === "reveal") {
+    switchScreenUI("reveal");
+    runRevealAnimation();
+    return;
+  }
+
+  showScreen("setup-question");
 }
 
 function wireEvents() {
@@ -3520,29 +3546,55 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  const parkName = gameState.settings?.park ?? "Not set";
+  const parkName = gameState.settings?.park || "";
   const parkLabel = $("wsd-park-label");
-  if (parkLabel) parkLabel.textContent = parkName;
-  applyParkTheme(gameState.settings?.park ?? null);
+  if (parkLabel) parkLabel.textContent = parkName || "Not set";
+  applyParkTheme(parkName);
+  renderAttractionOptions();
 
-  if (!gameState.currentRound) {
-    rebuildSetupQuestionScreen();
+  const r = gameState.currentRound;
+  const scr = ROUND_SCREENS.includes(gameState.screen) ? gameState.screen : "setup-question";
+
+  if (!r) {
     showScreen("setup-question");
     return;
   }
 
-  const scr = ROUNDSCREENS.includes(gameState.screen)
-    ? gameState.screen
-    : "setup-question";
-
   if (scr === "setup-question") {
-    rebuildSetupQuestionScreen();
+    const attrSel = $("wsd-attraction-select");
+    const meta = $("wsd-attraction-meta");
+    const badge = $("wsd-question-type-badge");
+
+    if (attrSel && r.attraction) {
+  const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
+  if (idx >= 0) {
+    attrSel.value = String(idx);
+    // remove the placeholder "Select an attraction" option
+    const placeholder = attrSel.querySelector('option[value=""]');
+    if (placeholder) placeholder.remove();
+  }
+}
+
+
+    if (meta) {
+      meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
+    }
+
+    setQuestionDisplay(r.question || "Select the attraction you're in line for above. 👆");
+    if (badge) badge.textContent = r.questionType === "custom" ? "Custom question" : (r.question ? "Question" : "Pending");
+    updateQuestionLock();
     showScreen("setup-question");
     return;
   }
 
   if (scr === "enter-answers") {
-    rebuildEnterAnswersScreen();
+    const enterQ = $("wsd-enter-question");
+    const ansInp = $("wsd-answer-input");
+    const ghostInp = $("wsd-ghost-answer-input");
+    if (enterQ) enterQ.textContent = r.question || "";
+    if (ansInp) ansInp.value = "";
+    if (ghostInp) ghostInp.value = "";
+    renderAnswerProgress();
     showScreen("enter-answers");
     return;
   }
@@ -3558,13 +3610,12 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  if (scr === "reveal") {
-    rebuildRevealScreen();
+     if (scr === "reveal") {
     showScreen("reveal");
+    rebuildRevealScreen();
     return;
   }
 
-  rebuildSetupQuestionScreen();
   showScreen("setup-question");
 }
 // ---------- Bootstrapping on DOM ready ----------
