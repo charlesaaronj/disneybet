@@ -3541,83 +3541,147 @@ function rebuildSetupScreenFromState() {
   updatePlayerInputLock();
 }
 function rebuildRoundScreenFromState() {
-  if (!gameState) {
-    showScreen("setup-game");
-    return;
-  }
+  if (!gameState) return;
 
-  const parkName = gameState.settings?.park || "";
-  const parkLabel = $("wsd-park-label");
-  if (parkLabel) parkLabel.textContent = parkName || "Not set";
-  applyParkTheme(parkName);
-  renderAttractionOptions();
+  const current = gameState.screen;
 
-  const r = gameState.currentRound;
-  const scr = ROUND_SCREENS.includes(gameState.screen) ? gameState.screen : "setup-question";
-
-  if (!r) {
+  if (current === "scores") {
+    startNewRoundCore();
+    renderCurrentRoundScreen("setup-question");
     showScreen("setup-question");
     return;
   }
 
-  if (scr === "setup-question") {
+  const target = ROUND_SCREENS.includes(current) ? current : "setup-question";
+  renderCurrentRoundScreen(target);
+  showScreen(target);
+}
+
+function renderCurrentRoundScreen(screenName) {
+  if (!gameState?.currentRound) return;
+
+  const r = gameState.currentRound;
+
+  if (screenName === "setup-question") {
+    renderAttractionOptions();
+
     const attrSel = $("wsd-attraction-select");
     const meta = $("wsd-attraction-meta");
     const badge = $("wsd-question-type-badge");
 
-    if (attrSel && r.attraction) {
-  const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
-  if (idx >= 0) {
-    attrSel.value = String(idx);
-    // remove the placeholder "Select an attraction" option
-    const placeholder = attrSel.querySelector('option[value=""]');
-    if (placeholder) placeholder.remove();
-  }
-}
-
-
-    if (meta) {
-      meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
+    if (attrSel) {
+      if (r.attraction) {
+        const attractionIndex = gameState.attractions.findIndex(
+          a => a.name === r.attraction.name
+        );
+        attrSel.value = attractionIndex >= 0 ? String(attractionIndex) : "";
+      } else {
+        attrSel.value = "";
+      }
     }
 
-    setQuestionDisplay(r.question || "Select the attraction you're in line for above. 👆");
-    if (badge) badge.textContent = r.questionType === "custom" ? "Custom question" : (r.question ? "Question" : "Pending");
+    if (meta) {
+      meta.textContent = r.attraction
+        ? `${r.attraction.park} • ${r.attraction.land}`
+        : "";
+    }
+
+    if (badge) {
+      badge.textContent = r.questionType ? labelForType(r.questionType) : "Pending";
+    }
+
+    if (r.questionType === "custom") {
+      const display = $("wsd-question-display");
+      const textarea = $("wsd-question-text");
+      if (display) display.style.display = "none";
+      if (textarea) {
+        textarea.style.display = "block";
+        textarea.value = r.question || "";
+        textarea.readOnly = false;
+      }
+    } else {
+      setQuestionDisplay(r.question || "Select the attraction you're in line for above. 👆");
+    }
+
     updateQuestionLock();
-    showScreen("setup-question");
     return;
   }
 
-  if (scr === "enter-answers") {
+  if (screenName === "enter-answers") {
     const enterQ = $("wsd-enter-question");
     const ansInp = $("wsd-answer-input");
     const ghostInp = $("wsd-ghost-answer-input");
+    const err = $("wsd-answers-error");
+
     if (enterQ) enterQ.textContent = r.question || "";
     if (ansInp) ansInp.value = "";
     if (ghostInp) ghostInp.value = "";
+    if (err) err.textContent = "";
+
     renderAnswerProgress();
-    showScreen("enter-answers");
     return;
   }
 
-  if (scr === "select-answer") {
-    renderSelectAnswerScreen();
-    showScreen("select-answer");
+  if (screenName === "select-answer") {
+    const qEl = $("wsd-select-question");
+    const ansEl = $("wsd-selected-answer");
+    const labelEl = document.querySelector("#screen-select-answer .wsd-form-label");
+    const toWagers = $("wsd-to-wagers");
+    const selectAgain = $("wsd-select-again");
+
+    if (qEl) qEl.textContent = r.question || "";
+
+    const normalized = (r.answers || [])
+      .filter(a => a && !a.isGhost)
+      .map(a => (a.text || "").trim().toLowerCase())
+      .filter(Boolean);
+
+    const hasDuplicateAnswers = normalized.length !== new Set(normalized).size;
+
+    if (hasDuplicateAnswers) {
+      if (labelEl) labelEl.textContent = "Round issue";
+      if (ansEl) {
+        ansEl.classList.remove("wsd-anim-pop", "wsd-answer-highlight");
+        void ansEl.offsetWidth;
+        ansEl.textContent = "Oops — two players gave the same answer. Scrap this round and try again!";
+        ansEl.classList.add("wsd-anim-pop");
+      }
+      if (toWagers) toWagers.style.display = "none";
+      if (selectAgain) selectAgain.style.display = "none";
+      return;
+    }
+
+    if (r.selectedAnswer) {
+      renderSelectAnswerScreen();
+      if (toWagers) toWagers.style.display = "";
+      if (selectAgain) selectAgain.style.display = "";
+    }
     return;
   }
 
-  if (scr === "guess-wager") {
-    goToGuessWager();
+  if (screenName === "guess-wager") {
+    const qEl = $("wsd-gw-question");
+    const ansEl = $("wsd-gw-answer");
+    const err = $("wsd-gw-error");
+
+    if (qEl) qEl.textContent = r.question || "";
+    if (ansEl) ansEl.textContent = r.selectedAnswer?.text || "";
+    if (err) err.textContent = "";
+
+    renderWagerProgress();
     return;
   }
 
-     if (scr === "reveal") {
-    showScreen("reveal");
-    rebuildRevealScreen();
-    return;
+  if (screenName === "reveal") {
+    if (typeof renderRevealScreen === "function") {
+      renderRevealScreen();
+    } else {
+      if (typeof renderRevealSummary === "function") renderRevealSummary();
+      if (typeof renderRevealRows === "function") renderRevealRows();
+    }
   }
-
-  showScreen("setup-question");
 }
+
 // ---------- Bootstrapping on DOM ready ----------
 
 document.addEventListener("DOMContentLoaded", () => {
