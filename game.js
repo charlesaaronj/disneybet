@@ -3546,30 +3546,55 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  const parkName = gameState.settings?.park;
+  const parkName = gameState.settings?.park || "";
   const parkLabel = $("wsd-park-label");
   if (parkLabel) parkLabel.textContent = parkName || "Not set";
   applyParkTheme(parkName);
   renderAttractionOptions();
 
   const r = gameState.currentRound;
+  const scr = ROUND_SCREENS.includes(gameState.screen) ? gameState.screen : "setup-question";
+
   if (!r) {
     showScreen("setup-question");
     return;
   }
 
-  const scr = ROUNDSCREENS.includes(gameState.screen)
-    ? gameState.screen
-    : "setup-question";
-
   if (scr === "setup-question") {
-    rebuildSetupQuestionScreen();
+    const attrSel = $("wsd-attraction-select");
+    const meta = $("wsd-attraction-meta");
+    const badge = $("wsd-question-type-badge");
+
+    if (attrSel && r.attraction) {
+  const idx = gameState.attractions.findIndex(a => a.name === r.attraction.name);
+  if (idx >= 0) {
+    attrSel.value = String(idx);
+    // remove the placeholder "Select an attraction" option
+    const placeholder = attrSel.querySelector('option[value=""]');
+    if (placeholder) placeholder.remove();
+  }
+}
+
+
+    if (meta) {
+      meta.textContent = r.attraction ? `${r.attraction.park} • ${r.attraction.land}` : "";
+    }
+
+    setQuestionDisplay(r.question || "Select the attraction you're in line for above. 👆");
+    if (badge) badge.textContent = r.questionType === "custom" ? "Custom question" : (r.question ? "Question" : "Pending");
+    updateQuestionLock();
     showScreen("setup-question");
     return;
   }
 
   if (scr === "enter-answers") {
-    rebuildEnterAnswersScreen();
+    const enterQ = $("wsd-enter-question");
+    const ansInp = $("wsd-answer-input");
+    const ghostInp = $("wsd-ghost-answer-input");
+    if (enterQ) enterQ.textContent = r.question || "";
+    if (ansInp) ansInp.value = "";
+    if (ghostInp) ghostInp.value = "";
+    renderAnswerProgress();
     showScreen("enter-answers");
     return;
   }
@@ -3585,15 +3610,14 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  if (scr === "reveal") {
-    rebuildRevealScreen();
+     if (scr === "reveal") {
     showScreen("reveal");
+    rebuildRevealScreen();
     return;
   }
 
   showScreen("setup-question");
 }
-
 // ---------- Bootstrapping on DOM ready ----------
 
 document.addEventListener("DOMContentLoaded", () => {
