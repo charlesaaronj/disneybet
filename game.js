@@ -3564,6 +3564,30 @@ function rebuildSetupScreenFromState() {
   applyParkTheme(parkName || null);
   updatePlayerInputLock();
 }
+function getRoundScreenFromState() {
+  const r = gameState?.currentRound;
+  if (!gameState || !r) return "setup-question";
+
+  if (r.scoringApplied) return "reveal";
+
+  const answerOrder = Array.isArray(r.answerOrder) ? r.answerOrder : [];
+  const wagerOrder = Array.isArray(r.wagerOrder) ? r.wagerOrder : [];
+
+  if (r.selectedAnswer && wagerOrder.length && (r.wagerIndex ?? 0) < wagerOrder.length) {
+    return "guess-wager";
+  }
+
+  if (r.selectedAnswer) {
+    return "select-answer";
+  }
+
+  if (r.question && answerOrder.length && (r.answerIndex ?? 0) < answerOrder.length) {
+    return "enter-answers";
+  }
+
+  return "setup-question";
+}
+
 function rebuildRoundScreenFromState() {
   if (!gameState) return;
 
@@ -3575,6 +3599,20 @@ function rebuildRoundScreenFromState() {
   }
 
   const target = getRoundScreenFromState();
+
+  console.log("[round nav] saved screen =", gameState.screen);
+  console.log("[round nav] derived target =", target);
+  console.log("[round nav] round state =", JSON.stringify({
+    attraction: !!gameState.currentRound?.attraction,
+    question: !!gameState.currentRound?.question,
+    answers: gameState.currentRound?.answers?.length || 0,
+    answerIndex: gameState.currentRound?.answerIndex,
+    selectedAnswer: !!gameState.currentRound?.selectedAnswer,
+    wagers: gameState.currentRound?.wagers?.length || 0,
+    wagerIndex: gameState.currentRound?.wagerIndex,
+    scoringApplied: !!gameState.currentRound?.scoringApplied
+  }));
+
   renderCurrentRoundScreen(target);
   showScreen(target);
 }
