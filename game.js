@@ -1075,9 +1075,8 @@ const firstPlayerId =
 const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
 
 
-
+renderAnswerProgress();
 showPickOverlay(() => {
-  renderAnswerProgress();
   const nextInput = $("wsd-answer-input");
   if (nextInput) {
     nextInput.classList.add("wsd-anim-answer-refresh");
@@ -1253,9 +1252,8 @@ if (isGhostPlayer && ghostText) {
 
         saveState();
 
-
+ renderAnswerProgress();
         showPickOverlay(() => {
-          renderAnswerProgress();
           const nextInput = $("wsd-answer-input");
           if (nextInput) {
             nextInput.classList.add("wsd-anim-answer-refresh");
