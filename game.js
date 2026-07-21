@@ -3591,30 +3591,45 @@ function getRoundScreenFromState() {
 function rebuildRoundScreenFromState() {
   if (!gameState) return;
 
-if (gameState.screen === "scores" && gameState.currentRound?.scoringApplied) {
+  const r = gameState.currentRound;
+  if (!r) {
+    renderCurrentRoundScreen("setup-question");
+    showScreen("setup-question");
+    return;
+  }
+
+  if (gameState.screen === "scores" && r.scoringApplied) {
     startNewRoundCore();
     renderCurrentRoundScreen("setup-question");
     showScreen("setup-question");
     return;
   }
 
-  const target = getRoundScreenFromState();
+  if (r.scoringApplied) {
+    rebuildRevealScreen();
+    showScreen("reveal");
+    return;
+  }
 
-  console.log("[round nav] saved screen =", gameState.screen);
-  console.log("[round nav] derived target =", target);
-  console.log("[round nav] round state =", JSON.stringify({
-    attraction: !!gameState.currentRound?.attraction,
-    question: !!gameState.currentRound?.question,
-    answers: gameState.currentRound?.answers?.length || 0,
-    answerIndex: gameState.currentRound?.answerIndex,
-    selectedAnswer: !!gameState.currentRound?.selectedAnswer,
-    wagers: gameState.currentRound?.wagers?.length || 0,
-    wagerIndex: gameState.currentRound?.wagerIndex,
-    scoringApplied: !!gameState.currentRound?.scoringApplied
-  }));
+  if (r.selectedAnswer) {
+    if ((r.wagerIndex ?? 0) < (r.wagerOrder?.length ?? 0)) {
+      renderCurrentRoundScreen("guess-wager");
+      showScreen("guess-wager");
+    } else {
+      renderCurrentRoundScreen("select-answer");
+      showScreen("select-answer");
+    }
+    return;
+  }
 
-  renderCurrentRoundScreen(target);
-  showScreen(target);
+  if (r.question) {
+    renderCurrentRoundScreen("enter-answers");
+    showScreen("enter-answers");
+    return;
+  }
+
+  renderCurrentRoundScreen("setup-question");
+  showScreen("setup-question");
 }
 
 function renderCurrentRoundScreen(screenName) {
