@@ -1074,8 +1074,10 @@ const firstPlayerId =
   gameState.currentRound.answerOrder?.[gameState.currentRound.answerIndex ?? 0];
 const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
 
+renderAnswerProgress();
+
 showPickOverlay(() => {
-  renderAnswerProgress();
+  null,
 
   const nextInput = $("wsd-answer-input");
   if (nextInput) {
@@ -1252,8 +1254,9 @@ if (isGhostPlayer && ghostText) {
 
         saveState();
 
+renderAnswerProgress();
         showPickOverlay(() => {
-          renderAnswerProgress();
+          null,
 
           const nextInput = $("wsd-answer-input");
           if (nextInput) {
@@ -1719,9 +1722,9 @@ function saveWagerForCurrentPlayer() {
       } else {
         const nextPlayerId = order[r.wagerIndex];
         const nextPlayer = gameState.players.find(p => p.id === nextPlayerId);
-
+renderWagerProgress();
         showPickOverlay(() => {
-          renderWagerProgress();
+          null,
         }, `Pass the phone to ${nextPlayer ? nextPlayer.name : "the next player"}...`, 900);
       }
     });
