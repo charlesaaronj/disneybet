@@ -1096,7 +1096,10 @@ let ghostFieldTimer = null;
 function renderAnswerProgress() {
   const r = gameState.currentRound;
   const idx = r.answerIndex ?? 0;
-  const order = r.answerOrder || gameState.players.map(p => p.id);
+  const order = Array.isArray(r.answerOrder) && r.answerOrder.length
+    ? r.answerOrder
+    : gameState.players.map(p => p.id);
+
   const playerId = order[idx];
   const player = gameState.players.find(p => p.id === playerId);
 
@@ -1105,7 +1108,7 @@ function renderAnswerProgress() {
   const ghostWrap = id("wsd-ghost-answer-wrap");
   const ghostInput = id("wsd-ghost-answer-input");
 
-  if (prog) prog.textContent = `Player ${idx + 1} of ${order.length}`;
+  if (prog) prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
   if (label) label.textContent = player ? player.name : "Author";
 
   const isGhostPlayer =
