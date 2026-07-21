@@ -1150,31 +1150,33 @@ function saveAnswerForCurrentPlayer(skip) {
 
   if (err) err.textContent = "";
 
-  if (!skip && !text) {
-    if (err) err.textContent = "Please enter an answer or skip.";
-    return;
-  }
-  if (!skip && isGhostPlayer && !ghostText) {
+if (!skip && !text) {
+  if (err) err.textContent = "Please enter an answer or skip.";
+  return;
+}
+
+if (!skip && isGhostPlayer && !ghostText) {
   renderAnswerProgress();
   if (err) err.textContent = "Please enter both your answer and your Ghost answer.";
   return;
 }
 
-  if (!skip) {
-    r.answers.push({
-      playerId: player.id,
-      text,
-      isGhost: false
-    });
+if (!skip && isGhostPlayer) {
+  const normalizedText = text.trim().toLowerCase();
+  const normalizedGhostText = ghostText.trim().toLowerCase();
 
-    if (isGhostPlayer && ghostText) {
-      r.answers.push({
-        playerId: player.id,
-        text: ghostText,
-        isGhost: true,
-        ghostOwnerId: player.id
-      });
-    }
+  if (normalizedText && normalizedGhostText && normalizedText === normalizedGhostText) {
+    renderAnswerProgress();
+    if (err) err.textContent = "Your regular answer and Ghost answer must be different.";
+    return;
+  }
+}
+
+if (!skip) r.answers.push({ playerId: player.id, text, isGhost: false });
+if (isGhostPlayer && ghostText) {
+  r.answers.push({ playerId: player.id, text: ghostText, isGhost: true, ghostOwnerId: player.id });
+}
+
   }
 
   const saveBtn = $("wsd-save-answer");
