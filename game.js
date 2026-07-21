@@ -3591,7 +3591,7 @@ function getRoundScreenFromState() {
 function rebuildRoundScreenFromState() {
   if (!gameState) return;
 
-  if (gameState.screen === "scores") {
+if (gameState.screen === "scores" && gameState.currentRound?.scoringApplied) {
     startNewRoundCore();
     renderCurrentRoundScreen("setup-question");
     showScreen("setup-question");
