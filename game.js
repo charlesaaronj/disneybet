@@ -1096,41 +1096,30 @@ let ghostFieldTimer = null;
 function renderAnswerProgress() {
   const r = gameState.currentRound;
   const idx = r.answerIndex ?? 0;
-  const order = Array.isArray(r.answerOrder) && r.answerOrder.length
-    ? r.answerOrder
-    : gameState.players.map(p => p.id);
-
+  const order = r.answerOrder || gameState.players.map(p => p.id);
   const playerId = order[idx];
   const player = gameState.players.find(p => p.id === playerId);
 
-  const prog = id("wsd-answer-progress");
-  const label = id("wsd-current-player-label");
-  const ghostWrap = id("wsd-ghost-answer-wrap");
-  const ghostInput = id("wsd-ghost-answer-input");
+  const prog = $("wsd-answer-progress");
+  const label = $("wsd-current-player-label");
+  const ghostWrap = $("wsd-ghost-answer-wrap");
+  const ghostInput = $("wsd-ghost-answer-input");
 
-  if (prog) prog.textContent = `Player ${Math.min(idx + 1, order.length)} of ${order.length}`;
-  if (label) label.textContent = player ? player.name : "Author";
+  if (prog) prog.textContent = `Player ${idx + 1} of ${order.length}`;
+  if (label) label.textContent = player ? `${player.name}` : "Author";
 
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
 
-  if (ghostFieldTimer) {
-    clearTimeout(ghostFieldTimer);
-    ghostFieldTimer = null;
-  }
+  if (ghostFieldTimer) clearTimeout(ghostFieldTimer);
+ghostFieldTimer = null;
 
-  if (!isGhostPlayer) {
-    if (ghostWrap) ghostWrap.classList.remove("show");
-    if (ghostInput) ghostInput.value = "";
-    return;
-  }
+if (ghostWrap) ghostWrap.classList.remove("show");
 
-  if (ghostWrap && !ghostWrap.classList.contains("show")) {
-    ghostFieldTimer = setTimeout(() => {
-      ghostWrap.classList.add("show");
-      ghostFieldTimer = null;
-    }, 150);
-  }
+if (!isGhostPlayer) {
+  if (ghostInput) ghostInput.value = "";
+}
+
 }
 
 
