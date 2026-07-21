@@ -3598,13 +3598,6 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  if (gameState.screen === "scores" && r.scoringApplied) {
-    startNewRoundCore();
-    renderCurrentRoundScreen("setup-question");
-    showScreen("setup-question");
-    return;
-  }
-
   if (r.scoringApplied) {
     rebuildRevealScreen();
     showScreen("reveal");
@@ -3631,6 +3624,7 @@ function rebuildRoundScreenFromState() {
   renderCurrentRoundScreen("setup-question");
   showScreen("setup-question");
 }
+
 
 function renderCurrentRoundScreen(screenName) {
   if (!gameState?.currentRound) return;
