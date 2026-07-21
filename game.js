@@ -1114,11 +1114,11 @@ function renderAnswerProgress() {
   if (ghostFieldTimer) clearTimeout(ghostFieldTimer);
 ghostFieldTimer = null;
 
-if (ghostWrap) ghostWrap.classList.remove("show");
-
 if (!isGhostPlayer) {
+  if (ghostWrap) ghostWrap.classList.remove("show");
   if (ghostInput) ghostInput.value = "";
 }
+
 
 }
 
