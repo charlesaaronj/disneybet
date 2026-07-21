@@ -3388,6 +3388,30 @@ function showResumeModal() {
   }
 }
 
+function getRoundScreenFromState() {
+  const r = gameState?.currentRound;
+  if (!gameState || !r) return "setup-question";
+
+  if (r.scoringApplied) return "reveal";
+
+  const answerOrder = Array.isArray(r.answerOrder) ? r.answerOrder : [];
+  const wagerOrder = Array.isArray(r.wagerOrder) ? r.wagerOrder : [];
+
+  if (r.selectedAnswer && wagerOrder.length && (r.wagerIndex ?? 0) < wagerOrder.length) {
+    return "guess-wager";
+  }
+
+  if (r.selectedAnswer) {
+    return "select-answer";
+  }
+
+  if (r.question && answerOrder.length && (r.answerIndex ?? 0) < answerOrder.length) {
+    return "enter-answers";
+  }
+
+  return "setup-question";
+}
+
 function rebuildCurrentScreen() {
   if (!gameState) return;
 
@@ -3543,16 +3567,14 @@ function rebuildSetupScreenFromState() {
 function rebuildRoundScreenFromState() {
   if (!gameState) return;
 
-  const current = gameState.screen;
-
-  if (current === "scores") {
+  if (gameState.screen === "scores") {
     startNewRoundCore();
     renderCurrentRoundScreen("setup-question");
     showScreen("setup-question");
     return;
   }
 
-  const target = ROUND_SCREENS.includes(current) ? current : "setup-question";
+  const target = getRoundScreenFromState();
   renderCurrentRoundScreen(target);
   showScreen(target);
 }
