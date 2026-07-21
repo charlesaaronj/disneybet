@@ -1074,11 +1074,10 @@ const firstPlayerId =
   gameState.currentRound.answerOrder?.[gameState.currentRound.answerIndex ?? 0];
 const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
 
-renderAnswerProgress();
+
 
 showPickOverlay(() => {
-  null,
-
+  renderAnswerProgress();
   const nextInput = $("wsd-answer-input");
   if (nextInput) {
     nextInput.classList.add("wsd-anim-answer-refresh");
@@ -1254,10 +1253,9 @@ if (isGhostPlayer && ghostText) {
 
         saveState();
 
-renderAnswerProgress();
-        showPickOverlay(() => {
-          null,
 
+        showPickOverlay(() => {
+          renderAnswerProgress();
           const nextInput = $("wsd-answer-input");
           if (nextInput) {
             nextInput.classList.add("wsd-anim-answer-refresh");
@@ -1756,9 +1754,9 @@ function goToGuessWager() {
 
   const firstPlayerId = r.wagerOrder[r.wagerIndex];
   const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
-
+renderWagerProgress();
   showPickOverlay(() => {
-    renderWagerProgress();
+    null,
   }, `Pass the phone to ${firstPlayer ? firstPlayer.name : 'the next player'}...`, 900);
 
   if (r.ghostRound) {
