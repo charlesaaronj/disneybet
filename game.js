@@ -1100,27 +1100,36 @@ function renderAnswerProgress() {
   const playerId = order[idx];
   const player = gameState.players.find(p => p.id === playerId);
 
-  const prog = $("wsd-answer-progress");
-  const label = $("wsd-current-player-label");
-  const ghostWrap = $("wsd-ghost-answer-wrap");
-  const ghostInput = $("wsd-ghost-answer-input");
+  const prog = id("wsd-answer-progress");
+  const label = id("wsd-current-player-label");
+  const ghostWrap = id("wsd-ghost-answer-wrap");
+  const ghostInput = id("wsd-ghost-answer-input");
 
   if (prog) prog.textContent = `Player ${idx + 1} of ${order.length}`;
-  if (label) label.textContent = player ? `${player.name}` : "Author";
+  if (label) label.textContent = player ? player.name : "Author";
 
   const isGhostPlayer =
     !!r.ghostRound && !!player && player.id === r.ghostPlayerId;
 
-  if (ghostFieldTimer) clearTimeout(ghostFieldTimer);
-ghostFieldTimer = null;
+  if (ghostFieldTimer) {
+    clearTimeout(ghostFieldTimer);
+    ghostFieldTimer = null;
+  }
 
-if (ghostWrap) ghostWrap.classList.remove("show");
+  if (!isGhostPlayer) {
+    if (ghostWrap) ghostWrap.classList.remove("show");
+    if (ghostInput) ghostInput.value = "";
+    return;
+  }
 
-if (!isGhostPlayer) {
-  if (ghostInput) ghostInput.value = "";
+  if (ghostWrap && !ghostWrap.classList.contains("show")) {
+    ghostFieldTimer = setTimeout(() => {
+      ghostWrap.classList.add("show");
+      ghostFieldTimer = null;
+    }, 150);
+  }
 }
 
-}
 
 // Save the current player’s answer, or “skip” if requested
 function saveAnswerForCurrentPlayer(skip) {
