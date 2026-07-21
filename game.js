@@ -1177,7 +1177,6 @@ if (isGhostPlayer && ghostText) {
   r.answers.push({ playerId: player.id, text: ghostText, isGhost: true, ghostOwnerId: player.id });
 }
 
-  }
 
   const saveBtn = $("wsd-save-answer");
   const skipBtn = $("wsd-skip-player");
