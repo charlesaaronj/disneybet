@@ -1721,9 +1721,11 @@ function saveWagerForCurrentPlayer() {
         const nextPlayerId = order[r.wagerIndex];
         const nextPlayer = gameState.players.find(p => p.id === nextPlayerId);
 renderWagerProgress();
-        showPickOverlay(() => {
-          null,
-        }, `Pass the phone to ${nextPlayer ? nextPlayer.name : "the next player"}...`, 900);
+showPickOverlay(
+  null,
+  `Pass the phone to ${nextPlayer ? nextPlayer.name : "the next player"}...`,
+  900
+);
       }
     });
   });
@@ -1755,10 +1757,11 @@ function goToGuessWager() {
   const firstPlayerId = r.wagerOrder[r.wagerIndex];
   const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
 renderWagerProgress();
-  showPickOverlay(() => {
-    null,
-  }, `Pass the phone to ${firstPlayer ? firstPlayer.name : 'the next player'}...`, 900);
-
+showPickOverlay(
+  null,
+  `Pass the phone to ${nextPlayer ? nextPlayer.name : "the next player"}...`,
+  900
+);
   if (r.ghostRound) {
     const modalEl = $('modal-ghost-round');
     const bodyEl = $('modal-ghost-round-body');
