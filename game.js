@@ -959,6 +959,7 @@ function onGenerateNewQuestion() {
   if (badge) badge.textContent = categoryName || labelForType(type);
 
   saveState();
+  if (e?.currentTarget) e.currentTarget.blur();
 }
 
 // Switch to custom question mode
