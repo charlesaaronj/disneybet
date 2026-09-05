@@ -1,12 +1,5 @@
 :root {
-  @media (hover: none) {
-  .btn:hover,
-  .btn:active {
-    background-image: none;
-    background-color: initial;
-    filter: none;
-  }
-}
+
   /* Core brand */
   --wsd-blue-dark:   #42229b;
   --wsd-blue-light:  #4C1AA2ff;
