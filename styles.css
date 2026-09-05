@@ -230,6 +230,7 @@ body {
   padding: 0.55rem 0.75rem;
   background: var(--wsd-surface-input);
   color: var(--wsd-text-main);
+  margin-top: 12px;
 }
 .wsd-form-control:focus,
 .wsd-form-select:focus {
