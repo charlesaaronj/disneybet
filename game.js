@@ -724,43 +724,40 @@ function startGameFromSetup() {
 // ---------- Question setup ----------
 
 // Pick a question from GAME_QUESTIONS for this attraction
+function questionApplies(attraction, appliesTo) {
+  if (!appliesTo) return true;
+  if (appliesTo.types && !appliesTo.types.includes(attraction.type)) return false;
+  if (appliesTo.animatronics !== undefined && attraction.animatronics !== appliesTo.animatronics) return false;
+  if (appliesTo.preshow !== undefined && attraction.preshow !== appliesTo.preshow) return false;
+  if (appliesTo.postShow !== undefined && attraction.postShow !== appliesTo.postShow) return false;
+  return true;
+}
+
 function drawQuestionForAttraction(attraction) {
-  const isShow = attraction?.type === "show";
-  const allCategories = GAME_QUESTIONS.categories;
-
-  let categories;
-  if (isShow) {
-    categories = allCategories.filter(cat => cat.id === 15);
-  } else {
-    categories = allCategories.filter(cat => cat.id !== 15);
-  }
-
-  if (!categories.length) categories = allCategories;
-
-  const category = categories[Math.floor(Math.random() * categories.length)];
+  const eligible = GAME_QUESTIONS.filter(q => questionApplies(attraction, q.appliesTo));
+  const pool = eligible.length ? eligible : GAME_QUESTIONS;
 
   gameState.questionUsage ||= {};
   const usageMap = gameState.questionUsage;
-  const questionList = category.questions;
 
   let minUsage = Infinity;
   const candidates = [];
 
-  questionList.forEach(template => {
-    const key = `${category.id}::${template}`;
+  pool.forEach(q => {
+    const key = q.text;
     const count = usageMap[key] || 0;
 
     if (count < minUsage) {
       minUsage = count;
       candidates.length = 0;
-      candidates.push(template);
+      candidates.push(q);
     } else if (count === minUsage) {
-      candidates.push(template);
+      candidates.push(q);
     }
   });
 
-  const template = candidates[Math.floor(Math.random() * candidates.length)];
-  const key = `${category.id}::${template}`;
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+  const key = chosen.text;
   usageMap[key] = (usageMap[key] || 0) + 1;
   saveState();
 
@@ -768,18 +765,12 @@ function drawQuestionForAttraction(attraction) {
   const landName = attraction?.land || "this land";
   const parkNameFromState = gameState?.settings?.park || "this park";
 
-  const text = template
+  const text = chosen.text
     .replace(/{{attraction}}/g, attractionName)
     .replace(/{{land}}/g, landName)
     .replace(/{{park}}/g, parkNameFromState);
 
-  return {
-  text,
-  type: isShow ? "show" : "general",
-  categoryId: category.id,
-  categoryName: category.name
-};
-
+  return { text };
 }
 
 
