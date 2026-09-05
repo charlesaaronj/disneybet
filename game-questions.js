@@ -94,7 +94,7 @@ const GAME_QUESTIONS = [
   { text: "How does {{attraction}} stack up against the other attractions in {{land}}?", appliesTo: null },
   { text: "How does {{attraction}} stack up against the other attractions in {{park}}?", appliesTo: null },
   { text: "How does {{attraction}} stack up against attractions in other parks?", appliesTo: null },
-  { text: "How does {{attraction}} stack up against a previous verion of the attraction?", appliesTo: null },
+  { text: "How does {{attraction}} stack up against a previous version of the attraction?", appliesTo: { replaced: true }  },
   { text: "How does {{attraction}} compare to the last attraction you rode today?", appliesTo: null },
   { text: "Where does {{attraction}} rank among the attractions in {{land}} and why?", appliesTo: null },
   { text: "What's the longest you would wait in line for {{attraction}}?", appliesTo: null },
