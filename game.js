@@ -930,7 +930,7 @@ const labelForType = t =>
     : "Question";
 
 // Regenerate a new random question for the chosen attraction
-function onGenerateNewQuestion() {
+function onGenerateNewQuestion(e) {
   const err = $("wsd-setupq-error");
   if (!gameState || !gameState.currentRound.attraction) {
     if (err) err.textContent = "Select an attraction first.";
@@ -938,9 +938,7 @@ function onGenerateNewQuestion() {
   }
   if (err) err.textContent = "";
 
-  const { q, type, categoryName } = drawQuestion(
-    gameState.currentRound.attraction
-  );
+  const { q, type } = drawQuestion(gameState.currentRound.attraction);
   Object.assign(gameState.currentRound, {
     question: q,
     questionType: type
