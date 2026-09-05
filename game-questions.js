@@ -129,7 +129,7 @@ const GAME_QUESTIONS = [
   { text: "What classic element in {{park}} should never, ever be changed?", appliesTo: null },
   { text: "What classic element in {{park}} do you think should finally go?", appliesTo: null },
   { text: "What detail in {{park}} do you love pointing out to first-timers?", appliesTo: null },
-  { text: "If any two attractions in {{park}} crossed over, what mash-up would you create?", appliesTo: null },
+  { text: "If you combined two attractions in {{park}},what mash-up would you create?", appliesTo: null },
   { text: "What's the strongest memory you have from your very first visit to {{park}}?", appliesTo: null },
   { text: "If you could steal one attraction from any other park and bring it to {{park}}, what would it be?", appliesTo: null },
   { text: "What two attractions in {{park}} would you rank exactly the same, and why?", appliesTo: null },
