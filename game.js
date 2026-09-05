@@ -949,7 +949,7 @@ function onGenerateNewQuestion() {
   setQuestionDisplay(q);
 
   const badge = $("wsd-question-type-badge");
-  if (badge) badge.textContent = categoryName || labelForType(type);
+  if (badge) badge.textContent = titleCase(gameState.currentRound.attraction.type);
 
   saveState();
   if (e?.currentTarget) e.currentTarget.blur();
