@@ -33,6 +33,8 @@ function shuffle(a) {
   return copy;
 }
 
+const titleCase = s => s.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
 function resetGame() {
   localStorage.removeItem("whoSaidDiz");
   try {
@@ -905,8 +907,8 @@ function onAttractionChange() {
   flashQuestionDisplay();
 
   if (badge) {
-    badge.textContent = categoryName || labelForType(type);
-  }
+  badge.textContent = titleCase(attraction.type);
+}
 
   saveState();
   updateQuestionLock();
