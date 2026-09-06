@@ -100,7 +100,7 @@ const GAME_QUESTIONS = [
   { text: "Which {{park}} character would you most want as your tour guide for the day?", excludesTypes: null },
   { text: "What's your hottest take about {{park}}?", excludesTypes: null },
   { text: "What single change to {{park}} do you think would make fans furious?", excludesTypes: null },
-  { text: "What classic element in {{park}} should never, ever be changed?", excludesTypes: null },
+  { text: "What classic element in {{park}} should never be changed?", excludesTypes: null },
   { text: "What classic element in {{park}} do you think should finally go?", excludesTypes: null },
   { text: "What detail in {{park}} do you love pointing out to first-timers?", excludesTypes: null },
   { text: "If you combined two attractions in {{park}}, what mash-up would you create?", excludesTypes: null },
