@@ -726,17 +726,18 @@ function startGameFromSetup() {
 // ---------- Question setup ----------
 
 // Pick a question from GAME_QUESTIONS for this attraction
-function questionApplies(attraction, appliesTo) {
-  if (!appliesTo) return true;
-  if (appliesTo.types && !appliesTo.types.includes(attraction.type)) return false;
-  if (appliesTo.animatronics !== undefined && attraction.animatronics !== appliesTo.animatronics) return false;
-  if (appliesTo.preshow !== undefined && attraction.preshow !== appliesTo.preshow) return false;
-  if (appliesTo.postShow !== undefined && attraction.postShow !== appliesTo.postShow) return false;
+function questionApplies(attraction, q) {
+  if (q.excludesTypes && q.excludesTypes.includes(attraction.type)) return false;
+  if (q.requires) {
+    if (q.requires.animatronics !== undefined && attraction.animatronics !== q.requires.animatronics) return false;
+    if (q.requires.preshow !== undefined && attraction.preshow !== q.requires.preshow) return false;
+    if (q.requires.postShow !== undefined && attraction.postShow !== q.requires.postShow) return false;
+  }
   return true;
 }
 
 function drawQuestionForAttraction(attraction) {
-  const eligible = GAME_QUESTIONS.filter(q => questionApplies(attraction, q.appliesTo));
+  const eligible = GAME_QUESTIONS.filter(q => questionApplies(attraction, q));
   const pool = eligible.length ? eligible : GAME_QUESTIONS;
 
   gameState.questionUsage ||= {};
