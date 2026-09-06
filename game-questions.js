@@ -3,7 +3,7 @@ const GAME_QUESTIONS = [
   { text: "If you were the replacement for a character in {{attraction}}, who would it be?", excludesTypes: null },
   { text: "You're a greeter at {{attraction}} - what is your go‑to line?", excludesTypes: null },
   { text: "What real or fake cast member role on {{attraction}} would you least like to have?", excludesTypes: null },
-  { text: "What location on {{attraction}} would you most want to do a podcast from?", excludesTypes: null },
+  { text: "What location on {{attraction}} would you most want to do a podcast from?", excludesTypes: ["show", "film", "coaster"] },
   { text: "If you were asked to make {{attraction}} sad, what would you change?", excludesTypes: null },
   { text: "If you were asked to make {{attraction}} scary (or scarier), what would you change?", excludesTypes: null },
   { text: "What opinion about {{attraction}} would probably get you booed by other fans?", excludesTypes: null },
