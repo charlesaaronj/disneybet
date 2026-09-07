@@ -956,6 +956,7 @@ function onGenerateNewQuestion(e) {
     e.currentTarget.blur();
   });
 }
+}
 
 // Switch to custom question mode
 function onEnterCustomQuestion() {
