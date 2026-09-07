@@ -6,7 +6,7 @@ const PARK_MAGIC_KINGDOM = {
       park: "Magic Kingdom",
       land: "Main Street, U.S.A.",
       name: "Railroad",
-      type: "thrill-ride",
+      type: "tour-ride",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -241,7 +241,7 @@ const PARK_MAGIC_KINGDOM = {
       park: "Magic Kingdom",
       land: "Tomorrowland",
       name: "PeopleMover",
-      type: "thrill-ride",
+      type: "tour-ride",
       animatronics: false,
       preshow: false,
       postShow: false
