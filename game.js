@@ -2293,7 +2293,7 @@ function buildRevealSummaryLines(r) {
   } else if (ctx.authorWonRound) {
     line1 = `🎯 Nobody guessed the author. ${ctx.author.name} won the round.`;
   } else {
-    line1 = `🎉 ${ctx.winnerNames} guessed the author and won the round.`;
+    line1 = `🎉 ${ctx.winnerNames} guessed the author - ${ctx.author.name}.`;
   }
 
   return [line1, line4, line2, line3].filter(Boolean);
