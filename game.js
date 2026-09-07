@@ -993,7 +993,7 @@ function proceedToAnswers() {
 
   const roundNumber = gameState.roundNumber || 1;
   const canHaveGhost = roundNumber > 1;
-  const isGhostRound = canHaveGhost && Math.random() < 0.3;
+  const isGhostRound = canHaveGhost && Math.random() < 0.35;
 
   const ghostPlayerId = isGhostRound
     ? gameState.players[Math.floor(Math.random() * gameState.players.length)].id
@@ -1017,7 +1017,7 @@ function proceedToAnswers() {
   const maxBonus = playerCount * 2;
 
   const canBeHot = playerCount > 0 && roundNumber > 1;
-  const isHotRound = canBeHot && Math.random() < 0.25;
+  const isHotRound = canBeHot && Math.random() < 0.3;
 
   let hunnyHotBonus = 0;
 
