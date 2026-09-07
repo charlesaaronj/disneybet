@@ -66,7 +66,7 @@ const PARK_ANIMAL_KINGDOM = {
       park: "Animal Kingdom",
       land: "Rafiki's Planet Watch",
       name: "Wildlife Express Train",
-      type: "thrill-ride",
+      type: "tour-ride",
       animatronics: false,
       preshow: false,
       postShow: false
