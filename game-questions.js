@@ -115,5 +115,5 @@ const GAME_QUESTIONS = [
   { text: "If {{park}} added a brand new land tomorrow, what IP would you want it based on?", excludesTypes: null },
   { text: "If you could rename {{park}}, what would you call it?", excludesTypes: null },
   { text: "If you could rename {{attraction}}, what would you call it?", excludesTypes: null },
-    { text: "If you could rename {{land}}, what would you call it?", excludesTypes: null }
+  { text: "If you could rename {{land}}, what would you call it?", excludesTypes: null }
 ];
