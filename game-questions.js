@@ -79,7 +79,6 @@ const GAME_QUESTIONS = [
   { text: "What's the coolest setpiece inside {{attraction}}?", excludesTypes: ["coaster", "simulator", "show", "film", "tour-ride", "spinner-ride"] },
   { text: "Which part of {{attraction}} do you think people make too big a deal about?", excludesTypes: null },
   { text: "What part of {{attraction}} deserves to be talked about more?", excludesTypes: null },
-  { text: "What part of {{attraction}} always drags and feels too long?", excludesTypes: null },
   { text: "What part of {{attraction}} should hang just a little bit longer?", excludesTypes: null },
   { text: "What's the best part of {{attraction}} to get evacuated from?", excludesTypes: null },
   { text: "How does {{attraction}} stack up against the other attractions in {{park}}?", excludesTypes: null },
