@@ -1,6 +1,5 @@
 const GAME_QUESTIONS = [
   { text: "You're a cast member beginning a shift at {{attraction}}—what fake name tag are you putting on it?", excludesTypes: null },
-  { text: "If you were the replacement for a character in {{attraction}}, who would it be?", excludesTypes: null },
   { text: "You're a greeter at {{attraction}} - what is your go‑to line?", excludesTypes: null },
   { text: "What real or fake cast member role on {{attraction}} would you least like to have?", excludesTypes: null },
   { text: "What location on {{attraction}} would you most want to do a podcast from?", excludesTypes: ["show", "film", "coaster", "simulator", "spinner-ride"] },
@@ -113,7 +112,8 @@ const GAME_QUESTIONS = [
   { text: "If you could steal one attraction from any other park and bring it to {{park}}, what would it be?", excludesTypes: null },
   { text: "What two attractions in {{park}} would you rank exactly the same, and why?", excludesTypes: null },
   { text: "You have to live inside one {{park}} land for a week — which do you pick and why?", excludesTypes: null },
-  { text: "If you could live in {{park}} for a month, which land would you choose to reside in?", excludesTypes: null },
   { text: "If {{park}} added a brand new land tomorrow, what IP would you want it based on?", excludesTypes: null },
   { text: "If you could rename {{park}}, what would you call it?", excludesTypes: null },
+  { text: "If you could rename {{attraction}}, what would you call it?", excludesTypes: null },
+    { text: "If you could rename {{land}}, what would you call it?", excludesTypes: null }
 ];
