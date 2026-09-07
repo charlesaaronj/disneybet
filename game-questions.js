@@ -114,7 +114,7 @@ const GAME_QUESTIONS = [
   { text: "If you could steal one attraction from any other park and bring it to {{park}}, what would it be?", excludesTypes: null },
   { text: "What two attractions in {{park}} would you rank exactly the same, and why?", excludesTypes: null },
   { text: "You have to live inside one {{park}} land for a week — which do you pick and why?", excludesTypes: null },
-  { text: "If you had to eat only food from one {{land}} for a month, which land wins and why?", excludesTypes: null },
+  { text: "If you had to eat only food from {{park}} for a month, which land wins and why?", excludesTypes: null },
   { text: "If {{park}} added a brand new land tomorrow, what IP would you want it based on?", excludesTypes: null },
   { text: "If you could rename {{park}}, what would you call it?", excludesTypes: null },
 ];
