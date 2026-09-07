@@ -108,7 +108,6 @@ const GAME_QUESTIONS = [
   { text: "Which element of {{park}} would you most like to see reimagined for the future?", excludesTypes: null },
   { text: "What detail in {{park}} do you love pointing out to first-timers?", excludesTypes: null },
   { text: "If you could mash up any two {{park}} attractions, which would you choose and what would the result be?", excludesTypes: null },
-  { text: "What's the strongest memory you have from your very first visit to {{park}}?", excludesTypes: null },
   { text: "If you could steal one attraction from any other park and bring it to {{park}}, what would it be?", excludesTypes: null },
   { text: "What two attractions in {{park}} would you rank exactly the same, and why?", excludesTypes: null },
   { text: "You have to live inside one {{park}} land for a week — which do you pick and why?", excludesTypes: null },
