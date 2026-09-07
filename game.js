@@ -951,7 +951,10 @@ function onGenerateNewQuestion(e) {
   if (badge) badge.textContent = titleCase(gameState.currentRound.attraction.type);
 
   saveState();
-  if (e?.currentTarget) e.currentTarget.blur();
+  if (e?.currentTarget) {
+  requestAnimationFrame(() => {
+    e.currentTarget.blur();
+  });
 }
 
 // Switch to custom question mode
