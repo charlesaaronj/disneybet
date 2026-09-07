@@ -1017,7 +1017,7 @@ function proceedToAnswers() {
   const maxBonus = playerCount * 2;
 
   const canBeHot = playerCount > 0 && roundNumber > 1;
-  const isHotRound = canBeHot && Math.random() < 0.15;
+  const isHotRound = canBeHot && Math.random() < 0.25;
 
   let hunnyHotBonus = 0;
 
