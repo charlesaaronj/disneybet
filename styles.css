@@ -275,7 +275,12 @@ body {
   letter-spacing: 0.03em;
 }
 .wsd-btn-primary:active { transform: scale(0.97); }
-.wsd-btn-primary:hover  { filter: brightness(1.06); }
+/* Apply hover styling only on devices that actually have a mouse/trackpad */
+@media (hover: hover) and (pointer: fine) {
+  .wsd-btn-primary:hover {
+    filter: brightness(1.06);
+  }
+}
 
 .wsd-btn-secondary {
   display: block;
