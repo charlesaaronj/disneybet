@@ -37,7 +37,7 @@ const PARK_ANIMAL_KINGDOM = {
       park: "Animal Kingdom",
       land: "Africa",
       name: "Kilimanjaro Safaris",
-      type: "Ride",
+      type: "tour-ride",
       animatronics: false,
       preshow: false,
       postShow: false
