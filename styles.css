@@ -998,4 +998,7 @@ body {
 html, body {
   touch-action: manipulation;
 }
+#wsd-generate-question {
+  -webkit-tap-highlight-color: transparent;
+}
 
