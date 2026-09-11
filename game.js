@@ -21,7 +21,8 @@ function debugLog(msg) {
   const line = document.createElement("div");
   line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
   box.appendChild(line);
-  box.scrollTop = box.scrollHeight
+  box.scrollTop = box.scrollHeight;
+  }
 
 function shuffle(a) {
   const copy = a.slice();
