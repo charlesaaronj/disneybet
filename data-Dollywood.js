@@ -35,7 +35,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Timber Canyon",
       name: "Thunderhead",
-      type: "wooden-coaster",
+      type: "coaster",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -44,7 +44,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Timber Canyon",
       name: "Mystery Mine",
-      type: "steel-coaster",
+      type: "coaster",
       animatronics: false,
       preshow: true,
       postShow: false
@@ -53,7 +53,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Timber Canyon",
       name: "Wild Eagle",
-      type: "wing-coaster",
+      type: "coaster",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -62,7 +62,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Timber Canyon",
       name: "Drop Line",
-      type: "drop-tower",
+      type: "thrill-ride",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -71,7 +71,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Timber Canyon",
       name: "FireChaser Express",
-      type: "launch-coaster",
+      type: "coaster",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -82,7 +82,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Wildwood Grove",
       name: "Dragonflier",
-      type: "suspended-coaster",
+      type: "coaster",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -91,7 +91,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Wildwood Grove",
       name: "Big Bear Mountain",
-      type: "launch-coaster",
+      type: "coaster",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -100,7 +100,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Wildwood Grove",
       name: "NightFlight Expedition",
-      type: "indoor-adventure-coaster",
+      type: "dark-ride",
       animatronics: false,
       preshow: true,
       postShow: false
@@ -118,8 +118,8 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Wildwood Grove",
       name: "Great Tree Swing",
-      type: "swing-ride",
-      animatronics: false,
+      type: "thrill-ride",
+      animatronic: false,
       preshow: false,
       postShow: false
     },
@@ -145,7 +145,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Wildwood Grove",
       name: "Treetop Tower",
-      type: "drop-tower",
+      type: "thrill-ride",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -156,7 +156,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Jukebox Junction",
       name: "Lightning Rod",
-      type: "launch-coaster",
+      type: "coaster",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -165,7 +165,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Jukebox Junction",
       name: "Rockin' Roadway",
-      type: "car-ride",
+      type: "tour-ride",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -207,7 +207,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Rivertown Junction",
       name: "Smoky Mountain River Rampage",
-      type: "river-rapids",
+      type: "thrill-tide",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -216,7 +216,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Rivertown Junction",
       name: "Daredevil Falls",
-      type: "log-flume",
+      type: "thrill-ride",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -236,7 +236,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Country Fair",
       name: "Waltzing Swinger",
-      type: "swing-ride",
+      type: "thrill-ride",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -245,7 +245,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Country Fair",
       name: "Bumper Cars",
-      type: "bumper-cars",
+      type: "thrill-ride",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -254,7 +254,7 @@ const PARK_DOLLYWOOD = {
       park: "Dollywood",
       land: "Country Fair",
       name: "Flying Elephants",
-      type: "spinner-ride",
+      type: "flat-ride",
       animatronics: false,
       preshow: false,
       postShow: false
