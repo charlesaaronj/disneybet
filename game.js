@@ -3107,9 +3107,10 @@ function resumeRoundFlow() {
   }
 
   if (scr === "guess-wager") {
-    renderGuessWagerScreen();
-    return;
-  }
+  switchScreenUI("guess-wager");
+  renderWagerProgress();
+  return;
+}
 
   if (scr === "reveal") {
     switchScreenUI("reveal");
