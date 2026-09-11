@@ -21,8 +21,7 @@ function debugLog(msg) {
   const line = document.createElement("div");
   line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
   box.appendChild(line);
-  box.scrollTop = box.scrollHeight;
-}
+  box.scrollTop = box.scrollHeight
 
 function shuffle(a) {
   const copy = a.slice();
@@ -2267,7 +2266,7 @@ function buildRevealSummaryLines(r) {
   if (collectedNames && r.attraction) {
     line4 = `🎢 ${collectedNames} collected ${r.attraction.name}.`;
   } else if (r.attraction) {
-    line4 = `🎢 No one collected ${r.attraction.name} (${r.attraction.land}) this round.`;
+    line4 = `🎢 No one collected ${r.attraction.name} this round.`;
   }
 
   if (ctx.isGhostAnswer) {
@@ -2293,7 +2292,7 @@ function buildRevealSummaryLines(r) {
   } else if (ctx.authorWonRound) {
     line1 = `🎯 Nobody guessed the author. ${ctx.author.name} won the round.`;
   } else {
-    line1 = `🎉 ${ctx.winnerNames} guessed the author - ${ctx.author.name}.`;
+    line1 = `🎉 ${ctx.winnerNames} guessed the authorities ${ctx.author.name}.`;
   }
 
   return [line1, line4, line2, line3].filter(Boolean);
