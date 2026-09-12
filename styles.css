@@ -223,6 +223,16 @@ body {
   display: block;
   font-family: 'Lato', sans-serif;
 }
+.wsd-form-label-author {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wsd-text-softer);
+  margin-bottom: 0.1rem;
+  display: block;
+  font-family: 'Lato', sans-serif;
+}
 .wsd-form-control,
 .wsd-form-select {
   border-radius: 10px !important;
