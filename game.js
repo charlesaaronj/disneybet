@@ -1237,7 +1237,10 @@ if (isGhostPlayer && ghostText) {
           renderSelectAnswerScreen();
           console.log("round:", gameState.roundNumber, "ghostRound:", gameState.currentRound?.ghostRound);
 
-          if (labelEl) labelEl.textContent = "A player said";
+                    if (labelEl) labelEl.textContent = r.ghostRound
+            ? "A player or ghost 👻 said"
+            : "A player said";
+
           if (toWagers) toWagers.style.display = "";
           if (selectAgain) selectAgain.style.display = "";
 
@@ -1318,8 +1321,11 @@ function renderSelectAnswerScreen() {
   // Explicit label for this screen only
   const labelEl = document.querySelector('#screen-select-answer .wsd-form-label');
   if (labelEl) {
-    labelEl.textContent = 'A player said';
+    labelEl.textContent = r.ghostRound
+      ? 'A player or ghost 👻 said'
+      : 'A player said';
   }
+
 }
 
 // ---------- Guess + wager screen ----------
