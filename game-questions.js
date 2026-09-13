@@ -80,7 +80,7 @@ const GAME_QUESTIONS = [
   { text: "What part of {{attraction}} should hang just a little bit longer?", excludesTypes: null },
   { text: "What's the best part of {{attraction}} to get evacuated from?", excludesTypes: ["coaster", "simulator", "show", "film", "simulator", "spinner-ride"] },
   { text: "How does {{attraction}} stack up against the other attractions in {{park}}?", excludesTypes: null },
-  { text: "How does {{attraction}} stack up against attractions in other parks?", excludesTypes: null },
+  { text: "How does {{attraction}} stack up against similar attractions in other parks?", excludesTypes: null },
   { text: "How does {{attraction}} compare to the last attraction you rode today?", excludesTypes: null },
   { text: "Where does {{attraction}} rank among the attractions in {{land}} and why?", excludesTypes: null },
   { text: "What's the longest you would wait in line for {{attraction}}?", excludesTypes: null },
