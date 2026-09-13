@@ -55,7 +55,6 @@ const GAME_QUESTIONS = [
   { text: "What's something in {{attraction}} do you think almost everyone misses?", excludesTypes: null },
   { text: "What's your favorite trivia fact about {{attraction}}?", excludesTypes: null },
   { text: "What's your favorite fake trivia fact about {{attraction}}?", excludesTypes: null },
-  { text: "Where would you hide a hidden Mickey inside {{attraction}}?", excludesTypes: ["coaster", "simulator", "show", "film", "tour-ride", "spinner-ride"] },
   { text: "What easter egg would you add to {{attraction}}?", excludesTypes: ["coaster", "simulator", "show", "film", "tour-ride", "spinner-ride"] },
   { text: "If {{attraction}} were a song, what would its title be?", excludesTypes: null },
   { text: "Which character from {{attraction}} deserves their own spin‑off attraction?", excludesTypes: null },
