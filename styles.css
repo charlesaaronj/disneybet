@@ -233,8 +233,8 @@ body {
   display: block;
   font-family: 'Lato', sans-serif;
 }
-.wsd-form-control-name,
-.wsd-form-select {
+.wsd-form-control,
+.wsd-form-select-name {
   border-radius: 10px !important;
   border: 1.5px solid var(--wsd-gold-strong);
   font-size: 16px;
