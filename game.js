@@ -1318,7 +1318,7 @@ function renderSelectAnswerScreen() {
   ansEl.textContent = `"${r.selectedAnswer.text}"`;
   ansEl.classList.add('wsd-anim-pop', 'wsd-answer-highlight');
 
- / Explicit label for this screen only
+ // Explicit label for this screen only
 const labelEl = document.querySelector('#screen-select-answer .wsd-form-label');
 if (labelEl) {
 labelEl.textContent = r.ghostRound
