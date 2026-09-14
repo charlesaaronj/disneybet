@@ -1318,12 +1318,12 @@ function renderSelectAnswerScreen() {
   ansEl.textContent = `"${r.selectedAnswer.text}"`;
   ansEl.classList.add('wsd-anim-pop', 'wsd-answer-highlight');
 
-  // Explicit label for this screen only
+ / Explicit label for this screen only
 const labelEl = document.querySelector('#screen-select-answer .wsd-form-label');
 if (labelEl) {
-  labelEl.innerHTML = r.ghostRound
-    ? 'A player or <strong>ghost</strong> 👻 said'
-    : 'A player said';
+labelEl.textContent = r.ghostRound
+? 'A player or ghost 👻 said'
+: 'A player said';
 }
 }
 
