@@ -229,7 +229,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--wsd-text-softer);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
   display: block;
   font-family: 'Lato', sans-serif;
 }
