@@ -1759,7 +1759,7 @@ function goToGuessWager() {
 renderWagerProgress();
 showPickOverlay(
   null,
-  `Pass the phone to ${nextPlayer ? nextPlayer.name : "the next player"}...`,
+  `Pass the phone to ${firstPlayer ? firstPlayer.name : "the next player"}...`,
   900
 );
   if (r.ghostRound) {
