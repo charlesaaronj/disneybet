@@ -1023,7 +1023,21 @@ body {
 html, body {
   touch-action: manipulation;
 }
+.wsd-btn-primary,
+.wsd-btn-secondary,
+.wsd-btn-danger,
+.wsd-btn-tertiary,
+.wsd-wager-inline-btn,
+.wsd-nav-item {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Keep the id rule too, harmless to leave it */
 #wsd-generate-question {
   -webkit-tap-highlight-color: transparent;
 }
+
 
