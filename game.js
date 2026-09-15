@@ -932,29 +932,30 @@ const labelForType = t =>
 
 // Regenerate a new random question for the chosen attraction
 function onGenerateNewQuestion(e) {
-  // Always clear focus immediately — before any early return —
-  // so iOS Safari drops its fake tap/hover highlight no matter what.
-  const btn = e?.currentTarget;
-  if (btn) {
-    btn.blur();
-    requestAnimationFrame(() => btn.blur());
-  }
-
-  const err = id('wsd-setupq-error');
-  if (!gameState || !gameState.currentRound?.attraction) {
-    if (err) err.textContent = 'Select an attraction first.';
+  const err = $("wsd-setupq-error");
+  if (!gameState || !gameState.currentRound.attraction) {
+    if (err) err.textContent = "Select an attraction first.";
     return;
   }
-  if (err) err.textContent = '';
+  if (err) err.textContent = "";
 
   const { q, type } = drawQuestion(gameState.currentRound.attraction);
-  Object.assign(gameState.currentRound, { question: q, questionType: type });
+  Object.assign(gameState.currentRound, {
+    question: q,
+    questionType: type
+  });
+
   setQuestionDisplay(q);
 
-  const badge = id('wsd-question-type-badge');
+  const badge = $("wsd-question-type-badge");
   if (badge) badge.textContent = titleCase(gameState.currentRound.attraction.type);
 
   saveState();
+ if (e?.currentTarget) {
+    requestAnimationFrame(() => {
+      e.currentTarget.blur();
+    });
+  }
 }
 
 // Switch to custom question mode
@@ -3015,8 +3016,6 @@ function abandonRound() {
 
 
 // ---------- Wire events & bootstrap ----------
-
-
 document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
   const r = gameState?.currentRound;
   if (!r) return;
@@ -3091,15 +3090,6 @@ document.addEventListener(
   },
   true
 );
-
-document.addEventListener('touchend', function (e) {
-  const btn = e.target.closest(
-    '.wsd-btn-primary, .wsd-btn-secondary, .wsd-btn-tertiary, .wsd-btn-danger'
-  );
-  if (btn) {
-    setTimeout(() => btn.blur(), 0);
-  }
-}, { passive: true });
 
 function resumeRoundFlow() {
   if (!gameState || !gameState.currentRound) {
