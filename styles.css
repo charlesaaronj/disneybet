@@ -300,6 +300,9 @@ body {
   .wsd-btn-primary:hover {
     filter: brightness(1.06);
   }
+  .wsd-btn-secondary:hover { 
+  background: var(--wsd-surface-badge);
+}
 }
 
 .wsd-btn-secondary {
@@ -314,10 +317,6 @@ body {
   cursor: pointer;
   min-height: 48px;
   font-weight: 600;
-}
-
-.wsd-btn-secondary:hover { 
-  background: var(--wsd-surface-badge);
 }
 
 .wsd-btn-primary-modal {
