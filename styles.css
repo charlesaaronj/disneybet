@@ -315,9 +315,11 @@ body {
   min-height: 48px;
   font-weight: 600;
 }
-@media (hover: hover) and (pointer: fine) {
-.wsd-btn-secondary:hover { background: var(--wsd-surface-badge); } 
+
+.wsd-btn-secondary:hover { 
+  background: var(--wsd-surface-badge);
 }
+
 .wsd-btn-primary-modal {
   display: block;
   width: 100%;
