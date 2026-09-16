@@ -74,7 +74,7 @@ const PARK_IOA = {
     {
       park: "Islands of Adventure",
       land: "Jurassic Park",
-      name: "Jurassic World VelociCoaster",
+      name: "VelociCoaster",
       type: "coaster",
       animatronics: false,
       preshow: false,
@@ -83,7 +83,7 @@ const PARK_IOA = {
     {
       park: "Islands of Adventure",
       land: "Jurassic Park",
-      name: "Jurassic Park River Adventure",
+      name: "River Adventure",
       type: "boat-ride",
       animatronics: true,
       preshow: false,
@@ -93,7 +93,7 @@ const PARK_IOA = {
       park: "Islands of Adventure",
       land: "Jurassic Park",
       name: "Pteranodon Flyers",
-      type: "spinner-ride",
+      type: "coaster",
       animatronics: false,
       preshow: false,
       postShow: false
@@ -161,17 +161,6 @@ const PARK_IOA = {
       type: "tour-ride",
       animatronics: false,
       preshow: false,
-      postShow: false
-    },
-
-    // The Lost Continent
-    {
-      park: "Islands of Adventure",
-      land: "The Lost Continent",
-      name: "Poseidon's Fury",
-      type: "walkthrough",
-      animatronics: false,
-      preshow: true,
       postShow: false
     },
 
