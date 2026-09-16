@@ -64,7 +64,7 @@ const PARK_IOA = {
       park: "Islands of Adventure",
       land: "Skull Island",
       name: "Reign of Kong",
-      type: "tour-ride",
+      type: "dark-ride",
       animatronics: true,
       preshow: true,
       postShow: false
