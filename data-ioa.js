@@ -98,24 +98,6 @@ const PARK_IOA = {
       preshow: false,
       postShow: false
     },
-    {
-      park: "Islands of Adventure",
-      land: "Jurassic Park",
-      name: "Camp Jurassic",
-      type: "play-area",
-      animatronics: false,
-      preshow: false,
-      postShow: false
-    },
-    {
-      park: "Islands of Adventure",
-      land: "Jurassic Park",
-      name: "Discovery Center",
-      type: "walkthrough",
-      animatronics: false,
-      preshow: false,
-      postShow: false
-    },
 
     // The Wizarding World of Harry Potter - Hogsmeade
     {
