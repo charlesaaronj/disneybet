@@ -718,9 +718,13 @@ function startGameFromSetup() {
   renderAttractionOptions();
   saveState();
   updatePlayerInputLock();
-  showScreen("setup-question");
-  startNewRoundCore();
-
+  if (isBrandNewGame || !gameState.currentRound) {
+    showScreen('setup-question');
+    startNewRoundCore();
+  } else {
+    // Just show whatever screen the resumed round is actually on.
+    rebuildRoundScreenFromState();
+  }
 }
 
 // ---------- Question setup ----------
