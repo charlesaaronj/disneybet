@@ -172,6 +172,24 @@ const PARK_THEMES = {
     nav: "#ffe2cff2",
     avatar: "linear-gradient(135deg,#C47820,#E8B84A)",
     btn: "linear-gradient(180deg,#7A3A10,#C47820)"
+  },
+    "Universal Studios Florida": {
+    hero: "linear-gradient(180deg,#0B1F3A,#1C4FA0)",   // deep navy -> Universal blue
+    nav: "#e6edf7f2",
+    avatar: "linear-gradient(135deg,#1C4FA0,#5B8FD6)",
+    btn: "linear-gradient(180deg,#0B1F3A,#1C4FA0)"
+  },
+  "Islands of Adventure": {
+    hero: "linear-gradient(180deg,#0F3D2E,#1F7A4D)",   // deep jungle green -> adventure green
+    nav: "#e2f0e6f2",
+    avatar: "linear-gradient(135deg,#1F7A4D,#6BC48A)",
+    btn: "linear-gradient(180deg,#0F3D2E,#1F7A4D)"
+  },
+  "Epic Universe": {
+    hero: "linear-gradient(180deg,#2A0A45,#7A1FA8)",   // cosmic purple -> Celestial Park violet
+    nav: "#efe3f7f2",
+    avatar: "linear-gradient(135deg,#7A1FA8,#C46FE8)",
+    btn: "linear-gradient(180deg,#2A0A45,#7A1FA8)"
   }
 };
 
