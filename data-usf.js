@@ -142,15 +142,6 @@ const PARK_USF = {
       preshow: false,
       postShow: false
     },
-    {
-      park: "Universal Studios Florida",
-      land: "DreamWorks Land",
-      name: "Mama Luna Feline Fiesta",
-      type: "play-area",
-      animatronics: false,
-      preshow: false,
-      postShow: false
-    },
 
     // Hollywood
     {
