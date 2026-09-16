@@ -31,7 +31,7 @@ const GAME_QUESTIONS = [
   { text: "If {{attraction}} were a roadside attraction, what would the big billboard outside say?", excludesTypes: null },
   { text: "If {{attraction}} had a warning label, what would it say?", excludesTypes: null },
   { text: "If {{attraction}} were a hotel, what would the rooms be like?", excludesTypes: null },
-  { text: "If {{attraction}} were a board game, what would the goal be?", excludesTypes: null },
+  { text: "If {{attraction}} were a board game, what would the pieces be?", excludesTypes: null },
   { text: "If {{attraction}} had an unofficial fan club, what would members call themselves?", excludesTypes: null },
   { text: "If {{attraction}} borrowed something from another attraction, what would it be?", excludesTypes: null },
   { text: "If {{attraction}} were the subject of a true-crime documentary, what would it be called?", excludesTypes: null },
