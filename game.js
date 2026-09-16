@@ -2488,6 +2488,13 @@ function renderScoresScreen() {
   renderBonusProgress();
   renderManualAdjustmentsUI();
   maybeRenderCollectionsScreen();
+  
+  const startRoundBtn = $('wsd-start-round');
+  if (startRoundBtn) {
+    const r = gameState?.currentRound;
+    const roundInProgress = !!r && r.scoringApplied !== true;
+    startRoundBtn.textContent = roundInProgress ? 'Resume round' : 'Start new round';
+  }
 }
 
 // Show progress toward final bonus categories
