@@ -26,7 +26,7 @@ const PARK_USF = {
       park: "Universal Studios Florida",
       land: "Minion Land",
       name: "Despicable Me Minion Mayhem",
-      type: "dark-ride",
+      type: "film",
       animatronics: false,
       preshow: true,
       postShow: false
@@ -62,15 +62,6 @@ const PARK_USF = {
     },
 
     // San Francisco
-    {
-      park: "Universal Studios Florida",
-      land: "San Francisco",
-      name: "Fast & Furious: Supercharged",
-      type: "dark-ride",
-      animatronics: false,
-      preshow: true,
-      postShow: false
-    },
 
     // The Wizarding World of Harry Potter - Diagon Alley
     {
@@ -145,15 +136,6 @@ const PARK_USF = {
     {
       park: "Universal Studios Florida",
       land: "DreamWorks Land",
-      name: "Woody Woodpecker's Nuthouse Coaster",
-      type: "coaster",
-      animatronics: false,
-      preshow: false,
-      postShow: false
-    },
-    {
-      park: "Universal Studios Florida",
-      land: "DreamWorks Land",
       name: "Trollercoaster",
       type: "coaster",
       animatronics: false,
@@ -178,15 +160,6 @@ const PARK_USF = {
       type: "show",
       animatronics: false,
       preshow: true,
-      postShow: false
-    },
-    {
-      park: "Universal Studios Florida",
-      land: "Hollywood",
-      name: "Animal Actors on Location",
-      type: "show",
-      animatronics: false,
-      preshow: false,
       postShow: false
     }
   ]
