@@ -581,148 +581,96 @@ if (roundIndicator) {
 
 // Validate setup and either create or update gameState
 function startGameFromSetup() {
-  const errEl = $("wsd-setup-error");
-  const parkSel = $("wsd-park-select");
-  const parkName = parkSel ? parkSel.value : "";
-
-  if (errEl) errEl.textContent = "";
-
+  const errEl = id('wsd-setup-error');
+  const parkSel = id('wsd-park-select');
+  const parkName = parkSel ? parkSel.value : '';
+  if (errEl) errEl.textContent = '';
   if (!parkName || !PARKS[parkName]) {
-    if (errEl) errEl.textContent = "Please select a park.";
+    if (errEl) errEl.textContent = 'Please select a park.';
     return;
   }
-
-  const names = $$("#wsd-player-inputs input")
+  const names = sel('#wsd-player-inputs input')
     .map(i => i.value.trim())
     .filter(Boolean);
-
   if (names.length < 3) {
-    if (errEl) errEl.textContent =
-      "Please enter at least three player names.";
+    if (errEl) errEl.textContent = 'Please enter at least three player names.';
     return;
   }
-
   const uniqueNames = new Set(names.map(n => n.toLowerCase()));
   if (uniqueNames.size !== names.length) {
-    if (errEl) errEl.textContent =
-      "Each player must have a unique name.";
+    if (errEl) errEl.textContent = 'Each player must have a unique name.';
     return;
   }
 
   const parkData = PARKS[parkName];
+  const isBrandNewGame = !gameState; // capture BEFORE we create/mutate gameState
 
-  // First-time game creation
-  if (!gameState) {
-    const players = names.map((name, id) => ({
-      id,
+  if (isBrandNewGame) {
+    // First-time game creation
+    const players = names.map(name => ({
+      id: crypto.randomUUID?.() ?? String(Math.random()),
       name,
-      score: START_POINTS,
+      score: STARTPOINTS,
       wins: 0,
       collected: [],
       bonusTotal: 0,
-      stats: {
-        correctGuesses: 0,
-        totalRisked: 0,
-        uniqueLands: []
-      },
+      stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
       badgeColor: null
     }));
-
-    const palette = shuffle(PLAYER_BADGE_COLORS.slice());
-    players.forEach(p => {
-      p.badgeColor = palette.shift() || "#999999";
-    });
+    const palette = shuffle(PLAYERBADGECOLORS.slice());
+    players.forEach(p => { p.badgeColor = palette.shift() ?? '#999999'; });
 
     gameState = {
-      screen: "setup-question",
+      screen: 'setup-question',
       roundNumber: 1,
-      settings: {
-        park: parkName,
-        startingPoints: START_POINTS,
-        minPoints: MIN_POINTS
-      },
+      settings: { park: parkName, startingPoints: STARTPOINTS, minPoints: MINPOINTS },
       players,
-      lands: [
-        ...new Set(
-          parkData.attractions.map(a => a.land).filter(Boolean)
-        )
-      ],
+      lands: [...new Set(parkData.attractions.map(a => a.land).filter(Boolean))],
       attractions: parkData.attractions,
-      questionUsage: {}, // track questions per attraction/category
+      questionUsage: {},
       currentRound: null,
       history: [],
       finalBonusesApplied: false
     };
   } else {
-    // Existing game: update park + players
+    // Existing game — just update park + players, DO NOT touch currentRound
     const parkAttrs = parkData.attractions;
     Object.assign(gameState.settings, { park: parkName });
     Object.assign(gameState, {
       attractions: parkAttrs,
-      lands: [
-        ...new Set(
-          parkAttrs.map(a => a.land).filter(Boolean)
-        )
-      ]
+      lands: [...new Set(parkAttrs.map(a => a.land).filter(Boolean))]
     });
-    gameState.questionUsage ||= {};
+    gameState.questionUsage = gameState.questionUsage || {};
 
-    const existingPlayers = gameState.players || [];
+    const existingPlayers = gameState.players;
     gameState.players = names.map((name, index) => {
-      const old = existingPlayers.find(
-        p => p.name.toLowerCase() === name.toLowerCase()
-      );
-      if (old) {
-        old.name = name;
-        return old;
-      }
+      const old = existingPlayers.find(p => p.name.toLowerCase() === name.toLowerCase());
+      if (old) { old.name = name; return old; }
       const newId = existingPlayers.length
-        ? Math.max(...existingPlayers.map(p => p.id)) + 1
+        ? Math.max(...existingPlayers.map(p => p.id)) + 1 + index
         : index;
       return {
-        id: newId,
-        name,
-        score:
-          gameState.settings?.startingPoints ?? START_POINTS,
-        wins: 0,
-        collected: [],
-        bonusTotal: 0,
-        stats: {
-          correctGuesses: 0,
-          totalRisked: 0,
-          uniqueLands: []
-        },
-        badgeColor:
-          PLAYER_BADGE_COLORS[
-            index % PLAYER_BADGE_COLORS.length
-          ] || "#999999"
+        id: newId, name,
+        score: gameState.settings?.startingPoints ?? STARTPOINTS,
+        wins: 0, collected: [], bonusTotal: 0,
+        stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
+        badgeColor: PLAYERBADGECOLORS[index % PLAYERBADGECOLORS.length] ?? '#999999'
       };
     });
   }
 
-  const parkLabel = $("wsd-park-label");
+  const parkLabel = id('wsd-park-label');
   if (parkLabel) parkLabel.textContent = parkName;
-
   applyParkTheme(parkName);
-
-  const summary = $("wsd-player-summary");
-  if (summary && gameState?.players) {
-    summary.textContent = `${gameState.players.length} players`;
-  }
-
-  const startBtn = $("wsd-start-game");
-  if (startBtn) {
-    startBtn.textContent = "Resume game";
-  }
 
   renderAttractionOptions();
   saveState();
   updatePlayerInputLock();
+
   if (isBrandNewGame || !gameState.currentRound) {
     showScreen('setup-question');
     startNewRoundCore();
   } else {
-    // Just show whatever screen the resumed round is actually on.
     rebuildRoundScreenFromState();
   }
 }
