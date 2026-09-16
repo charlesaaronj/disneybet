@@ -1,4 +1,4 @@
-const PARK_UNIVERSAL_STUDIOS_FLORIDA = {
+const PARK_USF = {
   name: "Universal Studios Florida",
   attractions: [
     // Production Central
