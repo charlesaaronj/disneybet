@@ -667,6 +667,12 @@ function startGameFromSetup() {
   saveState();
   updatePlayerInputLock();
 
+  const startBtn = $('wsd-start-game');
+if (startBtn) {
+  const roundInProgress = !!gameState.currentRound && gameState.currentRound.scoringApplied !== true;
+  startBtn.textContent = roundInProgress ? 'Resume round' : 'Resume game';
+}
+
   if (isBrandNewGame || !gameState.currentRound) {
     showScreen('setup-question');
     startNewRoundCore();
