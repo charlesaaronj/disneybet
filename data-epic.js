@@ -1,4 +1,4 @@
-const PARK_EPIC_UNIVERSE = {
+const PARK_EPIC = {
   name: "Epic Universe",
   attractions: [
     // Celestial Park
