@@ -208,6 +208,9 @@ if (typeof PARK_ANIMAL_KINGDOM !== "undefined")
   PARKS[PARK_ANIMAL_KINGDOM.name] = PARK_ANIMAL_KINGDOM;
 if (typeof PARK_DOLLYWOOD !== "undefined")
   PARKS[PARK_DOLLYWOOD.name] = PARK_DOLLYWOOD;
+if (typeof PARK_USF !== 'undefined') PARKS[PARK_USF.name] = PARK_USF;
+if (typeof PARK_IOA !== 'undefined') PARKS[PARK_IOA.name] = PARK_IOA;
+if (typeof PARK_EPIC_UNIVERSE !== 'undefined') PARKS[PARK_EPIC_UNIVERSE.name] = PARK_EPIC_UNIVERSE;
 
 let gameState = null;
 let answerSaveLocked = false;
