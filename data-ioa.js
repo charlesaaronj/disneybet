@@ -1,4 +1,4 @@
-const PARK_ISLANDS_OF_ADVENTURE = {
+const PARK_IOA = {
   name: "Islands of Adventure",
   attractions: [
     // Marvel Super Hero Island
