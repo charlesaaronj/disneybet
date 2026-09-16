@@ -20,15 +20,6 @@ const PARK_EPIC = {
       preshow: false,
       postShow: false
     },
-    {
-      park: "Epic Universe",
-      land: "Celestial Park",
-      name: "Astronomica",
-      type: "play-area",
-      animatronics: false,
-      preshow: false,
-      postShow: false
-    },
 
     // The Wizarding World of Harry Potter - Ministry of Magic
     {
@@ -136,14 +127,5 @@ const PARK_EPIC = {
       preshow: true,
       postShow: false
     },
-    {
-      park: "Epic Universe",
-      land: "Dark Universe",
-      name: "Darkmoor Monster Makeup Experience",
-      type: "walkthrough",
-      animatronics: false,
-      preshow: false,
-      postShow: false
-    }
   ]
 };
