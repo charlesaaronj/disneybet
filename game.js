@@ -607,8 +607,8 @@ function startGameFromSetup() {
 
   if (isBrandNewGame) {
     // First-time game creation
-    const players = names.map(name => ({
-      id: crypto.randomUUID?.() ?? String(Math.random()),
+    const players = names.map((name, idx) => ({
+      id: idx,
       name,
       score: STARTPOINTS,
       wins: 0,
@@ -643,18 +643,18 @@ function startGameFromSetup() {
     gameState.questionUsage = gameState.questionUsage || {};
 
     const existingPlayers = gameState.players;
-    gameState.players = names.map((name, index) => {
+    gameState.players = names.map((name, idx) => {
       const old = existingPlayers.find(p => p.name.toLowerCase() === name.toLowerCase());
       if (old) { old.name = name; return old; }
       const newId = existingPlayers.length
-        ? Math.max(...existingPlayers.map(p => p.id)) + 1 + index
-        : index;
+        ? Math.max(...existingPlayers.map(p => p.id)) + 1 + idx
+        : idx;
       return {
         id: newId, name,
         score: gameState.settings?.startingPoints ?? STARTPOINTS,
         wins: 0, collected: [], bonusTotal: 0,
         stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
-        badgeColor: PLAYERBADGECOLORS[index % PLAYERBADGECOLORS.length] ?? '#999999'
+        badgeColor: PLAYERBADGECOLORS[idx % PLAYERBADGECOLORS.length] ?? '#999999'
       };
     });
   }
