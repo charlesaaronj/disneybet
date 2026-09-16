@@ -581,15 +581,15 @@ if (roundIndicator) {
 
 // Validate setup and either create or update gameState
 function startGameFromSetup() {
-  const errEl = id('wsd-setup-error');
-  const parkSel = id('wsd-park-select');
+  const errEl = $('wsd-setup-error');
+  const parkSel = $('wsd-park-select');
   const parkName = parkSel ? parkSel.value : '';
   if (errEl) errEl.textContent = '';
   if (!parkName || !PARKS[parkName]) {
     if (errEl) errEl.textContent = 'Please select a park.';
     return;
   }
-  const names = sel('#wsd-player-inputs input')
+  const names = $$('#wsd-player-inputs input')
     .map(i => i.value.trim())
     .filter(Boolean);
   if (names.length < 3) {
@@ -610,20 +610,20 @@ function startGameFromSetup() {
     const players = names.map((name, idx) => ({
       id: idx,
       name,
-      score: STARTPOINTS,
+      score: START_POINTS,
       wins: 0,
       collected: [],
       bonusTotal: 0,
       stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
       badgeColor: null
     }));
-    const palette = shuffle(PLAYERBADGECOLORS.slice());
+    const palette = shuffle(PLAYER_BADGE_COLORS.slice());
     players.forEach(p => { p.badgeColor = palette.shift() ?? '#999999'; });
 
     gameState = {
       screen: 'setup-question',
       roundNumber: 1,
-      settings: { park: parkName, startingPoints: STARTPOINTS, minPoints: MINPOINTS },
+      settings: { park: parkName, startingPoints: START_POINTS, minPoints: MIN_POINTS },
       players,
       lands: [...new Set(parkData.attractions.map(a => a.land).filter(Boolean))],
       attractions: parkData.attractions,
@@ -651,15 +651,15 @@ function startGameFromSetup() {
         : idx;
       return {
         id: newId, name,
-        score: gameState.settings?.startingPoints ?? STARTPOINTS,
+        score: gameState.settings?.startingPoints ?? START_POINTS,
         wins: 0, collected: [], bonusTotal: 0,
         stats: { correctGuesses: 0, totalRisked: 0, uniqueLands: [] },
-        badgeColor: PLAYERBADGECOLORS[idx % PLAYERBADGECOLORS.length] ?? '#999999'
+        badgeColor: PLAYER_BADGE_COLORS[idx % PLAYER_BADGE_COLORS.length] ?? '#999999'
       };
     });
   }
 
-  const parkLabel = id('wsd-park-label');
+  const parkLabel = $('wsd-park-label');
   if (parkLabel) parkLabel.textContent = parkName;
   applyParkTheme(parkName);
 
@@ -3211,13 +3211,18 @@ document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click'
       showScreen("scores");
     }
   );
-  $("wsd-start-round")?.addEventListener(
-    "click",
-    () => {
-      startNewRoundCore();
-      showScreen("setup-question");
-    }
-  );
+  
+$('wsd-start-round')?.addEventListener('click', () => {
+  const r = gameState?.currentRound;
+  const roundIsFinished = !r || r.scoringApplied === true;
+
+  if (roundIsFinished) {
+    startNewRoundCore();
+    showScreen('setup-question');
+  } else {
+    rebuildRoundScreenFromState();
+  }
+});
   $("wsd-view-history")?.addEventListener(
     "click",
     () => {
