@@ -1655,9 +1655,16 @@ function saveWagerForCurrentPlayer() {
   let amount = wagerInp ? parseInt(wagerInp.value, 10) : NaN;
 
   if (!guessedAuthorId) {
-    if (err) err.textContent = 'Please choose a guess.';
-    return;
+  if (err) {
+    err.textContent = 'Please choose a guess.';
+
+    setTimeout(() => {
+      err.textContent = '';
+    }, 3000); // 3,000 milliseconds = 3 seconds
   }
+
+  return;
+}
 
   if (isNaN(amount)) amount = 1;
   amount = Math.max(1, amount);
