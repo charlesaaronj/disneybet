@@ -102,7 +102,7 @@ const GAME_QUESTIONS = [
   { text: "Where does {{attraction}} rank among the attractions in {{land}} and why?", excludesTypes: null },
   { text: "What's the longest you would wait in line for {{attraction}}?", excludesTypes: null },
   { text: "What's something about {{attraction}} that should never be changed?", excludesTypes: null },
-  { text: "What part of {{attraction}} would you most like to see updated?", excludesTypes: null },
+  { text: "You can pick one thing about {{attraction}} to change - what is it?", excludesTypes: null },
   { text: "If you were given a prop from {{attraction}}, what would you want it to be?", excludesTypes: ["coaster", "simulator", "show", "film", "spinner-ride"] },
   { text: "What three words best describe the overall vibe of {{park}}?", excludesTypes: null },
   { text: "What's the most photogenic spot in all of {{park}}?", excludesTypes: null },
