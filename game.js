@@ -3154,6 +3154,13 @@ function wireEvents() {
       updatePlayerInputLock();
     }
   );
+wsd-abandon-game?.addEventListener(
+  "click",
+  () => confirmThenReset(
+    "Restart this game and clear all scores and history?",
+    "restart"
+  )
+);
 
   // Question flow
   $("wsd-attraction-select")?.addEventListener(
