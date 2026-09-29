@@ -3154,7 +3154,7 @@ function wireEvents() {
       updatePlayerInputLock();
     }
   );
-wsd-abandon-game?.addEventListener(
+document.getElementById("wsd-abandon-game")?.addEventListener(
   "click",
   () => confirmThenReset(
     "Restart this game and clear all scores and history?",
