@@ -67,7 +67,6 @@ const GAME_QUESTIONS = [
   { text: "You're designing a quick‑service spot beside {{attraction}} - what's the signature dish?", excludesTypes: null },
   { text: "If {{attraction}} got its own fragrance, what would it be called?", excludesTypes: null },
   { text: "Describe the smell of {{attraction}} in three words or less.", excludesTypes: null },
-  { text: "What favorite memory do you have about {{attraction}}?", excludesTypes: null },
   { text: "What favorite fake memory do you have about {{attraction}}?", excludesTypes: null },
   { text: "What detail in {{attraction}} do you love pointing out to people?", excludesTypes: null },
   { text: "What's something in {{attraction}} that almost everyone misses?", excludesTypes: null },
