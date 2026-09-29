@@ -26,7 +26,7 @@ const PARK_USF = {
       park: "Universal Studios Florida",
       land: "Minion Land",
       name: "Despicable Me Minion Mayhem",
-      type: "film",
+      type: "simulator",
       animatronics: false,
       preshow: true,
       postShow: false
@@ -108,7 +108,7 @@ const PARK_USF = {
       park: "Universal Studios Florida",
       land: "Springfield, U.S.A.",
       name: "The Simpsons Ride",
-      type: "dark-ride",
+      type: "simulator",
       animatronics: false,
       preshow: true,
       postShow: false
