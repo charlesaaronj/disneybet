@@ -62,6 +62,7 @@ const GAME_QUESTIONS = [
   { text: "What singer would you pick to sing a theme song for {{attraction}}?", excludesTypes: null },
   { text: "What fake company would be the funniest sponsor for {{attraction}}?", excludesTypes: null },
   { text: "If you built a themed eatery next to {{attraction}}, what would you call it?", excludesTypes: null },
+  { text: "If you built a themed all-you-can-eat buffet next to {{attraction}}, what would be your signature item?", excludesTypes: null },
   { text: "What's your ideal snack to eat right before or after riding {{attraction}}?", excludesTypes: null },
   { text: "What would you serve at a snack stand based on {{attraction}}?", excludesTypes: null },
   { text: "You're designing a quick‑service spot beside {{attraction}} - what's the signature dish?", excludesTypes: null },
