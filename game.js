@@ -61,7 +61,6 @@ function confirmThenReset(message, action) {
   }
 }
 
-// Wraps actions that require a gameState
 function requireState(fn) {
   return () => {
     if (!gameState) {
@@ -256,7 +255,6 @@ function ensurePlayerStats(p) {
   if (!Array.isArray(p.stats.uniqueLands)) p.stats.uniqueLands = [];
 }
 
-// Ensures older saves still work with new fields
 function ensureStateShape() {
   if (!gameState) return;
 
@@ -276,13 +274,11 @@ function ensureStateShape() {
 
   if (!gameState.currentRound) return;
   const r = gameState.currentRound;
-  
+
   if (!Array.isArray(r.wagerOrder)) r.wagerOrder = shuffle(gameState.players.map(p => p.id));
 if (typeof r.wagerIndex !== 'number') r.wagerIndex = 0;
 if (!Array.isArray(r.wagers)) r.wagers = [];
 
-
-  // Round arrays we still care about, without house bonus
   ["correctGuessers", "payouts", "collectionsThisRound"].forEach(k => {
     r[k] ||= [];
   });
@@ -292,11 +288,9 @@ if (typeof r.ghostRoundInfoShown !== "boolean") r.ghostRoundInfoShown = false;
 if (!Array.isArray(r.ghostGuessBonusAwardedTo)) r.ghostGuessBonusAwardedTo = [];
 }
 
-// Convenience lookup
 const getAttractionByName = name =>
   gameState.attractions.find(a => a.name === name);
 
-// Count unique lands collected by a player
 function getPlayerUniqueLandCount(player) {
   const s = new Set();
   player.collected.forEach(name => {
@@ -351,7 +345,6 @@ function applyParkTheme(parkName) {
 }
 // ---------- Hero spotlight helpers ----------
 
-// Spotlight per screen (after welcome)
 function showHeroSpotlightForScreen(screenName) {
   if (!screenName) return;
 
@@ -371,7 +364,7 @@ function showHeroSpotlightForScreen(screenName) {
   const backdrop = overlay.querySelector(".wsd-spotlight-backdrop");
 
   function clearSpotlight() {
-    console.log('[spotlight cleared]', screenName, 'gameState.screen =', gameState?.screen);
+
     heroCard.classList.remove("wsd-hero-card-spotlight");
     overlay.style.display = "none";
     try {
@@ -399,7 +392,6 @@ function initHeroSpotlightAfterWelcome() {
   );
 }
 
-// Called once from splash after first-time onboarding completes
 window.initHeroSpotlightFirstVisit = function () {
   var screenName = (window.gameState && window.gameState.screen) || "setup-game";
   showHeroSpotlightForScreen(screenName);
@@ -428,7 +420,7 @@ function switchScreenUI(name) {
 }
 
 function showScreen(name) {
-  console.log('[showScreen]', name, 'gameState.screen before =', gameState?.screen);
+
   switchScreenUI(name);
 
   if (gameState) {
@@ -439,7 +431,7 @@ function showScreen(name) {
 
   if (name !== "game-end") {
     showHeroSpotlightForScreen(name);
-    console.log('[showScreen done]', name, 'gameState.screen after =', gameState?.screen);
+
   }
 }
 // ---------- Setup screen + locks ----------
@@ -488,7 +480,6 @@ function updateQuestionLock() {
     });
 }
 
-// Question display helpers
 function flashQuestionDisplay() {
   const display = $("wsd-question-display");
   if (!display) return;
@@ -509,7 +500,6 @@ function setQuestionDisplay(text) {
     display.style.display = text ? "block" : "none";
     display.textContent = text || "";
 
-    // Persistent border state: accent only for real questions
     display.classList.toggle("wsd-question-live", !isPrompt);
   }
 
@@ -531,13 +521,11 @@ function showCustomTextarea() {
   }
 }
 
-// Populate parks, player inputs, and lock state
 function initSetupScreen() {
-  debugLog("initSetupScreen starting");
+
   const sel = $("wsd-park-select");
   const container = $("wsd-player-inputs");
-  debugLog(`wsd-park-select exists? ${!!sel}`);
-  debugLog(`wsd-player-inputs exists? ${!!container}`);
+
   if (!sel || !container) return;
 
   sel.innerHTML = '<option value="">Select a park</option>';
@@ -553,10 +541,9 @@ function initSetupScreen() {
   }
 
   updatePlayerInputLock();
-  debugLog("Setup screen ready");
+
 }
 
-// Add one player input row
 function addPlayerInput(container, name = "") {
   const wrap = document.createElement("div");
   wrap.className = "d-flex align-items-center mb-1";
@@ -600,7 +587,6 @@ if (roundIndicator) {
 }
 }
 
-// Validate setup and either create or update gameState
 function startGameFromSetup() {
   const errEl = $('wsd-setup-error');
   const parkSel = $('wsd-park-select');
@@ -627,7 +613,6 @@ function startGameFromSetup() {
   const isBrandNewGame = !gameState; // capture BEFORE we create/mutate gameState
 
   if (isBrandNewGame) {
-    // First-time game creation
     const players = names.map((name, idx) => ({
       id: idx,
       name,
@@ -654,7 +639,6 @@ function startGameFromSetup() {
       finalBonusesApplied: false
     };
   } else {
-    // Existing game — just update park + players, DO NOT touch currentRound
     const parkAttrs = parkData.attractions;
     Object.assign(gameState.settings, { park: parkName });
     Object.assign(gameState, {
@@ -704,7 +688,6 @@ if (startBtn) {
 
 // ---------- Question setup ----------
 
-// Pick a question from GAME_QUESTIONS for this attraction
 function questionApplies(attraction, q) {
   if (q.excludesTypes && q.excludesTypes.includes(attraction.type)) return false;
   if (q.requires) {
@@ -755,13 +738,11 @@ function drawQuestionForAttraction(attraction) {
   return { text };
 }
 
-
 function renderAttractionOptions() {
   const sel = $("wsd-attraction-select");
   if (!sel || !gameState) return;
   sel.innerHTML = "";
 
-  // only add placeholder if no attraction chosen yet
   const hasAttraction = !!gameState.currentRound?.attraction;
   if (!hasAttraction) {
     sel.innerHTML = `<option value="">Select an attraction</option>`;
@@ -775,8 +756,6 @@ function renderAttractionOptions() {
   });
 }
 
-
-// Initialize a fresh round state
 function startNewRoundCore() {
   if (!gameState) return;
 
@@ -812,7 +791,6 @@ function startNewRoundCore() {
   scoringApplied: false
 };
 
-
   saveState();
 
   [
@@ -841,7 +819,6 @@ function startNewRoundCore() {
   updateQuestionLock();
 }
 
-// Handle attraction selection
 function onAttractionChange() {
   if (!gameState) return;
 
@@ -864,7 +841,6 @@ function onAttractionChange() {
     return;
   }
 
-  // Once a real attraction is selected, remove the placeholder
   if (attrSel) {
     const firstOption = attrSel.querySelector('option[value=""]');
     if (firstOption) firstOption.remove();
@@ -894,8 +870,6 @@ function onAttractionChange() {
   updateQuestionLock();
 }
 
-
-// Wraps drawQuestionForAttraction for current round
 function drawQuestion(attraction) {
   const { text, categoryId, categoryName } =
     drawQuestionForAttraction(attraction);
@@ -909,7 +883,6 @@ const labelForType = t =>
     ? "Custom question"
     : "Question";
 
-// Regenerate a new random question for the chosen attraction
 function onGenerateNewQuestion(e) {
   const err = $("wsd-setupq-error");
   if (!gameState || !gameState.currentRound.attraction) {
@@ -932,7 +905,6 @@ function onGenerateNewQuestion(e) {
   saveState();
 }
 
-// Switch to custom question mode
 function onEnterCustomQuestion() {
   showCustomTextarea();
   const badge = $("wsd-question-type-badge");
@@ -941,7 +913,6 @@ function onEnterCustomQuestion() {
   saveState();
 }
 
-// Move from question screen to answer entry screen
 function proceedToAnswers() {
   const err = $("wsd-setupq-error");
   if (err) err.textContent = "";
@@ -972,10 +943,9 @@ function proceedToAnswers() {
   const ghostPlayerId = isGhostRound
     ? gameState.players[Math.floor(Math.random() * gameState.players.length)].id
     : null;
-    
+
    gameState.currentRound.ghostRound = isGhostRound;
    gameState.currentRound.ghostPlayerId = ghostPlayerId;
-
 
   Object.assign(gameState.currentRound, {
     question: q,
@@ -1018,8 +988,6 @@ function proceedToAnswers() {
       titleEl.textContent = "Hunny Pot Hot Round!";
     }
 
-    
-
     try {
       if (modalEl && typeof bootstrap !== "undefined") {
         new bootstrap.Modal(modalEl).show();
@@ -1045,7 +1013,6 @@ const firstPlayerId =
   gameState.currentRound.answerOrder?.[gameState.currentRound.answerIndex ?? 0];
 const firstPlayer = gameState.players.find(p => p.id === firstPlayerId);
 
-
 renderAnswerProgress();
 showPickOverlay(() => {
   const nextInput = $("wsd-answer-input");
@@ -1061,7 +1028,6 @@ showPickOverlay(() => {
 }
 // ---------- Answers flow ----------
 
-// Update the “Player X of Y” indicator and current player label
 let ghostFieldTimer = null;
 
 function renderAnswerProgress() {
@@ -1090,18 +1056,15 @@ if (!isGhostPlayer) {
   if (ghostInput) ghostInput.value = "";
 }
 
-
 }
 
-
-// Save the current player’s answer, or “skip” if requested
 function saveAnswerForCurrentPlayer(skip) {
 
   if (ghostFieldTimer) {
   clearTimeout(ghostFieldTimer);
   ghostFieldTimer = null;
 }
-  
+
   if (answerSaveLocked) return;
 
   const r = gameState.currentRound;
@@ -1148,7 +1111,6 @@ if (!skip) r.answers.push({ playerId: player.id, text, isGhost: false });
 if (isGhostPlayer && ghostText) {
   r.answers.push({ playerId: player.id, text: ghostText, isGhost: true, ghostOwnerId: player.id });
 }
-
 
   const saveBtn = $("wsd-save-answer");
   const skipBtn = $("wsd-skip-player");
@@ -1209,7 +1171,6 @@ if (isGhostPlayer && ghostText) {
 
           pickRandomAnswer();
           renderSelectAnswerScreen();
-          console.log("round:", gameState.roundNumber, "ghostRound:", gameState.currentRound?.ghostRound);
 
                     if (labelEl) labelEl.textContent = r.ghostRound
             ? "A player or ghost 👻 said"
@@ -1245,14 +1206,12 @@ if (isGhostPlayer && ghostText) {
 
 // ---------- Random answer selection (with ghost pool) ----------
 
-// Pick a random answer from current answers, maybe adding a ghost
 function pickRandomAnswer() {
   const r = gameState.currentRound;
   const pool = r.answers.slice();
   const chosenIndex = Math.floor(Math.random() * pool.length);
   r.selectedAnswer = pool[chosenIndex];
 }
-// Animate “picking” overlay, then call onDone
 function showPickOverlay(onDone, labelText = "Selecting an answer...", holdMs = 1400) {
   const overlay = $("wsd-pick-overlay");
   if (!overlay) {
@@ -1278,8 +1237,6 @@ function showPickOverlay(onDone, labelText = "Selecting an answer...", holdMs = 
   }, holdMs);
 }
 
-
-// Show selected answer on the “Select answer” screen
 function renderSelectAnswerScreen() {
   const r = gameState.currentRound;
   const qEl = $('wsd-select-question');
@@ -1292,7 +1249,6 @@ function renderSelectAnswerScreen() {
   ansEl.textContent = `"${r.selectedAnswer.text}"`;
   ansEl.classList.add('wsd-anim-pop', 'wsd-answer-highlight');
 
- // Explicit label for this screen only
 const labelEl = document.querySelector('#screen-select-answer .wsd-form-label');
 if (labelEl) {
 labelEl.textContent = r.ghostRound
@@ -1367,7 +1323,6 @@ function populateGuessOptionsForPlayer(player) {
   defaultOpt.disabled = true;
   guessSel.appendChild(defaultOpt);
 
-  // Base options: all other players, never themselves
   gameState.players
     .filter(p => p.id !== player.id)
     .forEach(p => {
@@ -1509,7 +1464,6 @@ function renderWagerProgress() {
 
   if (err) err.textContent = '';
 
-  // Default: wager visible, author note hidden
   if (wagerRow) wagerRow.style.display = '';
   if (authorNote) authorNote.style.display = 'none';
 
@@ -1523,12 +1477,10 @@ function renderWagerProgress() {
       wagerInp.max = player.score;
       wagerInp.value = Math.min(1, player.score);
 
-      // Fade/dissolve animation for the dropdown
       guessSel.classList.remove('wsd-guess-fade');
       void guessSel.offsetWidth;
       guessSel.classList.add('wsd-guess-fade');
 
-      // Fade animation for the wager input
       wagerInp.classList.remove('wsd-guess-fade');
       void wagerInp.offsetWidth;
       wagerInp.classList.add('wsd-guess-fade');
@@ -1539,7 +1491,6 @@ function renderWagerProgress() {
   syncWagerDisplay();
   updateHoneyPotDisplay(true);
 }
-
 
 function showPassWagerModal() {
   const player = getCurrentWagerPlayer();
@@ -1644,7 +1595,6 @@ function saveWagerForCurrentPlayer() {
     return;
   }
 
-  // Figure out if this player is the author of the selected answer
   const selected = r.selectedAnswer;
   const authorId = selected?.isGhost
     ? (selected.ghostOwnerId ?? selected.playerId)
@@ -1670,7 +1620,6 @@ function saveWagerForCurrentPlayer() {
   amount = Math.max(1, amount);
   amount = Math.min(amount, player.score);
 
-  // Authors cannot wager: their wager is always 0
   if (isAuthorTurn) {
     amount = 0;
   }
@@ -1712,9 +1661,6 @@ showPickOverlay(
   });
 }
 
-
-
-// Build the guess/wager rows and jump to guess-wager screen
 function goToGuessWager() {
   const errEl = $('wsd-gw-error');
   if (errEl) errEl.textContent = '';
@@ -1768,8 +1714,6 @@ showPickOverlay(
   }
 }
 
-
-// Reset wagers UI back to starting defaults
 function clearWagersUI() {
   const player = getCurrentWagerPlayer();
   const guessSel = $('wsd-gw-guess');
@@ -1783,12 +1727,10 @@ function clearWagersUI() {
   updateHoneyPotDisplay(true);
 }
 
-
 function lockWagers() {
   saveWagerForCurrentPlayer();
 }
 
-//Set house bonus name
 function getHouseBonusChooser() {
   if (!gameState || !Array.isArray(gameState.players) || !gameState.players.length) {
     return null;
@@ -1797,13 +1739,6 @@ function getHouseBonusChooser() {
   return gameState.players[index] || null;
 }
 
-// Compute payouts with full-pot model:
-// - All wagers go into the pot.
-// - The Hunny Pot also gets +1 point per player every round.
-// - Hot Round bonus is added on top when active.
-// - Winners (author alone, or correct guessers) split the pot,
-//   with the pot rounded up so it splits evenly.
-// - For Ghost, only correct Ghost guessers share the pot.
 function computeRevealAndScoring() {
   const r = gameState.currentRound;
   if (!r || r.scoringApplied) return;
@@ -2034,7 +1969,6 @@ function computeRevealAndScoring() {
   applyRoundResults(authorId);
   r.scoringApplied = true;
 }
-// Apply scoring to players, update collections, ghost pool, and history
 function applyRoundResults(authorId) {
   const r = gameState.currentRound;
   const scoreBefore = {};
@@ -2102,7 +2036,6 @@ if (r.selectedAnswer?.isGhost) {
     player.bonusTotal = (player.bonusTotal || 0) + 2;
   });
 }
-  // History: no house bonus fields anymore
   gameState.history.push({
     roundNumber: gameState.roundNumber,
     park: gameState.settings.park,
@@ -2465,7 +2398,6 @@ function maybeRenderCollectionsScreen() {
     window.renderCollectionsScreen();
   }
 }
-// Main scores screen: leaderboard + bonus progress + manual controls
 function renderScoresScreen() {
   const list = $("wsd-scores-list");
   if (!list) return;
@@ -2516,7 +2448,7 @@ function renderScoresScreen() {
   renderBonusProgress();
   renderManualAdjustmentsUI();
   maybeRenderCollectionsScreen();
-  
+
   const startRoundBtn = $('wsd-start-round');
   if (startRoundBtn) {
     const r = gameState?.currentRound;
@@ -2525,7 +2457,6 @@ function renderScoresScreen() {
   }
 }
 
-// Show progress toward final bonus categories
 function renderBonusProgress() {
   const el = $("wsd-bonus-progress");
   if (!el) return;
@@ -2636,7 +2567,6 @@ function renderBonusProgress() {
     html || "<div class='wsd-text-small'>No rounds played yet.</div>";
 }
 
-// Manual +1/-1 adjustments UI on scores screen
 function renderManualAdjustmentsUI() {
   const c = $("wsd-manual-adjustments");
   if (!c) return;
@@ -2664,7 +2594,6 @@ function renderManualAdjustmentsUI() {
   });
 }
 
-// Apply a manual score adjustment and log it into last history item
 function adjustPlayerScore(pid, delta) {
   const p = gameState.players.find(pl => pl.id === pid);
   if (!p) return;
@@ -2688,7 +2617,6 @@ function adjustPlayerScore(pid, delta) {
   renderScoresScreen();
 }
 
-// “Invert” current scores relative ranking (party rule)
 function invertCurrentScores() {
   if (!gameState || gameState.players.length < 2) return;
 
@@ -2720,7 +2648,6 @@ function invertCurrentScores() {
   renderScoresScreen();
 }
 
-// Show history of all rounds, latest first
 function renderHistoryScreen() {
   const c = $("wsd-history-list");
   if (!c) return;
@@ -2827,7 +2754,6 @@ function renderHistoryScreen() {
     c.appendChild(wrap);
   });
 }
-// Compute final bonuses once then show game-end screen
 function computeFinalBonusesAndShow() {
   if (gameState.finalBonusesApplied) {
     renderFinalResults();
@@ -2924,7 +2850,6 @@ function spawnEndgameConfetti(container) {
   }
 }
 
-// Show final ranking with medals and bonus breakdown
 function renderFinalResults() {
   const sorted = [...gameState.players].sort((a, b) =>
     b.score === a.score ? b.wins - a.wins : b.score - a.score
@@ -3002,7 +2927,6 @@ function abandonRound() {
   showScreen("setup-question");
 }
 
-
 // ---------- Wire events & bootstrap ----------
 document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
   const r = gameState?.currentRound;
@@ -3014,11 +2938,8 @@ document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
   const wagerInp   = document.getElementById('wsd-gw-wager');
   const authorNote = document.getElementById('wsd-author-wager-note');
 
-  console.log('authorNote element:', authorNote); // TEMP: remove when working
-
   const selectedGuessId = guessSel ? guessSel.value : '';
 
-  // Who is the author of the selected answer?
   const selectedAnswer = r.selectedAnswer;
   const authorId = selectedAnswer && selectedAnswer.isGhost
     ? (selectedAnswer.ghostOwnerId ?? selectedAnswer.playerId)
@@ -3026,29 +2947,24 @@ document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
 
   const isAuthorTurn = !!player && player.id === authorId;
 
-  // Non-author turns: keep normal screen
   if (!isAuthorTurn) {
     if (authorNote) authorNote.style.display = 'none';
     if (wagerRow) wagerRow.style.display = '';
     return;
   }
 
-  // Author turn: only change screen AFTER they pick a guess
   if (selectedGuessId) {
-    // Hide wager row
     if (wagerRow) {
-      console.log('Hiding wagerRow for author');
+
       wagerRow.style.display = 'none';
     }
 
-    // Lock stored wager at 0
     if (wagerInp) {
       wagerInp.value = '0';
     }
 
-    // Show the concise explanation
     if (authorNote) {
-      console.log('Showing authorNote for author');
+
       authorNote.textContent =
         "You wrote this answer so your wager is 0.";
       authorNote.style.display = 'block';
@@ -3057,12 +2973,10 @@ document.getElementById('wsd-gw-guess')?.addEventListener('change', () => {
     syncWagerDisplay(true);
     updateHoneyPotDisplay(true);
   } else {
-    // If no guess selected, revert to normal
     if (authorNote) authorNote.style.display = 'none';
     if (wagerRow) wagerRow.style.display = '';
   }
 });
-
 
 document.addEventListener("DOMContentLoaded", () => {
   initWagerStepper();
@@ -3115,9 +3029,7 @@ function resumeRoundFlow() {
 }
 
 function wireEvents() {
-  debugLog("wireEvents starting");
 
-  // Setup screen
   $("wsd-start-game")?.addEventListener(
     "click",
     startGameFromSetup
@@ -3142,7 +3054,6 @@ function wireEvents() {
       const label = $("wsd-park-label");
 
       if (!name) {
-        // Cleared park: reset theme + lock inputs
         if (label) label.textContent = "Not set";
         applyParkTheme(null);
         updatePlayerInputLock();
@@ -3162,7 +3073,6 @@ document.getElementById("wsd-abandon-game")?.addEventListener(
   )
 );
 
-  // Question flow
   $("wsd-attraction-select")?.addEventListener(
     "change",
     () => {
@@ -3186,8 +3096,6 @@ document.getElementById("wsd-abandon-game")?.addEventListener(
     "click",
     abandonRound
   );
-
-  // Answers
 
 const answerInput = $("wsd-answer-input");
 if (answerInput) {
@@ -3221,8 +3129,7 @@ if (answerInput) {
     "click",
     abandonRound
   );
-  
-// Select answer
+
 document.getElementById('wsd-select-again')?.addEventListener('click', () => {
   showPickOverlay(() => {
     pickRandomAnswer();
@@ -3234,7 +3141,6 @@ document.getElementById('wsd-select-again')?.addEventListener('click', () => {
 document.getElementById('wsd-to-wagers')?.addEventListener('click', goToGuessWager);
 document.getElementById('wsd-abandon-from-select')?.addEventListener('click', abandonRound);
 
-// Guess wager
 document.getElementById('wsd-save-wager')?.addEventListener('click', saveWagerForCurrentPlayer);
 document.getElementById('wsd-clear-wager')?.addEventListener('click', clearWagersUI);
 document.getElementById('wsd-abandon-from-gw')?.addEventListener('click', abandonRound);
@@ -3250,8 +3156,6 @@ document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click'
   continueFromFinalHunnyPot();
 });
 
-
-  // Scores / round navigation
   $("wsd-to-scores")?.addEventListener(
     "click",
     () => {
@@ -3259,7 +3163,7 @@ document.getElementById('wsd-final-honeypot-continue')?.addEventListener('click'
       showScreen("scores");
     }
   );
-  
+
 $('wsd-start-round')?.addEventListener('click', () => {
   const r = gameState?.currentRound;
   const roundIsFinished = !r || r.scoringApplied === true;
@@ -3279,7 +3183,6 @@ $('wsd-start-round')?.addEventListener('click', () => {
     }
   );
 
-  // End game / restart
   $("wsd-end-game")?.addEventListener("click", () => {
     confirmThenReset(
       "End this game and show final scores? You cannot keep playing this game afterward.",
@@ -3320,7 +3223,6 @@ $('wsd-start-round')?.addEventListener('click', () => {
     }
   );
 
-  // Invert scores easter egg
   const invertBtn = $("wsd-invert-scores");
   if (invertBtn) {
     invertBtn.addEventListener("click", () => {
@@ -3334,7 +3236,6 @@ $('wsd-start-round')?.addEventListener('click', () => {
     });
   }
 
-  // Confirm reset modal “Yes” button
   const confirmYes = $("modal-confirm-reset-yes");
   if (confirmYes) {
     confirmYes.addEventListener("click", () => {
@@ -3351,7 +3252,6 @@ $('wsd-start-round')?.addEventListener('click', () => {
     });
   }
 
-  // Bottom nav
   $("wsd-nav-home")?.addEventListener("click", () => {
   rebuildSetupScreenFromState();
   showScreen("setup-game");
@@ -3393,30 +3293,6 @@ function showResumeModal() {
       keyboard: false
     }).show();
   }
-}
-
-function getRoundScreenFromState() {
-  const r = gameState?.currentRound;
-  if (!gameState || !r) return "setup-question";
-
-  if (r.scoringApplied) return "reveal";
-
-  const answerOrder = Array.isArray(r.answerOrder) ? r.answerOrder : [];
-  const wagerOrder = Array.isArray(r.wagerOrder) ? r.wagerOrder : [];
-
-  if (r.selectedAnswer && wagerOrder.length && (r.wagerIndex ?? 0) < wagerOrder.length) {
-    return "guess-wager";
-  }
-
-  if (r.selectedAnswer) {
-    return "select-answer";
-  }
-
-  if (r.question && answerOrder.length && (r.answerIndex ?? 0) < answerOrder.length) {
-    return "enter-answers";
-  }
-
-  return "setup-question";
 }
 
 function rebuildCurrentScreen() {
@@ -3632,7 +3508,6 @@ function rebuildRoundScreenFromState() {
   showScreen("setup-question");
 }
 
-
 function renderCurrentRoundScreen(screenName) {
   if (!gameState?.currentRound) return;
 
@@ -3764,7 +3639,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadState();
   ensureStateShape();
   initSetupScreen();
-  
+
   const verEl = $("wsd-version");
 if (verEl) verEl.textContent = `v${APP_VERSION}`;
 
