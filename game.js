@@ -1577,21 +1577,21 @@ function showFinalHunnyPotModal() {
   const titleEl = $('modal-final-honeypot-title');
   const b = getCurrentHunnyPotBreakdown(false);
 
-  if (titleEl) titleEl.textContent = 'Final Hunny Pot';
-  if (bodyEl) {
-    bodyEl.textContent = '';
-    
-    bodyEl.appendChild(document.createTextNode(
-      b.hotBonus > 0
-        ? `${b.basePoints} base points + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus = `
-        : `${b.basePoints} base points + ${b.wagerPoints} wagers = `
-    )
-    const strong = document.createElement('strong');
-    strong.textContent = `${b.total} 🍯 points`;
-    bodyEl.appendChild(strong);
-    );
-  }
+if (titleEl) titleEl.textContent = 'Final Hunny Pot';
 
+if (bodyEl) {
+  bodyEl.textContent = '';
+
+  bodyEl.appendChild(document.createTextNode(
+    b.hotBonus > 0
+      ? `${b.basePoints} base points + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus = `
+      : `${b.basePoints} base points + ${b.wagerPoints} wagers = `
+  ));
+
+  const strong = document.createElement('strong');
+  strong.textContent = `${b.total} 🍯 points`;
+  bodyEl.appendChild(strong);
+}
   if (modalEl && typeof bootstrap !== 'undefined') {
     try {
       new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false }).show();
