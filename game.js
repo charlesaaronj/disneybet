@@ -1585,8 +1585,8 @@ function showFinalHunnyPotModal() {
     bodyEl.appendChild(strong);
     bodyEl.appendChild(document.createTextNode(
       b.hotBonus > 0
-        ? ` - from ${b.basePoints} base points + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus.`
-        : ` - from ${b.basePoints} base points + ${b.wagerPoints} wagers.`
+        ? ` from ${b.basePoints} base points + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus.`
+        : ` from ${b.basePoints} base points + ${b.wagerPoints} wagers.`
     ));
   }
 
