@@ -722,6 +722,7 @@ function drawQuestionForAttraction(attraction) {
   });
 
   const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+  if (!chosen) return { text: "" };
   const key = chosen.text;
   usageMap[key] = (usageMap[key] || 0) + 1;
   saveState();
@@ -854,6 +855,12 @@ function onAttractionChange() {
   }
 
   const { q, type, categoryName } = drawQuestion(attraction);
+  if (!q) {
+    const err = $("wsd-setupq-error");
+    if (err) err.textContent = "No questions are available for this park.";
+    updateQuestionLock();
+    return;
+  }
   Object.assign(gameState.currentRound, {
     question: q,
     questionType: type
@@ -892,6 +899,10 @@ function onGenerateNewQuestion(e) {
   if (err) err.textContent = "";
 
   const { q, type } = drawQuestion(gameState.currentRound.attraction);
+  if (!q) {
+    if (err) err.textContent = "No questions are available for this park.";
+    return;
+  }
   Object.assign(gameState.currentRound, {
     question: q,
     questionType: type
@@ -1573,7 +1584,7 @@ function continueFromFinalHunnyPot() {
 function finishSecretWagers() {
   updateHoneyPotDisplay(false);
   saveState();
-  continueFromFinalHunnyPot();
+  showFinalHunnyPotModal();
 }
 
 function saveWagerForCurrentPlayer() {
@@ -1974,9 +1985,23 @@ function computeRevealAndScoring() {
 
   r.payouts = payouts;
 
-  applyRoundResults(authorId);
-  r.scoringApplied = true;
-  saveState();
+  // Commit the round as one logical operation. If an unexpected error occurs,
+  // restore the player/round/history state instead of leaving half-applied scores.
+  const playerSnapshot = JSON.stringify(gameState.players);
+  const roundSnapshot = JSON.stringify(r);
+  const historySnapshot = JSON.stringify(gameState.history);
+  try {
+    applyRoundResults(authorId);
+    r.scoringApplied = true;
+    saveState();
+  } catch (error) {
+    gameState.players = JSON.parse(playerSnapshot);
+    gameState.currentRound = JSON.parse(roundSnapshot);
+    gameState.history = JSON.parse(historySnapshot);
+    console.error("Round scoring failed; changes rolled back", error);
+    saveState();
+    throw error;
+  }
 }
 function applyRoundResults(authorId) {
   const r = gameState.currentRound;
@@ -3509,6 +3534,23 @@ function rebuildRoundScreenFromState() {
       renderCurrentRoundScreen("select-answer");
       showScreen("select-answer");
     }
+    return;
+  }
+
+  // A reload can occur after the last answer was saved but before the
+  // selection animation picked an answer. Resume that selection safely.
+  const completedAnswers = Array.isArray(r.answerOrder) && r.answerOrder.length > 0 &&
+    (r.answerIndex ?? 0) >= r.answerOrder.length;
+  if (completedAnswers && !r.selectedAnswer) {
+    const regular = (r.answers || []).filter(a => a && !a.isGhost)
+      .map(a => String(a.text || "").trim().toLowerCase()).filter(Boolean);
+    const duplicate = regular.length !== new Set(regular).size;
+    if (!duplicate && (r.answers || []).length) {
+      pickRandomAnswer();
+      saveState();
+    }
+    renderCurrentRoundScreen("select-answer");
+    showScreen("select-answer");
     return;
   }
 
