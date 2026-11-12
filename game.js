@@ -321,6 +321,8 @@ function applyParkTheme(parkName) {
     ["#modal-scoring .modal-header", "color", t ? "#fff" : ""],
     ["#modal-hunny-hot .modal-header", "backgroundImage", t?.hero],
     ["#modal-hunny-hot .modal-header", "color", t ? "#fff" : ""],
+    ["#modal-final-honeypot .modal-header", "backgroundImage", t?.hero || ""],
+    ["#modal-final-honeypot .modal-header", "color", t ? "#fff" : ""],
     ["#modal-bonuses .modal-header", "backgroundImage", t?.hero || ""],
     ["#modal-bonuses .modal-header", "color", t ? "#fff" : ""],
     ["#modal-wager-help .modal-header", "backgroundImage", t?.hero || ""],
@@ -1536,7 +1538,40 @@ function showPassWagerModal() {
   }
 }
 
+// Match the existing Hunny Pot modal's presentation without changing
+// the final confirmation's markup, text, or behavior.
+function styleFinalHunnyPotModal() {
+  const target = $('modal-final-honeypot');
+  const reference = $('modal-hunny-hot') || $('modal-scoring');
+  if (!target) return;
+
+  if (reference) {
+    for (const selector of ['.modal-dialog', '.modal-content', '.modal-header', '.modal-body', '.modal-footer']) {
+      const sourcePart = reference.querySelector(selector);
+      const targetPart = target.querySelector(selector);
+      if (sourcePart && targetPart) {
+        // Retain Bootstrap's required base class and existing custom classes.
+        sourcePart.classList.forEach(cls => targetPart.classList.add(cls));
+      }
+    }
+    const sourceButton = reference.querySelector('.modal-footer .btn-primary, .modal-footer .wsd-btn-primary');
+    const continueButton = $('wsd-final-honeypot-continue');
+    if (sourceButton && continueButton) {
+      sourceButton.classList.forEach(cls => continueButton.classList.add(cls));
+    }
+  }
+
+  // Use the same active-park gradient and header text color as other modals.
+  const theme = PARK_THEMES[gameState?.settings?.park];
+  const header = target.querySelector('.modal-header');
+  if (header) {
+    header.style.backgroundImage = theme?.hero || '';
+    header.style.color = theme ? '#fff' : '';
+  }
+}
+
 function showFinalHunnyPotModal() {
+  styleFinalHunnyPotModal();
   const modalEl = $('modal-final-honeypot');
   const bodyEl = $('modal-final-honeypot-body');
   const titleEl = $('modal-final-honeypot-title');
