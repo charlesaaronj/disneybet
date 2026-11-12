@@ -2,7 +2,7 @@
 //   Who Said Diz —  game.js (refactored, commented, same behavior)
 // ===========================================================
 
-const APP_VERSION = "2.0";
+const APP_VERSION = "2.0.1";
 
 // ---------- Small DOM + utility helpers ----------
 const $ = id => document.getElementById(id);
@@ -1068,6 +1068,7 @@ function saveAnswerForCurrentPlayer(skip) {
   if (answerSaveLocked) return;
 
   const r = gameState.currentRound;
+  if (!r || r.scoringApplied || gameState.screen !== "enter-answers") return;
   const idx = r.answerIndex || 0;
   const order = r.answerOrder || gameState.players.map(p => p.id);
   const playerId = order[idx];
@@ -1107,8 +1108,9 @@ if (!skip && isGhostPlayer) {
   }
 }
 
-if (!skip) r.answers.push({ playerId: player.id, text, isGhost: false });
-if (isGhostPlayer && ghostText) {
+  if (!player) return;
+  if (!skip) r.answers.push({ playerId: player.id, text, isGhost: false });
+if (!skip && isGhostPlayer && ghostText) {
   r.answers.push({ playerId: player.id, text: ghostText, isGhost: true, ghostOwnerId: player.id });
 }
 
@@ -1124,6 +1126,7 @@ if (isGhostPlayer && ghostText) {
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
+      if (gameState?.currentRound !== r) { answerSaveLocked = false; return; }
       if (saveBtn) saveBtn.disabled = false;
       if (skipBtn) skipBtn.disabled = false;
       answerSaveLocked = false;
@@ -1208,7 +1211,8 @@ if (isGhostPlayer && ghostText) {
 
 function pickRandomAnswer() {
   const r = gameState.currentRound;
-  const pool = r.answers.slice();
+  const pool = r.answers.filter(a => a && typeof a.text === "string" && a.text.trim());
+  if (!pool.length) return;
   const chosenIndex = Math.floor(Math.random() * pool.length);
   r.selectedAnswer = pool[chosenIndex];
 }
@@ -1369,7 +1373,7 @@ function syncWagerDisplay(animate = false) {
   if (!inp || !valEl || !player) return;
 
   const min = 1;
-  const max = Math.max(min, player.score || 1);
+  const max = Math.max(min, Math.floor(player.score || 1));
 
   inp.min = min;
   inp.max = max;
@@ -1401,7 +1405,7 @@ function changeWagerBy(delta) {
   if (!inp || !player) return;
 
   const min = 1;
-  const max = Math.max(min, player.score || 1);
+  const max = Math.max(min, Math.floor(player.score || 1));
   const current = parseInt(inp.value, 10) || min;
   const next = Math.max(min, Math.min(max, current + delta));
 
@@ -1602,7 +1606,7 @@ function saveWagerForCurrentPlayer() {
   const isAuthorTurn = !!player && player.id === authorId;
 
   const guessedAuthorId = guessSel ? guessSel.value : '';
-  let amount = wagerInp ? parseInt(wagerInp.value, 10) : NaN;
+  let amount = wagerInp ? Number(wagerInp.value) : NaN;
 
   if (!guessedAuthorId) {
   if (err) {
@@ -1616,9 +1620,12 @@ function saveWagerForCurrentPlayer() {
   return;
 }
 
-  if (isNaN(amount)) amount = 1;
+  if (!Number.isFinite(amount) || !Number.isInteger(amount)) {
+    if (err) err.textContent = "Please enter a whole-number wager.";
+    return;
+  }
   amount = Math.max(1, amount);
-  amount = Math.min(amount, player.score);
+  amount = Math.min(amount, Math.max(1, Math.floor(player.score || 1)));
 
   if (isAuthorTurn) {
     amount = 0;
@@ -1642,6 +1649,7 @@ function saveWagerForCurrentPlayer() {
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
+      if (gameState?.currentRound !== r) { wagerSaveLocked = false; return; }
       wagerSaveLocked = false;
       if (saveBtn) saveBtn.disabled = false;
 
@@ -1968,6 +1976,7 @@ function computeRevealAndScoring() {
 
   applyRoundResults(authorId);
   r.scoringApplied = true;
+  saveState();
 }
 function applyRoundResults(authorId) {
   const r = gameState.currentRound;
@@ -3306,10 +3315,10 @@ function rebuildCurrentScreen() {
   const scr = gameState.screen || "setup-game";
 
   if (scr === "setup-game") rebuildSetupGameScreen();
-  if (scr === "setup-question") rebuildSetupQuestionScreen();
+  if (scr === "setup-question") renderCurrentRoundScreen("setup-question");
   if (scr === "enter-answers") rebuildEnterAnswersScreen();
-  if (scr === "select-answer") renderSelectAnswerScreen();
-  if (scr === "guess-wager") goToGuessWager();
+  if (scr === "select-answer") renderCurrentRoundScreen("select-answer");
+  if (scr === "guess-wager") renderCurrentRoundScreen("guess-wager");
   if (scr === "reveal") rebuildRevealScreen();
   if (scr === "scores") renderScoresScreen();
   if (scr === "history") renderHistoryScreen();
@@ -3456,7 +3465,7 @@ function getRoundScreenFromState() {
   const answerOrder = Array.isArray(r.answerOrder) ? r.answerOrder : [];
   const wagerOrder = Array.isArray(r.wagerOrder) ? r.wagerOrder : [];
 
-  if (r.selectedAnswer && wagerOrder.length && (r.wagerIndex ?? 0) < wagerOrder.length) {
+  if (r.selectedAnswer && (r.wagerIndex ?? 0) > 0 && (r.wagerIndex ?? 0) < wagerOrder.length) {
     return "guess-wager";
   }
 
@@ -3464,7 +3473,7 @@ function getRoundScreenFromState() {
     return "select-answer";
   }
 
-  if (r.question && answerOrder.length && (r.answerIndex ?? 0) < answerOrder.length) {
+  if (r.question && (r.answerIndex ?? 0) > 0 && (r.answerIndex ?? 0) < answerOrder.length) {
     return "enter-answers";
   }
 
@@ -3488,7 +3497,12 @@ function rebuildRoundScreenFromState() {
   }
 
   if (r.selectedAnswer) {
-    if ((r.wagerIndex ?? 0) < (r.wagerOrder?.length ?? 0)) {
+    if ((r.wagers?.length ?? 0) > 0 && (r.wagerIndex ?? 0) >= (r.wagerOrder?.length ?? 0)) {
+      // All wagers were saved; finish scoring rather than returning to answer selection.
+      continueFromFinalHunnyPot();
+      return;
+    }
+    if ((r.wagerIndex ?? 0) > 0 || gameState.screen === "guess-wager") {
       renderCurrentRoundScreen("guess-wager");
       showScreen("guess-wager");
     } else {
@@ -3498,7 +3512,7 @@ function rebuildRoundScreenFromState() {
     return;
   }
 
-  if (r.question) {
+  if (r.question && ((r.answerIndex ?? 0) > 0 || gameState.screen === "enter-answers")) {
     renderCurrentRoundScreen("enter-answers");
     showScreen("enter-answers");
     return;
