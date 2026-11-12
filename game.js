@@ -1580,14 +1580,16 @@ function showFinalHunnyPotModal() {
   if (titleEl) titleEl.textContent = 'Final Hunny Pot';
   if (bodyEl) {
     bodyEl.textContent = '';
+    
+    bodyEl.appendChild(document.createTextNode(
+      b.hotBonus > 0
+        ? `${b.basePoints} base points + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus = `
+        : `${b.basePoints} base points + ${b.wagerPoints} wagers = `
+    )
     const strong = document.createElement('strong');
     strong.textContent = `${b.total} 🍯 points`;
     bodyEl.appendChild(strong);
-    bodyEl.appendChild(document.createTextNode(
-      b.hotBonus > 0
-        ? ` from ${b.basePoints} base points + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus.`
-        : ` from ${b.basePoints} base points + ${b.wagerPoints} wagers.`
-    ));
+    );
   }
 
   if (modalEl && typeof bootstrap !== 'undefined') {
