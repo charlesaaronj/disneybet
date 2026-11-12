@@ -1581,13 +1581,12 @@ function showFinalHunnyPotModal() {
   if (bodyEl) {
     bodyEl.textContent = '';
     const strong = document.createElement('strong');
-    strong.textContent = `${b.total} points`;
+    strong.textContent = `${b.total} 🍯 points`;
     bodyEl.appendChild(strong);
-    bodyEl.appendChild(document.createElement('br'));
     bodyEl.appendChild(document.createTextNode(
       b.hotBonus > 0
-        ? `Built from ${b.basePoints} base + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus.`
-        : `Built from ${b.basePoints} base + ${b.wagerPoints} wagers.`
+        ? ` - from ${b.basePoints} base points + ${b.wagerPoints} wagers + ${b.hotBonus} Hot Round bonus.`
+        : ` - from ${b.basePoints} base points + ${b.wagerPoints} wagers.`
     ));
   }
 
